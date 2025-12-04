@@ -1,20 +1,19 @@
-import nodemailer from 'nodemailer';
-import { NextResponse } from 'next/server';
+import nodemailer from "nodemailer";
+import { NextResponse } from "next/server";
 
 interface FormData {
   name: string;
   email: string;
   phone: string;
-  title: string;
   message: string;
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
   const body = await req.json();
-  const { name, email, phone, message, title } = body as FormData;
+  const { name, email, phone, message } = body as FormData;
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
       user: process.env.USER_EMAIL,
       pass: process.env.USER_PASSWORD,
@@ -22,16 +21,16 @@ export async function POST(req: Request): Promise<NextResponse> {
   });
 
   const recipients = [
-    ...(process.env.ADDITIONAL_EMAILS?.split(',') || []),
-  ].join(',');
+    ...(process.env.ADDITIONAL_EMAILS?.split(",") || []),
+  ].join(",");
 
   const htmlTemplate = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
-      <div style="background-color: #36A0D1; padding: 20px; text-align: center;">
-        <img src="https://www.sukhbrar.ca/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.86e8f871.webp&w=3840&q=75" alt="Logo" style="max-width: 200px;" />
+      <div style="background-color: #d4dde8; padding: 20px; text-align: center;">
+      <h1 style="color:#22558b; font-size=48px">BC<span style="color:#eea500;">Club</span></h1>
       </div>
       <div style="padding: 20px;">
-        <h2 style="color: #36A0D1;">New Contact Form Submission</h2>
+        <h2 style="color: #22558b;">New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
@@ -47,17 +46,17 @@ export async function POST(req: Request): Promise<NextResponse> {
   const mailOptions = {
     from: email,
     to: recipients,
-    subject: title,
+    subject: "New Enquiry from Get In Touch Form",
     html: htmlTemplate,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    return NextResponse.json({ message: 'Email sent successfully!' });
+    return NextResponse.json({ message: "Email sent successfully!" });
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error("Error sending email:", error);
     return NextResponse.json(
-      { message: 'Failed to send email!' },
+      { message: "Failed to send email!" },
       { status: 500 }
     );
   }

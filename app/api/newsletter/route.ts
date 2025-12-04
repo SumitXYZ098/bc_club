@@ -1,6 +1,5 @@
-
-import nodemailer from 'nodemailer';
-import { NextResponse } from 'next/server';
+import nodemailer from "nodemailer";
+import { NextResponse } from "next/server";
 
 interface NewsletterData {
   email: string;
@@ -11,11 +10,14 @@ export async function POST(req: Request): Promise<NextResponse> {
   const { email } = body as NewsletterData;
 
   if (!email) {
-    return NextResponse.json({ message: 'Email is required.' }, { status: 400 });
+    return NextResponse.json(
+      { message: "Email is required." },
+      { status: 400 }
+    );
   }
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
       user: process.env.USER_EMAIL,
       pass: process.env.USER_PASSWORD,
@@ -24,13 +26,13 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   const recipients = [
     process.env.USER_EMAIL,
-    ...(process.env.ADDITIONAL_EMAILS?.split(',') || []),
-  ].join(',');
+    ...(process.env.ADDITIONAL_EMAILS?.split(",") || []),
+  ].join(",");
 
   const htmlTemplate = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
       <div style="background-color: #d4dde8; padding: 20px; text-align: center;">
-      <span style="color:#22558b; font-size=48px">BC<span style="color:#eea500;">Club</span></span>
+      <h1 style="color:#22558b; font-size=48px">BC<span style="color:#eea500;">Club</span></h1>
       </div>
       <div style="padding: 20px;">
         <h2 style="color: #22558b;">New Newsletter Subscription</h2>
@@ -45,19 +47,18 @@ export async function POST(req: Request): Promise<NextResponse> {
   const mailOptions = {
     from: process.env.USER_EMAIL,
     to: recipients,
-    subject: 'New Newsletter Subscription',
+    subject: "New Newsletter Subscription",
     html: htmlTemplate,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    return NextResponse.json({ message: 'Subscription received!' });
+    return NextResponse.json({ message: "Subscription received!" });
   } catch (error) {
-    console.error('Error sending newsletter email:', error);
+    console.error("Error sending newsletter email:", error);
     return NextResponse.json(
-      { message: 'Failed to process subscription.' },
+      { message: "Failed to process subscription." },
       { status: 500 }
     );
   }
 }
-

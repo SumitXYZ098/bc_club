@@ -8,7 +8,10 @@
   --secondary: #eea500;
   --gray: #f0f0f0;
   --black70: #333333;
-  --lightWhite: #d4dde8;
+  --lightWhite: #848484;
+  --borderColor: #0f0f0f29;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 @theme inline {
@@ -19,6 +22,7 @@
   --color-gray: var(--gray);
   --color-black70: var(--black70);
   --color-lightWhite: var(--lightWhite);
+  --color-borderColor:var(--borderColor);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,14 +33,42 @@
     --secondary: #eea500;
     --gray: #f0f0f0;
     --black70: #333333;
-    --lightWhite: #d4dde8;
+    --lightWhite: #848484;
+    --borderColor: #0f0f0f29;
   }
+}
+
+@theme {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1260px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-y: scroll;
 }
+
+.scrollBar {
+  scrollbar-width: none;
+}
+
 .plusJakartaDisplay {
   font-family: "Plus Jakarta Display", sans-serif;
+}
+
+body::-webkit-scrollbar {
+  display: none !important;
 }

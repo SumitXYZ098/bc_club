@@ -30,9 +30,9 @@ const getHeadingStyles = (type: IHeadingTypes) => {
     case IHeadingTypes.heading24:
       return `text-2xl`;
     case IHeadingTypes.heading48:
-      return ` xl:text-5xl md:text-[32px] md:leading-10 text-2xl`;
+      return ` xl:text-5xl xl:leading-14 md:text-[32px] md:leading-10 text-2xl`;
     case IHeadingTypes.heading60:
-      return `xl:text-6xl md:text-5xl text-[40px] leading-12`;
+      return `xl:text-6xl xl:leading-[68px] md:text-5xl md:leading-14 text-[40px] leading-12`;
     default:
       return ` text-2xl `;
   }

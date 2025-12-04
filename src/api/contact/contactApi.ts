@@ -2,7 +2,6 @@ interface FormData {
   name: string;
   email: string;
   phone: string;
-  title: string;
   message: string;
 }
 

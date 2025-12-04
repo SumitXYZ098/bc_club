@@ -48,7 +48,7 @@ const NewsLetter = () => {
     <div className="bg-primary p-5 md:py-6 md:px-4 xl:py-7 xl:px-9 rounded w-full flex flex-col gap-y-2.5 md:gap-y-5 xl:gap-x-10 xl:flex-nowrap xl:flex-row xl:justify-between xl:items-center-safe">
       <div className="w-full xl:w-[55%] flex flex-col md:gap-y-2 gap-y-1.5">
         <span className="text-2xl font-bold">NewsLetter</span>
-        <span className="text-lightWhite md:text-base text-sm">
+        <span className="opacity-80 md:text-base text-sm">
           Be the first one to know about discounts, offers and events
         </span>
       </div>
@@ -84,7 +84,11 @@ const NewsLetter = () => {
         >
           Submit
         </button>
-        {error && <p className="text-red-500 absolute md:-bottom-4 -bottom-2 mt-3 text-sm">{error}</p>}
+        {error && (
+          <p className="text-red-500 absolute md:-bottom-4.5 -bottom-2 mt-3 text-sm">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );

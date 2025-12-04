@@ -37,7 +37,7 @@ const Footer = () => {
           <Description
             content="We ara a lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat..."
             type={IDescriptionTypes.dec16}
-            customClasses="opacity-80"
+            customClasses="text-lightWhite"
           />
         </div>
         <div className="flex items-center-safe gap-x-2">

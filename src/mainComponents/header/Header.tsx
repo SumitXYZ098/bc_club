@@ -26,13 +26,15 @@ const Header = () => {
   return (
     <header className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 xl:py-6 md:py-4 py-3 flex items-center justify-between w-full">
       {/* Logo */}
-      <Image
-        alt="logo"
-        src={Icons.bcClub}
-        width={119}
-        height={42}
-        className="md:w-[119px] md:h-10.5 w-22.5 h-9 object-contain"
-      />
+      <Link href={"/"}>
+        <Image
+          alt="logo"
+          src={Icons.bcClub}
+          width={119}
+          height={42}
+          className="md:w-[119px] md:h-10.5 w-22.5 h-9 object-contain"
+        />
+      </Link>
       <nav className="hidden xl:flex justify-end-safe items-center-safe gap-x-5">
         <div className="flex items-center gap-x-5">
           {menulist.map((item, idx) => (
