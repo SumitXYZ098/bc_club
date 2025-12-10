@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -45,7 +46,7 @@ const Header = () => {
     }
 
     setLastScrollY(window.scrollY);
-    setIsScrolled(window.scrollY > 300);
+    setIsScrolled(window.scrollY > 80);
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -55,7 +56,7 @@ const Header = () => {
         : setIsVisible(false);
 
       setLastScrollY(currentScrollY);
-      setIsScrolled(currentScrollY > 300);
+      setIsScrolled(currentScrollY > 80);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -95,9 +96,9 @@ const Header = () => {
         className={`xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 xl:py-6 md:py-4 py-3 flex items-center justify-between w-full fixed top-0 left-0 right-0 z-9999 ${
           isLaptop
             ? isScrolled
-              ? "bg-lightWhite"
+              ? "bg-background shadow"
               : "bg-transparent"
-            : "shadow bg-[#f2f2f2]"
+            : "shadow bg-background"
         }`}
       >
         {/* Logo */}
