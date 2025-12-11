@@ -8,7 +8,7 @@ import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
 import Image from "next/image";
-import { Icons } from "@/app/exports";
+import { Icons } from "@/src/app/exports";
 
 const GetInTouchLink: React.FC<GetInTouchLinkListProps> = ({
   title,

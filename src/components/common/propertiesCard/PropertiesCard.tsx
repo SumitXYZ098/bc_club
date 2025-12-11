@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 import LineGradient from "../lineGradient/LineGradient";
 import Description, { IDescriptionTypes } from "../../description/Description";
-import { Icons } from "@/app/exports";
+import { Icons } from "@/src/app/exports";
 import CustomButton from "../../button/CustomButton";
 
 export interface PropertyCardProps {

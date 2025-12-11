@@ -1,5 +1,5 @@
 "use client";
-import { Icons } from "@/app/exports";
+import { Icons } from "@/src/app/exports";
 import { newsletterApi } from "@/src/api/newsletter/newsletterApi";
 import { AxiosError } from "axios";
 import Image from "next/image";

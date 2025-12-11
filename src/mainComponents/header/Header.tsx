@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Icons } from "@/app/exports";
+import { Icons } from "@/src/app/exports";
 import { useMediaQuery } from "@/src/hooks/useMediaQuery";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -155,13 +155,37 @@ const Header = () => {
 
         {/* Mobile Menu */}
         <div onClick={onPressMenuButton} className="block lg:hidden">
-          <button className="group inline-flex w-12 h-12 text-primary items-center justify-center rounded transition">
+          <button
+            className="group inline-flex w-12 h-12 text-primary text-center items-center justify-center rounded shadow-[0_1px_0_--theme(--color-slate-950/.04),0_1px_2px_--theme(--color-slate-950/.12),inset_0_-2px_0_--theme(--color-slate-950/.04)] hover:shadow-[0_1px_0_--theme(--color-slate-950/.04),0_4px_8px_--theme(--color-slate-950/.12),inset_0_-2px_0_--theme(--color-slate-950/.04)] transition"
+            aria-pressed={showMenu}
+            type="button"
+          >
             <span className="sr-only">Menu</span>
             <svg
               className="w-6 h-6 fill-current pointer-events-none"
               viewBox="0 0 16 16"
             >
-              <rect y="7" width="16" height="2" rx="1" />
+              <rect
+                className="origin-center -translate-y-[5px] translate-x-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-pressed:translate-x-0 group-aria-pressed:translate-y-0 group-aria-pressed:rotate-315"
+                y="7"
+                width="9"
+                height="2"
+                rx="1"
+              />
+              <rect
+                className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-pressed:rotate-45"
+                y="7"
+                width="16"
+                height="2"
+                rx="1"
+              />
+              <rect
+                className="origin-center translate-y-[5px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-pressed:translate-y-0 group-aria-pressed:rotate-135"
+                y="7"
+                width="9"
+                height="2"
+                rx="1"
+              />
             </svg>
           </button>
         </div>

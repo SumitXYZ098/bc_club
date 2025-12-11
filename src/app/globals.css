@@ -98,3 +98,17 @@ body::-webkit-scrollbar {
     opacity: 1;
   }
 }
+
+/* Make all FusionCharts SVG papers transparent */
+.fusioncharts-container > [id^="raphael-paper-"] {
+  background-color: transparent !important;
+}
+
+.fusioncharts-container > svg > g > [pointer-events="bounding-box"] {
+  display: none !important;
+}
+
+[class*="raphael-group-"][class*="-background"] rect {
+  fill-opacity: 0 !important;
+  stroke-width: 0 !important;
+}

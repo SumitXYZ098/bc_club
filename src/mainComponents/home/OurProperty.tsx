@@ -1,5 +1,5 @@
 "use client";
-import { Images } from "@/app/exports";
+import { Images } from "@/src/app/exports";
 import CustomButton from "@/src/components/button/CustomButton";
 import PropertiesCard, {
   PropertyCardProps,

@@ -1,4 +1,4 @@
-import { Icons } from "@/app/exports";
+import { Icons } from "@/src/app/exports";
 import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
