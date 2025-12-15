@@ -42,7 +42,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   // isStyle,
 }) => {
   const pathname = usePathname();
-  console.log(pathname);
 
   return (
     <div
@@ -160,7 +159,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           >
             <div
               className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                pathname === "/properties" ? "md:w-auto w-full" : "w-full"
+                pathname === "/properties" ? "px-3 text-nowrap md:w-auto w-full" : "w-full"
               }`}
             >
               <Image
@@ -174,7 +173,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </div>
             <div
               className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                pathname === "/properties" ? "md:w-auto w-full" : "w-full"
+                pathname === "/properties" ? "px-3 md:w-auto w-full" : "w-full"
               }`}
             >
               <Image
@@ -187,8 +186,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <span>{beds}</span>
             </div>
             <div
-              className={`flex flex-row items-center gap-x-1 justify-center  py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                pathname === "/properties" ? "md:w-auto w-full" : "w-full"
+              className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
+                pathname === "/properties" ? "px-3 w-full md:w-auto" : "w-full"
               }`}
             >
               <Image

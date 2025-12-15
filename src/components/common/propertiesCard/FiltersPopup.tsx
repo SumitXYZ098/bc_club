@@ -99,7 +99,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
           {/* Status */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             {[
-              { k: "sale", l: "For Sale", i: Icons.forsale },
+              { k: "sale", l: "For Sale", i: Icons.forSale },
               { k: "sold", l: "Sold", i: Icons.sold },
               { k: "expired", l: "Expired", i: Icons.expire },
             ].map((s) => (
