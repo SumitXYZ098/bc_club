@@ -16,7 +16,12 @@ const Icons = {
    google:"../google.svg",
   forsale:"../forsale.svg",
   sold:"../sold.svg",
-  expire:"../expire.svg"
+  expire:"../expire.svg",
+  courtorder:"../courtorder.svg",
+  openhouse:"../openhouse.svg",
+  soldicon:"../soldicon.svg",
+  star:"../star.svg",
+  save:"../save.svg"
 };
 
 const Images = {
@@ -26,6 +31,8 @@ const Images = {
   singleFamily: "/singleFamily.webp",
   singleFamilyTwo: "/singleFamilyTwo.webp",
   singleFamilyThree: "/singleFamilyThree.webp",
+  map:"/map.webp"
+
 
  
 };

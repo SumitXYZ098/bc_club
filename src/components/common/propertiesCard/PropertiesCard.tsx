@@ -46,9 +46,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   return (
     <div
-      className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-auto ${pathname === "/properties"?"xl:w-[31.5%] md:w-[48%] w-full ":"w-full "}    ${
-        isLogin && "group"
-      }`}
+      className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-auto ${
+        pathname === "/properties"
+          ? "xl:w-[31.5%] md:w-[48%] w-full "
+          : "w-full "
+      }    ${isLogin && "group"}`}
     >
       <div className="flex flex-col gap-y-3 p-5 w-full h-auto">
         <div className="relative">
@@ -151,10 +153,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <p className="text-lightWhite text-sm">{address}</p>
 
           {/* Specs */}
-          <div className={`flex items-center justify-between ${ pathname === "/properties" ? "gap-x-1" : "gap-3"}`} >
+          <div
+            className={`flex items-center justify-between ${
+              pathname === "/properties" ? "gap-x-1" : "gap-3"
+            }`}
+          >
             <div
-              className={`flex flex-row items-center gap-x-1 justify-center p-2 rounded-md bg-gray text-lightWhite   ${
-                pathname === "/properties" ? "md:w-auto w-full" : "w-full "
+              className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
+                pathname === "/properties" ? "md:w-auto w-full" : "w-full"
               }`}
             >
               <Image
@@ -167,8 +173,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <span>{sqft} sqft</span>
             </div>
             <div
-              className={`flex flex-row items-center gap-x-1 justify-center p-2 rounded-md bg-gray text-lightWhite   ${
-                pathname === "/properties" ? "md:w-auto w-full" : "w-full "
+              className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
+                pathname === "/properties" ? "md:w-auto w-full" : "w-full"
               }`}
             >
               <Image
@@ -181,8 +187,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <span>{beds}</span>
             </div>
             <div
-              className={`flex flex-row items-center gap-x-1 justify-center p-2 rounded-md bg-gray text-lightWhite   ${
-                pathname === "/properties" ? "md:w-auto w-full" : "w-full "
+              className={`flex flex-row items-center gap-x-1 justify-center  py-2 rounded-md bg-gray text-lightWhite text-sm ${
+                pathname === "/properties" ? "md:w-auto w-full" : "w-full"
               }`}
             >
               <Image
