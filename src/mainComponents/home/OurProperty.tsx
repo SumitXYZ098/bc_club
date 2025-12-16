@@ -102,7 +102,7 @@ const OurProperty = () => {
           />
           <div className="flex flex-row gap-x-5 w-full">
             <Swiper
-              speed={1500}
+              speed={2500}
               spaceBetween={12}
               slidesPerView={1.1}
               autoplay={{

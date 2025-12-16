@@ -47,7 +47,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     <div
       className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-auto ${
         pathname === "/properties"
-          ? "xl:w-[31.5%] md:w-[48%] w-full "
+          ? "md:w-[48%] w-full "
           : "w-full "
       }    ${isLogin && "group"}`}
     >
@@ -159,7 +159,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           >
             <div
               className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                pathname === "/properties" ? "px-3 text-nowrap md:w-auto w-full" : "w-full"
+                pathname === "/properties" ? "w-full" : "w-full"
               }`}
             >
               <Image
@@ -173,7 +173,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </div>
             <div
               className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                pathname === "/properties" ? "px-3 md:w-auto w-full" : "w-full"
+                pathname === "/properties" ? "w-full" : "w-full"
               }`}
             >
               <Image
@@ -187,7 +187,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </div>
             <div
               className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                pathname === "/properties" ? "px-3 w-full md:w-auto" : "w-full"
+                pathname === "/properties" ? "w-full" : "w-full"
               }`}
             >
               <Image

@@ -17,6 +17,7 @@ import SignupPopup from "../auth/SignupPopup";
 import ForgotPassword from "../auth/ForgotPassword";
 import OtpScreen from "../auth/OtpScreen";
 import NewPassword from "../auth/NewPassword";
+import { usePathname } from "next/navigation";
 
 export const menulist = [
   { title: "About Us", href: "/about-us" },
@@ -87,6 +88,9 @@ const Header = () => {
     setOpenNewPassword(true);
   };
 
+  // Get active pathname
+  const pathname = usePathname();
+
   return (
     <AnimatePresence>
       <motion.header
@@ -118,7 +122,7 @@ const Header = () => {
             src={Icons.bcClub}
             width={119}
             height={42}
-            className="w-[119px] h-10.5 object-contain"
+            className="w-29.75 h-10.5 object-contain"
           />
         </Link>
 
@@ -128,7 +132,9 @@ const Header = () => {
               <Link
                 key={idx}
                 href={item.href}
-                className="text-foreground text-base uppercase hover:font-semibold transition-all duration-300"
+                className={`text-foreground text-base uppercase hover:font-semibold transition-all duration-300 ${
+                  pathname === item.href && "font-semibold"
+                }`}
               >
                 {item.title}
               </Link>
@@ -166,7 +172,7 @@ const Header = () => {
               viewBox="0 0 16 16"
             >
               <rect
-                className="origin-center -translate-y-[5px] translate-x-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-pressed:translate-x-0 group-aria-pressed:translate-y-0 group-aria-pressed:rotate-315"
+                className="origin-center -translate-y-1.25 translate-x-1.75 transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-pressed:translate-x-0 group-aria-pressed:translate-y-0 group-aria-pressed:rotate-315"
                 y="7"
                 width="9"
                 height="2"
@@ -180,7 +186,7 @@ const Header = () => {
                 rx="1"
               />
               <rect
-                className="origin-center translate-y-[5px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-pressed:translate-y-0 group-aria-pressed:rotate-135"
+                className="origin-center translate-y-1.25 transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-pressed:translate-y-0 group-aria-pressed:rotate-135"
                 y="7"
                 width="9"
                 height="2"
