@@ -25,6 +25,8 @@ const Icons = {
   accurate: "../accurate.svg",
   free: "../free.svg",
   instantResult: "../instantResult.svg",
+  arrowup:"../arrowup.svg",
+  
 };
 
 const Images = {
@@ -38,6 +40,10 @@ const Images = {
   blogimg: "/blogimg.webp",
   firsttown: "/firsttown.webp",
   secondtown: "/secondtown.webp",
+   leadership:"/leadership.webp",
+   billwalsh:"/billwalsh.webp",
+   saleimg:"/saleimg.webp",
+   leaderlesson:"/leaderlesson.webp"
 };
 
 export { Icons, Images };
