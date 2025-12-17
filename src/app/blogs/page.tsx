@@ -13,7 +13,7 @@ const Page = () => {
       {/* ================= HERO SECTION ================= */}
 
       <section className="relative bg-background overflow-hidden">
-        <div className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-28 pb-40 text-center relative z-10">
+        <div className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-28 pb-40 text-center relative mt-25 z-10">
           <h1 className="text-4xl md:text-5xl font-semibold text-[#2E2E2E]">
             Our <span className="text-[#F4A51C]">Blog</span>
           </h1>

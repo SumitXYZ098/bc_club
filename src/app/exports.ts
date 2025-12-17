@@ -26,6 +26,11 @@ const Icons = {
   free: "../free.svg",
   instantResult: "../instantResult.svg",
   arrowup:"../arrowup.svg",
+  facebookicon:"../facebookicon.svg",
+  twittericon:"../twittericon.svg",
+  linkedin:"../linkedin.svg",
+  print:"../print.svg",
+  riveticons:"../riveticons.svg"
   
 };
 
