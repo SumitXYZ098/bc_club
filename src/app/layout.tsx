@@ -7,6 +7,7 @@ import Footer from "@/src/mainComponents/footer/Footer";
 export const metadata: Metadata = {
   title: "BC Club",
   description: "British Columbia Club",
+  robots: "noindex, nofollow"
 };
 
 export default function RootLayout({
@@ -23,10 +24,10 @@ export default function RootLayout({
         />
       </Head>
       <body className={`plusJakartaDisplay antialiased bg-background`}>
-         <Header />
+        <Header />
         {children}
         <Footer />
-       </body>
+      </body>
     </html>
   );
 }
