@@ -3,6 +3,7 @@ import { PropertyCardProps } from "../components/common/propertiesCard/Propertie
 
 export const propertyData: PropertyCardProps[] = [
   {
+    id: "1",
     image: Images.singleFamilyThree,
     title: "Apartment/Condo",
     price: 350000,
@@ -17,6 +18,7 @@ export const propertyData: PropertyCardProps[] = [
     mls: "R3059142",
   },
   {
+    id: "2",
     image: Images.singleFamilyThree,
     title: "Luxury Condo",
     price: 489000,
@@ -31,6 +33,7 @@ export const propertyData: PropertyCardProps[] = [
     mls: "R2078332",
   },
   {
+    id: "3",
     image: Images.singleFamilyThree,
     title: "Luxury Condo",
     price: 489000,
@@ -45,6 +48,7 @@ export const propertyData: PropertyCardProps[] = [
     mls: "R2078332",
   },
   {
+    id: "4",
     image: Images.singleFamilyThree,
     title: "Luxury Condo",
     price: 489000,
@@ -59,6 +63,7 @@ export const propertyData: PropertyCardProps[] = [
     mls: "R2078332",
   },
   {
+    id: "5",
     image: Images.singleFamilyThree,
     title: "Luxury Condo",
     price: 489000,
@@ -73,6 +78,7 @@ export const propertyData: PropertyCardProps[] = [
     mls: "R2078332",
   },
   {
+    id: "6",
     image: Images.singleFamilyThree,
     title: "Luxury Condo",
     price: 489000,
@@ -152,5 +158,31 @@ export const propertyDetails = {
   buildingStoreys: { label: "Building Storeys", value: 42400 },
   grossLeasableArea: { label: "Gross Leasable Area", value: 42400 },
   netLeasableArea: { label: "Net Leasable Area", value: 42400 },
-  numberOfApartmentUnits: { label: "No. of Apartment Units", value: 42400 }
+  numberOfApartmentUnits: { label: "No. of Apartment Units", value: 42400 },
 };
+
+
+export const propertyImages = [
+  // Existing
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9",
+  "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d",
+  "https://images.unsplash.com/photo-1600585154526-990dced4db0d",
+  "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea",
+  "https://images.unsplash.com/photo-1600585154154-0b0a3d06d3c4",
+  "https://images.unsplash.com/photo-1572120360610-d971b9d7767c",
+  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6",
+  "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde",
+  "https://images.unsplash.com/photo-1598928506311-c55ded91a20c",
+  "https://images.unsplash.com/photo-1600047509358-9dc75507daeb",
+  "https://images.unsplash.com/photo-1576941089067-2de3c901e126",
+  "https://images.unsplash.com/photo-1580587771525-78b9dba3b914",
+  "https://images.unsplash.com/photo-1599423300746-b62533397364",
+  "https://images.unsplash.com/photo-1600585152915-d208bec867a1",
+  "https://images.unsplash.com/photo-1600585154084-4e5fe7c39198",
+  "https://images.unsplash.com/photo-1593696140826-c58b021acf8b",
+  "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f1",
+  "https://images.unsplash.com/photo-1600047509782-20b8f98a2f63",
+  "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
+  "https://images.unsplash.com/photo-1600585153780-ec9b8c8d3cde",
+];

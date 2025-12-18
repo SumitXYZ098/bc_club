@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@ariakit/react":"^0.4.20",
+    "@ariakit/react": "^0.4.20",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fluentui/react-icons": "^2.0.316",
@@ -35,7 +35,8 @@
     "react-otp-input": "^3.1.1",
     "recharts": "^3.6.0",
     "styled-components": "^6.1.19",
-    "swiper": "^12.0.3"
+    "swiper": "^12.0.3",
+    "yet-another-react-lightbox": "^3.27.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
