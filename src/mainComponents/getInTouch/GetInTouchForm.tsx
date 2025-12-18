@@ -138,7 +138,7 @@ export default function GetInTouchForm() {
       {/* Submit */}
       <button
         type="submit"
-        className=" bg-primary text-background py-3 rounded-xl mt-4 text-lg font-semibold w-1/2"
+        className=" bg-primary text-background py-3 rounded-xl mt-4 text-lg font-medium w-1/2"
       >
         Submit
       </button>

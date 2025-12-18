@@ -13,7 +13,7 @@ const SearchPropertyTab = () => {
           <input
             type="radio"
             name="my_tabs"
-            className="tab checked:bg-primary bg-gray checked:text-background font-semibold text-lightWhite min-w-[30%] w-[32%]!  md:py-2.5 py-1.5 rounded-md h-auto"
+            className="tab checked:bg-primary bg-gray checked:text-background font-medium text-lightWhite min-w-[30%] w-[32%]!  md:py-2.5 py-1.5 rounded-md h-auto"
             aria-label={item}
             defaultChecked={idx === 0}
           />

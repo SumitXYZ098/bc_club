@@ -16,6 +16,7 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@mui/styled-engine-sc": "^7.3.6",
+    "@mui/styles": "^6.5.0",
     "@types/nodemailer": "^7.0.4",
     "apexcharts": "^5.3.6",
     "axios": "^1.13.2",

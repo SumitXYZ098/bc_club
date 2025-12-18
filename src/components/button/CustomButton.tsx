@@ -12,6 +12,7 @@ interface CustomButtonProps extends ButtonProps {
     | "secondary-outlined"
     | "white-primary";
   customClasses?: string;
+  disabled?: boolean;
 }
 
 const getButtonStyle = (
@@ -43,6 +44,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   onClick,
   buttonType = "primary",
   customClasses,
+  disabled,
 }) => {
   return (
     <button
@@ -50,6 +52,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         buttonType
       )} ${customClasses}`}
       onClick={onClick}
+      disabled={disabled}
     >
       {label}
     </button>

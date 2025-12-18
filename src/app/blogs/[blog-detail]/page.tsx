@@ -12,7 +12,7 @@ export default function page() {
             {/* ================= LEFT CONTENT ================= */}
             <div className="lg:col-span-2 bg-white rounded-2xl p-8">
               {/* Title */}
-              <h1 className="text-3xl font-semibold text-[#2E2E2E] mb-6">
+              <h1 className="text-3xl font-bold text-[#2E2E2E] mb-6">
                 Smart Property Investment In 2025
               </h1>
 
@@ -34,7 +34,7 @@ export default function page() {
                   scale content production while maintaining quality.
                 </p>
 
-                <h2 className="text-lg font-semibold text-[#2E2E2E]">
+                <h2 className="text-lg font-bold text-[#2E2E2E]">
                   Steering Clear of Common AI Writing Pitfalls
                 </h2>
 
@@ -44,7 +44,7 @@ export default function page() {
                   and originality.
                 </p>
 
-                <h2 className="text-lg font-semibold text-[#2E2E2E]">
+                <h2 className="text-lg font-bold text-[#2E2E2E]">
                   Understanding ChatGPT Capabilities – Define Your Style
                 </h2>
 
@@ -54,7 +54,7 @@ export default function page() {
                   voice.
                 </p>
 
-                <h2 className="text-lg font-semibold text-[#2E2E2E]">
+                <h2 className="text-lg font-bold text-[#2E2E2E]">
                   Conclusion: Embracing AI in Blog Creation
                 </h2>
 
@@ -69,7 +69,7 @@ export default function page() {
             <aside className="bg-white rounded-2xl p-2 h-fit sticky top-12">
               {/* Category */}
               <div className="mb-8">
-                <h3 className="text-sm font-semibold text-white bg-[#F4A51C] inline-block px-4 py-2 rounded-lg mb-4">
+                <h3 className="text-sm font-bold text-white bg-[#F4A51C] inline-block px-4 py-2 rounded-lg mb-4">
                   Blog Category
                 </h3>
 
@@ -83,7 +83,7 @@ export default function page() {
 
               {/* Recent Blogs */}
               <div>
-                <h3 className="text-sm font-semibold text-[#2E2E2E] mb-4">
+                <h3 className="text-sm font-bold text-[#2E2E2E] mb-4">
                   Recent Blogs
                 </h3>
 

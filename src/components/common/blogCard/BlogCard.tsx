@@ -31,7 +31,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
       {/* Content */}
       <div className="p-4 sm:p-5 flex flex-col gap-3 ">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-snug line-clamp-2">
+          <h3 className="text-sm sm:text-base font-bold text-gray-900 leading-snug line-clamp-2">
             {title}
           </h3>
 

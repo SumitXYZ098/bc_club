@@ -25,7 +25,7 @@ export interface PropertyCardProps {
   // isStyle?: boolean;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({
+const PropertiesCard: React.FC<PropertyCardProps> = ({
   image,
   title,
   price,
@@ -74,7 +74,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           {/* Price Drop Banner */}
           {priceDrop && (
             <span
-              className="absolute bottom-3 right-0 bg-secondary text-background pl-7 pr-3 pt-2 pb-2 text-xs h-auto font-semibold"
+              className="absolute bottom-3 right-0 bg-secondary text-background pl-7 pr-3 pt-2 pb-2 text-xs h-auto font-medium"
               style={{
                 clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
               }}
@@ -230,4 +230,4 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   );
 };
 
-export default PropertyCard;
+export default PropertiesCard;

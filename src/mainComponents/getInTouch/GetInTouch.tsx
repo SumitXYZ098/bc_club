@@ -58,7 +58,7 @@ const GetInTouch = () => {
               <span className="text-sm">Mail</span>
               <Link
                 href={"mailto:Unreal@bcclub.com"}
-                className="text-lg font-semibold"
+                className="text-lg font-medium"
               >
                 Unreal@bcclub.com
               </Link>

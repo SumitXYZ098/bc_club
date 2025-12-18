@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
-import PropertyCard from "@/src/components/common/propertiesCard/PropertiesCard";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import { Chip } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesMap from "./PropertiesMap";
 import { propertyData } from "../dummyData";
+import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCard";
 
 export default function PropertiesListingPage() {
   const [openFilters, setOpenFilters] = useState(false);
@@ -172,7 +172,7 @@ export default function PropertiesListingPage() {
 
           <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar xl:w-[64%] w-full xl:p-3">
             {propertyData.map((property, index) => (
-              <PropertyCard key={index} {...property} isLogin />
+              <PropertiesCard key={index} {...property} isLogin />
             ))}
           </div>
         </div>

@@ -137,3 +137,20 @@ export const dummyListings = [
     baths: 4,
   },
 ];
+
+export const propertyDetails = {
+  land: { label: "Land", value: 176000 },
+  description: { label: "Description", value: 42400 },
+  bedrooms: { label: "Bedrooms", value: 42400 },
+  baths: { label: "Baths", value: 42400 },
+  carports: { label: "Carports", value: 42400 },
+  garages: { label: "Garages", value: 42400 },
+  landSize: { label: "Land Size", value: 42400 },
+  firstFloorArea: { label: "First Floor Area", value: 42400 },
+  secondFloorArea: { label: "Second Floor Area", value: 198400 },
+  basementFinishArea: { label: "Basement Finish Area", value: 156000 },
+  buildingStoreys: { label: "Building Storeys", value: 42400 },
+  grossLeasableArea: { label: "Gross Leasable Area", value: 42400 },
+  netLeasableArea: { label: "Net Leasable Area", value: 42400 },
+  numberOfApartmentUnits: { label: "No. of Apartment Units", value: 42400 }
+};

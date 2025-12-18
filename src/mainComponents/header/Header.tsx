@@ -132,8 +132,8 @@ const Header = () => {
               <Link
                 key={idx}
                 href={item.href}
-                className={`text-foreground text-base uppercase hover:font-semibold transition-all duration-300 ${
-                  pathname === item.href && "font-semibold"
+                className={`text-foreground text-base uppercase hover:font-medium transition-all duration-300 ${
+                  pathname === item.href && "font-medium"
                 }`}
               >
                 {item.title}
