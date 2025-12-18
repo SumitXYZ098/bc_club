@@ -13,8 +13,8 @@ const Page = () => {
       {/* ================= HERO SECTION ================= */}
 
       <section className="relative bg-background overflow-hidden">
-        <div className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-28 pb-40 text-center relative mt-25 z-10">
-          <h1 className="text-4xl md:text-5xl font-semibold text-[#2E2E2E]">
+        <div className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-28 pb-40 text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-[#2E2E2E]">
             Our <span className="text-[#F4A51C]">Blog</span>
           </h1>
 
@@ -41,8 +41,8 @@ const Page = () => {
       <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 py-16 md:py-24 relative z-20">
         <div className="flex flex-col lg:flex-row gap-2">
           {/* ===== LEFT BIG CARD ===== */}
-            <div className="lg:w-2/4 bg-white rounded-2xl   overflow-hidden">
-          <Link href="/blogs/blog-detail" className="block">
+          <div className="lg:w-2/4 bg-white rounded-2xl   overflow-hidden">
+            <Link href="/blogs/blog-detail" className="block">
               <div className="relative h-64 sm:h-80 md:h-96 lg:h-95 w-full">
                 <Image
                   src={Images.blogimg}
@@ -58,7 +58,7 @@ const Page = () => {
                   <span className="text-[#22558B]">20 Jan 2025</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#2E2E2E]">
+                  <h3 className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
                     Smart Property Investment in 2025
                   </h3>
                   <Image
@@ -75,8 +75,8 @@ const Page = () => {
                   estate. With rising demand, smart homes, and urban expansion.
                 </p>
               </div>
-          </Link>
-            </div>
+            </Link>
+          </div>
           {/* ===== RIGHT SIDE ===== */}
           <div className="xl:w-1/2 flex flex-col">
             {/* CARD 1 */}
@@ -95,7 +95,7 @@ const Page = () => {
                   <span className="text-[#22558B]">20 Jan 2025</span>
                 </div>
 
-                <h4 className="text-sm font-semibold text-[#2E2E2E] leading-snug">
+                <h4 className="text-sm font-bold text-[#2E2E2E] leading-snug">
                   First-Time Home Buyer’s Complete Guide
                 </h4>
               </div>
@@ -117,7 +117,7 @@ const Page = () => {
                   <span className="text-[#22558B]">20 Jan 2025</span>
                 </div>
 
-                <h4 className="text-sm font-semibold text-[#2E2E2E] leading-snug">
+                <h4 className="text-sm font-bold text-[#2E2E2E] leading-snug">
                   First-Time Home Buyer’s Complete Guide
                 </h4>
               </div>

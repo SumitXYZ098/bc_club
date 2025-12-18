@@ -62,7 +62,7 @@ export default function page() {
           <div className="flex flex-col ">
             {/* ================= LEFT CONTENT ================= */}
             {/* Title */}
-            <h1 className="text-3xl font-semibold text-[#2E2E2E] mb-6">
+            <h1 className="text-3xl font-bold text-[#2E2E2E] mb-6">
               Smart Property Investment In 2025
             </h1>
 

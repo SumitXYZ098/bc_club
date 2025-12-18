@@ -25,7 +25,7 @@ export interface PropertyCardProps {
   // isStyle?: boolean;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({
+const PropertiesCard: React.FC<PropertyCardProps> = ({
   image,
   title,
   price,
@@ -46,12 +46,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   return (
     <div
       className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-auto ${
-        pathname === "/properties"
-          ? "md:w-[48%] w-full "
-          : "w-full "
+        pathname === "/properties" ? "md:w-[49%] w-full " : "w-full"
       }    ${isLogin && "group"}`}
     >
-      <div className="flex flex-col gap-y-3 p-5 w-full h-auto">
+      <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-auto">
         <div className="relative">
           <div className="w-full h-56 overflow-clip rounded-lg">
             <Image
@@ -76,7 +74,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           {/* Price Drop Banner */}
           {priceDrop && (
             <span
-              className="absolute bottom-3 right-0 bg-secondary text-background pl-7 pr-3 pt-2 pb-2 text-xs h-auto font-semibold"
+              className="absolute bottom-3 right-0 bg-secondary text-background pl-7 pr-3 pt-2 pb-2 text-xs h-auto font-medium"
               style={{
                 clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
               }}
@@ -232,4 +230,4 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   );
 };
 
-export default PropertyCard;
+export default PropertiesCard;

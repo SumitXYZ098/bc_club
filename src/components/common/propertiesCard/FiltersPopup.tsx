@@ -90,7 +90,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
         >
           {/* Header */}
           <div className="flex items-center justify-between cursor-pointer mb-6">
-            <h2 className="text-xl font-semibold  ">Filters</h2>
+            <h2 className="text-xl font-medium  ">Filters</h2>
             <button onClick={onClose}>
               <FiX size={22} />
             </button>
@@ -132,7 +132,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
 
           {/* Price Range */}
           <div className="mb-6">
-            <h3 className="font-semibold mb-3">Price Range</h3>
+            <h3 className="font-medium mb-3">Price Range</h3>
             <div className="relative">
               <PriceSlider
                 value={price}
@@ -154,8 +154,8 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                 <p className="text-[10px] sm:text-xs text-gray-300 mb-1 whitespace-nowrap">
                   Min Price
                 </p>
-                <div className="flex items-center gap-1 border border-[#33333333] rounded-xl w-[96px] sm:w-[122px] px-3 sm:px-4 py-2 h-full">
-                  <span className="text-[#EEA500] font-semibold">$</span>
+                <div className="flex items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-3 sm:px-4 py-2 h-full">
+                  <span className="text-[#EEA500] font-medium">$</span>
                   <LineGradient customClasses="mx-0.5 sm:mx-1" vr />
                   <span className="text-xs sm:text-sm font-medium">
                     {price[0]}
@@ -171,8 +171,8 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                 <p className="text-[10px] sm:text-xs text-gray-300 mb-1 whitespace-nowrap">
                   Max Price
                 </p>
-                <div className="flex items-center gap-1 border border-[#33333333] rounded-xl w-[96px] sm:w-[122px] px-3 sm:px-4 py-2 h-full">
-                  <span className="text-[#EEA500] font-semibold">$</span>
+                <div className="flex items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-3 sm:px-4 py-2 h-full">
+                  <span className="text-[#EEA500] font-medium">$</span>
                   <LineGradient customClasses="mx-0.5 sm:mx-1" vr />
                   <span className="text-xs sm:text-sm font-medium">
                     {price[1]}
@@ -185,7 +185,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
 
           {/* Property Info */}
           <div className="mb-6 border-[#33333333] pt-5">
-            <h3 className="font-semibold mb-4">Property Info</h3>
+            <h3 className="font-medium mb-4">Property Info</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {["Bedrooms", "Bathroom"].map((label, idx) => {
@@ -244,7 +244,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
 
           {/* Extra Features */}
           <div className="border-[#33333333] pt-2">
-            <h3 className="font-semibold mb-4">Features</h3>
+            <h3 className="font-medium mb-4">Features</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {[
                 { label: " Court-ordered sale", icon: Icons.courtorder },

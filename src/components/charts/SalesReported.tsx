@@ -194,7 +194,7 @@ export default function SalesReported({ location }: { location: string }) {
           {metrics.map((m) => (
             <option
               key={m}
-              className="text-black opacity-50 text-base font-semibold"
+              className="text-black opacity-50 text-base font-medium"
             >
               {m}
             </option>

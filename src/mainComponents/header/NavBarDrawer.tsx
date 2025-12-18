@@ -38,7 +38,7 @@ const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
               <Link
                 href={item.href}
                 onClick={onClose}
-                className="text-foreground text-base uppercase hover:font-semibold transition-all duration-300"
+                className="text-foreground text-base uppercase hover:font-medium transition-all duration-300"
               >
                 {item.title}
               </Link>

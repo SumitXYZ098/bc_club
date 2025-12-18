@@ -213,7 +213,7 @@ const OurProperty = () => {
 
 export default OurProperty;
 
-const listings: PropertyCardProps[] = [
+export const listings: PropertyCardProps[] = [
   {
     title: "Apartment/Condo",
     price: 350000,
