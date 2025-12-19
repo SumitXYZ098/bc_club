@@ -5,7 +5,7 @@ import Description, {
 import React from "react";
 import { propertyDetails } from "../dummyData";
 
-const PropertyInformation = () => {
+const PropertyAssessmentInformation = () => {
   return (
     <div className="flex xl:flex-row xl:flex-nowrap flex-col gap-x-6 md:gap-y-5 gap-y-6 justify-between bg-gray md:p-6 p-4 rounded-xl w-full min-h-4 h-full">
       {/* Property Information */}
@@ -86,4 +86,4 @@ const PropertyInformation = () => {
   );
 };
 
-export default PropertyInformation;
+export default PropertyAssessmentInformation;

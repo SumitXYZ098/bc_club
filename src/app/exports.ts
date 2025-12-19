@@ -35,6 +35,8 @@ const Icons = {
   favorite: "../favorite.svg",
   property: "../property.svg",
   vectorMap: "../vectorMap.svg",
+  garage: "../garage.svg",
+  calendar: "../calendar.svg",
 };
 
 const Images = {
@@ -53,6 +55,7 @@ const Images = {
   saleimg: "/saleimg.webp",
   leaderlesson: "/leaderlesson.webp",
   assessment: "/assessment.webp",
+  employee: "/employee.webp",
 };
 
 export { Icons, Images };

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React from "react";
-import { propertyData } from "../dummyData";
+
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import Description, {
   IDescriptionTypes,
@@ -12,8 +12,7 @@ import {
 } from "@fluentui/react-icons";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 
-const PropertyTopAddressSection = ({ data }: { data: any }) => {
-  const address = propertyData.find((list) => list.id === data);
+const PropertyTopAddressSection = ({ property }: { property: any }) => {
   return (
     <div className="xl:mb-8 mb-4 w-full flex md:flex-row flex-col md:items-center md:justify-between gap-y-3">
       <div className="flex flex-col md:w-[75%] xl:gap-y-4 gap-y-3">
@@ -21,7 +20,7 @@ const PropertyTopAddressSection = ({ data }: { data: any }) => {
           <Heading
             tagType="h1"
             type={IHeadingTypes.heading32}
-            content={address?.address}
+            content={property?.address}
           />
           <span className="text-red flex items-center-safe xl:text-base text-xs gap-x-1">
             <ArrowCircleDownFilled /> $96,000 on Sep 8, 2025
@@ -33,19 +32,19 @@ const PropertyTopAddressSection = ({ data }: { data: any }) => {
             Southwestern Ontario, Ontario, Canada
           </span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
-          <span>MLS® {address?.mls}</span>
+          <span>MLS® {property?.mls}</span>
         </div>
       </div>
       <div className="flex md:flex-col items-center md:items-end-safe gap-x-1.5 gap-y-3">
         <Heading
           tagType="h5"
           type={IHeadingTypes.heading48}
-          content={`$${address?.price.toLocaleString()}`}
+          content={`$${property?.price.toLocaleString()}`}
           customClasses="text-primary"
         />
         <Description
           type={IDescriptionTypes.dec1614}
-          content={`${address?.sqft}sqft`}
+          content={`${property?.sqft}sqft`}
           customClasses="text-black70"
         />
       </div>
