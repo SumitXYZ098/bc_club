@@ -157,67 +157,83 @@ const MarketTrend = () => {
       </div>
 
       <div className=" rounded-2xl bg-[#F5F6F8] p-4 pb-16">
-        <div className="h-124.75   rounded-xl ">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-semibold text-sm w-85.5">
-              City of Vancouver / Median Sold Price in all Neighborhoods
-            </h2>
+    <div className="h-130 rounded-xl">
+  {/* Header */}
+  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+    <h2 className="font-semibold text-sm md:w-85">
+      City of Vancouver / Median Sold Price in all Neighborhoods
+    </h2>
 
-            <div className="flex gap-3 text-xs">
-              <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg ">
-                <span className="w-3 h-3 bg-blue-800 rounded"></span> All
-                Residential
-              </span>
-              <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg ">
-                <span className="w-3 h-3 bg-green-500 rounded"></span> 12-MA
-              </span>
-              <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg ">
-                <span className="w-3 h-3 bg-yellow-400 rounded"></span> Sold
-                Count
-              </span>
-            </div>
-          </div>
-          <ResponsiveContainer className="mb-10" width="100%" height="100%">
-            <ComposedChart data={data}>
-              <XAxis dataKey="month" />
-              <YAxis yAxisId="price" tickFormatter={(v) => `${v / 1000}M`} />
-              <YAxis
-                yAxisId="sold"
-                orientation="right"
-                tickFormatter={(v) => `${v}K`}
-              />
+    <div className="flex gap-3 text-xs flex-wrap">
+      <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
+        <span className="w-3 h-3 bg-blue-800 rounded"></span>
+        All Residential
+      </span>
+      <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
+        <span className="w-3 h-3 bg-green-500 rounded"></span>
+        12-MA
+      </span>
+      <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
+        <span className="w-3 h-3 bg-yellow-400 rounded"></span>
+        Sold Count
+      </span>
+    </div>
+  </div>
 
-              <Tooltip />
+  {/* X Scroll Wrapper */}
+  <div className="overflow-x-auto scrollbar-hide">
+    <div className="min-w-200 md:min-w-full">
+      <ResponsiveContainer width="100%" height={420}>
+        <ComposedChart data={data}>
+          <XAxis dataKey="month" />
 
-              <Bar
-                yAxisId="sold"
-                dataKey="sold"
-                barSize={30}
-                fill="#1f3a5f"
-                radius={[6, 6, 0, 0]}
-              >
-                <LabelList dataKey="sold" position="top" />
-              </Bar>
+          <YAxis
+            yAxisId="price"
+            tickFormatter={(v) => `${v / 1000}M`}
+          />
 
-              <Line
-                yAxisId="price"
-                dataKey="price"
-                stroke="#f59e0b"
-                strokeWidth={1}
-                dot={false}
-              />
+          <YAxis
+            yAxisId="sold"
+            orientation="right"
+            tickFormatter={(v) => `${v}K`}
+          />
 
-              <Line
-                className="mb-290"
-                yAxisId="price"
-                dataKey="ma"
-                stroke="#22c55e"
-                strokeWidth={1}
-                dot={false}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
+          <Tooltip />
+
+          <Bar
+            yAxisId="sold"
+            name="Sold "
+            dataKey="sold"
+            barSize={30}
+            fill="#1f3a5f"
+            radius={[6, 6, 0, 0]}
+                  
+          >
+            <LabelList dataKey="sold" position="top" />
+          </Bar>
+
+          <Line
+            yAxisId="price"
+            dataKey="price"
+            stroke="#f59e0b"
+            strokeWidth={1}
+            dot={{r:3}}
+                 
+          />
+
+          <Line
+            yAxisId="price"
+            dataKey="ma"
+            stroke="#22c55e"
+            strokeWidth={1}
+            dot={{r:3}}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+</div>
+
       </div>
     </div>
   );

@@ -36,9 +36,7 @@ const HomePropertiesSold = () => {
           <GaugeChartComponent value={value} label={label} />
         </div>
         <div className="flex items-center justify-center gap-1.5 -mt-8">
-          <span className="text-base font-medium text-foreground">
-            {label}
-          </span>
+          <span className="text-base font-medium text-foreground">{label}</span>
           <div className="tooltip tooltip-bottom" data-tip={tip}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -229,25 +229,29 @@ const MonthlySale = () => {
 
       {/* CHART */}
       <div className="bg-white rounded-2xl shadow p-6 mt-10">
-        <div className="flex justify-between mb-10">
-          <h3 className="text-sm font-medium text-gray-700 mb-4">
+        <div className="flex flex-col md:flex-row justify-between mb-10">
+          <h3 className="text-sm font-medium text-gray-700 mb-4 md:mb-0">
             City Of Vancouver Median Sold Price in all Neighborhoods*
           </h3>
-          <div className="flex gap-3 text-xs">
-            <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg ">
+
+          <div className="flex gap-3 text-xs flex-wrap">
+            <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
               <span className="w-3 h-3 bg-blue-800 rounded"></span> All
               Residential
             </span>
-            <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg ">
+            <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
               <span className="w-3 h-3 bg-green-500 rounded"></span> 12-MA
             </span>
-            <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg ">
+            <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
               <span className="w-3 h-3 bg-yellow-400 rounded"></span> Sold Count
             </span>
           </div>
         </div>
 
-        <ResponsiveContainer width="100%" height={380}>
+        {/*SCROLL WRAPPER */}
+        <div className="overflow-x-auto scrollbar-hide ">
+          <div className="min-w-175 md:min-w-full">
+         <ResponsiveContainer width="100%" height={380}>
           <ComposedChart data={getFilteredData()}>
             <XAxis dataKey="month" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}K`} />
@@ -299,6 +303,8 @@ const MonthlySale = () => {
             />
           </ComposedChart>
         </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </section>
   );

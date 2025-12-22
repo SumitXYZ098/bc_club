@@ -265,7 +265,7 @@ const StatsDetail: React.FC = () => {
             </div>
 
             {/* STATS TABLE */}
-            <div className="mt-3 border-borderColor rounded-xl overflow-hidden text-foreground">
+            <div className="mt-3 border-borderColor rounded-xl shadow overflow-hidden text-foreground">
               <table className="w-full text-sm">
                 <tbody>
                   {stats.map((s, i) => (
@@ -294,7 +294,7 @@ const StatsDetail: React.FC = () => {
 
             {/* FOOTER */}
             <div className="mt-3 bg-[#F0F0F0] rounded-xl py-2 text-center text-sm text-yellow-600 font-medium cursor-pointer">
-               Show detailed Charts
+               Show detailed Chartsv 
             </div>
           </div>
         )}
