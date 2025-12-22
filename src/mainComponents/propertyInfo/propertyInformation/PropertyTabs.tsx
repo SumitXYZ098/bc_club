@@ -10,10 +10,10 @@ const tabs = [
   { label: "Estimate", id: "estimate" },
   { label: "Pricing", id: "pricing" },
   { label: "Assessment", id: "assessment" },
-  { label: "Financing", id: "financing" },
+  // { label: "Financing", id: "financing" },
   { label: "Neighbourhood", id: "neighbourhood" },
   { label: "Stats", id: "stats" },
-  { label: "Similar", id: "similar" },
+  // { label: "Similar", id: "similar" },
 ];
 
 export default function PropertyTabs() {

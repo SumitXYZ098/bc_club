@@ -11,11 +11,20 @@ import { Icons } from "@/src/app/exports";
 import Link from "next/link";
 import DynamicTable from "@/src/components/common/dynamicTable/DynamicTable";
 import {
+  buildingComplexHeaders,
+  buildingComplexRows,
+  marketStatsHeaders,
+  marketStatsRows,
+  nearbySchoolsHeaders,
+  nearbySchoolsRows,
   propertyDetailsHeaders,
   propertyDetailsRows,
   roomHeaders,
   roomRows,
+  taxHistoryHeaders,
+  taxHistoryRows,
 } from "../../dummyData";
+import AssessmentHistory from "./AssessmentHistory";
 
 const PropertyInformation = ({ property }: { property: any }) => {
   const featureslist = [
@@ -54,7 +63,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
           {/* Description */}
           <div
             id="overview"
-            className="scroll-mt-20 p-6 rounded-2xl bg-gray flex flex-col gap-y-3"
+            className="scroll-mt-40 p-6 rounded-2xl bg-gray flex flex-col gap-y-3"
           >
             <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
               Description
@@ -71,7 +80,7 @@ Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, t
           {/* Features */}
           <div
             id="features"
-            className="scroll-mt-20 p-6 rounded-2xl border border-borderColor flex flex-col gap-y-3"
+            className="scroll-mt-40 p-6 rounded-2xl border border-borderColor flex flex-col gap-y-3"
           >
             <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
               Features
@@ -140,9 +149,17 @@ Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, t
             headers={roomHeaders}
             rows={roomRows}
           />
+
+          {/*  */}
+          <div id="assessment" className="flex flex-col md:gap-y-6 gap-y-5">
+            <AssessmentHistory />
+            <DynamicTable headers={taxHistoryHeaders} rows={taxHistoryRows} />
+          </div>
+
+          {/* Pricing Estimate */}
           <div
             id="estimate"
-            className="scroll-mt-20 p-5 rounded-xl bg-gray flex flex-col gap-y-4"
+            className="scroll-mt-40 p-5 rounded-xl bg-gray flex flex-col gap-y-4"
           >
             <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
               Pricing Estimate
@@ -163,6 +180,30 @@ Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, t
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* Nearby Schools */}
+          <div id="neighbourhood" className="scroll-mt-40">
+            <DynamicTable
+              title={"Nearby Schools"}
+              headers={nearbySchoolsHeaders}
+              rows={nearbySchoolsRows}
+            />
+          </div>
+
+          {/* Building Complex Information */}
+          <DynamicTable
+            title={"Building Complex Information"}
+            headers={buildingComplexHeaders}
+            rows={buildingComplexRows}
+          />
+          {/* Market Statistics */}
+          <div id="stats" className="scroll-mt-40">
+            <DynamicTable
+              title="Market Statistics"
+              headers={marketStatsHeaders}
+              rows={marketStatsRows}
+            />
           </div>
         </div>
       </div>

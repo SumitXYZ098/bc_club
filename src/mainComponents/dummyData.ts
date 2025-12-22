@@ -1,4 +1,5 @@
 import { Images } from "../app/exports";
+import { TableHeader } from "../components/common/dynamicTable/DynamicTable";
 import { PropertyCardProps } from "../components/common/propertiesCard/PropertiesCard";
 
 export const propertyData: PropertyCardProps[] = [
@@ -201,11 +202,7 @@ export const propertyImages = [
   "https://images.unsplash.com/photo-1600585153780-ec9b8c8d3cde",
 ];
 
-export const propertyDetailsHeaders: {
-  key: string;
-  label: string;
-  align?: "left" | "right" | "center";
-}[] = [
+export const propertyDetailsHeaders: TableHeader[] = [
   { key: "label", label: "" },
   { key: "value", label: "", align: "right" },
 ];
@@ -360,11 +357,7 @@ export const propertyDetailsRows = [
   },
 ];
 
-export const roomHeaders: {
-  key: string;
-  label: string;
-  align?: "left" | "right" | "center";
-}[] = [
+export const roomHeaders: TableHeader[] = [
   { key: "room", label: "Room" },
   { key: "level", label: "Level", align: "center" },
   { key: "dimensions", label: "Dimensions", align: "right" },
@@ -404,6 +397,218 @@ export const roomRows = [
       room: "Bathroom",
       level: "Main",
       dimensions: "8'0 × 6'5",
+    },
+  },
+];
+
+export const nearbySchoolsHeaders: TableHeader[] = [
+  { key: "school", label: "School Name" },
+  { key: "address", label: "Address", align: "center" },
+  { key: "details", label: "Details", align: "right" },
+];
+
+export const nearbySchoolsRows = [
+  {
+    data: {
+      school: "Blakeburn Elementary",
+      address: "1040 Riverside Dr",
+      details: "0.5 km Public • SD 39",
+    },
+  },
+  {
+    data: {
+      school: "Terry Fox Secondary",
+      address: "1260 Riverwood Gate",
+      details: "0.3 km Public • SD 39",
+    },
+  },
+  {
+    data: {
+      school: "Archbishop Carney Regional Secondary",
+      address: "1335 Dominion Ave",
+      details: "0.9 km Independent • SD 39",
+    },
+  },
+  {
+    data: {
+      school: "Cedar Drive Elementary",
+      address: "3150 Cedar Dr",
+      details: "1.1 km Public • SD 39",
+    },
+  },
+  {
+    data: {
+      school: "Birchland Elementary",
+      address: "1331 Fraser Ave",
+      details: "1.4 km Public • SD 39",
+    },
+  },
+  {
+    data: {
+      school: "James Park Elementary",
+      address: "1761 Westminster Ave",
+      details: "1.9 km Public • SD 39",
+    },
+  },
+  {
+    data: {
+      school: "Henry Hudson Elementary",
+      address: "1551 Cypress St",
+      details: "2.3 km Independent • SD 39",
+    },
+  },
+];
+
+export const buildingComplexHeaders: TableHeader[] = [
+  { key: "label", label: "" },
+  { key: "value", label: "", align: "right" },
+];
+
+export const buildingComplexRows = [
+  {
+    data: {
+      label: "Building Name",
+      value: "The Sea Breeze",
+    },
+  },
+  {
+    data: {
+      label: "Active Listings",
+      value: "1 listing",
+    },
+  },
+  {
+    data: {
+      label: "Units",
+      value: "61 units",
+    },
+  },
+  {
+    data: {
+      label: "Storeys",
+      value: "3 Storeys",
+    },
+  },
+  {
+    data: {
+      label: "Year Built",
+      value: "1967",
+    },
+  },
+  {
+    data: {
+      label: "Neighborhood",
+      value: "Kitsilano",
+    },
+  },
+];
+
+export const taxHistoryHeaders: TableHeader[] = [
+  { key: "year", label: "Year" },
+  { key: "land", label: "Land" },
+  { key: "impr", label: "IMPR." },
+  { key: "total", label: "TOTAL" },
+  { key: "yoy", label: "YOY CHANGE", align: "center" },
+
+];
+
+export const taxHistoryRows = [
+  {
+    data: {
+      year: "2025",
+      land: "$586,000",
+      impr: "$26,300",
+      total: "$612,300",
+      yoy: "+1.7%",
+    },
+  },
+  {
+    data: {
+      year: "2024",
+      land: "$586,000",
+      impr: "$26,300",
+      total: "$612,300",
+      yoy: "+1.7%",
+    },
+  },
+  {
+    data: {
+      year: "2023",
+      land: "$600,000",
+      impr: "$28,450",
+      total: "$640,750",
+      yoy: "+1.9%",
+    },
+  },
+  {
+    data: {
+      year: "2022",
+      land: "$640,000",
+      impr: "$32,800",
+      total: "$700,300",
+      yoy: "+2.3%",
+    },
+  },
+  {
+    data: {
+      year: "2021",
+      land: "$660,000",
+      impr: "$35,000",
+      total: "$730,150",
+      yoy: "+2.5%",
+    },
+  },
+  {
+    data: {
+      year: "2020",
+      land: "$620,000",
+      impr: "$30,600",
+      total: "$670,500",
+      yoy: "+2.1%",
+    },
+  },
+];
+
+export const marketStatsHeaders: TableHeader[] = [
+  { key: "type", label: "Apartment" },
+  { key: "active", label: "All Active", align: "center" },
+  { key: "price", label: "This Property", align: "right" },
+];
+
+export const marketStatsRows = [
+  {
+    data: {
+      type: "Apartment",
+      active: "1,250",
+      price: "$594,900",
+    },
+  },
+  {
+    data: {
+      type: "Apartment",
+      active: "1,250",
+      price: "$594,900",
+    },
+  },
+  {
+    data: {
+      type: "Apartment",
+      active: "1,250",
+      price: "$594,900",
+    },
+  },
+  {
+    data: {
+      type: "Apartment",
+      active: "1,250",
+      price: "$594,900",
+    },
+  },
+  {
+    data: {
+      type: "Apartment",
+      active: "1,250",
+      price: "$594,900",
     },
   },
 ];

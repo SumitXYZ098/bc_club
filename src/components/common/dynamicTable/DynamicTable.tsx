@@ -1,7 +1,7 @@
 import React from "react";
 import LineGradient from "../lineGradient/LineGradient";
 
-type TableHeader = {
+export type TableHeader = {
   key: string;
   label: string;
   align?: "left" | "right" | "center";
@@ -13,7 +13,7 @@ type TableRow = {
 };
 
 interface DynamicTableProps {
-  title: string;
+  title?: string;
   headers: TableHeader[];
   rows: TableRow[];
 }
@@ -37,10 +37,12 @@ export default function DynamicTable({
   const colCount = headers.length;
 
   return (
-    <div className="rounded-2xl overflow-clip bg-gray">
-      <h3 className="xl:text-xl md:text-lg text-base font-bold p-5 pb-4">
-        {title}
-      </h3>
+    <div className="rounded-2xl overflow-clip bg-gray pt-5">
+      {title && (
+        <h3 className="xl:text-xl md:text-lg text-base font-bold p-5 pt-0 pb-4">
+          {title}
+        </h3>
+      )}
 
       {/* Header */}
       {headers.length > 0 && (

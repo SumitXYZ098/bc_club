@@ -1,7 +1,6 @@
 import { propertyData, propertyImages } from "@/src/mainComponents/dummyData";
 import GetInTouch from "@/src/mainComponents/getInTouch/GetInTouch";
 import PropertyGallery from "@/src/mainComponents/propertyInfo/PropertyGallery";
-import AssessmentHistory from "@/src/mainComponents/propertyInfo/propertyInformation/AssessmentHistory";
 import PropertyInformation from "@/src/mainComponents/propertyInfo/propertyInformation/PropertyInformation";
 import PropertyTopAddressSection from "@/src/mainComponents/propertyInfo/PropertyTopAddressSection";
 import React from "react";
@@ -20,7 +19,6 @@ const page = async ({ params }: { params: Promise<Params> }) => {
         <PropertyTopAddressSection property={data} />
         <PropertyGallery images={propertyImages} />
         <PropertyInformation property={data} />
-           <AssessmentHistory/>
       </section>
       <GetInTouch />
     </>
