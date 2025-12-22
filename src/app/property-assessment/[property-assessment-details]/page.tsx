@@ -3,7 +3,7 @@ import MapTapSection from "@/src/mainComponents/propertyAssessment/MapTapSection
 import PropertyAssessmentInformation from "@/src/mainComponents/propertyAssessment/PropertyAssessmentInformation";
 import PropertyAssessmentTopSection from "@/src/mainComponents/propertyAssessment/PropertyAssessmentTopSection";
 import RegisterWithBC from "@/src/mainComponents/propertyAssessment/RegisterWithBC";
-
+ 
 interface Params {
   "property-assessment-details": string;
 }
@@ -19,6 +19,7 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
         <RegisterWithBC />
         <MapTapSection />
       </section>
+    
       <GetInTouch />
     </>
   );
