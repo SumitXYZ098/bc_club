@@ -152,7 +152,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 };
 
 /* ================= MAIN COMPONENT ================= */
-const MonthlySale = () => {
+const MonthlySaleChart = () => {
   const [filters, setFilters] = useState({
     region: "Vancouver Downtown",
     data: "Sold Prices by Months",
@@ -310,4 +310,4 @@ const MonthlySale = () => {
   );
 };
 
-export default MonthlySale;
+export default MonthlySaleChart;

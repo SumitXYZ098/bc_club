@@ -8,6 +8,7 @@ import Description, {
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { dummyListings } from "../dummyData";
+import { useRouter } from "next/navigation";
 
 const HomeEstimationTop = () => {
   const [search, setSearch] = useState<string>("");
@@ -27,6 +28,9 @@ const HomeEstimationTop = () => {
       setShowDropdown(false);
     }
   }, [query]);
+
+  const router = useRouter();
+
   return (
     <section className="xl:max-w-screen-2xl mx-auto w-full relative xl:pt-53.5 xl:pb-31 md:pt-38.75 md:pb-29 pt-26.5 pb-17 px-6 flex flex-col items-center-safe">
       <h1 className="xl:text-6xl xl:leading-17 md:text-5xl md:leading-14 text-[40px] leading-12 font-bold text-center">
@@ -72,9 +76,7 @@ const HomeEstimationTop = () => {
               {filteredResults.map((item, index) => (
                 <div
                   key={item.id}
-                  onClick={() =>
-                    window.open(`/property-assessment/${item.id}`, "_self")
-                  }
+                  onClick={() => router.push(`/property-assessment/${item.id}`)}
                   className={`cursor-pointer p-3 hover:bg-gray-100 border-gray ${
                     index + 1 === filteredResults.length ? "" : "border-b"
                   } `}

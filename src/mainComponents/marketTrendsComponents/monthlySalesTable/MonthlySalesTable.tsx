@@ -133,7 +133,7 @@ const TABLE_DATA = [
 ];
 
 /* ================= MAIN ================= */
-const TotalMonthlySale = () => {
+const MonthlySalesTable = () => {
   const [property, setProperty] = useState("All Residential");
   const [neighborhood, setNeighborhood] = useState("All Neighborhoods");
   const [year, setYear] = useState("Select Year");
@@ -252,4 +252,4 @@ const TotalMonthlySale = () => {
   );
 };
 
-export default TotalMonthlySale;
+export default MonthlySalesTable;

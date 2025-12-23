@@ -56,7 +56,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
   ];
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
-      <div className="flex flex-col xl:w-[70%] w-full h-full ">
+      <div className="flex flex-col xl:w-[70%] w-full h-full  relative">
         {/* Property Tabs */}
         <PropertyTabs />
         <div className="xl:space-y-13 md:space-y-8 space-y-6">
@@ -80,7 +80,7 @@ Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, t
           {/* Features */}
           <div
             id="features"
-            className="scroll-mt-40 p-6 rounded-2xl border border-borderColor flex flex-col gap-y-3"
+            className="scroll-mt-30 p-6 rounded-2xl border border-borderColor flex flex-col gap-y-3"
           >
             <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
               Features
@@ -151,7 +151,10 @@ Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, t
           />
 
           {/*  */}
-          <div id="assessment" className="flex flex-col md:gap-y-6 gap-y-5">
+          <div
+            id="assessment"
+            className="scroll-mt-40 flex flex-col md:gap-y-6 gap-y-5"
+          >
             <AssessmentHistory />
             <DynamicTable headers={taxHistoryHeaders} rows={taxHistoryRows} />
           </div>
@@ -204,6 +207,8 @@ Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, t
               headers={marketStatsHeaders}
               rows={marketStatsRows}
             />
+            {/* Sentinel (DO NOT REMOVE) */}
+            <div id="stats-end" className="h-px" />
           </div>
         </div>
       </div>

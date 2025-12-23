@@ -1,12 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import MarketTrend from "./trendSaleChart/MarketTrend";
-import MonthlySale from "./monthlySale/MonthlySale";
+import MarketTrend from "./marketTrend/MarketTrend";
 import { FiPrinter, FiShare2 } from "react-icons/fi";
 import GetInTouch from "../getInTouch/GetInTouch";
-import TotalMonthySale from "./totalMonthlySale/TotalMonthySale";
-import StatsMap from "../statsMap/StatsMap";
-import MonthlySalesReports from "../monthlySalesReports/MonthlySalesReports";
+import MonthlySalesReports from "./monthlySalesReports/MonthlySalesReports";
+import StatsMap from "./statsMap/StatsMap";
+import MonthlySaleChart from "./monthlySaleChart/MonthlySaleChart";
+import MonthlySalesTable from "./monthlySalesTable/MonthlySalesTable";
 
 const TrendStepPage = () => {
   const [activeTab, setActiveTab] = useState<number>(0);
@@ -75,8 +75,8 @@ const TrendStepPage = () => {
         </div>
 
         {activeTab === 0 && <MarketTrend />}
-        {activeTab === 1 && <MonthlySale />}
-        {activeTab === 2 && <TotalMonthySale />}
+        {activeTab === 1 && <MonthlySaleChart />}
+        {activeTab === 2 && <MonthlySalesTable />}
         {activeTab === 3 && <StatsMap />}
         {activeTab === 4 && <MonthlySalesReports />}
       </section>

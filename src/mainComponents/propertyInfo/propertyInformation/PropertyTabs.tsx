@@ -18,6 +18,7 @@ const tabs = [
 
 export default function PropertyTabs() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isSticky, setIsSticky] = useState(true);
 
   const handleClick = (id: string) => {
     const el = document.getElementById(id);
@@ -53,8 +54,36 @@ export default function PropertyTabs() {
     return () => observer.disconnect();
   }, []);
 
+  /**
+   * Sticky control (unstick at bottom of last section)
+   */
+  useEffect(() => {
+    const sentinel = document.getElementById("stats-end");
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When bottom sentinel reaches sticky offset → unstick
+        setIsSticky(!entry.isIntersecting);
+      },
+      {
+        rootMargin: "-100px 0px -60% 0px", // SAME as sticky top offset
+        threshold: 0,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="sticky xl:top-0 top-18 z-50 bg-background xl:pt-13 py-3 w-full md:block hidden">
+    <div
+      className={`
+        ${isSticky ? "sticky xl:top-0 top-18" : "relative"}
+        z-50 bg-background xl:pt-13 py-3 w-full hidden md:block
+      `}
+    >
       <div className="flex xl:flex-nowrap flex-wrap gap-2">
         {tabs.map(({ label, id }) => {
           const isActive = activeTab === id;

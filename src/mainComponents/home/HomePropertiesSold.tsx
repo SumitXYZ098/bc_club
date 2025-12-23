@@ -1,15 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import dynamic from "next/dynamic";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { MenuItem, Select } from "@mui/material";
 import { cities, propertyDataByCity } from ".";
-
-// Dynamically import FusionCharts component with SSR disabled
-const GaugeChartComponent = dynamic<{ value: number; label: string }>(
-  () => import("@/src/components/charts/GaugeChart"),
-  { ssr: false }
-);
+import MarketDemandGauge from "@/src/components/charts/MarketDemandGauge";
 
 const HomePropertiesSold = () => {
   const [location, setLocation] = useState<string>("Surrey, BC");
@@ -33,9 +27,9 @@ const HomePropertiesSold = () => {
       <div className="w-full bg-gray rounded-xl p-4">
         <h3 className="text-lg font-bold text-foreground">Market Demand</h3>
         <div className="relative w-full flex items-center justify-center min-h-50">
-          <GaugeChartComponent value={value} label={label} />
+          <MarketDemandGauge value={value} />
         </div>
-        <div className="flex items-center justify-center gap-1.5 -mt-8">
+        <div className="flex items-center justify-center gap-1.5 -mt-4">
           <span className="text-base font-medium text-foreground">{label}</span>
           <div className="tooltip tooltip-bottom" data-tip={tip}>
             <svg

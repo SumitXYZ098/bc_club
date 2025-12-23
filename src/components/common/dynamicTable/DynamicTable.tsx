@@ -37,64 +37,65 @@ export default function DynamicTable({
   const colCount = headers.length;
 
   return (
-    <div className="rounded-2xl overflow-clip bg-gray pt-5">
+    <div className="rounded-2xl overflow-clip overflow-x-scroll bg-gray pt-5">
       {title && (
         <h3 className="xl:text-xl md:text-lg text-base font-bold p-5 pt-0 pb-4">
           {title}
         </h3>
       )}
-
-      {/* Header */}
-      {headers.length > 0 && (
-        <div
-          className="grid xl:text-base text-sm text-foreground px-5 mb-3 "
-          style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
-        >
-          {headers.map((h) => (
-            <div key={h.key} className={getAlignClass(h.align)}>
-              {h.label}
-            </div>
-          ))}
-        </div>
-      )}
-      <LineGradient customClasses="my-1" />
-
-      {/* Rows */}
-
-      {rows.map((row, index) => (
-        <div
-          key={index}
-          className={`px-5 py-3.5 xl:text-base text-sm ${
-            index % 2 !== 0 ? "bg-background" : ""
-          }`}
-        >
+      <div className={`${colCount > 3 ? "min-w-125" : ""} w-full`}>
+        {/* Header */}
+        {headers.length > 0 && (
           <div
-            className={`grid text-foreground`}
+            className="grid xl:text-base text-sm text-foreground px-5 mb-3 "
             style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
           >
             {headers.map((h) => (
               <div key={h.key} className={getAlignClass(h.align)}>
-                {row.data[h.key]}
+                {h.label}
               </div>
             ))}
           </div>
+        )}
+        <LineGradient customClasses="my-1" />
 
-          {/* Sub rows */}
-          {row.subRows?.map((subRow, i) => (
+        {/* Rows */}
+
+        {rows.map((row, index) => (
+          <div
+            key={index}
+            className={`px-5 py-3.5 xl:text-base text-sm ${
+              index % 2 !== 0 ? "bg-background" : ""
+            }`}
+          >
             <div
-              key={i}
-              className="grid p-1 text-black70/50"
+              className={`grid text-foreground`}
               style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
             >
               {headers.map((h) => (
                 <div key={h.key} className={getAlignClass(h.align)}>
-                  {subRow.data[h.key]}
+                  {row.data[h.key]}
                 </div>
               ))}
             </div>
-          ))}
-        </div>
-      ))}
+
+            {/* Sub rows */}
+            {row.subRows?.map((subRow, i) => (
+              <div
+                key={i}
+                className="grid p-1 text-black70/50"
+                style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+              >
+                {headers.map((h) => (
+                  <div key={h.key} className={getAlignClass(h.align)}>
+                    {subRow.data[h.key]}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
