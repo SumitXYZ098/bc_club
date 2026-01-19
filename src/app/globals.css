@@ -51,12 +51,12 @@
 }
 
 @theme {
-  --breakpoint-xs:400px;
+  --breakpoint-xs: 400px;
   --breakpoint-sm: 500px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1260px;
-  --font-weight-medium: 550
+  --font-weight-medium: 550;
 }
 
 html,
@@ -106,20 +106,10 @@ body::-webkit-scrollbar {
   scrollbar-width: none; /* Firefox */
 }
 
-/* Make all FusionCharts SVG papers transparent */
-.fusioncharts-container > [id^="raphael-paper-"] {
-  background-color: transparent !important;
-}
-
-.fusioncharts-container > svg > g > [pointer-events="bounding-box"] {
-  display: none !important;
-}
-
 [class*="raphael-group-"][class*="-background"] rect {
   fill-opacity: 0 !important;
   stroke-width: 0 !important;
 }
-
 
 /* Hide scrollbar but keep scroll */
 .scrollbar-hide::-webkit-scrollbar {
@@ -131,19 +121,24 @@ body::-webkit-scrollbar {
   scrollbar-width: none; /* Firefox */
 }
 
-
-
-
- 
-
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes popupSlide {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .animate-fadeIn {
@@ -153,4 +148,3 @@ body::-webkit-scrollbar {
 .animate-popupSlide {
   animation: popupSlide 0.3s ease-out;
 }
-

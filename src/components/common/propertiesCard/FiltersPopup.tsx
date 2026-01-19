@@ -15,15 +15,19 @@ const PriceSlider = styled(Slider)({
   color: "#E8A200",
   height: 6,
   padding: "14px 0",
-
   "& .MuiSlider-thumb": {
     height: 18,
     width: 18,
     backgroundColor: "#E8A200",
     border: "3px solid #fff",
     boxShadow: "0 2px 6px rgba(0,0,0,.25)",
+    '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+      boxShadow: 'inherit',
+    },
+    '&::before': {
+      display: 'none',
+    },
   },
-
   "& .MuiSlider-track": {
     height: 12,
   },
@@ -33,6 +37,23 @@ const PriceSlider = styled(Slider)({
     opacity: 1,
     backgroundColor: "#e5e5e5",
     borderRadius: 10,
+  },
+  '& .MuiSlider-valueLabel': {
+    lineHeight: 1.2,
+    fontSize: 12,
+    background: 'unset',
+    padding: 0,
+    width: 50,
+    height: 32,
+    borderRadius: 20,
+    backgroundColor: '#E8A200',
+    transform: 'translate(0%, 10%) rotate(180deg) scale(0)',
+    '&.MuiSlider-valueLabelOpen': {
+      transform: 'translate(0%, 10%) rotate(180deg) scale(1)',
+    },
+    '& > *': {
+      transform: 'rotate(180deg)',
+    },
   },
 });
 
@@ -140,12 +161,13 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                 max={100}
                 onChange={(_, v) => setPrice(v as number[])}
                 disableSwap
+                valueLabelDisplay="auto"
               />
-              <div className="absolute left-0 -bottom-6">
+              {/* <div className="absolute left-0 -bottom-6">
                 <div className="bg-[#EEA500] text-white text-xs px-3 py-1 rounded-full shadow">
                   ${price[0]}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="flex items-center mt-8 justify-between gap-2 sm:gap-4">
