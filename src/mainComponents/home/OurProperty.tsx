@@ -1,14 +1,18 @@
 "use client";
 import CustomButton from "@/src/components/button/CustomButton";
-import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCard";
+import PropertiesCard, {
+  PropertyCardProps,
+} from "@/src/components/common/propertiesCard/PropertiesCard";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { propertyData } from "../dummyData";
+import { ListingsApiResponse } from "@/src/api/listing/listing.types";
+import axios from "axios";
 
 const tabList = [
   "Newly Listed properties",
@@ -18,6 +22,8 @@ const tabList = [
 
 const OurProperty = () => {
   const [tab, setTab] = useState<string>("Newly Listed properties");
+  const [data, setData] = useState<PropertyCardProps[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   // refs for each section
   const newlyListedRef = useRef<HTMLDivElement | null>(null);
@@ -48,6 +54,100 @@ const OurProperty = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await axios.get<ListingsApiResponse>(
+          "https://api.bridgedataoutput.com/api/v2/test/listings?access_token=6baca547742c6f96a6ff71b138424f21",
+        );
+
+        // const properties: PropertyCardProps[] = res.data.bundle.map(
+        //   (listing) => ({
+        //     id: listing.ListingKey,
+        //     image: "",
+        //     title: `${listing.PropertySubType}`,
+        //     price: listing.ListPrice,
+        //     daysAgo: listing.DaysOnMarket ?? 0,
+        //     address: listing.UnparsedAddress || "",
+        //     sqft: listing.LivingArea ?? 0,
+        //     beds: listing.BedroomsPossible ?? 0,
+        //     baths: listing.BathroomsTotalInteger ?? 0,
+        //     priceDrop:
+        //       listing.PreviousListPrice &&
+        //       listing.PreviousListPrice > listing.ListPrice
+        //         ? Number(
+        //             (
+        //               (listing.PreviousListPrice - listing.ListPrice) /
+        //               listing.ListPrice
+        //             ).toFixed(1),
+        //           )
+        //         : undefined,
+        //     assessedDiff: listing.ListPrice
+        //       ? Number(
+        //           (
+        //             (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+        //             listing.ListPrice
+        //           ).toFixed(1),
+        //         )
+        //       : 0,
+        //     mls: listing.ListingId,
+        //     realtor: listing.ListAgentFullName || "Unknown",
+        //     isLogin: false,
+        //   }),
+        // );
+
+        const properties: PropertyCardProps[] = res.data.bundle
+          .filter((listing) => listing.UnparsedAddress) // keep only listings with address
+          .map((listing) => {
+            return {
+              id: listing.ListingKey,
+              image: "",
+              title: `${listing.PropertySubType}`,
+              price: listing.ListPrice,
+              daysAgo: listing.DaysOnMarket ?? 0,
+              address: listing.UnparsedAddress || "",
+              sqft: listing.LivingArea ?? 0,
+              beds: listing.BedroomsPossible ?? 0,
+              baths: listing.BathroomsTotalInteger ?? 0,
+              priceDrop:
+                listing.PreviousListPrice &&
+                listing.PreviousListPrice > listing.ListPrice
+                  ? Number(
+                      (
+                        (listing.PreviousListPrice - listing.ListPrice) /
+                        listing.ListPrice
+                      ).toFixed(1),
+                    )
+                  : undefined,
+              assessedDiff: listing.ListPrice
+                ? Number(
+                    (
+                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                      listing.ListPrice
+                    ).toFixed(1),
+                  )
+                : 0,
+              mls: listing.ListingId,
+              realtor: listing.ListAgentFullName || "Unknown",
+              isLogin: false,
+            };
+          });
+
+        setData(properties);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setError(error.response?.data?.error?.message || "API error");
+        } else {
+          setError("An unexpected error occurred");
+        }
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  console.log("Data Json Est", error);
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:pl-16 md:pl-13 pl-6 w-full xl:pt-26.5 md:pt-31 pt-13 xl:pb-36 md:pb-33 pb-19.5 relative">
       <Heading
@@ -70,7 +170,7 @@ const OurProperty = () => {
           ))}
         </div>
         <Link
-          href={"/property"}
+          href={"/properties"}
           className="flex flex-row items-center bg-secondary text-background font-black md:text-base text-sm md:py-4.5 xl:px-13.5 py-2.5 px-7 rounded-lg"
         >
           View All
@@ -118,11 +218,11 @@ const OurProperty = () => {
                 640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
                 1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
               }}
-              className="mySwiper w-full pt-5! pb-9!"
+              className="mySwiper w-full h-full pt-5! pb-9!"
             >
-              {propertyData.map((item, index) => (
-                <SwiperSlide key={index}>
-                  <PropertiesCard {...item} isLogin />
+              {data.map((property) => (
+                <SwiperSlide key={property.id}>
+                  <PropertiesCard {...property} isLogin />
                 </SwiperSlide>
               ))}
             </Swiper>

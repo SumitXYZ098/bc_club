@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 import LineGradient from "../lineGradient/LineGradient";
 import Description, { IDescriptionTypes } from "../../description/Description";
-import { Icons } from "@/src/app/exports";
+import { Icons, Images } from "@/src/app/exports";
 import CustomButton from "../../button/CustomButton";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -56,11 +56,11 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
           isLogin && "group"
         }`}
       >
-        <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-auto">
+        <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-full justify-between">
           <div className="relative">
             <div className="w-full h-56 overflow-clip rounded-lg">
               <Image
-                src={image}
+                src={image || Images.apartment}
                 alt={title}
                 className="w-full h-56 object-cover rounded-lg group-hover:scale-125 transition duration-300 ease-in-out"
                 width={700}

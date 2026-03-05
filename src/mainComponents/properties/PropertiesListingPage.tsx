@@ -1,28 +1,93 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import { Chip } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesMap from "./PropertiesMap";
-import { propertyData } from "../dummyData";
-import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCard";
+import PropertiesCard, {
+  PropertyCardProps,
+} from "@/src/components/common/propertiesCard/PropertiesCard";
+import axios from "axios";
+import { ListingsApiResponse } from "@/src/api/listing/listing.types";
 
 export default function PropertiesListingPage() {
   const [openFilters, setOpenFilters] = useState(false);
   const [search, setSearch] = useState("");
   const [isChip, setIsChip] = useState(false);
-  const [activePrice, setActivePrice] = useState<string>('');
-  const [activeBathRoom, setActiveBathRoom] = useState<string>('');
-  const [activeBedRoom, setActiveBedRoom] = useState<string>('');
-  const [activeProperty, setActiveProperty] = useState<string>('');
+  const [activePrice, setActivePrice] = useState<string>("");
+  const [activeBathRoom, setActiveBathRoom] = useState<string>("");
+  const [activeBedRoom, setActiveBedRoom] = useState<string>("");
+  const [activeProperty, setActiveProperty] = useState<string>("");
   const pillBase =
     "px-6 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none pr-10 font-medium cursor-pointer border transition w-full";
 
   const pillActive = "border-primary text-primary ring-1 ring-blue-200";
 
   const pillInactive = "border-[#30548733] text-gray-800";
+
+  const [data, setData] = useState<PropertyCardProps[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await axios.get<ListingsApiResponse>(
+          "https://api.bridgedataoutput.com/api/v2/test/listings?access_token=6baca547742c6f96a6ff71b138424f21",
+        );
+
+        const properties: PropertyCardProps[] = res.data.bundle.map(
+          (listing) => {
+            return {
+              id: listing.ListingKey,
+              image: "",
+              title: `${listing.PropertySubType}`,
+              price: listing.ListPrice,
+              daysAgo: listing.DaysOnMarket ?? 0,
+              address: listing.UnparsedAddress || "210 Stracke Pines Trail # 515, Wolfbury TX 79725-5531",
+              sqft: listing.LivingArea ?? 0,
+              beds: listing.BedroomsPossible ?? 0,
+              baths: listing.BathroomsTotalInteger ?? 0,
+              priceDrop:
+                listing.PreviousListPrice &&
+                listing.PreviousListPrice > listing.ListPrice
+                  ? Number(
+                      (
+                        (listing.PreviousListPrice - listing.ListPrice) /
+                        listing.ListPrice
+                      ).toFixed(1),
+                    )
+                  : undefined,
+              assessedDiff: listing.ListPrice
+                ? Number(
+                    (
+                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                      listing.ListPrice
+                    ).toFixed(1),
+                  )
+                : 0,
+              mls: listing.ListingId,
+              realtor: listing.ListAgentFullName || "Unknown",
+              isLogin: false,
+            };
+          },
+        );
+
+        setData(properties);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setError(error.response?.data?.error?.message || "API error");
+        } else {
+          setError("An unexpected error occurred");
+        }
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  console.log("Data Json Est", error);
 
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
@@ -84,7 +149,7 @@ export default function PropertiesListingPage() {
 
           <div
             className={`${pillBase} ${
-              activePrice !== 'any' ? pillActive : pillInactive
+              activePrice !== "any" ? pillActive : pillInactive
             } relative w-full xl:flex hidden text-nowrap gap-x-0.5`}
           >
             <span>Price:</span>
@@ -101,7 +166,7 @@ export default function PropertiesListingPage() {
 
           <div
             className={`${pillBase} ${
-              activeBedRoom !== '1' ? pillActive : pillInactive
+              activeBedRoom !== "1" ? pillActive : pillInactive
             } relative w-full xl:flex hidden text-nowrap`}
           >
             <span>BedRoom:</span>
@@ -118,7 +183,7 @@ export default function PropertiesListingPage() {
 
           <div
             className={`${pillBase} ${
-              activeBathRoom !== '1' ? pillActive : pillInactive
+              activeBathRoom !== "1" ? pillActive : pillInactive
             } relative w-full xl:flex hidden text-nowrap`}
           >
             <span>BathRoom:</span>
@@ -135,7 +200,7 @@ export default function PropertiesListingPage() {
 
           <div
             className={`${pillBase} ${
-              activeProperty !== 'any' ? pillActive : pillInactive
+              activeProperty !== "any" ? pillActive : pillInactive
             } relative w-full xl:flex hidden text-nowrap`}
           >
             <span>Property Type:</span>
@@ -152,10 +217,10 @@ export default function PropertiesListingPage() {
 
           <button
             onClick={() => {
-              setActivePrice('any');
-              setActiveBedRoom('1');
-              setActiveBathRoom('1');
-              setActiveProperty('any');
+              setActivePrice("any");
+              setActiveBedRoom("1");
+              setActiveBathRoom("1");
+              setActiveProperty("any");
             }}
             className="px-6 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] items-center gap-2 border-[#30548733] cursor-pointer w-3/4 xl:flex hidden"
           >
@@ -171,8 +236,8 @@ export default function PropertiesListingPage() {
           </div>
 
           <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar xl:w-[64%] w-full xl:p-3">
-            {propertyData.map((property, index) => (
-              <PropertiesCard key={index} {...property} isLogin />
+            {data.map((property) => (
+              <PropertiesCard key={property.id} {...property} isLogin />
             ))}
           </div>
         </div>
