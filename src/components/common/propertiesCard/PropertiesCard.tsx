@@ -79,7 +79,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             </span>
 
             {/* Price Drop Banner */}
-            {priceDrop && (
+            {priceDrop !== undefined && priceDrop > 0 && (
               <span
                 className="absolute bottom-3 right-0 bg-secondary text-background pl-7 pr-3 pt-2 pb-2 text-xs h-auto font-medium"
                 style={{
