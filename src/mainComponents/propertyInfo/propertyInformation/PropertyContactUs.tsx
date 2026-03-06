@@ -21,9 +21,9 @@ const PropertyContactUs = ({ property }: { property: any }) => {
       </div>
       <div className="flex items-end gap-x-1.5">
         <span className="text-4xl text-primary font-bold">
-          ${property?.price.toLocaleString()}
+          ${property?.price.toLocaleString()|| "23,45,600"}
         </span>
-        <span className="text-base text-black70">{property?.sqft} sqft</span>
+        <span className="text-base text-black70">{property?.sqft || 1470} sqft</span>
       </div>
       <LineGradient />
       <span className="text-2xl font-bold">Contact with us now !</span>

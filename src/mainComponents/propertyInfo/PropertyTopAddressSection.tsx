@@ -20,7 +20,10 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
           <Heading
             tagType="h1"
             type={IHeadingTypes.heading32}
-            content={property?.address}
+            content={
+              property?.address ||
+              "210 Stracke Pines Trail # 515, Wolfbury TX 79725-5531"
+            }
           />
           <span className="text-red flex items-center-safe xl:text-base text-xs gap-x-1">
             <ArrowCircleDownFilled /> $96,000 on Sep 8, 2025
@@ -32,19 +35,19 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
             Southwestern Ontario, Ontario, Canada
           </span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
-          <span>MLS® {property?.mls}</span>
+          <span>MLS® {property?.mls || 'FPR345643E3'}</span>
         </div>
       </div>
       <div className="flex md:flex-col items-center md:items-end-safe gap-x-1.5 gap-y-3">
         <Heading
           tagType="h5"
           type={IHeadingTypes.heading48}
-          content={`$${property?.price.toLocaleString()}`}
+          content={`$${property?.price.toLocaleString() || '23,45,600'}`}
           customClasses="text-primary"
         />
         <Description
           type={IDescriptionTypes.dec1614}
-          content={`${property?.sqft}sqft`}
+          content={`${property?.sqft || '1470'}sqft`}
           customClasses="text-black70"
         />
       </div>
