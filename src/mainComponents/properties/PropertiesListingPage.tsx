@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
-import { Chip } from "@mui/material";
+import { Chip, PaginationItem } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesMap from "./PropertiesMap";
@@ -10,7 +10,7 @@ import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
 import axios from "axios";
-import { ListingsApiResponse } from "@/src/api/listing/listing.types";
+import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 
 export default function PropertiesListingPage() {
   const [openFilters, setOpenFilters] = useState(false);
@@ -20,6 +20,8 @@ export default function PropertiesListingPage() {
   const [activeBathRoom, setActiveBathRoom] = useState<string>("");
   const [activeBedRoom, setActiveBedRoom] = useState<string>("");
   const [activeProperty, setActiveProperty] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+
   const pillBase =
     "px-6 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none pr-10 font-medium cursor-pointer border transition w-full";
 
@@ -29,49 +31,66 @@ export default function PropertiesListingPage() {
 
   const [data, setData] = useState<PropertyCardProps[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20); // or whatever you want
+  const [pageCount, setPageCount] = useState(1);
 
   useEffect(() => {
     const fetchListings = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const res = await axios.get<ListingsApiResponse>(
-          "https://api.bridgedataoutput.com/api/v2/test/listings?access_token=6baca547742c6f96a6ff71b138424f21",
+        const res = await axios.get(
+          `https://backendbcclub.xyzdemowebsites.com/api/properties`,
+          {
+            params: {
+              "pagination[page]": page,
+              "pagination[pageSize]": pageSize,
+            },
+          },
         );
 
-        const properties: PropertyCardProps[] = res.data.bundle.map(
-          (listing) => {
-            return {
-              id: listing.ListingKey,
-              image: "",
-              title: `${listing.PropertySubType}`,
-              price: listing.ListPrice,
-              daysAgo: listing.DaysOnMarket ?? 0,
-              address: listing.UnparsedAddress || "210 Stracke Pines Trail # 515, Wolfbury TX 79725-5531",
-              sqft: listing.LivingArea ?? 0,
-              beds: listing.BedroomsPossible ?? 0,
-              baths: listing.BathroomsTotalInteger ?? 0,
-              priceDrop:
-                listing.PreviousListPrice &&
-                listing.PreviousListPrice > listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.PreviousListPrice - listing.ListPrice) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : undefined,
-              assessedDiff: listing.ListPrice
+        const listings = res.data.data;
+        const pagination = res.data.meta.pagination;
+
+        setPageCount(pagination.pageCount);
+
+        const properties: PropertyCardProps[] = listings.map(
+          (listing: any) => ({
+            id: listing.documentId,
+            image: listing?.media?.[0]?.MediaURL,
+            title: listing?.property_sub_type,
+            price: listing?.price,
+            daysAgo: listing.DaysOnMarket ?? 0,
+            address: listing?.address
+              ? `${listing?.address}, ${listing?.city}, ${listing?.state}`
+              : `${listing?.city}, ${listing?.state}` || "",
+            sqft: listing?.area ?? 0,
+            beds: listing?.bedrooms ?? 0,
+            baths: listing?.bathrooms ?? 0,
+            priceDrop:
+              listing.PreviousListPrice &&
+              listing.PreviousListPrice > listing.ListPrice
                 ? Number(
                     (
-                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                      (listing.PreviousListPrice - listing.ListPrice) /
                       listing.ListPrice
                     ).toFixed(1),
                   )
-                : 0,
-              mls: listing.ListingId,
-              realtor: listing.ListAgentFullName || "Unknown",
-              isLogin: false,
-            };
-          },
+                : undefined,
+            assessedDiff: listing.ListPrice
+              ? Number(
+                  (
+                    (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                    listing.ListPrice
+                  ).toFixed(1),
+                )
+              : 0,
+            mls: listing?.mls_number,
+            realtor: listing?.raw_data?.ListAOR || "Unknown",
+            isLogin: false,
+          }),
         );
 
         setData(properties);
@@ -81,11 +100,13 @@ export default function PropertiesListingPage() {
         } else {
           setError("An unexpected error occurred");
         }
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchListings();
-  }, []);
+  }, [page, pageSize]);
 
   console.log("Data Json Est", error);
 
@@ -235,10 +256,50 @@ export default function PropertiesListingPage() {
             <PropertiesMap />
           </div>
 
-          <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar xl:w-[64%] w-full xl:p-3">
-            {data.map((property) => (
-              <PropertiesCard key={property.id} {...property} isLogin />
-            ))}
+          <div className="xl:w-[64%] w-full flex flex-col">
+            <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
+              {loading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <PropertyCardSkeleton key={i} />
+                  ))
+                : data.map((property) => (
+                    <PropertiesCard key={property.id} {...property} isLogin />
+                  ))}
+            </div>
+            <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
+              {/* Prev */}
+              <button
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                className="px-4 py-2 border rounded-md disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              {/* Page Numbers */}
+              {Array.from({ length: pageCount }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPage(i + 1)}
+                  className={`px-4 py-2 border rounded-md ${
+                    page === i + 1
+                      ? "bg-primary text-white border-primary"
+                      : "bg-white"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              {/* Next */}
+              <button
+                onClick={() => setPage((prev) => Math.min(prev + 1, pageCount))}
+                disabled={page === pageCount}
+                className="px-4 py-2 border rounded-md disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>

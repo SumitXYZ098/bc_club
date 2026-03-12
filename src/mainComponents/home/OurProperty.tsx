@@ -13,6 +13,7 @@ import "swiper/css/pagination";
 import { propertyData } from "../dummyData";
 import { ListingsApiResponse } from "@/src/api/listing/listing.types";
 import axios from "axios";
+import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 
 const tabList = [
   "Newly Listed properties",
@@ -24,6 +25,7 @@ const OurProperty = () => {
   const [tab, setTab] = useState<string>("Newly Listed properties");
   const [data, setData] = useState<PropertyCardProps[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // refs for each section
   const newlyListedRef = useRef<HTMLDivElement | null>(null);
@@ -57,59 +59,29 @@ const OurProperty = () => {
 
   useEffect(() => {
     const fetchListings = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const res = await axios.get<ListingsApiResponse>(
-          "https://api.bridgedataoutput.com/api/v2/test/listings?access_token=6baca547742c6f96a6ff71b138424f21",
+        const res = await axios.get(
+          "https://backendbcclub.xyzdemowebsites.com/api/properties",
         );
 
-        // const properties: PropertyCardProps[] = res.data.bundle.map(
-        //   (listing) => ({
-        //     id: listing.ListingKey,
-        //     image: "",
-        //     title: `${listing.PropertySubType}`,
-        //     price: listing.ListPrice,
-        //     daysAgo: listing.DaysOnMarket ?? 0,
-        //     address: listing.UnparsedAddress || "",
-        //     sqft: listing.LivingArea ?? 0,
-        //     beds: listing.BedroomsPossible ?? 0,
-        //     baths: listing.BathroomsTotalInteger ?? 0,
-        //     priceDrop:
-        //       listing.PreviousListPrice &&
-        //       listing.PreviousListPrice > listing.ListPrice
-        //         ? Number(
-        //             (
-        //               (listing.PreviousListPrice - listing.ListPrice) /
-        //               listing.ListPrice
-        //             ).toFixed(1),
-        //           )
-        //         : undefined,
-        //     assessedDiff: listing.ListPrice
-        //       ? Number(
-        //           (
-        //             (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-        //             listing.ListPrice
-        //           ).toFixed(1),
-        //         )
-        //       : 0,
-        //     mls: listing.ListingId,
-        //     realtor: listing.ListAgentFullName || "Unknown",
-        //     isLogin: false,
-        //   }),
-        // );
-
-        const properties: PropertyCardProps[] = res.data.bundle
-          .filter((listing) => listing.UnparsedAddress) // keep only listings with address
-          .map((listing) => {
+        const properties: PropertyCardProps[] = res.data.data
+          .filter((listing: any) => listing?.address)
+          .map((listing: any) => {
             return {
-              id: listing.ListingKey,
-              image: "",
-              title: `${listing.PropertySubType}`,
-              price: listing.ListPrice,
+              id: listing.documentId,
+              image: listing?.media?.[0]?.MediaURL,
+              title: listing?.property_sub_type,
+              price: listing?.price,
               daysAgo: listing.DaysOnMarket ?? 0,
-              address: listing.UnparsedAddress || "",
-              sqft: listing.LivingArea ?? 0,
-              beds: listing.BedroomsPossible ?? 0,
-              baths: listing.BathroomsTotalInteger ?? 0,
+              address:
+                `${listing?.address}, ${listing?.city}, ${listing?.state}` ||
+                "",
+              sqft: listing?.area ?? 0,
+              beds: listing?.bedrooms ?? 0,
+              baths: listing?.bathrooms ?? 0,
               priceDrop:
                 listing.PreviousListPrice &&
                 listing.PreviousListPrice > listing.ListPrice
@@ -128,8 +100,8 @@ const OurProperty = () => {
                     ).toFixed(1),
                   )
                 : 0,
-              mls: listing.ListingId,
-              realtor: listing.ListAgentFullName || "Unknown",
+              mls: listing?.mls_number,
+              realtor: listing?.raw_data?.ListAOR || "Unknown",
               isLogin: false,
             };
           });
@@ -141,6 +113,8 @@ const OurProperty = () => {
         } else {
           setError("An unexpected error occurred");
         }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -198,35 +172,43 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Newly Listed Properties"
           />
-          <div className="flex flex-row gap-x-5 w-full">
-            <Swiper
-              speed={2500}
-              spaceBetween={12}
-              slidesPerView={1.1}
-              autoplay={{
-                delay: 0,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true,
-              }}
-              modules={[Autoplay, Pagination]}
-              loop
-              pagination={{
-                clickable: true,
-                dynamicBullets: true,
-              }}
-              breakpoints={{
-                640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
-                1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
-              }}
-              className="mySwiper w-full h-full pt-5! pb-9!"
-            >
-              {data.map((property) => (
-                <SwiperSlide key={property.id}>
-                  <PropertiesCard {...property} isLogin />
-                </SwiperSlide>
+          {loading ? (
+            <div className="flex flex-nowrap gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <PropertyCardSkeleton key={i} />
               ))}
-            </Swiper>
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-row gap-x-5 w-full">
+              <Swiper
+                speed={2500}
+                spaceBetween={12}
+                slidesPerView={1.1}
+                autoplay={{
+                  delay: 0,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                modules={[Autoplay, Pagination]}
+                loop
+                pagination={{
+                  clickable: true,
+                  dynamicBullets: true,
+                }}
+                breakpoints={{
+                  640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
+                  1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
+                }}
+                className="mySwiper w-full h-full pt-5! pb-9!"
+              >
+                {data.map((property) => (
+                  <SwiperSlide key={property.id}>
+                    <PropertiesCard {...property} isLogin />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          )}
         </div>
 
         {/* Court ordered sales */}

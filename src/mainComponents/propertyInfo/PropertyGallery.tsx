@@ -6,7 +6,7 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
 type Props = {
-  images: string[];
+  images: any[];
 };
 
 export default function PropertyGallery({ images }: Props) {
@@ -28,7 +28,7 @@ export default function PropertyGallery({ images }: Props) {
           }}
         >
           <Image
-            src={images[0]}
+            src={images[0].MediaURL}
             alt="Property image"
             width={1020}
             height={450}
@@ -51,7 +51,7 @@ export default function PropertyGallery({ images }: Props) {
                 }}
               >
                 <Image
-                  src={img}
+                  src={img.MediaURL}
                   alt={`Thumbnail ${i + 1}`}
                   width={450}
                   height={300}
@@ -77,7 +77,7 @@ export default function PropertyGallery({ images }: Props) {
         open={open}
         close={() => setOpen(false)}
         index={index}
-        slides={images.map((src) => ({ src }))}
+        slides={images.map((img) => ({ src: img.MediaURL }))}
       />
     </>
   );

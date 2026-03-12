@@ -25,17 +25,17 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
               "210 Stracke Pines Trail # 515, Wolfbury TX 79725-5531"
             }
           />
-          <span className="text-red flex items-center-safe xl:text-base text-xs gap-x-1">
+          <span className="text-red items-center-safe xl:text-base text-xs gap-x-1 hidden">
             <ArrowCircleDownFilled /> $96,000 on Sep 8, 2025
           </span>
         </div>
         <div className="flex md:flex-row flex-col text-wrap md:items-center xl:text-base text-sm gap-y-1.5 text-black70">
           <span className="flex items-center gap-x-0.5">
             <LocationRippleFilled className="text-secondary md:w-8 md:h-8 w-6 h-6" />
-            Southwestern Ontario, Ontario, Canada
+            {property?.city}, {property?.state}, Canada
           </span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
-          <span>MLS® {property?.mls || 'FPR345643E3'}</span>
+          <span>MLS® {property?.mls_number || 'FPR345643E3'}</span>
         </div>
       </div>
       <div className="flex md:flex-col items-center md:items-end-safe gap-x-1.5 gap-y-3">
@@ -47,7 +47,7 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
         />
         <Description
           type={IDescriptionTypes.dec1614}
-          content={`${property?.sqft || '1470'}sqft`}
+          content={`${property?.area || '1470'}sqft`}
           customClasses="text-black70"
         />
       </div>

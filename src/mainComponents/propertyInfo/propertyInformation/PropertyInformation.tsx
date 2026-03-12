@@ -31,12 +31,12 @@ const PropertyInformation = ({ property }: { property: any }) => {
     {
       icon: Icons.bedroom,
       label: "Bedrooms",
-      value: property?.beds,
+      value: property?.bedrooms,
     },
     {
       icon: Icons.bathtub,
       label: "Bathrooms",
-      value: property?.baths,
+      value: property?.bathrooms,
     },
     {
       icon: Icons.garage,
@@ -51,7 +51,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
     {
       icon: Icons.scale,
       label: "Area Size",
-      value: property?.sqft,
+      value: property?.area,
     },
   ];
   return (
@@ -71,9 +71,10 @@ const PropertyInformation = ({ property }: { property: any }) => {
             <Description
               type={IDescriptionTypes.dec1614}
               customClasses="text-black70/50"
-              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vel euismod lectus. Integer at arcu sollicitudin, fermentum ipsum congue, volutpat nibh. Curabitur at iaculis odio. Curabitur congue augue quis elit cursus faucibus. Aenean quis varius diam, ut mattis arcu. Integer porta ligula quis lorem imperdiet convallis. Mauris et neque non turpis viverra tincidunt. Donec lobortis purus sed lacinia varius. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur condimentum semper est id condimentum.
-
-Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, tellus vitae efficitur placerat, nisi metus pharetra turpis, sed bibendum eros est ac diam. Vivamus dapibus elit id orci ultrices, sit amet ullamcorper magna lobortis. In hac habitasse platea dictumst. Integer vehicula sapien augue, et ullamcorper quam egestas ut. Ut sit amet eros eros. Nullam ligula diam, egestas at nisl sed, laoreet accumsan nibh. Mauris justo justo, hendrerit eget elementum sed, sodales non nisi. Aliquam eget leo in metus condimentum placerat quis at dui. Suspendisse nec ullamcorper dui. Nulla porta scelerisque ipsum congue malesuada. Sed sodales, nisl in tristique vestibulum, metus mauris ultricies odio, et sodales nulla ligula at tortor."
+              content={
+                property?.raw_data?.PublicRemarks ||
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vel euismod lectus. Integer at arcu sollicitudin, fermentum ipsum congue, volutpat nibh. Curabitur at iaculis odio. Curabitur congue augue quis elit cursus faucibus. Aenean quis varius diam, ut mattis arcu. Integer porta ligula quis lorem imperdiet convallis. Mauris et neque non turpis viverra tincidunt. Donec lobortis purus sed lacinia varius. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur condimentum semper est id condimentum.Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, tellus vitae efficitur placerat, nisi metus pharetra turpis, sed bibendum eros est ac diam. Vivamus dapibus elit id orci ultrices, sit amet ullamcorper magna lobortis. In hac habitasse platea dictumst. Integer vehicula sapien augue, et ullamcorper quam egestas ut. Ut sit amet eros eros. Nullam ligula diam, egestas at nisl sed, laoreet accumsan nibh. Mauris justo justo, hendrerit eget elementum sed, sodales non nisi. Aliquam eget leo in metus condimentum placerat quis at dui. Suspendisse nec ullamcorper dui. Nulla porta scelerisque ipsum congue malesuada. Sed sodales, nisl in tristique vestibulum, metus mauris ultricies odio, et sodales nulla ligula at tortor."
+              }
             />
           </div>
 

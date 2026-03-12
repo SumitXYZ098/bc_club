@@ -17,13 +17,19 @@ const PropertyContactUs = ({ property }: { property: any }) => {
       </div>
       <div className="flex items-center gap-x-1.5 text-[#636366]">
         <MapPin className="w-6 h-6" />
-        <span className="text-base">Southwestern Ontario, Ontario, Canada</span>
+        <span className="text-base">
+          {`${property?.city}, ${property?.state},` ||
+            "Southwestern Ontario, Ontario,"}
+          Canada
+        </span>
       </div>
       <div className="flex items-end gap-x-1.5">
         <span className="text-4xl text-primary font-bold">
-          ${property?.price.toLocaleString()|| "23,45,600"}
+          ${property?.price.toLocaleString() || "23,45,600"}
         </span>
-        <span className="text-base text-black70">{property?.sqft || 1470} sqft</span>
+        <span className="text-base text-black70">
+          {property?.area || 1470} sqft
+        </span>
       </div>
       <LineGradient />
       <span className="text-2xl font-bold">Contact with us now !</span>

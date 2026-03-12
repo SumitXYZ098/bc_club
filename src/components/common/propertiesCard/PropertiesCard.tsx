@@ -74,9 +74,11 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             </button>
 
             {/* Days Ago */}
-            <span className="absolute top-3 right-3 bg-background text-primary px-3 py-1.5 text-sm rounded-full">
-              {daysAgo} days ago
-            </span>
+            {daysAgo !== 0 && (
+              <span className="absolute top-3 right-3 bg-background text-primary px-3 py-1.5 text-sm rounded-full">
+                {daysAgo} days ago
+              </span>
+            )}
 
             {/* Price Drop Banner */}
             {priceDrop !== undefined && priceDrop > 0 && (
