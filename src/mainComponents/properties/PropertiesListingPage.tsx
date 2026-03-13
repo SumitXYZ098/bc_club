@@ -30,6 +30,7 @@ export default function PropertiesListingPage() {
   const pillInactive = "border-[#30548733] text-gray-800";
 
   const [data, setData] = useState<PropertyCardProps[]>([]);
+  const [listingData, setListingData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20); // or whatever you want
@@ -55,6 +56,7 @@ export default function PropertiesListingPage() {
         const pagination = res.data.meta.pagination;
 
         setPageCount(pagination.pageCount);
+        setListingData(listings);
 
         const properties: PropertyCardProps[] = listings.map(
           (listing: any) => ({
@@ -253,7 +255,7 @@ export default function PropertiesListingPage() {
         {/* Map + List */}
         <div className="flex justify-between items-start mb-10 w-full ">
           <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
-            <PropertiesMap />
+            <PropertiesMap locations={listingData} />
           </div>
 
           <div className="xl:w-[64%] w-full flex flex-col">

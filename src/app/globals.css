@@ -148,3 +148,58 @@ body::-webkit-scrollbar {
 .animate-popupSlide {
   animation: popupSlide 0.3s ease-out;
 }
+
+.price-marker {
+  background: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #222;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  border: 1px solid #e5e5e5;
+  white-space: nowrap;
+}
+.price-marker:hover {
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 16px;
+  transition: all;
+  transition-duration: 500ms;
+  transition-timing-function: ease-in-out;
+}
+
+.mapboxgl-popup-content {
+  padding: 10px !important;
+  overflow: hidden;
+  border-radius: 12px !important ;
+
+  .property-card {
+    width: 100%;
+    font-family: sans-serif;
+  }
+
+  .property-image {
+    width: 100%;
+    height: 120px;
+     border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .property-content {
+    padding: 10px 0;
+  }
+
+  .property-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 4px 0;
+    color: var(--primary);
+  }
+
+  .property-content p {
+    margin: 2px 0;
+    color: var(--black70);
+  }
+}
