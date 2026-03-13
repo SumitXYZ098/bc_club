@@ -183,23 +183,40 @@ body::-webkit-scrollbar {
   .property-image {
     width: 100%;
     height: 120px;
-     border-radius: 4px;
+    border-radius: 4px;
     object-fit: cover;
   }
 
   .property-content {
+    width: 100%;
     padding: 10px 0;
   }
 
-  .property-content h3 {
+  .property-content .price {
     font-size: 16px;
     font-weight: 600;
     margin: 4px 0;
     color: var(--primary);
   }
 
+  .property-content .type {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 4px 0;
+    color: var(--black70);
+  }
+
   .property-content p {
     margin: 2px 0;
     color: var(--black70);
+  }
+  .property-content .combine {
+    margin: 2px 0;
+    font-size: 12px;
+    color: var(--black70);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
 }

@@ -59,13 +59,16 @@ const PropertiesMap: React.FC<SimpleMapProps> = ({
         <img src="${property?.media?.[0]?.MediaURL || Images.apartment}" class="property-image"/>
 
         <div class="property-content">
-          <h3>$${property?.price.toLocaleString()}</h3>
+         <h3 class="price">$${property?.price.toLocaleString()}</h3>
+         <span class="type">${property?.property_sub_type}</span>
           <p>${
             property?.address
-              ? `${property?.address}, ${property?.city}, ${property?.state}`
+              ? `${property?.address}`
               : `${property?.city}, ${property?.state}`
           }</p>
-          <p><strong>MLS® ${property?.mls_number}</strong></p>
+          <div class="combine"><span class="mls"><strong>MLS® ${property?.mls_number}</strong></span>
+          <span class="aor"><strong>${property?.raw_data?.ListAOR || "Unknown"}</strong></span>
+          </div>
         </div>
       </div></a>`),
           )
