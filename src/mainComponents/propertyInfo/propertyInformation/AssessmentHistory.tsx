@@ -42,7 +42,7 @@ const AssessmentHistory = () => {
   return (
     <div className="w-full bg-background rounded-xl mt-10">
       <div className="flex  items-center mb-4">
-        <h2 className="text-lg font-semibold">Assessment History</h2>
+        <h2 className="text-lg font-semibold">Assessment History (Dummy Data)</h2>
       </div>
 
       <div className="h-70">

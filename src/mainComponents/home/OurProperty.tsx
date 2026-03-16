@@ -68,7 +68,10 @@ const OurProperty = () => {
         );
 
         const properties: PropertyCardProps[] = res.data.data
-          .filter((listing: any) => listing?.address)
+          .filter(
+            (listing: any) =>
+              listing?.address && listing?.property_status !== "Rented",
+          )
           .map((listing: any) => {
             return {
               id: listing.documentId,
@@ -120,8 +123,7 @@ const OurProperty = () => {
 
     fetchListings();
   }, []);
-
-  console.log("Data Json Est", error);
+  console.log("Data", data);
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:pl-16 md:pl-13 pl-6 w-full xl:pt-26.5 md:pt-31 pt-13 xl:pb-36 md:pb-33 pb-19.5 relative">
       <Heading

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
-import { Chip, PaginationItem } from "@mui/material";
+import { Chip, MenuItem, PaginationItem, Select } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesMap from "./PropertiesMap";
@@ -11,19 +11,21 @@ import PropertiesCard, {
 } from "@/src/components/common/propertiesCard/PropertiesCard";
 import axios from "axios";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
+import { Endpoints } from "@/src/api/endpoints";
 
 export default function PropertiesListingPage() {
   const [openFilters, setOpenFilters] = useState(false);
   const [search, setSearch] = useState("");
   const [isChip, setIsChip] = useState(false);
-  const [activePrice, setActivePrice] = useState<string>("");
-  const [activeBathRoom, setActiveBathRoom] = useState<string>("");
-  const [activeBedRoom, setActiveBedRoom] = useState<string>("");
-  const [activeProperty, setActiveProperty] = useState<string>("");
+  const [activePrice, setActivePrice] = useState<string>("any");
+  const [activeBathRoom, setActiveBathRoom] = useState<string>("any");
+  const [activeBedRoom, setActiveBedRoom] = useState<string>("any");
+  const [activeProperty, setActiveProperty] = useState<string>("any");
   const [loading, setLoading] = useState(false);
 
   const pillBase =
-    "px-6 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none pr-10 font-medium cursor-pointer border transition w-full";
+    "pl-4 pr-2 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none font-medium cursor-pointer border transition w-full";
 
   const pillActive = "border-primary text-primary ring-1 ring-blue-200";
 
@@ -36,23 +38,51 @@ export default function PropertiesListingPage() {
   const [pageSize] = useState(20); // or whatever you want
   const [pageCount, setPageCount] = useState(1);
 
+  const params: any = {
+    "pagination[page]": page,
+    "pagination[pageSize]": pageSize,
+    "filters[property_status][$ne]": "Rented",
+    "filters[property_sub_type][$notNull]": true,
+  };
+
+  // price sorting
+  if (activePrice && activePrice !== "any") {
+    params.price = activePrice;
+  }
+
+  // bedroom filter
+  if (activeBedRoom && activeBedRoom !== "any") {
+    params.beds = activeBedRoom;
+  }
+
+  // bathroom filter
+  if (activeBathRoom && activeBathRoom !== "any") {
+    params.baths = activeBathRoom;
+  }
+
+  // property type filter
+  if (activeProperty && activeProperty !== "any") {
+    params.type = activeProperty;
+  }
+
+  // search
+  if (search) {
+    params.search = search;
+  }
+
   useEffect(() => {
     const fetchListings = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const res = await axios.get(
-          `https://backendbcclub.xyzdemowebsites.com/api/properties`,
-          {
-            params: {
-              "pagination[page]": page,
-              "pagination[pageSize]": pageSize,
-            },
-          },
-        );
+        const res = await axios.get(Endpoints.getListing, {
+          params,
+        });
 
         const listings = res.data.data;
+
+        console.log(listings);
         const pagination = res.data.meta.pagination;
 
         setPageCount(pagination.pageCount);
@@ -108,9 +138,15 @@ export default function PropertiesListingPage() {
     };
 
     fetchListings();
-  }, [page, pageSize]);
-
-  console.log("Data Json Est", error);
+  }, [
+    page,
+    pageSize,
+    activePrice,
+    activeBedRoom,
+    activeBathRoom,
+    activeProperty,
+    search,
+  ]);
 
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
@@ -170,80 +206,86 @@ export default function PropertiesListingPage() {
             <span className="font-medium">Filters</span>
           </button>
 
-          <div
-            className={`${pillBase} ${
-              activePrice !== "any" ? pillActive : pillInactive
-            } relative w-full xl:flex hidden text-nowrap gap-x-0.5`}
-          >
-            <span>Price:</span>
-            <select
-              onChange={(e) => setActivePrice(e.target.value)}
-              className="w-full outline-0"
-              value={activePrice}
-            >
-              <option value="any">Any</option>
-              <option value="low">Below 50L</option>
-              <option value="high">Above 50L</option>
-            </select>
-          </div>
+          {/* Price */}
+          <FilterPillSelect
+            label="Price"
+            value={activePrice}
+            onChange={setActivePrice}
+            pillBase={pillBase}
+            pillActive={pillActive}
+            pillInactive={pillInactive}
+            options={[
+              { label: "Any", value: "any" },
+              { label: "Low to High", value: "asc" },
+              { label: "High to Low", value: "desc" },
+            ]}
+          />
 
-          <div
-            className={`${pillBase} ${
-              activeBedRoom !== "1" ? pillActive : pillInactive
-            } relative w-full xl:flex hidden text-nowrap`}
-          >
-            <span>BedRoom:</span>
-            <select
-              onChange={(e) => setActiveBedRoom(e.target.value)}
-              className="w-full outline-0"
-              value={activeBedRoom}
-            >
-              <option value="1">Any</option>
-              <option value="2">2+</option>
-              <option value="3">3+</option>
-            </select>
-          </div>
+          {/* BedRoom */}
+          <FilterPillSelect
+            label="BedRoom"
+            value={activeBedRoom}
+            onChange={setActiveBedRoom}
+            pillBase={pillBase}
+            pillActive={pillActive}
+            pillInactive={pillInactive}
+            options={[
+              { label: "Any", value: "any" },
+              { label: "1", value: "1" },
+              { label: "2", value: "2" },
+              { label: "3", value: "3" },
+              { label: "4+", value: "4" },
+            ]}
+          />
 
-          <div
-            className={`${pillBase} ${
-              activeBathRoom !== "1" ? pillActive : pillInactive
-            } relative w-full xl:flex hidden text-nowrap`}
-          >
-            <span>BathRoom:</span>
-            <select
-              onChange={(e) => setActiveBathRoom(e.target.value)}
-              className="w-full outline-0"
-              value={activeBathRoom}
-            >
-              <option value="1">Any</option>
-              <option value="2">2+</option>
-              <option value="3">3+</option>
-            </select>
-          </div>
+          {/* BathRoom */}
+          <FilterPillSelect
+            label="BathRoom"
+            value={activeBathRoom}
+            onChange={setActiveBathRoom}
+            pillBase={pillBase}
+            pillActive={pillActive}
+            pillInactive={pillInactive}
+            options={[
+              { label: "Any", value: "any" },
+              { label: "1", value: "1" },
+              { label: "2", value: "2" },
+              { label: "3", value: "3" },
+              { label: "4+", value: "4" },
+            ]}
+          />
 
-          <div
-            className={`${pillBase} ${
-              activeProperty !== "any" ? pillActive : pillInactive
-            } relative w-full xl:flex hidden text-nowrap`}
-          >
-            <span>Property Type:</span>
-            <select
-              onChange={(e) => setActiveProperty(e.target.value)}
-              value={activeProperty}
-              className="w-full outline-0"
-            >
-              <option value="any">Any</option>
-              <option value="house">House</option>
-              <option value="flat">Flat</option>
-            </select>
-          </div>
+          {/* Property Type */}
+          <FilterPillSelect
+            label="Property Type"
+            value={activeProperty}
+            onChange={setActiveProperty}
+            pillBase={pillBase}
+            pillActive={pillActive}
+            pillInactive={pillInactive}
+            options={[
+              { label: "Any", value: "any" },
+              { label: "Apartment/Condo", value: "Apartment/Condo" },
+              {
+                label: "Single Family Residence",
+                value: "Single Family Residence",
+              },
+              { label: "Townhouse", value: "Townhouse" },
+              { label: "Half Duplex", value: "Half Duplex" },
+              {
+                label: "Row House (Non-Strata)",
+                value: "Row House (Non-Strata)",
+              },
+            ]}
+          />
 
           <button
             onClick={() => {
               setActivePrice("any");
-              setActiveBedRoom("1");
-              setActiveBathRoom("1");
+              setActiveBedRoom("any");
+              setActiveBathRoom("any");
               setActiveProperty("any");
+              setPage(1);
             }}
             className="px-6 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] items-center gap-2 border-[#30548733] cursor-pointer w-3/4 xl:flex hidden"
           >

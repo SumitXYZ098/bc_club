@@ -56,6 +56,7 @@ const Images = {
   leaderlesson: "/leaderlesson.webp",
   assessment: "/assessment.webp",
   employee: "/employee.webp",
+  mlsr:'/mlsr-logo.png',
 };
 
 export { Icons, Images };

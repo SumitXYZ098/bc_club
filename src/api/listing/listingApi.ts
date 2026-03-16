@@ -1,11 +1,10 @@
 import axios from "axios";
 import { ListingsApiResponse } from "./listing.types";
+import { Endpoints } from "../endpoints";
 
 export async function getListings(): Promise<ListingsApiResponse> {
   try {
-    const res = await axios.get(
-      "https://backendbcclub.xyzdemowebsites.com/api/properties",
-    );
+    const res = await axios.get(Endpoints.getListing);
 
     return res.data;
   } catch (error) {
@@ -18,9 +17,7 @@ export async function getListings(): Promise<ListingsApiResponse> {
 
 export async function getListingById(id: string): Promise<any> {
   try {
-    const res = await axios.get(
-      `https://backendbcclub.xyzdemowebsites.com/api/properties/${id}`,
-    );
+    const res = await axios.get(Endpoints.getListingById(id));
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

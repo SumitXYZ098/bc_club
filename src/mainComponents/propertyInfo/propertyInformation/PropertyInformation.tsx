@@ -140,13 +140,13 @@ const PropertyInformation = ({ property }: { property: any }) => {
           </div>
           {/* Property Details */}
           <DynamicTable
-            title="Property Details"
+            title="Property Details (Dummy Data)"
             headers={propertyDetailsHeaders}
             rows={propertyDetailsRows}
           />
           {/* Room Information */}
           <DynamicTable
-            title="Room Information"
+            title="Room Information (Dummy Data)"
             headers={roomHeaders}
             rows={roomRows}
           />
@@ -166,7 +166,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
             className="scroll-mt-40 p-5 rounded-xl bg-gray flex flex-col gap-y-4"
           >
             <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
-              Pricing Estimate
+              Pricing Estimate (Dummy Data)
             </h2>
             <LineGradient customClasses="" />
             {/* Pricing content can be added here */}
@@ -189,7 +189,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
           {/* Nearby Schools */}
           <div id="neighbourhood" className="scroll-mt-40">
             <DynamicTable
-              title={"Nearby Schools"}
+              title={"Nearby Schools (Dummy Data)"}
               headers={nearbySchoolsHeaders}
               rows={nearbySchoolsRows}
             />
@@ -197,14 +197,14 @@ const PropertyInformation = ({ property }: { property: any }) => {
 
           {/* Building Complex Information */}
           <DynamicTable
-            title={"Building Complex Information"}
+            title={"Building Complex Information (Dummy Data)"}
             headers={buildingComplexHeaders}
             rows={buildingComplexRows}
           />
           {/* Market Statistics */}
           <div id="stats" className="scroll-mt-40">
             <DynamicTable
-              title="Market Statistics"
+              title="Market Statistics  (Dummy Data)"
               headers={marketStatsHeaders}
               rows={marketStatsRows}
             />
