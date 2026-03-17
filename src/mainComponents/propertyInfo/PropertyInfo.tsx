@@ -31,8 +31,6 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
     }
   }, [paramsId]);
 
-  console.log(listing);
-
   if (loading)
     return (
       <div className="xl:max-w-screen-2xl mx-auto w-full h-screen p-10 flex justify-center items-center">

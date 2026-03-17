@@ -211,153 +211,137 @@ export const propertyDetailsHeaders: TableHeader[] = [
   { key: "label", label: "" },
   { key: "value", label: "", align: "right" },
 ];
-export const propertyDetailsRows = [
+
+export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Property Type",
-      value: "Apartment/Condo",
+      value: property?.property_sub_type || "-",
     },
   },
   {
     data: {
       label: "Bedrooms",
-      value: "1",
+      value: property?.bedrooms ?? "-",
     },
   },
   {
     data: {
       label: "Bathrooms",
-      value: "1",
+      value: property?.bathrooms ?? "-",
     },
   },
   {
     data: {
       label: "Asking Price",
-      value: "$594,900",
+      value: property?.price
+        ? `$${Number(property.price).toLocaleString()}`
+        : "-",
     },
   },
   {
     data: {
       label: "Maintenance Fee",
-      value: "$410.5",
+      value: property?.raw_data?.AssociationFee
+        ? `$${property.raw_data.AssociationFee}`
+        : "-",
     },
   },
   {
     data: {
       label: "Listing Date",
-      value: "2025/July/10",
+      value: property?.raw_data?.ListingContractDate
+        ? new Date(property.raw_data.ListingContractDate).toLocaleDateString()
+        : "-",
     },
     subRows: [
       {
         data: {
-          label: "Days at New Price",
-          value: "93 days",
-        },
-      },
-      {
-        data: {
           label: "Days On Market",
-          value: "153 days",
+          value: property?.DaysOnMarket ? `${property.DaysOnMarket} days` : "-",
         },
       },
       {
         data: {
-          label: "Cumulative Days On Market",
-          value: "123 days",
+          label: "Status",
+          value:  "-",
         },
       },
     ],
   },
   {
     data: {
-      label: "Previously Sold Date",
-      value: "2015/Feb/24",
-    },
-  },
-  {
-    data: {
       label: "Floor Area",
-      value: "629 sqft",
+      value: property?.area ? `${property.area} sqft` : "-",
     },
     subRows: [
       {
         data: {
           label: "Price per SqFt",
-          value: "$946",
-        },
-      },
-      {
-        data: {
-          label: "Maint. Fee per SqFt",
-          value: "$0.65",
+          value:
+            property?.price && property?.area
+              ? `$${Math.round(property.price / property.area)}`
+              : "-",
         },
       },
     ],
   },
   {
     data: {
+      label: "Year Built",
+      value: property?.raw_data?.YearBuilt || "-",
+    },
+  },
+  {
+    data: {
       label: "Age",
-      value: "82 years (1943)",
+      value: property?.raw_data?.BCRES_Age
+        ? `${property.raw_data.BCRES_Age} years`
+        : "-",
     },
   },
   {
     data: {
       label: "Property Taxes",
-      value: "$1,787",
+      value: property?.raw_data?.TaxAnnualAmount
+        ? `$${property.raw_data.TaxAnnualAmount}`
+        : "-",
     },
   },
   {
     data: {
-      label: "Ownership Interest",
-      value: "Freehold Strata",
+      label: "Ownership",
+      value: property?.raw_data?.Ownership || "-",
     },
   },
   {
     data: {
-      label: "PID",
-      value: "003-263-932",
+      label: "MLS Number",
+      value: property?.mls_number || "-",
     },
   },
   {
     data: {
-      label: "Seller’s Agent",
-      value: "$5,823",
+      label: "Address",
+      value: `${property?.address}, ${property?.city}, ${property?.state}`,
     },
   },
   {
     data: {
-      label: "Storeys (Finished)",
-      value: "4",
-    },
-  },
-  {
-    data: {
-      label: "Basement Info",
-      value: "None",
-    },
-  },
-  {
-    data: {
-      label: "Seller’s Agent",
-      value: "Century 21 Purcell Realty Ltd",
-    },
-  },
-  {
-    data: {
-      label: "Roof",
-      value: "Asphalt Shingle",
+      label: "Parking",
+      value: property?.raw_data?.ParkingTotal ?? "-",
     },
   },
   {
     data: {
       label: "Heating",
-      value: "Baseboard heaters, Electric",
+      value: property?.raw_data?.Heating?.join(", ") || "-",
     },
   },
   {
     data: {
       label: "Water Supply",
-      value: "Community Water User Utility",
+      value: property?.raw_data?.WaterSource?.join(", ") || "-",
     },
   },
 ];
@@ -368,43 +352,45 @@ export const roomHeaders: TableHeader[] = [
   { key: "dimensions", label: "Dimensions", align: "right" },
 ];
 
-export const roomRows = [
-  {
-    data: {
-      room: "Living Room",
-      level: "Main",
-      dimensions: "15'5 × 13'8",
-    },
-  },
-  {
-    data: {
-      room: "Kitchen",
-      level: "Main",
-      dimensions: "12'0 × 10'5",
-    },
-  },
-  {
-    data: {
-      room: "Bedroom 1",
-      level: "Upper",
-      dimensions: "14'2 × 12'0",
-    },
-  },
-  {
-    data: {
-      room: "Bedroom 2",
-      level: "Upper",
-      dimensions: "13'0 × 11'0",
-    },
-  },
-  {
-    data: {
-      room: "Bathroom",
-      level: "Main",
-      dimensions: "8'0 × 6'5",
-    },
-  },
-];
+export const getRoomRows = (property: any) => {
+  const raw = property?.raw_data || {};
+  const rooms: Record<string, any> = {};
+
+  // Step 1: Group keys by room index
+  Object.keys(raw).forEach((key) => {
+    const match = key.match(/^BCRES_Room(\d+)(.*)$/);
+    if (!match) return;
+
+    const index = match[1]; // room number
+    const field = match[2]; // RoomType, RoomLevel...
+
+    if (!rooms[index]) rooms[index] = {};
+
+    rooms[index][field] = raw[key];
+  });
+
+  // Step 2: Convert to rows (skip null values)
+  return Object.values(rooms)
+    .filter(
+      (room: any) =>
+        room.RoomType && room.RoomLevel && room.RoomWidth && room.RoomLength,
+    )
+    .map((room: any) => {
+      // const formatFeetInches = (num: number) => {
+      //   const feet = Math.floor(num);
+      //   const inches = Math.round((num - feet) * 12);
+      //   return `${feet}'${inches}`;
+      // };
+
+      return {
+        data: {
+          room: room.RoomType,
+          level: room.RoomLevel,
+          dimensions: `${room.RoomWidth} × ${room.RoomLength}`,
+        },
+      };
+    });
+};
 
 export const nearbySchoolsHeaders: TableHeader[] = [
   { key: "school", label: "School Name" },

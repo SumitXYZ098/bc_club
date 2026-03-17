@@ -41,7 +41,7 @@ export default function PropertiesListingPage() {
   const params: any = {
     "pagination[page]": page,
     "pagination[pageSize]": pageSize,
-    "filters[property_status][$ne]": "Rented",
+    "filters[property_status][$notIn]": ["Rented", "Expired"],
     "filters[property_sub_type][$notNull]": true,
   };
 

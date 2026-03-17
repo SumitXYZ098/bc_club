@@ -13,14 +13,14 @@ import DynamicTable from "@/src/components/common/dynamicTable/DynamicTable";
 import {
   buildingComplexHeaders,
   buildingComplexRows,
+  getPropertyDetailsRows,
+  getRoomRows,
   marketStatsHeaders,
   marketStatsRows,
   nearbySchoolsHeaders,
   nearbySchoolsRows,
   propertyDetailsHeaders,
-  propertyDetailsRows,
   roomHeaders,
-  roomRows,
   taxHistoryHeaders,
   taxHistoryRows,
 } from "../../dummyData";
@@ -31,29 +31,44 @@ const PropertyInformation = ({ property }: { property: any }) => {
     {
       icon: Icons.bedroom,
       label: "Bedrooms",
-      value: property?.bedrooms,
+      value: property?.bedrooms || "Na",
     },
     {
       icon: Icons.bathtub,
       label: "Bathrooms",
-      value: property?.bathrooms,
+      value: property?.bathrooms || "Na",
     },
     {
       icon: Icons.garage,
       label: "Garage",
-      value: 2,
+      value: "0",
     },
     {
       icon: Icons.calendar,
       label: "Year Built",
-      value: 2,
+      value: property?.raw_data?.YearBuilt || "Na",
     },
     {
       icon: Icons.scale,
       label: "Area Size",
-      value: property?.area,
+      value: property?.area || "Na",
     },
   ];
+
+  const formatCurrency = (num?: number) => {
+    if (!num) return "-";
+    return `$${Number(num).toLocaleString()}`;
+  };
+
+  const price = property?.price;
+  const assessed = property?.raw_data?.TaxAssessedValue;
+  const rentEstimate = property?.raw_data?.RentEstimate; // if exists
+
+  console.log(rentEstimate, assessed, price);
+
+  const offerValue = price || assessed || 0;
+  const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
+
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
       <div className="flex flex-col xl:w-[70%] w-full h-full  relative">
@@ -71,10 +86,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
             <Description
               type={IDescriptionTypes.dec1614}
               customClasses="text-black70/50"
-              content={
-                property?.raw_data?.PublicRemarks ||
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vel euismod lectus. Integer at arcu sollicitudin, fermentum ipsum congue, volutpat nibh. Curabitur at iaculis odio. Curabitur congue augue quis elit cursus faucibus. Aenean quis varius diam, ut mattis arcu. Integer porta ligula quis lorem imperdiet convallis. Mauris et neque non turpis viverra tincidunt. Donec lobortis purus sed lacinia varius. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur condimentum semper est id condimentum.Nulla sodales justo erat, vel ultrices elit lacinia vel. Suspendisse vehicula, tellus vitae efficitur placerat, nisi metus pharetra turpis, sed bibendum eros est ac diam. Vivamus dapibus elit id orci ultrices, sit amet ullamcorper magna lobortis. In hac habitasse platea dictumst. Integer vehicula sapien augue, et ullamcorper quam egestas ut. Ut sit amet eros eros. Nullam ligula diam, egestas at nisl sed, laoreet accumsan nibh. Mauris justo justo, hendrerit eget elementum sed, sodales non nisi. Aliquam eget leo in metus condimentum placerat quis at dui. Suspendisse nec ullamcorper dui. Nulla porta scelerisque ipsum congue malesuada. Sed sodales, nisl in tristique vestibulum, metus mauris ultricies odio, et sodales nulla ligula at tortor."
-              }
+              content={property?.raw_data?.PublicRemarks || "No Description"}
             />
           </div>
 
@@ -140,15 +152,15 @@ const PropertyInformation = ({ property }: { property: any }) => {
           </div>
           {/* Property Details */}
           <DynamicTable
-            title="Property Details (Dummy Data)"
+            title="Property Details"
             headers={propertyDetailsHeaders}
-            rows={propertyDetailsRows}
+            rows={getPropertyDetailsRows(property)}
           />
           {/* Room Information */}
           <DynamicTable
-            title="Room Information (Dummy Data)"
+            title="Room Information"
             headers={roomHeaders}
-            rows={roomRows}
+            rows={getRoomRows(property)}
           />
 
           {/*  */}
@@ -166,21 +178,24 @@ const PropertyInformation = ({ property }: { property: any }) => {
             className="scroll-mt-40 p-5 rounded-xl bg-gray flex flex-col gap-y-4"
           >
             <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
-              Pricing Estimate (Dummy Data)
+              Pricing Estimate
             </h2>
             <LineGradient customClasses="" />
             {/* Pricing content can be added here */}
             <div className="flex flex-row md:flex-nowrap flex-wrap justify-between w-full xl:gap-x-6 gap-x-5 gap-y-4">
+              {/* Offer Value */}
               <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
                 <span className="text-sm">Offer Value Estimate</span>
                 <span className="text-primary font-bold text-xl xl:text-2xl">
-                  $605,000
+                  {formatCurrency(offerValue)}
                 </span>
               </div>
+
+              {/* Rent Estimate */}
               <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
                 <span className="text-sm">Offer Rent Estimate</span>
                 <span className="text-primary font-bold text-xl xl:text-2xl">
-                  $2,390
+                  {formatCurrency(offerRent)}
                 </span>
               </div>
             </div>
