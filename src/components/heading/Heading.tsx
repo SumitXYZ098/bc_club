@@ -23,6 +23,8 @@ const getHeadingStyles = (type: IHeadingTypes) => {
   switch (type) {
     case IHeadingTypes.heading32:
       return `xl:text-[32px] xl:leading-10 md:text-2xl text-xl`;
+        case IHeadingTypes.heading30:
+      return `xl:text-[30px] xl:leading-9 md:text-xl text-lg`;
     case IHeadingTypes.heading16:
       return `text-base`;
     case IHeadingTypes.heading20:
