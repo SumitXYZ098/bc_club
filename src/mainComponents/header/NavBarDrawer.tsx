@@ -13,7 +13,8 @@ type INavBarDrawerProps = {
 };
 
 const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
-  const { setOpenSignup, setOpenLogin } = useAuthContext();
+  const { setOpenSignup, setOpenLogin, isLoggedIn, logoutUser } =
+    useAuthContext();
   return (
     <Drawer
       open={open}
@@ -53,24 +54,38 @@ const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
         </ul>
 
         <div className="flex flex-nowrap items-center gap-x-3">
-          <CustomButton
-            label="Login"
-            buttonType="primary"
-            onClick={() => {
-              setOpenLogin(true);
-              onClose();
-            }}
-            customClasses="w-full text-base!"
-          />
-          <CustomButton
-            label="Sign up"
-            buttonType="secondary-outlined"
-            onClick={() => {
-              setOpenSignup(true);
-              onClose();
-            }}
-            customClasses="w-full text-base!"
-          />
+          {isLoggedIn ? (
+            <CustomButton
+              label="Logout"
+              buttonType="primary"
+              onClick={() => {
+                logoutUser();
+                onClose();
+              }}
+              customClasses="w-full text-base!"
+            />
+          ) : (
+            <>
+              <CustomButton
+                label="Login"
+                buttonType="primary"
+                onClick={() => {
+                  setOpenLogin(true);
+                  onClose();
+                }}
+                customClasses="w-full text-base!"
+              />
+              <CustomButton
+                label="Sign up"
+                buttonType="secondary-outlined"
+                onClick={() => {
+                  setOpenSignup(true);
+                  onClose();
+                }}
+                customClasses="w-full text-base!"
+              />
+            </>
+          )}
         </div>
       </nav>
     </Drawer>
