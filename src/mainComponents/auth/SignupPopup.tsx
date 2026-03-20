@@ -13,9 +13,15 @@ interface SignupPopupProps {
   open: boolean;
   onClose: () => void;
   onOpenLogin: () => void;
+  onOpenAccCreation: () => void;
 }
 
-const SignupPopup = ({ open, onClose, onOpenLogin }: SignupPopupProps) => {
+const SignupPopup = ({
+  open,
+  onClose,
+  onOpenLogin,
+  onOpenAccCreation,
+}: SignupPopupProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,9 +44,10 @@ const SignupPopup = ({ open, onClose, onOpenLogin }: SignupPopupProps) => {
         email: data.email,
         password: data.password,
       });
-      console.log("Signup Success:", response);
-      onOpenLogin(); // Redirect to login after successful signup
-      reset();
+      if (response.message) {
+        onOpenAccCreation(); // Redirect to login after successful signup
+        reset();
+      }
     } catch (error: any) {
       setErrorMsg(error.message || "Failed to sign up");
     } finally {
@@ -57,7 +64,7 @@ const SignupPopup = ({ open, onClose, onOpenLogin }: SignupPopupProps) => {
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}
-        <div className="flex gap-4 mb-[31px]">
+        <div className="flex gap-4 mb-7.75">
           <TextField
             label="First Name"
             type="text"
@@ -124,7 +131,7 @@ const SignupPopup = ({ open, onClose, onOpenLogin }: SignupPopupProps) => {
           <span className="text-[#000F0D] text-sm">or</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
-        <div className="bg-[#F3F3F3] flex justify-center gap-1 py-3 px-[52px] rounded-md">
+        <div className="bg-[#F3F3F3] flex justify-center gap-1 py-3 px-13 rounded-md">
           <button className="flex   transition text-[#232323]">
             Continue with
           </button>

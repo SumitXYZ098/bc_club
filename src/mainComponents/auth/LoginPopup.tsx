@@ -51,7 +51,6 @@ const LoginPopup = ({
         identifier: data.email,
         password: data.password,
       });
-      console.log("Login Success:", response);
       const userStr = data.email.split("@")[0].toUpperCase();
       const actualUsername =
         response?.user?.username || response?.username || userStr;

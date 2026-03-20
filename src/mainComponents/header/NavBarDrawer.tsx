@@ -56,13 +56,19 @@ const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
           <CustomButton
             label="Login"
             buttonType="primary"
-            onClick={() => setOpenLogin(true)}
+            onClick={() => {
+              setOpenLogin(true);
+              onClose();
+            }}
             customClasses="w-full text-base!"
           />
           <CustomButton
             label="Sign up"
             buttonType="secondary-outlined"
-            onClick={() => setOpenSignup(true)}
+            onClick={() => {
+              setOpenSignup(true);
+              onClose();
+            }}
             customClasses="w-full text-base!"
           />
         </div>

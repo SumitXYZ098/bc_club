@@ -7,12 +7,15 @@ import SignupPopup from "./SignupPopup";
 import ForgotPassword from "./ForgotPassword";
 import OtpScreen from "./OtpScreen";
 import NewPassword from "./NewPassword";
+import AccountCreate from "./AccountCreate";
 
 interface AuthContextType {
   openLogin: boolean;
   setOpenLogin: (open: boolean) => void;
   openSignup: boolean;
   setOpenSignup: (open: boolean) => void;
+  openAccCreation: boolean;
+  setOpenAccCreation: (open: boolean) => void;
   openForgot: boolean;
   setOpenForgot: (open: boolean) => void;
   openOtp: boolean;
@@ -42,6 +45,7 @@ export const useAuthContext = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignup, setOpenSignup] = useState(false);
+  const [openAccCreation, setOpenAccCreation] = useState(false);
   const [openForgot, setOpenForgot] = useState(false);
   const [openOtp, setOpenOtp] = useState(false);
   const [openNewPassword, setOpenNewPassword] = useState(false);
@@ -86,6 +90,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setOpenLogin,
         openSignup,
         setOpenSignup,
+        openAccCreation,
+        setOpenAccCreation,
         openForgot,
         setOpenForgot,
         openOtp,
@@ -103,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }}
     >
       {children}
-      
+
       {/* INITIALIZE POPUPS HERE SO THEY ARE AVAILABLE GLOBALLY */}
       <LoginPopup
         open={openLogin}
@@ -123,6 +129,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         onClose={() => setOpenSignup(false)}
         onOpenLogin={() => {
           setOpenSignup(false);
+          setOpenLogin(true);
+        }}
+        onOpenAccCreation={() => {
+          setOpenSignup(false);
+          setOpenAccCreation(true);
+        }}
+      />
+
+      <AccountCreate
+        open={openAccCreation}
+        onClose={() => setOpenAccCreation(false)}
+        onOpenLogin={() => {
+          setOpenAccCreation(false);
           setOpenLogin(true);
         }}
       />
