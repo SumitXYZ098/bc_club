@@ -5,31 +5,32 @@ import PropertiesCard, {
 } from "@/src/components/common/propertiesCard/PropertiesCard";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import { propertyData } from "../dummyData";
-import { ListingsApiResponse } from "@/src/api/listing/listing.types";
 import axios from "axios";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+import { getListings } from "@/src/api/listing/listingApi";
+import { useAuthContext } from "../auth/AuthContext";
 
 const tabList = [
   "Newly Listed properties",
-  "Court ordered sales",
+  // "Court ordered sales",
   "Sold properties",
 ];
 
 const OurProperty = () => {
   const [tab, setTab] = useState<string>("Newly Listed properties");
   const [data, setData] = useState<PropertyCardProps[]>([]);
+  const [soldList, setSoldList] = useState<PropertyCardProps[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [errorSold, setErrorSold] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { isLoggedIn } = useAuthContext();
 
   // refs for each section
   const newlyListedRef = useRef<HTMLDivElement | null>(null);
-  const courtOrderedRef = useRef<HTMLDivElement | null>(null);
+  // const courtOrderedRef = useRef<HTMLDivElement | null>(null);
   const soldRef = useRef<HTMLDivElement | null>(null);
 
   // HEIGHT of fixed header or desired space from top
@@ -40,7 +41,7 @@ const OurProperty = () => {
 
     const refMap: Record<string, React.RefObject<HTMLDivElement | null>> = {
       "Newly Listed properties": newlyListedRef,
-      "Court ordered sales": courtOrderedRef,
+      // "Court ordered sales": courtOrderedRef,
       "Sold properties": soldRef,
     };
 
@@ -56,22 +57,28 @@ const OurProperty = () => {
       });
     }
   };
+  const params: any = {
+    "filters[property_status][$notIn]": ["Rented", "Expired"],
+    "filters[property_sub_type][$notNull]": true,
+    "filters[raw_data][BCRES_SoldDate][$null]": true,
+  };
 
-  useEffect(() => {
+  const soldParams: any = {
+    "filters[property_status][$notIn]": ["Rented", "Expired"],
+    "filters[raw_data][BCRES_SoldDate][$notNull]": true,
+    "filters[property_sub_type][$notNull]": true,
+  };
+
+  useLayoutEffect(() => {
     const fetchListings = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const res = await axios.get(
-          "https://backendbcclub.xyzdemowebsites.com/api/properties",
-        );
+        const res = await getListings(params);
 
-        const properties: PropertyCardProps[] = res.data.data
-          .filter(
-            (listing: any) =>
-              listing?.address && listing?.property_status !== "Rented",
-          )
+        const properties: PropertyCardProps[] = res.data
+          .filter((listing: any) => listing?.address)
           .map((listing: any) => {
             return {
               id: listing.documentId,
@@ -123,7 +130,68 @@ const OurProperty = () => {
 
     fetchListings();
   }, []);
-  console.log("Data", data);
+
+  useLayoutEffect(() => {
+    const fetchSoldListings = async () => {
+      setLoading(true);
+      setErrorSold(null);
+
+      try {
+        const res = await getListings(soldParams);
+
+        const soldProperties: PropertyCardProps[] = res.data
+          .filter((listing: any) => listing?.address)
+          .map((listing: any) => {
+            return {
+              id: listing.documentId,
+              image: listing?.media?.[0]?.MediaURL,
+              title: listing?.property_sub_type,
+              price: listing?.price,
+              daysAgo: listing.DaysOnMarket ?? 0,
+              address:
+                `${listing?.address}, ${listing?.city}, ${listing?.state}` ||
+                "",
+              sqft: listing?.area ?? 0,
+              beds: listing?.bedrooms ?? 0,
+              baths: listing?.bathrooms ?? 0,
+              priceDrop:
+                listing.PreviousListPrice &&
+                listing.PreviousListPrice > listing.ListPrice
+                  ? Number(
+                      (
+                        (listing.PreviousListPrice - listing.ListPrice) /
+                        listing.ListPrice
+                      ).toFixed(1),
+                    )
+                  : undefined,
+              assessedDiff: listing.ListPrice
+                ? Number(
+                    (
+                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                      listing.ListPrice
+                    ).toFixed(1),
+                  )
+                : 0,
+              mls: listing?.mls_number,
+              realtor: listing?.raw_data?.ListAOR || "Unknown",
+            };
+          });
+
+        setSoldList(soldProperties);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setErrorSold(error.response?.data?.error?.message || "API error");
+        } else {
+          setErrorSold("An unexpected error occurred");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSoldListings();
+  }, []);
+
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:pl-16 md:pl-13 pl-6 w-full xl:pt-26.5 md:pt-31 pt-13 xl:pb-36 md:pb-33 pb-19.5 relative">
       <Heading
@@ -180,6 +248,15 @@ const OurProperty = () => {
                 <PropertyCardSkeleton key={i} />
               ))}
             </div>
+          ) : data?.length === 0 ? (
+            <div className="text-center md:py-15 py-9 space-y-3 ">
+              <h3 className="md:text-lg text-base font-semibold">
+                No properties yet
+              </h3>
+              <p className="md:text-base text-sm text-lightWhite">
+                {error || "Looks like you haven’t added any properties."}
+              </p>
+            </div>
           ) : (
             <div className="flex flex-row gap-x-5 w-full">
               <Swiper
@@ -214,42 +291,60 @@ const OurProperty = () => {
         </div>
 
         {/* Court ordered sales */}
-        <div ref={courtOrderedRef} className="flex flex-col">
+        {/* <div ref={courtOrderedRef} className="flex flex-col">
           <Heading
             tagType="h3"
             type={IHeadingTypes.heading20}
             content="Court Ordered Sales"
           />
-          <div className="flex flex-row gap-x-5 w-full">
-            <Swiper
-              speed={1500}
-              spaceBetween={12}
-              slidesPerView={1.1}
-              autoplay={{
-                delay: 0,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true,
-              }}
-              modules={[Autoplay, Pagination]}
-              loop
-              pagination={{
-                clickable: true,
-                dynamicBullets: true,
-              }}
-              breakpoints={{
-                640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
-                1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
-              }}
-              className="mySwiper w-full pt-5! pb-9!"
-            >
-              {propertyData.map((item, index) => (
-                <SwiperSlide key={index}>
-                  <PropertiesCard {...item} isLogin={false} />
-                </SwiperSlide>
+
+          {loading ? (
+            <div className="flex flex-nowrap gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <PropertyCardSkeleton key={i} />
               ))}
-            </Swiper>
-          </div>
-        </div>
+            </div>
+          ) : data?.length === 0 ? (
+            <div className="text-center md:py-15 py-9 space-y-3 ">
+              <h3 className="md:text-lg text-base font-semibold">
+                No properties yet
+              </h3>
+              <p className="md:text-base text-sm text-lightWhite">
+                Looks like you haven’t added any properties.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-row gap-x-5 w-full">
+              <Swiper
+                speed={1500}
+                spaceBetween={12}
+                slidesPerView={1.1}
+                autoplay={{
+                  delay: 0,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                modules={[Autoplay, Pagination]}
+                loop
+                pagination={{
+                  clickable: true,
+                  dynamicBullets: true,
+                }}
+                breakpoints={{
+                  640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
+                  1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
+                }}
+                className="mySwiper w-full pt-5! pb-9!"
+              >
+                {propertyData.map((item, index) => (
+                  <SwiperSlide key={index}>
+                    <PropertiesCard {...item} isLogin={false} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          )}
+        </div> */}
 
         {/* Sold properties */}
         <div ref={soldRef} className="flex flex-col">
@@ -258,35 +353,53 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Sold Properties"
           />
-          <div className="flex flex-row gap-x-5 w-full">
-            <Swiper
-              speed={1500}
-              spaceBetween={12}
-              slidesPerView={1.1}
-              autoplay={{
-                delay: 0,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true,
-              }}
-              modules={[Autoplay, Pagination]}
-              loop
-              pagination={{
-                clickable: true,
-                dynamicBullets: true,
-              }}
-              breakpoints={{
-                640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
-                1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
-              }}
-              className="mySwiper w-full pt-5! pb-9!"
-            >
-              {propertyData.map((item, index) => (
-                <SwiperSlide key={index}>
-                  <PropertiesCard {...item} isLogin={false} />
-                </SwiperSlide>
+          {loading ? (
+            <div className="flex flex-nowrap gap-4 pt-5 pb-9">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <PropertyCardSkeleton key={i} />
               ))}
-            </Swiper>
-          </div>
+            </div>
+          ) : soldList?.length === 0 ? (
+            <div className="text-center md:py-15 py-9 space-y-3 ">
+              <h3 className="md:text-lg text-base font-semibold">
+                No sold properties yet
+              </h3>
+              <p className="md:text-base text-sm text-lightWhite">
+                {errorSold ||
+                  "Looks like you haven’t added any sold properties."}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-row gap-x-5 w-full">
+              <Swiper
+                speed={1500}
+                spaceBetween={12}
+                slidesPerView={1.1}
+                autoplay={{
+                  delay: 0,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                modules={[Autoplay, Pagination]}
+                loop
+                pagination={{
+                  clickable: true,
+                  dynamicBullets: true,
+                }}
+                breakpoints={{
+                  640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
+                  1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
+                }}
+                className="mySwiper w-full pt-5! pb-9!"
+              >
+                {soldList.map((item, index) => (
+                  <SwiperSlide key={index}>
+                    <PropertiesCard {...item} isLogin={isLoggedIn} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          )}
         </div>
       </div>
     </section>

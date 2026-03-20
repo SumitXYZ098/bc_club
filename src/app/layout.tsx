@@ -3,11 +3,14 @@ import "./globals.css";
 import Head from "next/head";
 import Header from "@/src/mainComponents/header/Header";
 import Footer from "@/src/mainComponents/footer/Footer";
+import { AuthProvider } from "@/src/mainComponents/auth/AuthContext";
+import "swiper/css";
+import "swiper/css/pagination";
 
 export const metadata: Metadata = {
   title: "BC Club",
   description: "British Columbia Club",
-  robots: "noindex, nofollow"
+  robots: "noindex, nofollow",
 };
 
 export default function RootLayout({
@@ -24,9 +27,11 @@ export default function RootLayout({
         />
       </Head>
       <body className={`plusJakartaDisplay antialiased bg-background`}>
-        <Header />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <Header />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

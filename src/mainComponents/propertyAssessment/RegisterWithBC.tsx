@@ -1,3 +1,4 @@
+"use client";
 import { Icons } from "@/src/app/exports";
 import CustomButton from "@/src/components/button/CustomButton";
 import Description, {
@@ -5,7 +6,7 @@ import Description, {
 } from "@/src/components/description/Description";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import Image from "next/image";
-import React from "react";
+import { useAuthContext } from "../auth/AuthContext";
 
 interface CardProps {
   icon: string;
@@ -32,6 +33,7 @@ const cardsData: CardProps[] = [
 ];
 
 const RegisterWithBC = () => {
+  const { setOpenSignup, setOpenLogin } = useAuthContext();
   return (
     <div className="w-full md:rounded-4xl rounded-3xl bg-primary xl:p-13 md:py-8 md:px-17 px-5 py-6 text-background flex flex-col items-center md:gap-y-6 gap-y-5">
       <Heading
@@ -66,9 +68,13 @@ const RegisterWithBC = () => {
           buttonType="white-primary"
           label="Register now for free"
           customClasses="rounded-md! w-full text-base! md:w-fit md:px-11!"
+          onClick={() => setOpenSignup(true)}
         />
         <p className="cursor-pointer text-base">
-          Already have an account? <span className="text-secondary">Login</span>
+          Already have an account?{" "}
+          <span onClick={() => setOpenLogin(true)} className="text-secondary">
+            Login
+          </span>
         </p>
       </div>
     </div>

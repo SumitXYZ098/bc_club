@@ -1,10 +1,11 @@
 import axios from "axios";
-import { ListingsApiResponse } from "./listing.types";
 import { Endpoints } from "../endpoints";
 
-export async function getListings(): Promise<ListingsApiResponse> {
+export async function getListings(params: any): Promise<any> {
   try {
-    const res = await axios.get(Endpoints.getListing);
+    const res = await axios.get(Endpoints.getListing, {
+      params,
+    });
 
     return res.data;
   } catch (error) {

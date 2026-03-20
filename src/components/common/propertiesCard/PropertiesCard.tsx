@@ -8,6 +8,7 @@ import { Icons, Images } from "@/src/app/exports";
 import CustomButton from "../../button/CustomButton";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 
 export interface PropertyCardProps {
   id: string;
@@ -40,9 +41,12 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   assessedDiff,
   mls,
   realtor,
-  isLogin,
+  isLogin: isLoginProp,
 }) => {
   const pathname = usePathname();
+
+  const { setOpenLogin, isLoggedIn } = useAuthContext();
+  const isLogin = isLoginProp ?? isLoggedIn;
 
   return (
     <Link
@@ -233,7 +237,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               label="Login Required"
               buttonType="primary"
               customClasses="font-bold py-4 px-18.5 absolute bottom-[105px]"
-              onClick={() => console.log(isLogin)}
+              onClick={() => setOpenLogin(true)}
             />
           </div>
         )}

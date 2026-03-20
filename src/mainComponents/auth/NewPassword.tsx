@@ -1,34 +1,51 @@
+"use client";
 import { useState } from "react";
 import CustomDialog from "@/src/components/common/customDialog/CustomDialog";
 import CustomButton from "@/src/components/button/CustomButton";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
+import { useForm } from "react-hook-form";
+import { resetPassword } from "@/src/api/auth/authApi";
+import { useAuthContext } from "./AuthContext";
 interface NewPasswordProps {
   open: boolean;
   onClose: () => void;
 }
 
 const NewPassword = ({ open, onClose }: NewPasswordProps) => {
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { resetEmail, resetToken } = useAuthContext();
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [showNewPassword, setShowNewPassword] = useState(false); // 👈 Separate state
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // 👈 Separate state
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSubmit = () => {
-    if (!newPassword || !confirmPassword) {
-      alert("Please fill in both fields.");
-      return;
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: { newPassword: "", confirmPassword: "" },
+  });
+
+  const onSubmit = async (data: any) => {
+    try {
+      setLoading(true);
+      setErrorMsg("");
+      await resetPassword({
+        email: resetEmail,
+        resetToken: resetToken,
+        newPassword: data.newPassword,
+      });
+      console.log("Password Reset Success");
+      onClose(); // Optional: or show a success toast
+    } catch (error: any) {
+      setErrorMsg(error.message || "Failed to reset password");
+    } finally {
+      setLoading(false);
     }
-    if (newPassword !== confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    console.log("New Password:", newPassword);
-    onClose();
   };
 
   return (
@@ -38,14 +55,19 @@ const NewPassword = ({ open, onClose }: NewPasswordProps) => {
       title="Set New Password"
       description="Enter your new password and confirm it below."
     >
-      <div className="flex flex-col gap-4 mt-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4 mt-4"
+      >
+        {errorMsg && <p className="text-red-500 text-sm mb-2">{errorMsg}</p>}
         {/* New Password */}
         <TextField
           label="New Password"
           type={showNewPassword ? "text" : "password"}
           className="w-full"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
+          {...register("newPassword", { required: "New password is required" })}
+          error={!!errors.newPassword}
+          helperText={errors.newPassword?.message as string}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -64,8 +86,16 @@ const NewPassword = ({ open, onClose }: NewPasswordProps) => {
           label="Confirm Password"
           type={showConfirmPassword ? "text" : "password"}
           className="w-full"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          {...register("confirmPassword", {
+            required: "Please confirm your password",
+            validate: (val: string) => {
+              if (watch("newPassword") != val) {
+                return "Passwords do no match";
+              }
+            },
+          })}
+          error={!!errors.confirmPassword}
+          helperText={errors.confirmPassword?.message as string}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -80,12 +110,12 @@ const NewPassword = ({ open, onClose }: NewPasswordProps) => {
         />
 
         <CustomButton
-          label="Update Password"
+          label={loading ? "Updating..." : "Update Password"}
           buttonType="primary"
           customClasses="w-full mt-4"
-          onClick={handleSubmit}
+          type="submit"
         />
-      </div>
+      </form>
     </CustomDialog>
   );
 };

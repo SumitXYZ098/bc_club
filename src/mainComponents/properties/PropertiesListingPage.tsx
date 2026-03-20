@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
-import { Chip, MenuItem, PaginationItem, Select } from "@mui/material";
+import { Chip } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesMap from "./PropertiesMap";
@@ -12,7 +12,7 @@ import PropertiesCard, {
 import axios from "axios";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
-import { Endpoints } from "@/src/api/endpoints";
+import { getListings } from "@/src/api/listing/listingApi";
 
 export default function PropertiesListingPage() {
   const [openFilters, setOpenFilters] = useState(false);
@@ -76,14 +76,10 @@ export default function PropertiesListingPage() {
       setError(null);
 
       try {
-        const res = await axios.get(Endpoints.getListing, {
-          params,
-        });
+        const res = await getListings(params);
 
-        const listings = res.data.data;
-
-        console.log(listings);
-        const pagination = res.data.meta.pagination;
+        const listings = res.data;
+        const pagination = res.meta.pagination;
 
         setPageCount(pagination.pageCount);
         setListingData(listings);

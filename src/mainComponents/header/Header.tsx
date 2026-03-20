@@ -12,11 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 import NavBarDrawer from "./NavBarDrawer";
 import CustomButton from "@/src/components/button/CustomButton";
 
-import LoginPopup from "../auth/LoginPopup";
-import SignupPopup from "../auth/SignupPopup";
-import ForgotPassword from "../auth/ForgotPassword";
-import OtpScreen from "../auth/OtpScreen";
-import NewPassword from "../auth/NewPassword";
+import { useAuthContext } from "../auth/AuthContext";
 import { usePathname } from "next/navigation";
 
 export const menulist = [
@@ -33,12 +29,8 @@ const Header = () => {
   const isLaptop = useMediaQuery("(min-width: 1200px)");
   const [showMenu, setShowMenu] = useState(false);
 
-  // POPUP STATES
-  const [openLogin, setOpenLogin] = useState(false);
-  const [openSignup, setOpenSignup] = useState(false);
-  const [openForgot, setOpenForgot] = useState(false);
-  const [openOtp, setOpenOtp] = useState(false);
-  const [openNewPassword, setOpenNewPassword] = useState(false);
+  const { setOpenLogin, setOpenSignup, isLoggedIn, username, logoutUser } =
+    useAuthContext();
 
   useEffect(() => {
     if (!isLaptop) {
@@ -81,12 +73,6 @@ const Header = () => {
   const onPressMenuButton = useCallback(() => {
     setShowMenu((prev) => !prev);
   }, []);
-
-  // OTP verified callback
-  const handleOtpVerified = () => {
-    setOpenOtp(false);
-    setOpenNewPassword(true);
-  };
 
   // Get active pathname
   const pathname = usePathname();
@@ -142,21 +128,48 @@ const Header = () => {
           </div>
 
           {/* LOGIN / SIGNUP BUTTONS */}
-          <div className="flex items-center gap-x-3">
-            <CustomButton
-              label="Login"
-              buttonType="primary"
-              onClick={() => setOpenLogin(true)}
-              customClasses="w-[132px]"
-            />
+          {isLoggedIn ? (
+            <div
+              className="flex items-center gap-x-2 cursor-pointer"
+              onClick={logoutUser}
+            >
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-primary"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <span className="text-primary font-bold uppercase">
+                {username}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-x-3">
+              <CustomButton
+                label="Login"
+                buttonType="primary"
+                onClick={() => setOpenLogin(true)}
+                customClasses="w-[132px]"
+              />
 
-            <CustomButton
-              label="Sign up"
-              buttonType="secondary-outlined"
-              onClick={() => setOpenSignup(true)}
-              customClasses="w-[132px]"
-            />
-          </div>
+              <CustomButton
+                label="Sign up"
+                buttonType="secondary-outlined"
+                onClick={() => setOpenSignup(true)}
+                customClasses="w-[132px]"
+              />
+            </div>
+          )}
         </nav>
 
         {/* Mobile Menu */}
@@ -197,61 +210,6 @@ const Header = () => {
         </div>
 
         <NavBarDrawer open={showMenu} onClose={onPressMenuButton} />
-
-        {/* LOGIN POPUP */}
-        <LoginPopup
-          open={openLogin}
-          onClose={() => setOpenLogin(false)}
-          onOpenSignup={() => {
-            setOpenLogin(false);
-            setOpenSignup(true);
-          }}
-          onOpenForgot={() => {
-            setOpenLogin(false);
-            setOpenForgot(true);
-          }}
-        />
-
-        {/* SIGNUP POPUP */}
-        <SignupPopup
-          open={openSignup}
-          onClose={() => setOpenSignup(false)}
-          onOpenLogin={() => {
-            setOpenSignup(false);
-            setOpenLogin(true);
-          }}
-        />
-
-        {/* FORGOT PASSWORD POPUP */}
-        <ForgotPassword
-          open={openForgot}
-          onClose={() => setOpenForgot(false)}
-          onOpenOtp={() => {
-            setOpenForgot(false);
-            setOpenOtp(true);
-          }}
-          onOpenSignup={() => {
-            setOpenForgot(false);
-            setOpenSignup(true);
-          }}
-          onOpenForgot={() => {
-            setOpenForgot(false);
-            setOpenForgot(true);
-          }}
-        />
-
-        {/* OTP SCREEN */}
-        <OtpScreen
-          open={openOtp}
-          onClose={() => setOpenOtp(false)}
-          onVerified={handleOtpVerified}
-        />
-
-        {/* NEW PASSWORD SCREEN */}
-        <NewPassword
-          open={openNewPassword}
-          onClose={() => setOpenNewPassword(false)}
-        />
       </motion.header>
     </AnimatePresence>
   );

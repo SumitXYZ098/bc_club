@@ -1,9 +1,11 @@
+"use client";
 import { Drawer } from "@mui/material";
 import React from "react";
 import { menulist } from "./Header";
 import Link from "next/link";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 import CustomButton from "@/src/components/button/CustomButton";
+import { useAuthContext } from "../auth/AuthContext";
 
 type INavBarDrawerProps = {
   open: boolean;
@@ -11,6 +13,7 @@ type INavBarDrawerProps = {
 };
 
 const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
+  const { setOpenSignup, setOpenLogin } = useAuthContext();
   return (
     <Drawer
       open={open}
@@ -53,13 +56,13 @@ const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
           <CustomButton
             label="Login"
             buttonType="primary"
-            onClick={() => console.log("Login ")}
+            onClick={() => setOpenLogin(true)}
             customClasses="w-full text-base!"
           />
           <CustomButton
             label="Sign up"
             buttonType="secondary-outlined"
-            onClick={() => console.log("Sign up")}
+            onClick={() => setOpenSignup(true)}
             customClasses="w-full text-base!"
           />
         </div>
