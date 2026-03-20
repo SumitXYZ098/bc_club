@@ -8,14 +8,13 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import { Icons } from "@/src/app/exports";
-import React, { useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { login } from "@/src/api/auth/authApi";
 import { useAuthContext } from "./AuthContext";
+import { GoogleLogin } from "@react-oauth/google";
 
 interface LoginModalProps {
   open: boolean;
@@ -65,6 +64,41 @@ const LoginPopup = ({
       setErrorMsg(error.message || "Failed to login");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async (idToken: string) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/google-login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken }),
+        },
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.message && !data.jwt) {
+        alert(data.message); // "Please verify your email"
+        return;
+      }
+
+      if (data.jwt) {
+        localStorage.setItem("token", data.jwt);
+        const userStr = data.email?.split("@")[0]?.toUpperCase() || "USER";
+        const actualUsername = data.user?.username || data.username || userStr;
+        loginUser(actualUsername.toUpperCase(), data.jwt, false);
+        onClose();
+        alert("Login successful!");
+      } else {
+        alert("Something went wrong");
+      }
+    } catch (error) {
+      console.error("Google Login Failed:", error);
+      setErrorMsg("Google Login Failed");
     }
   };
 
@@ -146,17 +180,16 @@ const LoginPopup = ({
           <span className="text-[#000F0D] text-sm">or</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
-        <div className="bg-[#F3F3F3] flex justify-center gap-2 py-3 px-13 rounded-md">
-          <button className="flex   transition text-[#232323]">
-            Continue with
-          </button>
-
-          <Image
-            width={100}
-            height={100}
-            alt="google"
-            src={Icons.google}
-            className="w-6 h-6 object-contain"
+        <div className="flex justify-center flex-col items-center gap-2 py-3 px-13 rounded-md">
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              const idToken = credentialResponse.credential;
+              if (idToken) handleGoogleLogin(idToken);
+            }}
+            onError={() => {
+              console.log("Login Failed");
+              setErrorMsg("Google Login Failed");
+            }}
           />
         </div>
 

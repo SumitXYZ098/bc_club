@@ -14,6 +14,7 @@ import CustomButton from "@/src/components/button/CustomButton";
 
 import { useAuthContext } from "../auth/AuthContext";
 import { usePathname } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 export const menulist = [
   { title: "Evaluation", href: "/home-estimation" },
@@ -129,29 +130,44 @@ const Header = () => {
 
           {/* LOGIN / SIGNUP BUTTONS */}
           {isLoggedIn ? (
-            <div
-              className="flex items-center gap-x-2 cursor-pointer"
-              onClick={logoutUser}
-            >
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-primary"
-                >
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+            <div className="dropdown dropdown-hover dropdown-end">
+              <div
+                className="flex items-center gap-x-2 cursor-pointer"
+                tabIndex={0}
+                role="button"
+              >
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <span className="text-primary font-bold uppercase">
+                  {username}
+                </span>
               </div>
-              <span className="text-primary font-bold uppercase">
-                {username}
-              </span>
+              <div
+                tabIndex={-1}
+                className="dropdown-content menu bg-white rounded-box z-1 px-3 py-1 shadow-sm gap-y-2 w-fit"
+              >
+                <span
+                  onClick={logoutUser}
+                  className="flex items-center gap-0.5 w-full cursor-pointer group text-secondary-text hover:text-primary hover:bg-background hover:font-medium px-4 py-2 rounded-lg transition-colors duration-300 ease-in-out"
+                >
+                  <LogOut className="group-hover:text-primary" />
+                  Logout
+                </span>
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-x-3">

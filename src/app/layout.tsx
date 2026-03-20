@@ -4,6 +4,7 @@ import Head from "next/head";
 import Header from "@/src/mainComponents/header/Header";
 import Footer from "@/src/mainComponents/footer/Footer";
 import { AuthProvider } from "@/src/mainComponents/auth/AuthContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -27,11 +28,13 @@ export default function RootLayout({
         />
       </Head>
       <body className={`plusJakartaDisplay antialiased bg-background`}>
-        <AuthProvider>
-          <Header />
-          {children}
-          <Footer />
-        </AuthProvider>
+        <GoogleOAuthProvider clientId="1027810983202-so3tffohuoqsk6k96dmn9t2n7rihjklb.apps.googleusercontent.com">
+          <AuthProvider>
+            <Header />
+            {children}
+            <Footer />
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );
