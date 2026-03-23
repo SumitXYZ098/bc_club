@@ -86,20 +86,20 @@ const LoginPopup = ({
       const data = await res.json();
       console.log(data);
 
-      if (data.message && !data.jwt) {
-        alert(data.message); // "Please verify your email"
+      if (data.message && !data.token) {
+        toast.info(data.message); // "Please verify your email"
         return;
       }
 
-      if (data.jwt) {
-        localStorage.setItem("token", data.jwt);
+      if (data.message && data.token) {
+        localStorage.setItem("token", data.token);
         const userStr = data.email?.split("@")[0]?.toUpperCase() || "USER";
         const actualUsername =
           data?.user?.fullName ||
           data.user?.username ||
           data.username ||
           userStr;
-        loginUser(actualUsername.toUpperCase(), data.jwt, false);
+        loginUser(actualUsername.toUpperCase(), data.token, false);
         onClose();
         toast.success("Login successful!");
       } else {
