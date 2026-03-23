@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { signup } from "@/src/api/auth/authApi";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuthContext } from "./AuthContext";
+import { toast } from "react-toastify";
 
 interface SignupPopupProps {
   open: boolean;
@@ -79,12 +80,16 @@ const SignupPopup = ({
       if (data.jwt) {
         localStorage.setItem("token", data.jwt);
         const userStr = data.email?.split("@")[0]?.toUpperCase() || "USER";
-        const actualUsername = data.user?.username || data.username || userStr;
+        const actualUsername =
+          data.user?.fullName ||
+          data.user?.username ||
+          data.username ||
+          userStr;
         loginUser(actualUsername.toUpperCase(), data.jwt, false);
         onClose();
-        alert("Login successful!");
+        toast.success("Login successful!");
       } else {
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       }
     } catch (error) {
       console.error("Google Login Failed:", error);

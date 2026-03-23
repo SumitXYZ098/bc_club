@@ -8,6 +8,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import QueryProvider from "@/src/providers/QueryProvider";
 import "swiper/css";
 import "swiper/css/pagination";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: "BC Club",
@@ -35,6 +37,7 @@ export default function RootLayout({
               <Header />
               {children}
               <Footer />
+              <ToastContainer />
             </AuthProvider>
           </GoogleOAuthProvider>
         </QueryProvider>

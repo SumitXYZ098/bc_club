@@ -1,6 +1,5 @@
 "use client";
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import Image from "next/image";
 import Slider from "@mui/material/Slider";
@@ -8,7 +7,8 @@ import { styled } from "@mui/material/styles";
 import { Icons } from "@/src/app/exports";
 import LineGradient from "../lineGradient/LineGradient";
 import CustomButton from "../../button/CustomButton";
-import { Modal } from "@mui/material";
+import { Dialog } from "@mui/material";
+import { useListingStore } from "@/src/store/useListingStore";
 
 // ================= Slider Theme =================
 const PriceSlider = styled(Slider)({
@@ -21,11 +21,11 @@ const PriceSlider = styled(Slider)({
     backgroundColor: "#E8A200",
     border: "3px solid #fff",
     boxShadow: "0 2px 6px rgba(0,0,0,.25)",
-    '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
-      boxShadow: 'inherit',
+    "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+      boxShadow: "inherit",
     },
-    '&::before': {
-      display: 'none',
+    "&::before": {
+      display: "none",
     },
   },
   "& .MuiSlider-track": {
@@ -38,21 +38,21 @@ const PriceSlider = styled(Slider)({
     backgroundColor: "#e5e5e5",
     borderRadius: 10,
   },
-  '& .MuiSlider-valueLabel': {
+  "& .MuiSlider-valueLabel": {
     lineHeight: 1.2,
     fontSize: 12,
-    background: 'unset',
-    padding: 0,
-    width: 50,
+    background: "unset",
+    padding: "0 10px",
+    width: "fit-content",
     height: 32,
     borderRadius: 20,
-    backgroundColor: '#E8A200',
-    transform: 'translate(0%, 10%) rotate(180deg) scale(0)',
-    '&.MuiSlider-valueLabelOpen': {
-      transform: 'translate(0%, 10%) rotate(180deg) scale(1)',
+    backgroundColor: "#E8A200",
+    transform: "translate(0%, 10%) rotate(180deg) scale(0)",
+    "&.MuiSlider-valueLabelOpen": {
+      transform: "translate(0%, 10%) rotate(180deg) scale(1)",
     },
-    '& > *': {
-      transform: 'rotate(180deg)',
+    "& > *": {
+      transform: "rotate(180deg)",
     },
   },
 });
@@ -65,12 +65,31 @@ interface FiltersDialogProps {
 
 // ================= Component =================
 export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
-  const [price, setPrice] = React.useState<number[]>([5, 80]);
-  const [bedrooms, setBedrooms] = React.useState<number | null>(null);
-  const [bathrooms, setBathrooms] = React.useState<number | null>(null);
-  const [status, setStatus] = React.useState("sale");
+  const { filters, updateFilter } = useListingStore();
 
-  React.useEffect(() => {
+  const [price, setPrice] = useState<[number | null, number | null]>([
+    filters.minPrice ?? 0,
+    filters.maxPrice ?? 20000000,
+  ]);
+
+  const [sqft, setSqft] = useState<[number | null, number | null]>([
+    filters.minSqft ?? 0,
+    filters.maxSqft ?? 5000,
+  ]);
+  const [bedrooms, setBedrooms] = useState<number | null>(
+    filters.activeBedRoom && filters.activeBedRoom !== "any"
+      ? Number(filters.activeBedRoom.replace("+", ""))
+      : null,
+  );
+  const [bathrooms, setBathrooms] = useState<number | null>(
+    filters.activeBathRoom && filters.activeBathRoom !== "any"
+      ? Number(filters.activeBathRoom.replace("+", ""))
+      : null,
+  );
+  const [status, setStatus] = useState<string>(filters.status ?? "");
+  const [location, setLocation] = useState<string>(filters.location ?? "");
+
+  useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
     return () => {
       document.body.style.overflow = "auto";
@@ -78,35 +97,54 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
   }, [open]);
 
   const handleClearAll = () => {
-    setPrice([0, 100]);
+    setPrice([0, 20000000]);
+    setSqft([0, 5000]);
     setBedrooms(null);
     setBathrooms(null);
-    setStatus("sale");
+    setStatus("");
+    setLocation("");
+    onClose();
+  };
+
+  const handleApplyFilter = () => {
+    updateFilter("minPrice", price[0]);
+    updateFilter("maxPrice", price[1]);
+    updateFilter("minSqft", sqft[0]);
+    updateFilter("maxSqft", sqft[1]);
+    updateFilter(
+      "activeBedRoom",
+      bedrooms ? (bedrooms >= 4 ? "4+" : bedrooms.toString()) : "any",
+    );
+    updateFilter(
+      "activeBathRoom",
+      bathrooms ? (bathrooms >= 4 ? "4+" : bathrooms.toString()) : "any",
+    );
+    updateFilter("status", status);
+    updateFilter("location", location);
+    onClose();
   };
 
   return (
-    <Modal
+    <Dialog
       open={open}
       onClose={onClose}
-      disableAutoFocus
-      aria-labelledby="filters-modal"
-      aria-describedby="filters-modal-description"
-      closeAfterTransition
-      BackdropProps={{
-        style: {
-          backgroundColor: "rgba(0,0,0,0.4)",
-          backdropFilter: "blur(1px)",
+      PaperProps={{
+        sx: {
+          width: "100%",
+          maxWidth: 650,
+          borderRadius: 5,
+          margin: "24px",
         },
       }}
     >
       {/* CENTER WRAPPER */}
       <div
-        className="fixed inset-0 flex items-center justify-center  px-4 z-9999"
+        className="flex items-center justify-center z-9999 w-full"
         onClick={onClose}
       >
         {/* CARD */}
         <div
-          className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto p-6 w-full max-w-xl scrollbar-hide"
+          className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-10 md:py-6 p-4 w-full scrollbar-hide"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -117,10 +155,10 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
             </button>
           </div>
 
-          {/* Status */}
+          {/* Property Type Status */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             {[
-              { k: "sale", l: "For Sale", i: Icons.forSale },
+              { k: "forSale", l: "For Sale", i: Icons.forSale },
               { k: "sold", l: "Sold", i: Icons.sold },
               { k: "expired", l: "Expired", i: Icons.expire },
             ].map((s) => (
@@ -141,64 +179,133 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
           <LineGradient />
 
           {/* Location */}
-          <div className="mb-6">
+          <div className="mb-6 space-y-2 flex flex-col gap-y-1">
             <label className="font-medium">Location</label>
-            <select className="mt-2 w-full border border-[#33333333] cursor-pointer rounded-xl px-4 py-3 focus:outline-none">
-              <option>Any area</option>
-              <option>Downtown</option>
-              <option>Suburb</option>
+            <select
+              value={location || ""}
+              onChange={(e) => setLocation(e.target.value as string)}
+              className="w-full border border-[#33333333] rounded-xl px-2 py-2 focus:outline-none cursor-pointer text-sm"
+            >
+              <option value="" disabled>
+                Select Location
+              </option>
+              {[
+                "New Westminster",
+                "Vancouver",
+                "Surrey",
+                "White Rock",
+                "North Vancouver",
+                "Tsawwassen",
+                "Coquitlam",
+                "Burnaby",
+                "Port Moody",
+                "Maple Ridge",
+                "Richmond",
+                "Delta",
+                "Langley",
+                "Hope",
+                "Chilliwack",
+                "Abbotsford",
+                "Whistler",
+                "West Vancouver",
+                "Sechelt",
+                "Mission",
+                "Port Coquitlam",
+                "Agassiz",
+              ].map((item) => (
+                <option value={item}>{item}</option>
+              ))}
             </select>
           </div>
           <LineGradient />
 
           {/* Price Range */}
-          <div className="mb-6">
-            <h3 className="font-medium mb-3">Price Range</h3>
+          <div className="md:mb-6 mb-3">
+            <h3 className="font-medium md:mb-3">Price Range</h3>
             <div className="relative">
               <PriceSlider
-                value={price}
-                min={0}
-                max={100}
-                onChange={(_, v) => setPrice(v as number[])}
+                value={[price[0] ?? 1000, price[1] ?? 20000000]}
+                min={1000}
+                max={20000000}
+                step={2000}
+                onChange={(_, v) => setPrice(v as [number, number])}
                 disableSwap
                 valueLabelDisplay="auto"
               />
-              {/* <div className="absolute left-0 -bottom-6">
-                <div className="bg-[#EEA500] text-white text-xs px-3 py-1 rounded-full shadow">
-                  ${price[0]}
-                </div>
-              </div> */}
             </div>
 
-            <div className="flex items-center mt-8 justify-between gap-2 sm:gap-4">
+            <div className="flex flex-row flex-wrap items-center mt-5 justify-between gap-x-0.5 sm:gap-4">
               {/* Min */}
-              <div className="flex items-center gap-2 sm:gap-4 h-full">
-                <p className="text-[10px] sm:text-xs text-gray-300 mb-1 whitespace-nowrap">
+              <div className="flex items-center gap-1 sm:gap-4 h-full">
+                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
                   Min Price
                 </p>
-                <div className="flex items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-3 sm:px-4 py-2 h-full">
-                  <span className="text-[#EEA500] font-medium">$</span>
-                  <LineGradient customClasses="mx-0.5 sm:mx-1" vr />
-                  <span className="text-xs sm:text-sm font-medium">
-                    {price[0]}
-                  </span>
+                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                  <span className="text-secondary">$</span>
+                  <span className="">{price[0]}</span>
                 </div>
               </div>
 
               {/* Divider */}
-              <LineGradient customClasses="mx-1 h-10 sm:h-15" vr />
+              <LineGradient
+                customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+                vr
+              />
 
               {/* Max */}
-              <div className="flex items-center gap-2 sm:gap-4 h-full">
-                <p className="text-[10px] sm:text-xs text-gray-300 mb-1 whitespace-nowrap">
+              <div className="flex items-center gap-1 sm:gap-4 h-full">
+                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
                   Max Price
                 </p>
-                <div className="flex items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-3 sm:px-4 py-2 h-full">
-                  <span className="text-[#EEA500] font-medium">$</span>
-                  <LineGradient customClasses="mx-0.5 sm:mx-1" vr />
-                  <span className="text-xs sm:text-sm font-medium">
-                    {price[1]}
-                  </span>
+                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                  <span className="text-secondary">$</span>
+                  <span className="">{price[1]}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <LineGradient />
+          {/* Area Range */}
+          <div className="md:mb-6 mb-3">
+            <h3 className="font-medium md:mb-3">Area Range</h3>
+            <div className="relative">
+              <PriceSlider
+                value={[sqft[0] ?? 100, sqft[1] ?? 5000]}
+                min={100}
+                max={5000}
+                step={100}
+                onChange={(_, v) => setSqft(v as [number, number])}
+                disableSwap
+                valueLabelDisplay="auto"
+              />
+            </div>
+
+            <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
+              {/* Min */}
+              <div className="flex items-center gap-1 sm:gap-4 h-full">
+                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                  Min Sqft
+                </p>
+                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                  <span className="">{sqft[0]}</span>
+                  <span className="text-secondary">sqft</span>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <LineGradient
+                customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+                vr
+              />
+
+              {/* Max */}
+              <div className="flex items-center gap-1 sm:gap-4 h-full">
+                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                  Max Sqft
+                </p>
+                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                  <span className="">{sqft[1]}</span>
+                  <span className="text-secondary">sqft</span>
                 </div>
               </div>
             </div>
@@ -221,7 +328,15 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                     <span className="text-sm">{label}</span>
 
                     <div className="flex items-center gap-3 border border-[rgba(15,15,15,0.12)] rounded-xl px-3 py-2">
-                      <button className="w-7 h-7 rounded-lg bg-[#30548729]">
+                      <button
+                        className="w-7 h-7 rounded-lg bg-[#30548729]"
+                        onClick={() => {
+                          const setter = idx === 0 ? setBedrooms : setBathrooms;
+                          const current = value ?? 0;
+                          if (current === 1) setter(null);
+                          else if (current > 1) setter(current - 1);
+                        }}
+                      >
                         −
                       </button>
 
@@ -229,7 +344,14 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                         {value ?? "any"}
                       </span>
 
-                      <button className="w-7 h-7 rounded-lg bg-[#30548729]">
+                      <button
+                        className="w-7 h-7 rounded-lg bg-[#30548729]"
+                        onClick={() => {
+                          const setter = idx === 0 ? setBedrooms : setBathrooms;
+                          const current = value ?? 0;
+                          setter(current + 1);
+                        }}
+                      >
                         +
                       </button>
                     </div>
@@ -242,7 +364,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
           <LineGradient />
 
           {/* Features */}
-          <div className="mb-6  border-[#33333333] pt-5">
+          {/* <div className="mb-6  border-[#33333333] pt-5">
             <h3 className="font-bold mb-5">Features</h3>
             <div className="grid grid-cols-3 gap-4">
               {[
@@ -262,10 +384,10 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
               ))}
             </div>
           </div>
-          <LineGradient />
+          <LineGradient /> */}
 
           {/* Extra Features */}
-          <div className="border-[#33333333] pt-2">
+          {/* <div className="border-[#33333333] pt-2">
             <h3 className="font-medium mb-4">Features</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {[
@@ -283,17 +405,17 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                   </span>
                 </div>
               ))}
-            </div>
+            </div> */}
 
-            {/* Bottom single item */}
-            <div className="mt-4 mb-5 ">
+          {/* Bottom single item */}
+          {/* <div className="mt-4 mb-5 ">
               <div className="flex items-center justify-center gap-2 px-3 py-3 border border-[rgba(15,15,15,0.12)] rounded-xl text-gray-400 text-xs">
                 <Image src={Icons.star} alt="" width={16} height={16} />
                 <span>Must Be on Favorites list</span>
               </div>
             </div>
-          </div>
-          <LineGradient />
+          </div> */}
+          {/* <LineGradient /> */}
 
           {/* Bottom Buttons */}
           <div className="pt-6 mt-2 border-[#0F0F0F1F] flex gap-4">
@@ -301,7 +423,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
               buttonType="secondary"
               label="Apply Filter"
               customClasses="w-1/2"
-              onClick={onClose}
+              onClick={handleApplyFilter}
             />
             <CustomButton
               buttonType="disabled"
@@ -312,6 +434,6 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
           </div>
         </div>
       </div>
-    </Modal>
+    </Dialog>
   );
 }

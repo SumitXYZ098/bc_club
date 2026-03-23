@@ -18,7 +18,7 @@ import { useGetListings } from "@/src/hooks/listing/useListingQueries";
 export default function PropertiesListingPage() {
   const [openFilters, setOpenFilters] = useState(false);
 
-  const { filters, updateFilter } = useListingStore();
+  const { filters, updateFilter, clearFilters } = useListingStore();
 
   const search = filters.search || "";
   const isChip = filters.isChip || false;
@@ -28,6 +28,13 @@ export default function PropertiesListingPage() {
   const activeProperty = filters.activeProperty || "any";
   const page = filters.page || 1;
   const pageSize = 20;
+
+  const minPrice = filters.minPrice;
+  const maxPrice = filters.maxPrice;
+  const minSqft = filters.minSqft;
+  const maxSqft = filters.maxSqft;
+  const status = filters.status;
+  const location = filters.location;
 
   const setSearch = (val: string) => updateFilter("search", val);
   const setIsChip = (val: boolean) => updateFilter("isChip", val);
@@ -82,6 +89,21 @@ export default function PropertiesListingPage() {
   // search
   if (search) {
     params.search = search;
+  }
+
+  // popup filters
+  if (minPrice !== undefined && minPrice > 1000) params.minPrice = minPrice;
+  if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
+  if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
+  if (maxSqft !== undefined && maxSqft < 5000) params.maxSqft = maxSqft;
+
+  if (status && status !== "any") {
+    params.propertyType = status;
+    delete params["filters[property_status][$notIn]"];
+  }
+
+  if (location && location !== "") {
+    params.location = location;
   }
 
   const {
@@ -184,7 +206,7 @@ export default function PropertiesListingPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex justify-between items-center gap-4 md:flex-nowrap flex-wrap mb-6">
+        <div className="flex justify-between items-center gap-4 flex-nowrap mb-6">
           <button
             onClick={() => setOpenFilters(true)}
             className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer xl:w-3/5 w-full"
@@ -269,13 +291,9 @@ export default function PropertiesListingPage() {
 
           <button
             onClick={() => {
-              setActivePrice("any");
-              setActiveBedRoom("any");
-              setActiveBathRoom("any");
-              setActiveProperty("any");
-              setPage(1);
+              clearFilters();
             }}
-            className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap xl:flex hidden ${activePrice !== "any" || activeBedRoom !== "any" || activeBathRoom !== "any" || activeProperty !== "any" ? "bg-primary text-white" : "bg-white"}`}
+            className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${activePrice !== "any" || activeBedRoom !== "any" || activeBathRoom !== "any" || activeProperty !== "any" || minPrice !== undefined || minSqft !== undefined || location ? "bg-primary text-white" : "bg-white"}`}
           >
             <FiX size={16} />
             <span className="font-medium">Reset Filters</span>

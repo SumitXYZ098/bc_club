@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { login } from "@/src/api/auth/authApi";
 import { useAuthContext } from "./AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
 
 interface LoginModalProps {
   open: boolean;
@@ -52,12 +53,16 @@ const LoginPopup = ({
       });
       const userStr = data.email.split("@")[0].toUpperCase();
       const actualUsername =
-        response?.user?.username || response?.username || userStr;
+        response?.user?.fullName ||
+        response?.user?.username ||
+        response?.username ||
+        userStr;
       loginUser(
         actualUsername.toUpperCase(),
         response?.jwt || response?.token,
         data.keepLoggedIn,
       );
+      toast.success("Login successful!");
       onClose(); // Close on success
       reset();
     } catch (error: any) {
@@ -89,12 +94,16 @@ const LoginPopup = ({
       if (data.jwt) {
         localStorage.setItem("token", data.jwt);
         const userStr = data.email?.split("@")[0]?.toUpperCase() || "USER";
-        const actualUsername = data.user?.username || data.username || userStr;
+        const actualUsername =
+          data?.user?.fullName ||
+          data.user?.username ||
+          data.username ||
+          userStr;
         loginUser(actualUsername.toUpperCase(), data.jwt, false);
         onClose();
-        alert("Login successful!");
+        toast.success("Login successful!");
       } else {
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       }
     } catch (error) {
       console.error("Google Login Failed:", error);
