@@ -6,30 +6,16 @@ import PropertyGallery from "./PropertyGallery";
 import PropertyInformation from "./propertyInformation/PropertyInformation";
 import GetInTouch from "../getInTouch/GetInTouch";
 import { propertyImages } from "@/src/mainComponents/dummyData";
-import { getListingById } from "@/src/api/listing/listingApi";
+import { useGetListingById } from "@/src/hooks/listing/useListingQueries";
 
 const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
-  const [listing, setListing] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchListing = async () => {
-      try {
-        setLoading(true);
-        const res = await getListingById(paramsId);
-        setListing(res?.data); // depends on API structure
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (paramsId) {
-      fetchListing();
-    }
-  }, [paramsId]);
+  const {
+    data: listing,
+    isLoading: loading,
+    error,
+  } = useGetListingById(paramsId, {
+    select: (res: any) => res?.data,
+  });
 
   if (loading)
     return (
@@ -37,7 +23,12 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
         Loading property...
       </div>
     );
-  if (error) return <div className="p-10 text-red-500">{error}</div>;
+  if (error)
+    return (
+      <div className="p-10 text-red-500">
+        {error.message || "An error occurred"}
+      </div>
+    );
   if (!listing) return null;
 
   return (

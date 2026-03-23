@@ -9,20 +9,41 @@ import PropertiesMap from "./PropertiesMap";
 import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
-import axios from "axios";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
-import { getListings } from "@/src/api/listing/listingApi";
+
+import { useListingStore } from "@/src/store/useListingStore";
+import { useGetListings } from "@/src/hooks/listing/useListingQueries";
 
 export default function PropertiesListingPage() {
   const [openFilters, setOpenFilters] = useState(false);
-  const [search, setSearch] = useState("");
-  const [isChip, setIsChip] = useState(false);
-  const [activePrice, setActivePrice] = useState<string>("any");
-  const [activeBathRoom, setActiveBathRoom] = useState<string>("any");
-  const [activeBedRoom, setActiveBedRoom] = useState<string>("any");
-  const [activeProperty, setActiveProperty] = useState<string>("any");
-  const [loading, setLoading] = useState(false);
+
+  const { filters, updateFilter } = useListingStore();
+
+  const search = filters.search || "";
+  const isChip = filters.isChip || false;
+  const activePrice = filters.activePrice || "any";
+  const activeBathRoom = filters.activeBathRoom || "any";
+  const activeBedRoom = filters.activeBedRoom || "any";
+  const activeProperty = filters.activeProperty || "any";
+  const page = filters.page || 1;
+  const pageSize = 20;
+
+  const setSearch = (val: string) => updateFilter("search", val);
+  const setIsChip = (val: boolean) => updateFilter("isChip", val);
+  const setActivePrice = (val: string) => updateFilter("activePrice", val);
+  const setActiveBathRoom = (val: string) =>
+    updateFilter("activeBathRoom", val);
+  const setActiveBedRoom = (val: string) => updateFilter("activeBedRoom", val);
+  const setActiveProperty = (val: string) =>
+    updateFilter("activeProperty", val);
+  const setPage = (val: number | ((prev: number) => number)) => {
+    if (typeof val === "function") {
+      updateFilter("page", val(page));
+    } else {
+      updateFilter("page", val);
+    }
+  };
 
   const pillBase =
     "pl-4 pr-2 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none font-medium cursor-pointer border transition w-full";
@@ -30,13 +51,6 @@ export default function PropertiesListingPage() {
   const pillActive = "border-primary text-primary ring-1 ring-blue-200";
 
   const pillInactive = "border-[#30548733] text-gray-800";
-
-  const [data, setData] = useState<PropertyCardProps[]>([]);
-  const [listingData, setListingData] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(20); // or whatever you want
-  const [pageCount, setPageCount] = useState(1);
 
   const params: any = {
     "pagination[page]": page,
@@ -70,79 +84,57 @@ export default function PropertiesListingPage() {
     params.search = search;
   }
 
-  useEffect(() => {
-    const fetchListings = async () => {
-      setLoading(true);
-      setError(null);
+  const {
+    data: queryData,
+    isLoading: loading,
+    error,
+  } = useGetListings(params, {
+    select: (res: any) => {
+      const listings = res?.data || [];
+      const pagination = res?.meta?.pagination || { pageCount: 1 };
 
-      try {
-        const res = await getListings(params);
+      const properties: PropertyCardProps[] = listings.map((listing: any) => ({
+        id: listing.documentId,
+        image: listing?.media?.[0]?.MediaURL,
+        title: listing?.property_sub_type,
+        price: listing?.price,
+        daysAgo: listing.DaysOnMarket ?? 0,
+        address: listing?.address
+          ? `${listing?.address}, ${listing?.city}, ${listing?.state}`
+          : `${listing?.city}, ${listing?.state}` || "",
+        sqft: listing?.area ?? 0,
+        beds: listing?.bedrooms ?? 0,
+        baths: listing?.bathrooms ?? 0,
+        priceDrop:
+          listing.PreviousListPrice &&
+          listing.PreviousListPrice > listing.ListPrice
+            ? Number(
+                (
+                  (listing.PreviousListPrice - listing.ListPrice) /
+                  listing.ListPrice
+                ).toFixed(1),
+              )
+            : undefined,
+        assessedDiff: listing.ListPrice
+          ? Number(
+              (
+                (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                listing.ListPrice
+              ).toFixed(1),
+            )
+          : 0,
+        mls: listing?.mls_number,
+        realtor: listing?.raw_data?.ListAOR || "Unknown",
+        isLogin: false,
+      }));
 
-        const listings = res.data;
-        const pagination = res.meta.pagination;
+      return { properties, listings, pagination };
+    },
+  });
 
-        setPageCount(pagination.pageCount);
-        setListingData(listings);
-
-        const properties: PropertyCardProps[] = listings.map(
-          (listing: any) => ({
-            id: listing.documentId,
-            image: listing?.media?.[0]?.MediaURL,
-            title: listing?.property_sub_type,
-            price: listing?.price,
-            daysAgo: listing.DaysOnMarket ?? 0,
-            address: listing?.address
-              ? `${listing?.address}, ${listing?.city}, ${listing?.state}`
-              : `${listing?.city}, ${listing?.state}` || "",
-            sqft: listing?.area ?? 0,
-            beds: listing?.bedrooms ?? 0,
-            baths: listing?.bathrooms ?? 0,
-            priceDrop:
-              listing.PreviousListPrice &&
-              listing.PreviousListPrice > listing.ListPrice
-                ? Number(
-                    (
-                      (listing.PreviousListPrice - listing.ListPrice) /
-                      listing.ListPrice
-                    ).toFixed(1),
-                  )
-                : undefined,
-            assessedDiff: listing.ListPrice
-              ? Number(
-                  (
-                    (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                    listing.ListPrice
-                  ).toFixed(1),
-                )
-              : 0,
-            mls: listing?.mls_number,
-            realtor: listing?.raw_data?.ListAOR || "Unknown",
-            isLogin: false,
-          }),
-        );
-
-        setData(properties);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setError(error.response?.data?.error?.message || "API error");
-        } else {
-          setError("An unexpected error occurred");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchListings();
-  }, [
-    page,
-    pageSize,
-    activePrice,
-    activeBedRoom,
-    activeBathRoom,
-    activeProperty,
-    search,
-  ]);
+  const data = queryData?.properties || [];
+  const listingData = queryData?.listings || [];
+  const pageCount = queryData?.pagination?.pageCount || 1;
 
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
@@ -283,10 +275,10 @@ export default function PropertiesListingPage() {
               setActiveProperty("any");
               setPage(1);
             }}
-            className="px-6 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] items-center gap-2 border-[#30548733] cursor-pointer w-3/4 xl:flex hidden"
+            className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap xl:flex hidden ${activePrice !== "any" || activeBedRoom !== "any" || activeBathRoom !== "any" || activeProperty !== "any" ? "bg-primary text-white" : "bg-white"}`}
           >
-            <FiX size={16} className="text-gray-600" />
-            <span className="font-medium text-gray-600">Reset Filters</span>
+            <FiX size={16} />
+            <span className="font-medium">Reset Filters</span>
           </button>
         </div>
 
@@ -298,48 +290,58 @@ export default function PropertiesListingPage() {
 
           <div className="xl:w-[64%] w-full flex flex-col">
             <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
-              {loading
-                ? Array.from({ length: 6 }).map((_, i) => (
-                    <PropertyCardSkeleton key={i} />
-                  ))
-                : data.map((property) => (
-                    <PropertiesCard key={property.id} {...property} isLogin />
-                  ))}
+              {loading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <PropertyCardSkeleton key={i} />
+                ))
+              ) : data.length === 0 ? (
+                <div className="w-full h-full flex justify-center items-center">
+                  <h3 className="text-2xl font-medium">No Properties Found</h3>
+                </div>
+              ) : (
+                data.map((property) => (
+                  <PropertiesCard key={property.id} {...property} isLogin />
+                ))
+              )}
             </div>
-            <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
-              {/* Prev */}
-              <button
-                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                disabled={page === 1}
-                className="px-4 py-2 border rounded-md disabled:opacity-50"
-              >
-                Prev
-              </button>
-
-              {/* Page Numbers */}
-              {Array.from({ length: pageCount }, (_, i) => (
+            {data.length !== 0 && (
+              <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
+                {/* Prev */}
                 <button
-                  key={i}
-                  onClick={() => setPage(i + 1)}
-                  className={`px-4 py-2 border rounded-md ${
-                    page === i + 1
-                      ? "bg-primary text-white border-primary"
-                      : "bg-white"
-                  }`}
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 border rounded-md disabled:opacity-50"
                 >
-                  {i + 1}
+                  Prev
                 </button>
-              ))}
 
-              {/* Next */}
-              <button
-                onClick={() => setPage((prev) => Math.min(prev + 1, pageCount))}
-                disabled={page === pageCount}
-                className="px-4 py-2 border rounded-md disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
+                {/* Page Numbers */}
+                {Array.from({ length: pageCount }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setPage(i + 1)}
+                    className={`px-4 py-2 border rounded-md ${
+                      page === i + 1
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+
+                {/* Next */}
+                <button
+                  onClick={() =>
+                    setPage((prev) => Math.min(prev + 1, pageCount))
+                  }
+                  disabled={page === pageCount}
+                  className="px-4 py-2 border rounded-md disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

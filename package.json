@@ -18,6 +18,8 @@
     "@mui/styled-engine-sc": "^7.3.9",
     "@mui/styles": "^6.5.0",
     "@react-oauth/google": "^0.13.4",
+    "@tanstack/react-query": "^5.95.0",
+    "@tanstack/react-query-devtools": "^5.95.0",
     "@types/nodemailer": "^7.0.11",
     "apexcharts": "^5.10.1",
     "axios": "^1.13.6",
@@ -26,7 +28,7 @@
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.577.0",
     "mapbox-gl": "^3.19.1",
-    "next": "16.1.6",
+    "next": "^16.2.1",
     "nodemailer": "^8.0.1",
     "react": "19.2.4",
     "react-apexcharts": "^2.1.0",
@@ -37,7 +39,8 @@
     "recharts": "^3.7.0",
     "styled-components": "^6.3.11",
     "swiper": "^12.1.2",
-    "yet-another-react-lightbox": "^3.29.1"
+    "yet-another-react-lightbox": "^3.29.1",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

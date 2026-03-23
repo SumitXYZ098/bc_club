@@ -1,205 +1,176 @@
 "use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+
 import CustomButton from "@/src/components/button/CustomButton";
 import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
-import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
-import Link from "next/link";
-import React, { useLayoutEffect, useRef, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
-import axios from "axios";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
-import { getListings } from "@/src/api/listing/listingApi";
+import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
+
+import { useGetListings } from "@/src/hooks/listing/useListingQueries";
 import { useAuthContext } from "../auth/AuthContext";
 
 const tabList = [
   "Newly Listed properties",
-  // "Court ordered sales",
+  "Expired Properties",
   "Sold properties",
 ];
 
+const OFFSET = 120;
+
+const swiperConfig = {
+  spaceBetween: 12,
+  slidesPerView: 1.1,
+  autoplay: {
+    delay: 0,
+    disableOnInteraction: false,
+    pauseOnMouseEnter: true,
+  },
+  modules: [Autoplay, Pagination],
+  loop: true,
+  pagination: {
+    clickable: true,
+    dynamicBullets: true,
+  },
+  breakpoints: {
+    640: { slidesPerView: 1.8, spaceBetween: 20 },
+    1024: { slidesPerView: 3, spaceBetween: 32 },
+  },
+  speed: 3000,
+};
+
 const OurProperty = () => {
-  const [tab, setTab] = useState<string>("Newly Listed properties");
-  const [data, setData] = useState<PropertyCardProps[]>([]);
-  const [soldList, setSoldList] = useState<PropertyCardProps[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [errorSold, setErrorSold] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const { isLoggedIn } = useAuthContext();
 
-  // refs for each section
-  const newlyListedRef = useRef<HTMLDivElement | null>(null);
-  // const courtOrderedRef = useRef<HTMLDivElement | null>(null);
-  const soldRef = useRef<HTMLDivElement | null>(null);
+  const [tab, setTab] = useState(tabList[0]);
 
-  // HEIGHT of fixed header or desired space from top
-  const OFFSET = 120;
 
-  const handleClick = (tabName: string) => {
+
+  const refs = {
+    "Newly Listed properties": useRef<HTMLDivElement>(null),
+    "Expired Properties": useRef<HTMLDivElement>(null),
+    "Sold properties": useRef<HTMLDivElement>(null),
+  };
+
+  const scrollToSection = (tabName: string) => {
     setTab(tabName);
-
-    const refMap: Record<string, React.RefObject<HTMLDivElement | null>> = {
-      "Newly Listed properties": newlyListedRef,
-      // "Court ordered sales": courtOrderedRef,
-      "Sold properties": soldRef,
-    };
-
-    const target = refMap[tabName].current;
+    const target = refs[tabName as keyof typeof refs]?.current;
 
     if (target) {
-      const targetPosition =
-        target.getBoundingClientRect().top + window.scrollY - OFFSET;
+      const top = target.getBoundingClientRect().top + window.scrollY - OFFSET;
 
-      window.scrollTo({
-        top: targetPosition,
-        behavior: "smooth",
-      });
+      window.scrollTo({ top, behavior: "smooth" });
     }
   };
-  const params: any = {
-    "filters[property_status][$notIn]": ["Rented", "Expired"],
-    "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
+
+  // 🔹 Mapping Function
+  const mapProperty = (listing: any): PropertyCardProps => ({
+    id: listing.documentId,
+    image: listing?.media?.[0]?.MediaURL,
+    title: listing?.property_sub_type,
+    price: listing?.price,
+    daysAgo: listing.DaysOnMarket ?? 0,
+    address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
+    sqft: listing?.area ?? 0,
+    beds: listing?.bedrooms ?? 0,
+    baths: listing?.bathrooms ?? 0,
+    priceDrop:
+      listing.PreviousListPrice > listing.ListPrice
+        ? Number(
+            (
+              (listing.PreviousListPrice - listing.ListPrice) /
+              listing.ListPrice
+            ).toFixed(1),
+          )
+        : undefined,
+    assessedDiff: listing.ListPrice
+      ? Number(
+          (
+            (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+            listing.ListPrice
+          ).toFixed(1),
+        )
+      : 0,
+    mls: listing?.mls_number,
+    realtor: listing?.raw_data?.ListAOR || "Unknown",
+  });
+
+  const { data: newList = [], isLoading: isLoadingNew } = useGetListings(
+    {
+      "filters[property_status][$notIn]": ["Rented", "Expired"],
+      "filters[raw_data][BCRES_SoldDate][$null]": true,
+      "filters[property_sub_type][$notNull]": true,
+    },
+    {
+      select: (res: any) =>
+        res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
+    }
+  );
+
+  const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
+    {
+      "filters[raw_data][BCRES_SoldDate][$notNull]": true,
+    },
+    {
+      select: (res: any) =>
+        res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
+    }
+  );
+
+  const { data: expiredList = [], isLoading: isLoadingExpired } = useGetListings(
+    {
+      "filters[property_status][$eq]": "Expired",
+    },
+    {
+      select: (res: any) =>
+        res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
+    }
+  );
+
+  const renderSlider = (
+    list: PropertyCardProps[],
+    isLoading: boolean,
+    isLoginOverride?: boolean,
+  ) => {
+    if (isLoading) {
+      return (
+        <div className="flex gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <PropertyCardSkeleton key={i} />
+          ))}
+        </div>
+      );
+    }
+
+    if (!list.length) {
+      return <p className="text-center py-10">No properties found</p>;
+    }
+
+    return (
+      <Swiper {...swiperConfig} className="pt-3! pb-9! mySwiper w-full h-full">
+        {list.map((item) => (
+          <SwiperSlide key={item.id}>
+            <PropertiesCard {...item} isLogin={isLoginOverride ?? isLoggedIn} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    );
   };
-
-  const soldParams: any = {
-    "filters[property_status][$notIn]": ["Rented", "Expired"],
-    "filters[raw_data][BCRES_SoldDate][$notNull]": true,
-    "filters[property_sub_type][$notNull]": true,
-  };
-
-  useLayoutEffect(() => {
-    const fetchListings = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await getListings(params);
-
-        const properties: PropertyCardProps[] = res.data
-          .filter((listing: any) => listing?.address)
-          .map((listing: any) => {
-            return {
-              id: listing.documentId,
-              image: listing?.media?.[0]?.MediaURL,
-              title: listing?.property_sub_type,
-              price: listing?.price,
-              daysAgo: listing.DaysOnMarket ?? 0,
-              address:
-                `${listing?.address}, ${listing?.city}, ${listing?.state}` ||
-                "",
-              sqft: listing?.area ?? 0,
-              beds: listing?.bedrooms ?? 0,
-              baths: listing?.bathrooms ?? 0,
-              priceDrop:
-                listing.PreviousListPrice &&
-                listing.PreviousListPrice > listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.PreviousListPrice - listing.ListPrice) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : undefined,
-              assessedDiff: listing.ListPrice
-                ? Number(
-                    (
-                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                      listing.ListPrice
-                    ).toFixed(1),
-                  )
-                : 0,
-              mls: listing?.mls_number,
-              realtor: listing?.raw_data?.ListAOR || "Unknown",
-              isLogin: false,
-            };
-          });
-
-        setData(properties);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setError(error.response?.data?.error?.message || "API error");
-        } else {
-          setError("An unexpected error occurred");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchListings();
-  }, []);
-
-  useLayoutEffect(() => {
-    const fetchSoldListings = async () => {
-      setLoading(true);
-      setErrorSold(null);
-
-      try {
-        const res = await getListings(soldParams);
-
-        const soldProperties: PropertyCardProps[] = res.data
-          .filter((listing: any) => listing?.address)
-          .map((listing: any) => {
-            return {
-              id: listing.documentId,
-              image: listing?.media?.[0]?.MediaURL,
-              title: listing?.property_sub_type,
-              price: listing?.price,
-              daysAgo: listing.DaysOnMarket ?? 0,
-              address:
-                `${listing?.address}, ${listing?.city}, ${listing?.state}` ||
-                "",
-              sqft: listing?.area ?? 0,
-              beds: listing?.bedrooms ?? 0,
-              baths: listing?.bathrooms ?? 0,
-              priceDrop:
-                listing.PreviousListPrice &&
-                listing.PreviousListPrice > listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.PreviousListPrice - listing.ListPrice) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : undefined,
-              assessedDiff: listing.ListPrice
-                ? Number(
-                    (
-                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                      listing.ListPrice
-                    ).toFixed(1),
-                  )
-                : 0,
-              mls: listing?.mls_number,
-              realtor: listing?.raw_data?.ListAOR || "Unknown",
-            };
-          });
-
-        setSoldList(soldProperties);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setErrorSold(error.response?.data?.error?.message || "API error");
-        } else {
-          setErrorSold("An unexpected error occurred");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSoldListings();
-  }, []);
 
   return (
-    <section className="xl:max-w-screen-2xl mx-auto xl:pl-16 md:pl-13 pl-6 w-full xl:pt-26.5 md:pt-31 pt-13 xl:pb-36 md:pb-33 pb-19.5 relative">
+    <section className="xl:max-w-screen-2xl mx-auto px-6 py-16">
       <Heading
         tagType="h2"
         type={IHeadingTypes.heading32}
         content="Explore Our Property"
-        customClasses="w-full text-center xl:pr-16 md:pr-13 pr-6"
+        customClasses="text-center"
       />
+
       {/* Tab  */}
       <div className="xl:mt-13 md:mt-6 mt-4 w-full flex items-center-safe justify-between flex-col gap-y-2 md:flex-row xl:pr-16 md:pr-13 pr-6 ">
         <div className="w-full md:w-[70%] xl:w-[60%] flex flex-nowrap flex-row h-auto shadow-[0_0_20px_0_rgba(0,0,0,0.12)] gap-x-2 rounded-xl p-2">
@@ -208,7 +179,7 @@ const OurProperty = () => {
               buttonType={tab === item ? "primary" : "disabled"}
               key={idx}
               label={item}
-              onClick={() => handleClick(item)}
+              onClick={() => scrollToSection(item)}
               customClasses="w-full"
             />
           ))}
@@ -233,173 +204,36 @@ const OurProperty = () => {
         </Link>
       </div>
 
-      {/* Tab Content */}
-      <div className="w-full flex flex-col xl:space-y-13 space-y-7 xl:mt-6 md:mt-7 mt-8">
-        {/* Newly Listed properties */}
-        <div ref={newlyListedRef} className="flex flex-col">
+      {/* Sections */}
+      <div className="space-y-10 mt-10">
+        <div
+          ref={refs["Newly Listed properties"]}
+          className="flex flex-col gap-4"
+        >
           <Heading
             tagType="h3"
             type={IHeadingTypes.heading20}
             content="Newly Listed Properties"
           />
-          {loading ? (
-            <div className="flex flex-nowrap gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <PropertyCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : data?.length === 0 ? (
-            <div className="text-center md:py-15 py-9 space-y-3 ">
-              <h3 className="md:text-lg text-base font-semibold">
-                No properties yet
-              </h3>
-              <p className="md:text-base text-sm text-lightWhite">
-                {error || "Looks like you haven’t added any properties."}
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-row gap-x-5 w-full">
-              <Swiper
-                speed={2500}
-                spaceBetween={12}
-                slidesPerView={1.1}
-                autoplay={{
-                  delay: 0,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
-                }}
-                modules={[Autoplay, Pagination]}
-                loop
-                pagination={{
-                  clickable: true,
-                  dynamicBullets: true,
-                }}
-                breakpoints={{
-                  640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
-                  1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
-                }}
-                className="mySwiper w-full h-full pt-5! pb-9!"
-              >
-                {data.map((property) => (
-                  <SwiperSlide key={property.id}>
-                    <PropertiesCard {...property} isLogin />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-          )}
+          {renderSlider(newList, isLoadingNew, true)}
         </div>
 
-        {/* Court ordered sales */}
-        {/* <div ref={courtOrderedRef} className="flex flex-col">
+        <div ref={refs["Expired Properties"]} className="flex flex-col gap-4">
           <Heading
             tagType="h3"
             type={IHeadingTypes.heading20}
-            content="Court Ordered Sales"
+            content="Expired Properties"
           />
+          {renderSlider(expiredList, isLoadingExpired)}
+        </div>
 
-          {loading ? (
-            <div className="flex flex-nowrap gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <PropertyCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : data?.length === 0 ? (
-            <div className="text-center md:py-15 py-9 space-y-3 ">
-              <h3 className="md:text-lg text-base font-semibold">
-                No properties yet
-              </h3>
-              <p className="md:text-base text-sm text-lightWhite">
-                Looks like you haven’t added any properties.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-row gap-x-5 w-full">
-              <Swiper
-                speed={1500}
-                spaceBetween={12}
-                slidesPerView={1.1}
-                autoplay={{
-                  delay: 0,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
-                }}
-                modules={[Autoplay, Pagination]}
-                loop
-                pagination={{
-                  clickable: true,
-                  dynamicBullets: true,
-                }}
-                breakpoints={{
-                  640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
-                  1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
-                }}
-                className="mySwiper w-full pt-5! pb-9!"
-              >
-                {propertyData.map((item, index) => (
-                  <SwiperSlide key={index}>
-                    <PropertiesCard {...item} isLogin={false} />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-          )}
-        </div> */}
-
-        {/* Sold properties */}
-        <div ref={soldRef} className="flex flex-col">
+        <div ref={refs["Sold properties"]} className="flex flex-col gap-4">
           <Heading
             tagType="h3"
             type={IHeadingTypes.heading20}
             content="Sold Properties"
           />
-          {loading ? (
-            <div className="flex flex-nowrap gap-4 pt-5 pb-9">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <PropertyCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : soldList?.length === 0 ? (
-            <div className="text-center md:py-15 py-9 space-y-3 ">
-              <h3 className="md:text-lg text-base font-semibold">
-                No sold properties yet
-              </h3>
-              <p className="md:text-base text-sm text-lightWhite">
-                {errorSold ||
-                  "Looks like you haven’t added any sold properties."}
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-row gap-x-5 w-full">
-              <Swiper
-                speed={1500}
-                spaceBetween={12}
-                slidesPerView={1.1}
-                autoplay={{
-                  delay: 0,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
-                }}
-                modules={[Autoplay, Pagination]}
-                loop
-                pagination={{
-                  clickable: true,
-                  dynamicBullets: true,
-                }}
-                breakpoints={{
-                  640: { slidesPerView: 1.8, spaceBetween: 20, speed: 2500 },
-                  1024: { slidesPerView: 3, spaceBetween: 32, speed: 2500 },
-                }}
-                className="mySwiper w-full pt-5! pb-9!"
-              >
-                {soldList.map((item, index) => (
-                  <SwiperSlide key={index}>
-                    <PropertiesCard {...item} isLogin={isLoggedIn} />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-          )}
+          {renderSlider(soldList, isLoadingSold)}
         </div>
       </div>
     </section>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 // Register Apex Charts components
@@ -63,8 +63,13 @@ const SummaryCard = ({ title, value }: { title: string; value: number }) => (
 -----------------------------------*/
 
 export default function SalesReported({ location }: { location: string }) {
+  const [isMounted, setIsMounted] = useState(false);
   const [range, setRange] = useState("15D");
   // const [metric, setMetric] = useState("New Listings");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Generate dynamic data
   const data = useMemo(
@@ -113,6 +118,8 @@ export default function SalesReported({ location }: { location: string }) {
     legend: { show: false },
     grid: { borderColor: "transparent" },
   };
+
+  if (!isMounted) return <div className="p-6 space-y-6 bg-background rounded-2xl min-h-[400px]"></div>;
 
   return (
     <div className="p-6 space-y-6 bg-background rounded-2xl">
