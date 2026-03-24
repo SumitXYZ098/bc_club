@@ -94,8 +94,12 @@ const Footer = () => {
       {/* CopyRight */}
       <div className="w-full h-auto flex flex-col gap-y-1.5 md:flex-row justify-center md:justify-between items-center md:py-6 py-4 border-t border-white text-sm text-lightWhite text-center">
         <span>
-          &copy; {currentYear}, All Rights Reserved. Presented by Harjeet Sidhu
-          & Sidhu Team PREC.
+          &copy; {currentYear}, All Rights Reserved.{" "}
+          <Link href={"https://thesidhuteam.ca"} className="underline">
+            {" "}
+            The Sidhu Team
+          </Link>{" "}
+          Planet Group Realty Inc Surrey
         </span>
         <Link href={"https://www.xyz.studio/"}>
           Design & Develop By <b>XYZ Studio</b>

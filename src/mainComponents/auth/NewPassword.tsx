@@ -8,12 +8,14 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { resetPassword } from "@/src/api/auth/authApi";
 import { useAuthContext } from "./AuthContext";
+import { toast } from "react-toastify";
 interface NewPasswordProps {
   open: boolean;
   onClose: () => void;
+  openLogin: () => void;
 }
 
-const NewPassword = ({ open, onClose }: NewPasswordProps) => {
+const NewPassword = ({ open, onClose, openLogin }: NewPasswordProps) => {
   const { resetEmail, resetToken } = useAuthContext();
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,6 +27,7 @@ const NewPassword = ({ open, onClose }: NewPasswordProps) => {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: { newPassword: "", confirmPassword: "" },
@@ -39,8 +42,9 @@ const NewPassword = ({ open, onClose }: NewPasswordProps) => {
         resetToken: resetToken,
         newPassword: data.newPassword,
       });
-      console.log("Password Reset Success");
-      onClose(); // Optional: or show a success toast
+      toast.success("Password reset successful. Please log in again.");
+      reset();
+      openLogin();
     } catch (error: any) {
       setErrorMsg(error.message || "Failed to reset password");
     } finally {
@@ -53,7 +57,7 @@ const NewPassword = ({ open, onClose }: NewPasswordProps) => {
       open={open}
       onClose={onClose}
       title="Set New Password"
-      description="Enter your new password and confirm it below."
+      description="Set your new password and continue exploring properties"
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -65,7 +69,18 @@ const NewPassword = ({ open, onClose }: NewPasswordProps) => {
           label="New Password"
           type={showNewPassword ? "text" : "password"}
           className="w-full"
-          {...register("newPassword", { required: "New password is required" })}
+          {...register("newPassword", {
+            required: "Password is required",
+            minLength: {
+              value: 8,
+              message: "Password must be at least 8 characters",
+            },
+            pattern: {
+              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+              message:
+                "Password must include uppercase, lowercase, number, and special character",
+            },
+          })}
           error={!!errors.newPassword}
           helperText={errors.newPassword?.message as string}
           InputProps={{

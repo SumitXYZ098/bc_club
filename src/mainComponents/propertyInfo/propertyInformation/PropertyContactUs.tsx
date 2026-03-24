@@ -43,7 +43,7 @@ const PropertyContactUs = ({ property }: { property: any }) => {
         <div className="flex gap-x-3 items-center">
           <Person32Filled className="text-primary w-10 h-10" />
           <div className="flex flex-col gap-y-2">
-            <span className="text-base font-medium">Dan Roy</span>
+            <span className="text-base font-medium">Contact Agent</span>
             <Link
               href={"tel:+1 485 526 258"}
               className="text-base text-primary flex gap-x-1"
@@ -53,12 +53,12 @@ const PropertyContactUs = ({ property }: { property: any }) => {
             </Link>
           </div>
         </div>
-        <button className="px-4 py-2.5 border border-primary rounded-md text-primary text-base font-bold">
-          Check Eligibility
+        <button className="px-4 py-2.5 border border-primary rounded-md text-primary text-base font-bold cursor-pointer">
+          Request a showing
         </button>
-        <button className="px-4 py-2.5 text-base font-bold bg-primary text-background rounded-md">
+        <Link href={'tel:0123456789'} className="px-4 py-2.5 text-center text-base font-bold bg-primary text-background rounded-md">
           Call Now
-        </button>
+        </Link>
       </div>
     </div>
   );

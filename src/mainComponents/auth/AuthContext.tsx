@@ -170,6 +170,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       />
 
       <NewPassword
+        openLogin={() => {
+          setOpenLogin(true);
+          setOpenNewPassword(false);
+        }}
         open={openNewPassword}
         onClose={() => setOpenNewPassword(false)}
       />

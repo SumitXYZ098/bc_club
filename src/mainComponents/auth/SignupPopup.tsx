@@ -43,12 +43,12 @@ const SignupPopup = ({
       setLoading(true);
       setErrorMsg("");
       const response = await signup({
-        username: `${data.firstName} ${data.lastName}`.trim(),
+        fullName: `${data.firstName} ${data.lastName}`.trim(),
         email: data.email,
         password: data.password,
       });
       if (response.message) {
-        onOpenAccCreation(); // Redirect to login after successful signup
+        onOpenAccCreation();
         reset();
       }
     } catch (error: any) {
@@ -102,7 +102,7 @@ const SignupPopup = ({
       open={open}
       onClose={onClose}
       title="Create an Account"
-      description="Enter your information to create a BCclub"
+      description="Fill the information for real estate updates"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}
@@ -146,7 +146,18 @@ const SignupPopup = ({
             label="Password"
             type={showPassword ? "text" : "password"}
             className="w-full p-4"
-            {...register("password", { required: "Password is required" })}
+            {...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 8,
+                message: "Password must be at least 8 characters",
+              },
+              pattern: {
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+                message:
+                  "Password must include uppercase, lowercase, number, and special character",
+              },
+            })}
             error={!!errors.password}
             helperText={errors.password?.message as string}
             InputProps={{

@@ -6,7 +6,7 @@ interface LoginPayload {
   password: string;
 }
 interface SignupPayload {
-  username: string;
+fullName: string;
   email: string;
   password: string;
 }

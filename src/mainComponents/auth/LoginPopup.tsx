@@ -63,7 +63,7 @@ const LoginPopup = ({
         data.keepLoggedIn,
       );
       toast.success("Login successful!");
-      onClose(); // Close on success
+      onClose();
       reset();
     } catch (error: any) {
       setErrorMsg(error.message || "Failed to login");
@@ -116,7 +116,7 @@ const LoginPopup = ({
       open={open}
       onClose={onClose}
       title="WelCome Back"
-      description="Let’s Login to grab amazing deal"
+      description="Log in to continue your home search"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}
@@ -170,6 +170,7 @@ const LoginPopup = ({
           />
 
           <button
+            type="button"
             onClick={onOpenForgot}
             className="text-[#22558B] text-sm hover:underline"
           >
