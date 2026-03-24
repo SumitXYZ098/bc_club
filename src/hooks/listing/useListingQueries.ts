@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { getListings, getListingById } from '@/src/api/listing/listingApi';
+import { getListings, getListingById, getFavouriteProperties } from '@/src/api/listing/listingApi';
 
 export const listingKeys = {
   all: ['listings'] as const,
@@ -7,6 +7,7 @@ export const listingKeys = {
   list: (params: any) => [...listingKeys.lists(), params] as const,
   details: () => [...listingKeys.all, 'detail'] as const,
   detail: (id: string) => [...listingKeys.details(), id] as const,
+  favourites: () => [...listingKeys.all, 'favourites'] as const,
 };
 
 export function useGetListings<TData = any>(
@@ -28,6 +29,16 @@ export function useGetListingById<TData = any>(
     queryKey: listingKeys.detail(id),
     queryFn: () => getListingById(id),
     enabled: !!id,
+    ...options,
+  });
+}
+
+export function useGetFavouriteProperties<TData = any>(
+  options?: Omit<UseQueryOptions<any, Error, TData, any>, 'queryKey' | 'queryFn'>
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: listingKeys.favourites(),
+    queryFn: () => getFavouriteProperties(),
     ...options,
   });
 }

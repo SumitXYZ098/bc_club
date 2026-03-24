@@ -49,8 +49,6 @@ const OurProperty = () => {
 
   const [tab, setTab] = useState(tabList[0]);
 
-
-
   const refs = {
     "Newly Listed properties": useRef<HTMLDivElement>(null),
     "Expired Properties": useRef<HTMLDivElement>(null),
@@ -74,7 +72,7 @@ const OurProperty = () => {
     image: listing?.media?.[0]?.MediaURL,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing.DaysOnMarket ?? 0,
+    daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
     address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
     sqft: listing?.area ?? 0,
     beds: listing?.bedrooms ?? 0,
@@ -97,19 +95,23 @@ const OurProperty = () => {
         )
       : 0,
     mls: listing?.mls_number,
-    realtor: listing?.raw_data?.ListAOR || "Unknown",
+    realtor:
+      listing?.office_data?.OfficeName ||
+      listing?.raw_data?.ListAOR ||
+      "Unknown",
+    isFavourite: listing?.is_favorite || false,
   });
 
   const { data: newList = [], isLoading: isLoadingNew } = useGetListings(
     {
-      "filters[property_status][$notIn]": ["Rented", "Expired"],
+      "filters[property_status][$notIn]": ["Expired"],
       "filters[raw_data][BCRES_SoldDate][$null]": true,
       "filters[property_sub_type][$notNull]": true,
     },
     {
       select: (res: any) =>
         res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
-    }
+    },
   );
 
   const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
@@ -119,23 +121,26 @@ const OurProperty = () => {
     {
       select: (res: any) =>
         res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
-    }
+    },
   );
 
-  const { data: expiredList = [], isLoading: isLoadingExpired } = useGetListings(
-    {
-      "filters[property_status][$eq]": "Expired",
-    },
-    {
-      select: (res: any) =>
-        res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
-    }
-  );
+  const { data: expiredList = [], isLoading: isLoadingExpired } =
+    useGetListings(
+      {
+        "filters[property_status][$eq]": "Expired",
+      },
+      {
+        select: (res: any) =>
+          res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
+      },
+    );
 
   const renderSlider = (
     list: PropertyCardProps[],
     isLoading: boolean,
     isLoginOverride?: boolean,
+    isSold?: boolean,
+    isExpired?: boolean,
   ) => {
     if (isLoading) {
       return (
@@ -155,7 +160,12 @@ const OurProperty = () => {
       <Swiper {...swiperConfig} className="pt-3! pb-9! mySwiper w-full h-full">
         {list.map((item) => (
           <SwiperSlide key={item.id}>
-            <PropertiesCard {...item} isLogin={isLoginOverride ?? isLoggedIn} />
+            <PropertiesCard
+              {...item}
+              isLogin={isLoginOverride ?? isLoggedIn}
+              isSold={isSold}
+              isExpired={isExpired}
+            />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -215,7 +225,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Newly Listed Properties"
           />
-          {renderSlider(newList, isLoadingNew, true)}
+          {renderSlider(newList, isLoadingNew, true, false, false)}
         </div>
 
         <div ref={refs["Expired Properties"]} className="flex flex-col gap-4">
@@ -224,7 +234,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Expired Properties"
           />
-          {renderSlider(expiredList, isLoadingExpired)}
+          {renderSlider(expiredList, isLoadingExpired, isLoggedIn, false, true)}
         </div>
 
         <div ref={refs["Sold properties"]} className="flex flex-col gap-4">
@@ -233,7 +243,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Sold Properties"
           />
-          {renderSlider(soldList, isLoadingSold)}
+          {renderSlider(soldList, isLoadingSold, isLoggedIn, true, false)}
         </div>
       </div>
     </section>

@@ -6,9 +6,10 @@ interface LoginPayload {
   password: string;
 }
 interface SignupPayload {
-fullName: string;
+  fullName: string;
   email: string;
   password: string;
+  role: string;
 }
 
 interface ForgotPasswordPayload {

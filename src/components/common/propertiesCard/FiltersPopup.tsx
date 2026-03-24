@@ -74,7 +74,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
 
   const [sqft, setSqft] = useState<[number | null, number | null]>([
     filters.minSqft ?? 0,
-    filters.maxSqft ?? 5000,
+    filters.maxSqft ?? 15000,
   ]);
   const [bedrooms, setBedrooms] = useState<number | null>(
     filters.activeBedRoom && filters.activeBedRoom !== "any"
@@ -98,7 +98,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
 
   const handleClearAll = () => {
     setPrice([0, 20000000]);
-    setSqft([0, 5000]);
+    setSqft([0, 15000]);
     setBedrooms(null);
     setBathrooms(null);
     setStatus("");
@@ -260,8 +260,14 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                   Max Price
                 </p>
                 <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                  <span className="text-secondary">$</span>
-                  <span className="">{price[1]}</span>
+                  {price[1] === 20000000 ? (
+                    <span className="">Max</span>
+                  ) : (
+                    <>
+                      <span className="text-secondary">$</span>
+                      <span className="">{price[1]}</span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -272,9 +278,9 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
             <h3 className="font-medium md:mb-3">Area Range</h3>
             <div className="relative">
               <PriceSlider
-                value={[sqft[0] ?? 100, sqft[1] ?? 5000]}
+                value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
                 min={100}
-                max={5000}
+                max={15000}
                 step={100}
                 onChange={(_, v) => setSqft(v as [number, number])}
                 disableSwap
@@ -306,8 +312,14 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                   Max Sqft
                 </p>
                 <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                  <span className="">{sqft[1]}</span>
-                  <span className="text-secondary">sqft</span>
+                  {sqft[1] === 15000 ? (
+                    <span className="">Max</span>
+                  ) : (
+                    <>
+                      <span className="">{sqft[1]}</span>
+                      <span className="text-secondary">sqft</span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

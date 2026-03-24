@@ -9,6 +9,10 @@ import CustomButton from "../../button/CustomButton";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
+import { getTimeAgo } from "@/src/utilities/utilities";
+import { useState } from "react";
+import { addToFavourite } from "@/src/api/listing/listingApi";
+import { toast } from "react-toastify";
 
 export interface PropertyCardProps {
   id: string;
@@ -25,6 +29,9 @@ export interface PropertyCardProps {
   mls: string;
   realtor: string;
   isLogin?: boolean;
+  isExpired?: boolean;
+  isSold?: boolean;
+  isFavourite?: boolean;
 }
 
 const PropertiesCard: React.FC<PropertyCardProps> = ({
@@ -41,18 +48,42 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   assessedDiff,
   mls,
   realtor,
+  isExpired,
+  isSold,
+  isFavourite: isFavouriteProp,
   isLogin: isLoginProp,
 }) => {
+  const [isFavourite, setIsFavourite] = useState(isFavouriteProp || false);
   const pathname = usePathname();
 
   const { setOpenLogin, isLoggedIn } = useAuthContext();
   const isLogin = isLoginProp ?? isLoggedIn;
 
+  const handleToggleFavourite = async (e: React.MouseEvent) => {
+    setIsFavourite(!isFavourite);
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isLogin) {
+      setOpenLogin(true);
+      return;
+    }
+
+    try {
+      const resp = await addToFavourite(id);
+      toast.success(resp.action || "Updated favourites");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update favourite");
+    }
+  };
+
   return (
     <Link
       href={`${!isLogin ? "#" : `/property-info/${id}`}`}
       className={`${
-        pathname === "/properties" ? "md:w-[49%] w-full " : "w-full"
+        pathname === "/properties" || pathname === "/wishlist"
+          ? "md:w-[49%] w-full "
+          : "w-full"
       }`}
     >
       <div
@@ -73,14 +104,21 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             </div>
 
             {/* Favorite Icon */}
-            <button className="absolute top-3 left-3 bg-background p-2 rounded-full shadow">
-              <Heart className="w-5 h-5 text-primary" />
-            </button>
+            {!isExpired && !isSold && isLoggedIn && (
+              <button
+                onClick={handleToggleFavourite}
+                className="absolute top-3 left-3 bg-background p-2 rounded-full shadow z-20 cursor-pointer"
+              >
+                <Heart
+                  className={`w-5 h-5 ${isFavourite ? "text-red fill-red" : "text-primary"}`}
+                />
+              </button>
+            )}
 
             {/* Days Ago */}
             {daysAgo !== 0 && (
               <span className="absolute top-3 right-3 bg-background text-primary px-3 py-1.5 text-sm rounded-full">
-                {daysAgo} days ago
+                {getTimeAgo(daysAgo)}
               </span>
             )}
 
@@ -95,6 +133,29 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 Price Drop {priceDrop}%
               </span>
             )}
+            {/* {priceDrop !== undefined && priceDrop > 0 && ( */}
+            {isSold && (
+              <span
+                className="absolute bottom-3 left-0 bg-red text-background pl-3 pr-7 pt-2 pb-2 text-xs h-auto font-medium"
+                style={{
+                  clipPath: "polygon(100% 0, 76% 49%, 100% 100%, 0 98%, 0 0)",
+                }}
+              >
+                Sold
+              </span>
+            )}
+
+            {isExpired && (
+              <span
+                className="absolute bottom-3 left-0 bg-gray text-black70 pl-3 pr-7 pt-2 pb-2 text-xs h-auto font-medium"
+                style={{
+                  clipPath: "polygon(100% 0, 76% 49%, 100% 100%, 0 98%, 0 0)",
+                }}
+              >
+                Expired
+              </span>
+            )}
+            {/* )} */}
           </div>
 
           <div className="space-y-3 mt-1">

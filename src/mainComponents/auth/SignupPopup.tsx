@@ -46,6 +46,7 @@ const SignupPopup = ({
         fullName: `${data.firstName} ${data.lastName}`.trim(),
         email: data.email,
         password: data.password,
+        role: "Admin",
       });
       if (response.message) {
         onOpenAccCreation();

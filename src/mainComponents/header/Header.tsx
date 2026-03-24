@@ -14,7 +14,8 @@ import CustomButton from "@/src/components/button/CustomButton";
 
 import { useAuthContext } from "../auth/AuthContext";
 import { usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { Heart, LogOut } from "lucide-react";
+import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 
 export const menulist = [
   { title: "Evaluation", href: "/home-estimation" },
@@ -158,11 +159,19 @@ const Header = () => {
               </div>
               <div
                 tabIndex={-1}
-                className="dropdown-content menu bg-white rounded-box z-1 px-3 py-1 shadow-sm gap-y-2 w-fit"
+                className="dropdown-content menu bg-white rounded-box z-1 px-4 py-3 shadow-sm gap-y-2 w-fit text-nowrap"
               >
+                <Link
+                  href={"/wishlist"}
+                  className="flex items-center gap-1 w-full cursor-pointer group text-secondary-text hover:text-primary hover:bg-background hover:font-medium  rounded-lg transition-colors duration-300 ease-in-out"
+                >
+                  <Heart className="group-hover:text-primary" />
+                  Wishlist
+                </Link>
+                <LineGradient />
                 <span
                   onClick={logoutUser}
-                  className="flex items-center gap-0.5 w-full cursor-pointer group text-secondary-text hover:text-primary hover:bg-background hover:font-medium px-4 py-2 rounded-lg transition-colors duration-300 ease-in-out"
+                  className="flex items-center gap-1 w-full cursor-pointer group text-secondary-text hover:text-primary hover:bg-background hover:font-medium  rounded-lg transition-colors duration-300 ease-in-out"
                 >
                   <LogOut className="group-hover:text-primary" />
                   Logout
