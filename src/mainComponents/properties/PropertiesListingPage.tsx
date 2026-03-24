@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
-import { Chip } from "@mui/material";
+import { Box, Chip, Pagination } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesMap from "./PropertiesMap";
@@ -157,6 +157,11 @@ export default function PropertiesListingPage() {
   const data = queryData?.properties || [];
   const listingData = queryData?.listings || [];
   const pageCount = queryData?.pagination?.pageCount || 1;
+
+  const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+    window.scrollTo({ top: 120, behavior: "smooth" });
+  };
 
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
@@ -322,43 +327,16 @@ export default function PropertiesListingPage() {
                 ))
               )}
             </div>
-            {data.length !== 0 && (
-              <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
-                {/* Prev */}
-                <button
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={page === 1}
-                  className="px-4 py-2 border rounded-md disabled:opacity-50"
-                >
-                  Prev
-                </button>
-
-                {/* Page Numbers */}
-                {Array.from({ length: pageCount }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setPage(i + 1)}
-                    className={`px-4 py-2 border rounded-md ${
-                      page === i + 1
-                        ? "bg-primary text-white border-primary"
-                        : "bg-white"
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-
-                {/* Next */}
-                <button
-                  onClick={() =>
-                    setPage((prev) => Math.min(prev + 1, pageCount))
-                  }
-                  disabled={page === pageCount}
-                  className="px-4 py-2 border rounded-md disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
+            {data?.length !== 0 && pageCount !== 0 && (
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                <Pagination
+                  count={pageCount}
+                  page={page}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                />
+              </Box>
             )}
           </div>
         </div>

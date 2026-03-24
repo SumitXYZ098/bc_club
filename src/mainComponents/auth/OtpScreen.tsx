@@ -72,7 +72,7 @@ const OtpScreen = ({ open, onClose, onVerified }: OtpScreenProps) => {
                   const numeric = val.replace(/[^0-9]/g, "");
                   onChange(numeric);
                 }}
-                numInputs={5}
+                numInputs={6}
                 shouldAutoFocus
                 renderInput={(props) => (
                   <input

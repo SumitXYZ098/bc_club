@@ -23,14 +23,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <Head>
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/plus-jakarta-display.min.css"
         />
       </Head>
-      <body className={`plusJakartaDisplay antialiased bg-background`}>
+      <body
+        className={`plusJakartaDisplay antialiased bg-background`}
+        suppressHydrationWarning
+      >
         <QueryProvider>
           <GoogleOAuthProvider clientId="265527084086-pd2igue5ksbto4srj2du15nj6b7re5ov.apps.googleusercontent.com">
             <AuthProvider>

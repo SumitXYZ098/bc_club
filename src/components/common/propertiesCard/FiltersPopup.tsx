@@ -212,8 +212,10 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                 "Mission",
                 "Port Coquitlam",
                 "Agassiz",
-              ].map((item) => (
-                <option value={item}>{item}</option>
+              ].map((item, idx) => (
+                <option key={idx} value={item}>
+                  {item}
+                </option>
               ))}
             </select>
           </div>

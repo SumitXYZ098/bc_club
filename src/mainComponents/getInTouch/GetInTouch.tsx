@@ -1,3 +1,4 @@
+"use client";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 import Link from "next/link";
 import React from "react";
@@ -9,6 +10,7 @@ import Description, {
 } from "@/src/components/description/Description";
 import Image from "next/image";
 import { Icons } from "@/src/app/exports";
+import { usePathname } from "next/navigation";
 
 const GetInTouchLink: React.FC<GetInTouchLinkListProps> = ({
   title,
@@ -29,8 +31,11 @@ const GetInTouchLink: React.FC<GetInTouchLinkListProps> = ({
 };
 
 const GetInTouch = () => {
+  const path = usePathname();
   return (
-    <section className="xl:max-w-screen-2xl mx-auto w-full flex flex-col xl:px-16 md:px-13 px-6 xl:py-20 md:py-20.5 pt-13 pb-8 bg-gray">
+    <section
+      className={`xl:max-w-screen-2xl mx-auto w-full flex flex-col xl:px-16 md:px-13 px-6 ${path == "/contact-us" ? "xl:py-30 md:pt-28 md:pb-20 pt-25 pb-12" : "xl:py-20 md:py-20.5 pt-13 pb-8"} bg-gray `}
+    >
       <div className="w-full flex flex-col xl:flex-row items-start justify-between gap-y-5">
         <div className="w-full xl:w-[43%] flex flex-col">
           <Heading

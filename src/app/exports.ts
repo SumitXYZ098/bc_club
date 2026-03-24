@@ -14,7 +14,7 @@ const Icons = {
   bedroom: "../bedroom.svg",
   scale: "../scale.svg",
   google: "../google.svg",
-  forSale: "../forSale.svg",
+  forSale: "../forsale.svg",
   sold: "../sold.svg",
   expire: "../expire.svg",
   courtorder: "../courtorder.svg",
