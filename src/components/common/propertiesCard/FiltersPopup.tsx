@@ -4,11 +4,12 @@ import { FiX } from "react-icons/fi";
 import Image from "next/image";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import { Icons } from "@/src/app/exports";
+import { Icons, Images } from "@/src/app/exports";
 import LineGradient from "../lineGradient/LineGradient";
 import CustomButton from "../../button/CustomButton";
 import { Dialog } from "@mui/material";
 import { useListingStore } from "@/src/store/useListingStore";
+import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 
 // ================= Slider Theme =================
 const PriceSlider = styled(Slider)({
@@ -65,6 +66,7 @@ interface FiltersDialogProps {
 
 // ================= Component =================
 export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
   const { filters, updateFilter } = useListingStore();
 
   const [price, setPrice] = useState<[number | null, number | null]>([
@@ -158,14 +160,20 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
           {/* Property Type Status */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             {[
-              { k: "forSale", l: "For Sale", i: Icons.forSale },
-              { k: "sold", l: "Sold", i: Icons.sold },
-              { k: "expired", l: "Expired", i: Icons.expire },
+              { k: "forSale", l: "For Sale", i: Images.forSale },
+              { k: "sold", l: "Sold", i: Images.sold },
+              { k: "expired", l: "Expired", i: Images.expired },
             ].map((s) => (
               <button
                 key={s.k}
-                onClick={() => setStatus(s.k)}
-                className={`border rounded-xl p-3 flex flex-col items-center gap-2 transition ${
+                onClick={() => {
+                  if ((s.k === "sold" || s.k === "expired") && !isLoggedIn) {
+                    setOpenLogin(true);
+                    return;
+                  }
+                  setStatus(s.k);
+                }}
+                className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition ${
                   status === s.k
                     ? "bg-[#7c7c7c33] border-[#0F0F0F33]"
                     : "border-[#0F0F0F33]"

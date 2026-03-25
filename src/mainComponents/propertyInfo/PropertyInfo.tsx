@@ -25,7 +25,7 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
     );
   if (error)
     return (
-      <div className="p-10 text-red-500">
+      <div className="p-10 text-red-500 xl:max-w-screen-2xl mx-auto w-full h-[50svh] p-10 flex justify-center items-center">
         {error.message || "An error occurred"}
       </div>
     );

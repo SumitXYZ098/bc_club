@@ -5,7 +5,9 @@ const PropertyCardSkeleton = () => {
   return (
     <div
       className={`${
-        pathname === "/properties" ? "md:w-[49%] w-full" : "w-full"
+        pathname === "/properties" || pathname === "/wishlist"
+          ? "md:w-[49%] w-full"
+          : "w-full"
       }`}
     >
       <div className="relative rounded-xl flex overflow-hidden border border-borderColor h-auto w-full animate-pulse">

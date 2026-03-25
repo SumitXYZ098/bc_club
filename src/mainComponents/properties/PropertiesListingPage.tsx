@@ -15,7 +15,7 @@ import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect
 import { useListingStore } from "@/src/store/useListingStore";
 import {
   useGetListings,
-  useGetFavouriteProperties,
+  useGetWishlistProperties,
 } from "@/src/hooks/listing/useListingQueries";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "../auth/AuthContext";
@@ -24,7 +24,7 @@ import Link from "next/link";
 
 export default function PropertiesListingPage() {
   const pathName = usePathname();
-  const isFavouritePage = pathName === "/wishlist";
+  const isWishlistPage = pathName === "/wishlist";
   const { isLoggedIn, setOpenLogin } = useAuthContext();
   const [openFilters, setOpenFilters] = useState(false);
 
@@ -111,6 +111,8 @@ export default function PropertiesListingPage() {
   if (status && status !== "any") {
     params.propertyType = status;
     delete params["filters[property_status][$notIn]"];
+    delete params["filters[raw_data][BCRES_SoldDate][$null]"];
+    delete params["filters[property_sub_type][$notNull]"];
   }
 
   if (location && location !== "") {
@@ -159,7 +161,7 @@ export default function PropertiesListingPage() {
         listing?.raw_data?.ListAOR ||
         "Unknown",
       isLogin: false,
-      isFavourite: listing?.is_favorite || isFavouritePage,
+      isFavourite: listing?.is_favorite || isWishlistPage,
     }));
 
     return { properties, listings, pagination };
@@ -171,35 +173,35 @@ export default function PropertiesListingPage() {
     error,
   } = useGetListings(params, {
     select,
-    enabled: !isFavouritePage,
+    enabled: !isWishlistPage,
   });
 
   const {
-    data: favouriteData,
-    isLoading: favLoading,
-    error: favError,
-    refetch: refetchFavourites,
-  } = useGetFavouriteProperties({
+    data: wishlistData,
+    isLoading: wishlistLoading,
+    error: wishlistError,
+    refetch: refetchWishlist,
+  } = useGetWishlistProperties({
     select,
-    enabled: isFavouritePage && isLoggedIn,
+    enabled: isWishlistPage && isLoggedIn,
   });
 
   useEffect(() => {
-    if (isFavouritePage && isLoggedIn) {
-      refetchFavourites();
+    if (isWishlistPage && isLoggedIn) {
+      refetchWishlist();
     }
-  }, [isFavouritePage, isLoggedIn, refetchFavourites]);
+  }, [isWishlistPage, isLoggedIn, refetchWishlist]);
 
-  const data = isFavouritePage
-    ? favouriteData?.properties || []
+  const data = isWishlistPage
+    ? wishlistData?.properties || []
     : queryData?.properties || [];
-  const listingData = isFavouritePage
-    ? favouriteData?.listings || []
+  const listingData = isWishlistPage
+    ? wishlistData?.listings || []
     : queryData?.listings || [];
-  const pageCount = isFavouritePage
-    ? favouriteData?.pagination?.pageCount || 1
+  const pageCount = isWishlistPage
+    ? wishlistData?.pagination?.pageCount || 1
     : queryData?.pagination?.pageCount || 1;
-  const isLoading = isFavouritePage ? favLoading : loading;
+  const isLoading = isWishlistPage ? wishlistLoading : loading;
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -209,29 +211,35 @@ export default function PropertiesListingPage() {
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
       <div className="h-full mt-24">
-        {isFavouritePage && !isLoggedIn && (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <h2 className="text-3xl font-bold">Favourites</h2>
-            <p className="text-gray-600">
-              Please login to view your favourite properties
-            </p>
-            <CustomButton
-              label="Login Now"
-              buttonType="primary"
-              onClick={() => setOpenLogin(true)}
-              customClasses="px-10"
-            />
-          </div>
-        )}
+        {(isWishlistPage ||
+          (status && (status === "sold" || status === "expired"))) &&
+          !isLoggedIn && (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <h2 className="text-3xl font-bold text-center capitalize">
+                {isWishlistPage ? "Wishlist" : `${status} Properties`}
+              </h2>
+              <p className="text-gray-600">
+                Please login to view your {isWishlistPage ? "wishlist" : status}{" "}
+                properties
+              </p>
+              <CustomButton
+                label="Login Now"
+                buttonType="primary"
+                onClick={() => setOpenLogin(true)}
+                customClasses="px-10"
+              />
+            </div>
+          )}
 
-        {(isLoggedIn || !isFavouritePage) && (
+        {(isLoggedIn ||
+          (!isWishlistPage && status !== "sold" && status !== "expired")) && (
           <>
-            {isFavouritePage && !isLoading && data.length === 0 ? (
+            {isWishlistPage && !isLoading && data.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4 w-full">
-                <h2 className="text-3xl font-bold">No Favourites Yet</h2>
+                <h2 className="text-3xl font-bold">No Wishlist Yet</h2>
                 <p className="text-gray-600 text-center max-w-md">
                   You haven't saved any properties yet. Explore our listings and
-                  click the heart icon to save your favourites!
+                  click the heart icon to save your wishlist!
                 </p>
                 <Link href="/properties">
                   <CustomButton
@@ -261,7 +269,7 @@ export default function PropertiesListingPage() {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search country..."
+                        placeholder="Search city..."
                         className="flex-1 text-sm outline-none bg-transparent"
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && search.trim()) {
@@ -443,35 +451,34 @@ export default function PropertiesListingPage() {
                 )}
 
                 {/* Map + List */}
-                <div className="flex justify-between items-start mb-10 w-full ">
-                  <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
-                    {isLoading ? (
-                      <div className="w-full h-full flex justify-center items-center animate-pulse bg-gray-200 rounded-xl"></div>
-                    ) : listingData?.length === 0 ? (
-                      <div className="w-full h-full flex justify-center items-center border border-borderColor rounded-xl">
-                        <h3 className="text-2xl font-medium">
-                          Location not found
-                        </h3>
-                      </div>
-                    ) : (
-                      <PropertiesMap locations={listingData} />
-                    )}
-                  </div>
-
-                  <div className="xl:w-[64%] w-full flex flex-col">
-                    <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
-                      {isLoading ? (
-                        Array.from({ length: 6 }).map((_, i) => (
+                {isLoading ? (
+                  <div className="flex justify-between items-start mb-10 w-full">
+                    <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
+                      <div className="w-full h-full flex justify-center items-center animate-pulse bg-gray-200 rounded-xl" />
+                    </div>
+                    <div className="xl:w-[64%] w-full flex flex-col">
+                      <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
+                        {Array.from({ length: 6 }).map((_, i) => (
                           <PropertyCardSkeleton key={i} />
-                        ))
-                      ) : data.length === 0 ? (
-                        <div className="w-full h-full flex justify-center items-center">
-                          <h3 className="text-2xl font-medium">
-                            No Properties Found
-                          </h3>
-                        </div>
-                      ) : (
-                        data.map((property) => (
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : data.length === 0 ? (
+                  <div className="w-full xl:h-[65svh] h-full flex justify-center items-center">
+                    <h3 className="text-2xl font-medium">
+                      No Properties Found
+                    </h3>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-start mb-10 w-full ">
+                    <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
+                      <PropertiesMap locations={listingData} />
+                    </div>
+
+                    <div className="xl:w-[64%] w-full flex flex-col">
+                      <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
+                        {data.map((property: any) => (
                           <PropertiesCard
                             key={property.id}
                             {...property}
@@ -479,28 +486,28 @@ export default function PropertiesListingPage() {
                             isSold={status === "sold"}
                             isExpired={status === "expired"}
                           />
-                        ))
+                        ))}
+                      </div>
+                      {data?.length !== 0 && pageCount !== 0 && (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            mt: 4,
+                          }}
+                        >
+                          <Pagination
+                            count={pageCount}
+                            page={page}
+                            onChange={handlePageChange}
+                            color="primary"
+                            size="large"
+                          />
+                        </Box>
                       )}
                     </div>
-                    {data?.length !== 0 && pageCount !== 0 && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          mt: 4,
-                        }}
-                      >
-                        <Pagination
-                          count={pageCount}
-                          page={page}
-                          onChange={handlePageChange}
-                          color="primary"
-                          size="large"
-                        />
-                      </Box>
-                    )}
                   </div>
-                </div>
+                )}
               </>
             )}
           </>

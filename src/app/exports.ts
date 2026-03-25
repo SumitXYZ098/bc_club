@@ -14,9 +14,6 @@ const Icons = {
   bedroom: "../bedroom.svg",
   scale: "../scale.svg",
   google: "../google.svg",
-  forSale: "../forsale.svg",
-  sold: "../sold.svg",
-  expire: "../expire.svg",
   courtorder: "../courtorder.svg",
   openhouse: "../openhouse.svg",
   soldicon: "../soldicon.svg",
@@ -56,7 +53,10 @@ const Images = {
   leaderlesson: "/leaderlesson.webp",
   assessment: "/assessment.webp",
   employee: "/employee.webp",
-  mlsr:'/mlsr-logo.png',
+  mlsr: "/mlsr-logo.png",
+  forSale: "/forSale.webp",
+  sold: "/sold.webp",
+  expired: "/expired.webp",
 };
 
 export { Icons, Images };

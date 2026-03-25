@@ -10,9 +10,11 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import { getTimeAgo } from "@/src/utilities/utilities";
-import { useState } from "react";
-import { addToFavourite } from "@/src/api/listing/listingApi";
-import { toast } from "react-toastify";
+import {
+  useGetMe,
+  useRemoveFromWishlist,
+  useToggleWishlist,
+} from "@/src/hooks/listing/useListingQueries";
 
 export interface PropertyCardProps {
   id: string;
@@ -53,28 +55,39 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   isFavourite: isFavouriteProp,
   isLogin: isLoginProp,
 }) => {
-  const [isFavourite, setIsFavourite] = useState(isFavouriteProp || false);
   const pathname = usePathname();
+  const { data: me } = useGetMe();
+  const toggleWishlist = useToggleWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
+
+  const isFavourite =
+    me?.favorites?.some((item: any) => item.documentId === id) ??
+    (isFavouriteProp || false);
 
   const { setOpenLogin, isLoggedIn } = useAuthContext();
   const isLogin = isLoginProp ?? isLoggedIn;
 
-  const handleToggleFavourite = async (e: React.MouseEvent) => {
-    setIsFavourite(!isFavourite);
+  const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (toggleWishlist.isPending) return;
 
     if (!isLogin) {
       setOpenLogin(true);
       return;
     }
 
-    try {
-      const resp = await addToFavourite(id);
-      toast.success(resp.action || "Updated favourites");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update favourite");
-    }
+    toggleWishlist.mutate(id);
+  };
+
+  const handleRemoveFromWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (removeFromWishlist.isPending) return;
+
+    removeFromWishlist.mutate(id);
   };
 
   return (
@@ -100,13 +113,16 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 className="w-full h-56 object-cover rounded-lg group-hover:scale-125 transition duration-300 ease-in-out"
                 width={700}
                 height={403}
+                loading="eager"
               />
             </div>
 
             {/* Favorite Icon */}
             {!isExpired && !isSold && isLoggedIn && (
               <button
-                onClick={handleToggleFavourite}
+                onClick={
+                  isFavourite ? handleRemoveFromWishlist : handleToggleWishlist
+                }
                 className="absolute top-3 left-3 bg-background p-2 rounded-full shadow z-20 cursor-pointer"
               >
                 <Heart

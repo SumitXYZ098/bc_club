@@ -64,8 +64,6 @@ const PropertyInformation = ({ property }: { property: any }) => {
   const assessed = property?.raw_data?.TaxAssessedValue;
   const rentEstimate = property?.raw_data?.RentEstimate; // if exists
 
-  console.log(rentEstimate, assessed, price);
-
   const offerValue = price || assessed || 0;
   const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
 
