@@ -4,6 +4,7 @@ import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { MenuItem, Select } from "@mui/material";
 import { cities, propertyDataByCity } from ".";
 import MarketDemandGauge from "@/src/components/charts/MarketDemandGauge";
+import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
 
 const HomePropertiesSold = () => {
   const [location, setLocation] = useState<string>("Surrey, BC");
@@ -63,9 +64,9 @@ const HomePropertiesSold = () => {
   };
 
   return (
-    <section className="xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6 xl:py-35 md:py-31 py-14 overflow-hidden">
+    <section className="xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6 xl:py-35 md:py-31 py-14 overflow-hidden flex flex-col items-end">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 w-full">
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading48}
@@ -174,6 +175,7 @@ const HomePropertiesSold = () => {
           </div>
         ))}
       </div>
+      <PoweredBy className="mt-2" />
     </section>
   );
 };

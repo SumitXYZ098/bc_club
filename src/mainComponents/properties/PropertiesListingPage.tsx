@@ -384,7 +384,24 @@ export default function PropertiesListingPage() {
                       onClick={() => {
                         clearFilters();
                       }}
-                      className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${activePrice !== "any" || activeBedRoom !== "any" || activeBathRoom !== "any" || activeProperty !== "any" || minPrice !== undefined || minSqft !== undefined || location ? "bg-primary text-white" : "bg-white"}`}
+                      className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
+                        activePrice !== "any" ||
+                        activeBedRoom !== "any" ||
+                        activeBathRoom !== "any" ||
+                        activeProperty !== "any" ||
+                        filters.status ||
+                        (filters.minPrice !== undefined &&
+                          filters.minPrice > 1000) ||
+                        (filters.maxPrice !== undefined &&
+                          filters.maxPrice < 20000000) ||
+                        (filters.minSqft !== undefined &&
+                          filters.minSqft > 100) ||
+                        (filters.maxSqft !== undefined &&
+                          filters.maxSqft < 15000) ||
+                        filters.location
+                          ? "bg-primary text-white"
+                          : "bg-white"
+                      }`}
                     >
                       <FiX size={16} />
                       <span className="font-medium">Reset Filters</span>
@@ -416,23 +433,24 @@ export default function PropertiesListingPage() {
                           className="bg-gray-100 text-sm"
                         />
                       ) : null}
-                      {filters.minSqft !== undefined &&
-                        filters.minSqft > 100 && (
-                          <Chip
-                            label={`${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
-                            onDelete={() => {
-                              updateFilter("minSqft", 0);
-                              updateFilter("maxSqft", 15000);
-                            }}
-                            className="bg-gray-100 text-sm"
-                          />
-                        )}
+                      {(filters.minSqft !== undefined &&
+                        filters.minSqft > 100) ||
+                      (filters.maxSqft !== undefined &&
+                        filters.maxSqft < 15000) ? (
+                        <Chip
+                          label={`${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
+                          onDelete={() => {
+                            updateFilter("minSqft", 0);
+                            updateFilter("maxSqft", 15000);
+                          }}
+                          className="bg-gray-100 text-sm"
+                        />
+                      ) : null}
                       {filters.status && (
                         <Chip
                           label={filters.status}
                           onDelete={() => {
                             updateFilter("status", "");
-                            clearFilters();
                           }}
                           className="bg-gray-100 text-sm capitalize"
                         />
@@ -473,7 +491,11 @@ export default function PropertiesListingPage() {
                 ) : (
                   <div className="flex justify-between items-start mb-10 w-full ">
                     <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
-                      <PropertiesMap locations={listingData} />
+                      <PropertiesMap
+                        locations={listingData}
+                        zoom={8}
+                        center={[-122.89, 49.28]}
+                      />
                     </div>
 
                     <div className="xl:w-[64%] w-full flex flex-col">

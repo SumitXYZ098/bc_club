@@ -98,6 +98,25 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      setPrice([filters.minPrice ?? 0, filters.maxPrice ?? 20000000]);
+      setSqft([filters.minSqft ?? 0, filters.maxSqft ?? 15000]);
+      setBedrooms(
+        filters.activeBedRoom && filters.activeBedRoom !== "any"
+          ? Number(filters.activeBedRoom.replace("+", ""))
+          : null,
+      );
+      setBathrooms(
+        filters.activeBathRoom && filters.activeBathRoom !== "any"
+          ? Number(filters.activeBathRoom.replace("+", ""))
+          : null,
+      );
+      setStatus(filters.status ?? "");
+      setLocation(filters.location ?? "");
+    }
+  }, [open, filters]);
+
   const handleClearAll = () => {
     setPrice([0, 20000000]);
     setSqft([0, 15000]);
@@ -146,7 +165,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
       >
         {/* CARD */}
         <div
-          className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-10 md:py-6 p-4 w-full scrollbar-hide"
+          className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-10 md:pt-6 p-4 pb-0 w-full scrollbar-hide"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -440,7 +459,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
           {/* <LineGradient /> */}
 
           {/* Bottom Buttons */}
-          <div className="pt-6 mt-2 border-[#0F0F0F1F] flex gap-4">
+          <div className="md:py-6 py-4 mt-2 border-[#0F0F0F1F] flex gap-4 sticky bottom-0 bg-background">
             <CustomButton
               buttonType="secondary"
               label="Apply Filter"

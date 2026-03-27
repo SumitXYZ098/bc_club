@@ -8,7 +8,7 @@ import Description, {
 } from "@/src/components/description/Description";
 import MedianAverageDays from "@/src/components/charts/MedianAverageDays";
 import MedianAveragePrice from "@/src/components/charts/MedianAveragePrice";
-import SalesReported from "@/src/components/charts/SalesReported";
+import SalesReportedRecharts from "@/src/components/charts/SalesReportedRecharts";
 
 const HomeSellingTrends = () => {
   const [location, setLocation] = useState<string>("Surrey, BC");
@@ -51,7 +51,8 @@ const HomeSellingTrends = () => {
         </div>
       </div>
 
-      <SalesReported location={location} />
+      <SalesReportedRecharts location={location} />
+
       <div className="flex md:flex-nowrap flex-wrap gap-6 items-center justify-between mt-6">
         <MedianAverageDays />
         <MedianAveragePrice />

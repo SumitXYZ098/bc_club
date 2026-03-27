@@ -25,6 +25,7 @@ import {
   taxHistoryRows,
 } from "../../dummyData";
 import AssessmentHistory from "./AssessmentHistory";
+import PropertyMap from "./PropertyMap";
 
 const PropertyInformation = ({ property }: { property: any }) => {
   const featureslist = [
@@ -66,6 +67,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
 
   const offerValue = price || assessed || 0;
   const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`;
 
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
@@ -131,22 +133,19 @@ const PropertyInformation = ({ property }: { property: any }) => {
                 Map location
               </h2>
               <Link
-                href={"https://maps.app.goo.gl/TAF4QMnBxnFqkMFq9"}
+                href={googleMapsUrl}
                 target="_blank"
                 className="px-5 py-3 bg-primary text-background text-base font-bold rounded-2xl"
               >
                 Open Map
               </Link>
             </div>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2819.838394129106!2d-123.09553402328041!3d49.27776627139203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5486716efeab78a3%3A0x369263f055846d81!2s519%20Union%20St%2C%20Vancouver%2C%20BC%20V6A%202B7%2C%20Canada!5e1!3m2!1sen!2sin!4v1766147459784!5m2!1sen!2sin"
-              width="100%"
-              height="100%"
-              allowFullScreen={true}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="w-full rounded-xl h-98.75"
-            ></iframe>
+            <PropertyMap
+              location={[property.longitude, property.latitude]}
+              address={property.address}
+              city={property.city}
+              state={property.state}
+            />
           </div>
           {/* Property Details */}
           <DynamicTable

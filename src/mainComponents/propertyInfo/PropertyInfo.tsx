@@ -1,6 +1,4 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
 import PropertyTopAddressSection from "./PropertyTopAddressSection";
 import PropertyGallery from "./PropertyGallery";
 import PropertyInformation from "./propertyInformation/PropertyInformation";
@@ -19,13 +17,13 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
 
   if (loading)
     return (
-      <div className="xl:max-w-screen-2xl mx-auto w-full h-screen p-10 flex justify-center items-center">
+      <div className="xl:max-w-screen-2xl mx-auto w-full h-[70svh] p-10 flex justify-center items-center">
         Loading property...
       </div>
     );
   if (error)
     return (
-      <div className="p-10 text-red-500 xl:max-w-screen-2xl mx-auto w-full h-[50svh] p-10 flex justify-center items-center">
+      <div className="p-10 text-red-500 xl:max-w-screen-2xl mx-auto w-full h-[50svh] flex justify-center items-center">
         {error.message || "An error occurred"}
       </div>
     );

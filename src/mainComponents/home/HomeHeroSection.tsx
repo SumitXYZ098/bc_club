@@ -6,6 +6,7 @@ import Description, {
 import Image from "next/image";
 import React from "react";
 import SearchPropertyTab from "./SearchPropertyTab";
+import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
 
 const HomeHeroSection = () => {
   return (
@@ -25,7 +26,7 @@ const HomeHeroSection = () => {
           <SearchPropertyTab />
         </div>
       </div>
-      <div className="xl:w-[59.5%] bg-gray xl:h-202.5 md:h-157.5 h-66.25 xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl z-10 xl:p-[141px_48px_64px_65px] md:px-12 md:py-13 p-5 flex">
+      <div className="xl:w-[59.5%] bg-gray xl:h-202.5 md:h-157.5 h-66.25 xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl z-10 xl:p-[141px_48px_64px_65px] md:px-12 md:py-13 p-5 flex flex-col items-end gap-1">
         <Image
           src={Icons.heroMapVector}
           alt="Map Vector"
@@ -33,6 +34,7 @@ const HomeHeroSection = () => {
           height={400}
           className="w-full h-auto object-scale-down"
         />
+        <PoweredBy />
       </div>
       <Image
         src={Icons.bgWaveLine}
