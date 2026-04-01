@@ -13,6 +13,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { useRouter } from "next/navigation";
 
 const timeRanges = ["15D", "1M", "3M", "6M", "Custom"];
 type SeriesKey = "detached" | "apartment" | "townhouse";
@@ -42,28 +43,18 @@ const generateDashboardData = (
   } else if (range === "6M") {
     totalDays = 180;
     startDate = dayjs().subtract(179, "day");
-  } else if (range === "Custom") {
-    if (start && end) {
-      endDate = dayjs(end);
-      startDate = dayjs(start);
-      totalDays = Math.abs(endDate.diff(startDate, "day")) + 1;
-      if (isNaN(totalDays) || totalDays < 1) totalDays = 1;
-    } else {
-      totalDays = 15;
-    }
+  } else {
+    totalDays = 15;
   }
 
   // Use 15 points for fixed ranges, but use daily resolution (one point per day) for Custom range
-  const points = range === "Custom" ? totalDays : 15;
+  const points = 15;
   const interval = totalDays > 1 ? (totalDays - 1) / (points - 1) : 0;
 
   const chartData = Array.from({ length: points }, (_, i) => {
     // For Custom range, it's exactly one point per day.
     // For fixed ranges, it samples 15 points across the duration.
-    const date =
-      range === "Custom"
-        ? startDate.add(i, "day")
-        : startDate.add(Math.round(i * interval), "day");
+    const date = startDate.add(Math.round(i * interval), "day");
 
     // Ensure we don't exceed the end date (especially for the last point in fixed ranges)
     const finalDate = i === points - 1 && range !== "Custom" ? endDate : date;
@@ -144,11 +135,8 @@ const SummaryCard = ({ title, value }: { title: string; value: number }) => (
    2️⃣ SalesReportedRecharts Component
 -----------------------------------*/
 
-export default function SalesReportedRecharts({
-  location,
-}: {
-  location: string;
-}) {
+const SalesReportedRecharts = ({ location }: { location: string }) => {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [range, setRange] = useState("3M");
   const [customStart, setCustomStart] = useState(
@@ -237,8 +225,14 @@ export default function SalesReportedRecharts({
             {timeRanges.map((r) => (
               <button
                 key={r}
-                onClick={() => setRange(r)}
-                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                onClick={() => {
+                  if (r === "Custom") {
+                    router.push("/market-trends");
+                  } else {
+                    setRange(r);
+                  }
+                }}
+                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   range === r
                     ? "bg-[#FFA500] text-white shadow-sm"
                     : "text-gray-500 hover:bg-gray-200"
@@ -248,51 +242,6 @@ export default function SalesReportedRecharts({
               </button>
             ))}
           </div>
-          {range === "Custom" && (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <div className="flex items-center gap-2 bg-[#F5F5F5] p-2 rounded-xl border border-gray-200">
-                <DatePicker
-                  value={dayjs(customStart)}
-                  format="DD/MM/YYYY"
-                  onChange={(newValue) =>
-                    setCustomStart(newValue?.toISOString() || "")
-                  }
-                  sx={{
-                    width: 140,
-                    "& .MuiInputBase-input": {
-                      py: 1,
-                      px: 1,
-                      fontSize: "13px",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "white",
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-                <span className="text-xs text-gray-500">to</span>
-                <DatePicker
-                  value={dayjs(customEnd)}
-                  format="DD/MM/YYYY"
-                  onChange={(newValue) =>
-                    setCustomEnd(newValue?.toISOString() || "")
-                  }
-                  sx={{
-                    width: 140,
-                    "& .MuiInputBase-input": {
-                      py: 1,
-                      px: 1,
-                      fontSize: "13px",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "white",
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </div>
-            </LocalizationProvider>
-          )}
         </div>
       </div>
 
@@ -397,4 +346,6 @@ export default function SalesReportedRecharts({
       </div>
     </div>
   );
-}
+};
+
+export default SalesReportedRecharts;

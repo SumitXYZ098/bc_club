@@ -99,8 +99,10 @@ const MedianAveragePriceRecharts = () => {
   return (
     <div className="p-4 bg-background border border-transparent rounded-[20px] shadow-sm space-y-6 w-full">
       {/* Header Row */}
-      <div className="flex flex-nowrap items-center justify-between gap-4">
-        <h2 className="text-xl font-bold text-black">Median & Average Price</h2>
+      <div className="flex lg:flex-nowrap flex-wrap items-center justify-between gap-4">
+        <h2 className="md:text-xl text-lg font-bold text-black">
+          Median & Average Price
+        </h2>
         <div className="flex items-center rounded-2xl gap-1">
           {["3M", "6M"].map((r) => (
             <button
