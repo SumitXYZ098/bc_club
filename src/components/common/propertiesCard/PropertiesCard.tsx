@@ -307,13 +307,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
         </div>
         {!isLogin && (
           <div className="bg-[#FFFFFF1f] backdrop-blur-md w-full h-full absolute rounded-xl justify-center items-center-safe flex flex-col">
-            {/* <span className="absolute top-9 right-9 bg-background text-primary px-3 py-1.5 text-sm rounded-full">
-              ## days ago
-            </span> */}
             <CustomButton
               label="Login Required"
               buttonType="primary"
-              customClasses="font-bold py-4 px-18.5 absolute bottom-[105px]"
+              customClasses="font-bold py-4 px-18.5"
               onClick={() => setOpenLogin(true)}
             />
           </div>
