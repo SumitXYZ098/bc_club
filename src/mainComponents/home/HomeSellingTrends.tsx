@@ -6,9 +6,9 @@ import { cities } from ".";
 import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
-import MedianAverageDays from "@/src/components/charts/MedianAverageDays";
-import MedianAveragePrice from "@/src/components/charts/MedianAveragePrice";
 import SalesReportedRecharts from "@/src/components/charts/SalesReportedRecharts";
+import MedianAverageDaysRecharts from "@/src/components/charts/MedianAverageDaysRecharts";
+import MedianAveragePriceRecharts from "@/src/components/charts/MedianAveragePriceRecharts";
 
 const HomeSellingTrends = () => {
   const [location, setLocation] = useState<string>("Surrey, BC");
@@ -53,9 +53,10 @@ const HomeSellingTrends = () => {
 
       <SalesReportedRecharts location={location} />
 
-      <div className="flex md:flex-nowrap flex-wrap gap-6 items-center justify-between mt-6">
-        <MedianAverageDays />
-        <MedianAveragePrice />
+      <div className="flex lg:flex-row flex-col gap-6 items-center justify-between mt-6">
+        {/* <MedianAverageDays /> */}
+        <MedianAverageDaysRecharts />
+        <MedianAveragePriceRecharts />
       </div>
     </section>
   );

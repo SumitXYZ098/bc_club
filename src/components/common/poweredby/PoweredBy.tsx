@@ -3,7 +3,7 @@ import React from "react";
 const PoweredBy = ({ className }: { className?: string }) => {
   return (
     <div className={`flex items-center gap-1 flex-nowrap ${className}`}>
-      <p className="text-black70 text-sm">Powered by data from</p>
+      <p className="text-black70 md:text-sm text-xs">Powered by data from</p>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
@@ -28,7 +28,7 @@ const PoweredBy = ({ className }: { className?: string }) => {
           fill="#D3E023"
         />
       </svg>
-      <p className="text-[#3B4E19] text-sm">Greater Vancouver Realtors</p>
+      <p className="text-[#3B4E19] md:text-sm text-xs">Greater Vancouver Realtors</p>
     </div>
   );
 };

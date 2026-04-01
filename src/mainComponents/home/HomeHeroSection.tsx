@@ -26,15 +26,15 @@ const HomeHeroSection = () => {
           <SearchPropertyTab />
         </div>
       </div>
-      <div className="xl:w-[59.5%] bg-gray xl:h-202.5 md:h-157.5 h-66.25 xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl z-10 xl:p-[141px_48px_64px_65px] md:px-12 md:py-13 p-5 flex flex-col items-end gap-1">
+      <div className="xl:w-[59.5%] bg-gray h-auto xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl z-10 xl:p-[141px_48px_21px_65px] md:px-12 md:py-8 p-5 flex flex-col items-end gap-1">
         <Image
           src={Icons.heroMapVector}
           alt="Map Vector"
           width={400}
           height={400}
-          className="w-full h-auto object-scale-down"
+          className="w-full xl:h-141.5 md:h-128.5 h-66.25 object-scale-down"
         />
-        <PoweredBy />
+        <PoweredBy className="" />
       </div>
       <Image
         src={Icons.bgWaveLine}

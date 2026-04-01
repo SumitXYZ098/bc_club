@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,84 +14,129 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
-const metrics = ["New Listings", "Sold", "Active", "Canceled"];
 const timeRanges = ["15D", "1M", "3M", "6M", "Custom"];
 type SeriesKey = "detached" | "apartment" | "townhouse";
 
 /* -------------------------------
    1️⃣ Fake Dynamic Sample Data Generator
 -----------------------------------*/
-const generateRandomSeries = (days: number) => {
-  return Array.from({ length: days }, () =>
-    Math.floor(Math.random() * (200 - 30) + 30),
-  );
-};
-
 const generateDashboardData = (
   location: string,
   range: string,
   start?: string,
   end?: string,
 ) => {
-  let days = 30;
-  if (range === "15D") days = 15;
-  else if (range === "1M") days = 30;
-  else if (range === "3M") days = 90;
-  else if (range === "6M") days = 180;
-  else if (range === "Custom") {
+  let totalDays = 15;
+  let startDate = dayjs().subtract(14, "day");
+  let endDate = dayjs();
+
+  if (range === "15D") {
+    totalDays = 15;
+    startDate = dayjs().subtract(14, "day");
+  } else if (range === "1M") {
+    totalDays = 30;
+    startDate = dayjs().subtract(29, "day");
+  } else if (range === "3M") {
+    totalDays = 90;
+    startDate = dayjs().subtract(89, "day");
+  } else if (range === "6M") {
+    totalDays = 180;
+    startDate = dayjs().subtract(179, "day");
+  } else if (range === "Custom") {
     if (start && end) {
-      const diffTime = Math.abs(
-        new Date(end).getTime() - new Date(start).getTime(),
-      );
-      days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      if (isNaN(days) || days < 1) days = 30;
+      endDate = dayjs(end);
+      startDate = dayjs(start);
+      totalDays = Math.abs(endDate.diff(startDate, "day")) + 1;
+      if (isNaN(totalDays) || totalDays < 1) totalDays = 1;
     } else {
-      days = 30;
+      totalDays = 15;
     }
   }
 
-  const detached = generateRandomSeries(days);
-  const apartment = generateRandomSeries(days);
-  const townhouse = generateRandomSeries(days);
-  const sold = Array.from({ length: days }, () =>
-    Math.floor(Math.random() * (200 - 100) + 100),
-  );
-  const listed = Array.from({ length: days }, () =>
-    Math.floor(Math.random() * (150 - 80) + 80),
-  );
+  // Use 15 points for fixed ranges, but use daily resolution (one point per day) for Custom range
+  const points = range === "Custom" ? totalDays : 15;
+  const interval = totalDays > 1 ? (totalDays - 1) / (points - 1) : 0;
 
-  // Recharts expects an array of objects where each object represents a point on the X axis
-  const chartData = Array.from({ length: days }, (_, i) => ({
-    name: `Day ${i + 1}`,
-    detached: detached[i],
-    apartment: apartment[i],
-    townhouse: townhouse[i],
-    sold: sold[i],
-    listed: listed[i],
-  }));
+  const chartData = Array.from({ length: points }, (_, i) => {
+    // For Custom range, it's exactly one point per day.
+    // For fixed ranges, it samples 15 points across the duration.
+    const date =
+      range === "Custom"
+        ? startDate.add(i, "day")
+        : startDate.add(Math.round(i * interval), "day");
+
+    // Ensure we don't exceed the end date (especially for the last point in fixed ranges)
+    const finalDate = i === points - 1 && range !== "Custom" ? endDate : date;
+    const name = finalDate.format("D MMM");
+
+    const d_sold = Math.floor(Math.random() * 40 + 10);
+    const d_total = d_sold + Math.floor(Math.random() * 40 + 5);
+    const a_sold = Math.floor(Math.random() * 40 + 10);
+    const a_total = a_sold + Math.floor(Math.random() * 40 + 5);
+    const t_sold = Math.floor(Math.random() * 40 + 10);
+    const t_total = t_sold + Math.floor(Math.random() * 40 + 5);
+
+    return {
+      name,
+      timestamp: finalDate.valueOf(),
+      detached_sold: d_sold,
+      detached_listed: d_total - d_sold,
+      apartment_sold: a_sold,
+      apartment_listed: a_total - a_sold,
+      townhouse_sold: t_sold,
+      townhouse_listed: t_total - t_sold,
+    };
+  });
+
+  const totalSold = Math.floor(Math.random() * 2000 + 1000);
+  const totalListed = Math.floor(totalSold * 1.5 + Math.random() * 500);
 
   return {
     summary: {
-      sold: Math.floor(Math.random() * 1500 + 400),
-      newListings: Math.floor(Math.random() * 2000 + 500),
+      sold: totalSold,
+      newListings: totalListed,
     },
     chartData,
   };
 };
 
+/* Custom Tooltip Component */
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-2.5 min-w-[180px]">
+        <p className="text-sm font-bold text-black border-b border-gray-100 pb-2 mb-1">
+          {label}
+        </p>
+        {payload.map((entry: any, index: number) => (
+          <div key={index} className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-3 h-3 rounded-sm shrink-0"
+                style={{ backgroundColor: entry.fill }}
+              />
+              <span className="text-xs font-medium text-gray-500 capitalize">
+                {entry.name.replace("_", " ")}
+              </span>
+            </div>
+            <span className="text-xs font-bold text-black">{entry.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 /* Summary Card Component */
-const SummaryCard = ({
-  title,
-  value,
-  color,
-}: {
-  title: string;
-  value: number;
-  color: string;
-}) => (
-  <div className="rounded p-2.5 bg-gray flex flex-col justify-center gap-y-0.5">
-    <h3 className="text-foreground text-xs">{title}</h3>
-    <p className={`text-2xl font-bold ${color}`}>{value.toLocaleString()}</p>
+const SummaryCard = ({ title, value }: { title: string; value: number }) => (
+  <div className="rounded-xl lg:p-6 p-4 bg-gray flex flex-col items-center justify-center gap-y-2 flex-1 w-1/2">
+    <h3 className="text-foreground lg:text-sm text-xs font-medium opacity-70">
+      {title}
+    </h3>
+    <p className="lg:text-4xl text-2xl font-bold text-black">
+      {value.toLocaleString()}
+    </p>
   </div>
 );
 
@@ -105,56 +150,54 @@ export default function SalesReportedRecharts({
   location: string;
 }) {
   const [isMounted, setIsMounted] = useState(false);
-  const [range, setRange] = useState("15D");
+  const [range, setRange] = useState("3M");
   const [customStart, setCustomStart] = useState(
-    new Date().setDate(new Date().getDate() - 7).toLocaleString(),
+    dayjs().subtract(7, "day").toISOString(),
   );
-  const [customEnd, setCustomEnd] = useState(new Date().toISOString());
-  const [metric, setMetric] = useState("New Listings");
+  const [customEnd, setCustomEnd] = useState(dayjs().toISOString());
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Generate dynamic data
   const data = useMemo(
     () => generateDashboardData(location, range, customStart, customEnd),
     [location, range, customStart, customEnd],
   );
 
-  /* Legends toggling */
   const [visibleSeries, setVisibleSeries] = useState({
     detached: true,
     apartment: true,
     townhouse: true,
   });
 
+  // Always show all names generated for the chart
+  const xTicks = data.chartData.map((d) => d.name);
+
   if (!isMounted)
     return (
-      <div className="p-6 space-y-6 bg-background rounded-2xl min-h-[400px]"></div>
+      <div className="p-8 space-y-8 bg-white border border-gray-100 rounded-3xl min-h-[500px] shadow-sm"></div>
     );
 
   return (
-    <div className="p-6 space-y-6 bg-background rounded-2xl">
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4 justify-between">
-        {/* Summary Cards */}
-        <div className="flex flex-row gap-x-1.5 items-center">
-          <SummaryCard
-            title="Total Properties Sold"
-            value={data.summary.sold}
-            color="text-[#E3A82A]"
-          />
-          <SummaryCard
-            title="Total Properties Listed"
-            value={data.summary.newListings}
-            color="text-[#377E22]"
-          />
-        </div>
+    <div className="lg:p-8 p-4 space-y-8 bg-white border border-transparent rounded-3xl">
+      {/* 1st Row: Summary Cards */}
+      <div className="flex flex-row flex-wrap gap-6 justify-center w-full">
+        <SummaryCard title="Total properties sold" value={data.summary.sold} />
+        <SummaryCard
+          title="Total properties listed"
+          value={data.summary.newListings}
+        />
+      </div>
 
-        {/* Legends */}
-        <div className="flex gap-4 items-center overflow-clip overflow-x-scroll p-5">
-          {["detached", "apartment", "townhouse"].map((key) => (
+      {/* 2nd Row: Filters and Series Toggles */}
+      <div className="flex flex-wrap items-center gap-6 justify-between">
+        <div className="flex flex-wrap gap-3 items-center">
+          {[
+            { key: "detached", color: "#FF0400" },
+            { key: "apartment", color: "#1D00FF" },
+            { key: "townhouse", color: "#007E64" },
+          ].map(({ key, color }) => (
             <button
               key={key}
               onClick={() =>
@@ -173,39 +216,32 @@ export default function SalesReportedRecharts({
                   return nextState;
                 })
               }
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-background border ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border transition-all ${
                 visibleSeries[key as keyof typeof visibleSeries]
-                  ? "border-[#00568F]"
-                  : "border-[#E7EAEE]"
-              }`}
+                  ? "border-gray-200"
+                  : "border-transparent opacity-40 shadow-none"
+              } shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]`}
             >
               <span
-                className="w-4 h-4 rounded"
-                style={{
-                  background:
-                    key === "detached"
-                      ? "#FF0400"
-                      : key === "apartment"
-                        ? "#1D00FF"
-                        : "#007E64",
-                }}
+                className="w-4 h-4 rounded-md"
+                style={{ background: color }}
               />
-              {key.charAt(0).toUpperCase() + key.slice(1)}
+              <span className="text-sm font-medium capitalize">{key}</span>
             </button>
           ))}
         </div>
 
         {/* Time Range */}
-        <div className="flex flex-col gap-2 items-end">
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-3 items-end">
+          <div className="flex flex-wrap bg-[#F5F5F5] p-1.5 rounded-xl gap-1">
             {timeRanges.map((r) => (
               <button
                 key={r}
                 onClick={() => setRange(r)}
-                className={`px-3 py-1 rounded-md text-base ${
+                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                   range === r
-                    ? "bg-secondary text-background"
-                    : "bg-gray text-foreground"
+                    ? "bg-[#FFA500] text-white shadow-sm"
+                    : "text-gray-500 hover:bg-gray-200"
                 }`}
               >
                 {r}
@@ -214,7 +250,7 @@ export default function SalesReportedRecharts({
           </div>
           {range === "Custom" && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <div className="flex items-center gap-2 bg-gray p-2 rounded-lg border border-[#E7EAEE]">
+              <div className="flex items-center gap-2 bg-[#F5F5F5] p-2 rounded-xl border border-gray-200">
                 <DatePicker
                   value={dayjs(customStart)}
                   format="DD/MM/YYYY"
@@ -222,22 +258,19 @@ export default function SalesReportedRecharts({
                     setCustomStart(newValue?.toISOString() || "")
                   }
                   sx={{
-                    width: 160,
+                    width: 140,
                     "& .MuiInputBase-input": {
                       py: 1,
-                      px: 1.5,
-                      fontSize: "14px",
-                    },
-                    "& .MuiPickersInputBase-sectionsContainer": {
-                      padding: 0,
+                      px: 1,
+                      fontSize: "13px",
                     },
                     "& .MuiOutlinedInput-root": {
-                      bgcolor: "background.default",
+                      bgcolor: "white",
                       borderRadius: 1,
                     },
                   }}
                 />
-                <span className="text-sm text-foreground px-1">to</span>
+                <span className="text-xs text-gray-500">to</span>
                 <DatePicker
                   value={dayjs(customEnd)}
                   format="DD/MM/YYYY"
@@ -245,18 +278,14 @@ export default function SalesReportedRecharts({
                     setCustomEnd(newValue?.toISOString() || "")
                   }
                   sx={{
-                    width: 160,
-
+                    width: 140,
                     "& .MuiInputBase-input": {
                       py: 1,
-                      px: 1.5,
-                      fontSize: "14px",
-                    },
-                    "& .MuiPickersInputBase-sectionsContainer": {
-                      padding: 0,
+                      px: 1,
+                      fontSize: "13px",
                     },
                     "& .MuiOutlinedInput-root": {
-                      bgcolor: "background.default",
+                      bgcolor: "white",
                       borderRadius: 1,
                     },
                   }}
@@ -267,107 +296,104 @@ export default function SalesReportedRecharts({
         </div>
       </div>
 
-      <div className="flex justify-between items-center">
-        <span className="text-black opacity-50 font-bold text-xl">
-          Properties
-        </span>
-        {/* Metrics */}
-        <div className="px-3 py-2 rounded-4xl bg-gray">
-          <select
-            value={metric}
-            onChange={(e) => setMetric(e.target.value)}
-            className="focus:outline-0 "
-          >
-            {metrics.map((m) => (
-              <option
-                key={m}
-                className="text-black opacity-50 text-base font-medium"
-              >
-                {m}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-black px-2">All Properties</h2>
 
-      {/* Chart */}
-      <div className="w-full h-[400px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data.chartData}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-          >
-            <CartesianGrid
-              vertical={false}
-              strokeDasharray="3 3"
-              stroke="transparent"
-            />
-            <XAxis
-              dataKey="name"
-              axisLine={{ stroke: "#E7EAEE" }}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: "#6B7280" }}
-            />
-            <YAxis
-              axisLine={{ stroke: "#E7EAEE" }}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: "#6B7280" }}
-            />
-            <Tooltip
-              contentStyle={{
-                borderRadius: "12px",
-                border: "none",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
-            />
-            {visibleSeries.detached && (
-              <Line
-                type="step"
-                dataKey="detached"
-                stroke="#FF0400"
-                strokeWidth={1}
-                dot={false}
-                activeDot={{ r: 4 }}
+        {/* Chart */}
+        <div className="w-full h-[350px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data.chartData}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              barGap={6}
+            >
+              <CartesianGrid
+                vertical={false}
+                stroke="#F0F0F0"
+                strokeDasharray="0"
               />
-            )}
-            {visibleSeries.apartment && (
-              <Line
-                type="step"
-                dataKey="apartment"
-                stroke="#1D00FF"
-                strokeWidth={1}
-                dot={false}
-                activeDot={{ r: 4 }}
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                ticks={xTicks}
+                tick={{ fontSize: 12, fill: "#9CA3AF", fontWeight: 500 }}
+                dy={10}
               />
-            )}
-            {visibleSeries.townhouse && (
-              <Line
-                type="step"
-                dataKey="townhouse"
-                stroke="#007E64"
-                strokeWidth={1}
-                dot={false}
-                activeDot={{ r: 4 }}
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                ticks={[0, 25, 50, 100]}
+                domain={[0, 100]}
+                tick={{ fontSize: 12, fill: "#9CA3AF", fontWeight: 500 }}
               />
-            )}
-            <Line
-              type="linear"
-              dataKey="sold"
-              stroke="#E3A82A"
-              strokeWidth={1}
-              dot={{ r: 3, fill: "#E3A82A", strokeWidth: 0 }}
-              activeDot={{ r: 5 }}
-            />
-            <Line
-              type="linear"
-              dataKey="listed"
-              stroke="#008001"
-              strokeWidth={1}
-              dot={{ r: 3, fill: "#008001", strokeWidth: 0 }}
-              activeDot={{ r: 5 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+              <Tooltip
+                cursor={{ fill: "transparent" }}
+                content={<CustomTooltip />}
+              />
+
+              {visibleSeries.detached && (
+                <Bar
+                  dataKey="detached_listed"
+                  stackId="detached"
+                  fill="#FF0400"
+                  barSize={12}
+                  radius={0}
+                  background={{ fill: "#F2F2F2", radius: 4 }}
+                />
+              )}
+              {visibleSeries.detached && (
+                <Bar
+                  dataKey="detached_sold"
+                  stackId="detached"
+                  fill="#FF8A88"
+                  barSize={12}
+                  radius={[4, 4, 0, 0] as [number, number, number, number]}
+                />
+              )}
+
+              {visibleSeries.apartment && (
+                <Bar
+                  dataKey="apartment_listed"
+                  stackId="apartment"
+                  fill="#1D00FF"
+                  barSize={12}
+                  radius={0}
+                  background={{ fill: "#F2F2F2", radius: 4 }}
+                />
+              )}
+              {visibleSeries.apartment && (
+                <Bar
+                  dataKey="apartment_sold"
+                  stackId="apartment"
+                  fill="#8A88FF"
+                  barSize={12}
+                  radius={[4, 4, 0, 0] as [number, number, number, number]}
+                />
+              )}
+
+              {visibleSeries.townhouse && (
+                <Bar
+                  dataKey="townhouse_listed"
+                  stackId="townhouse"
+                  fill="#007E64"
+                  barSize={12}
+                  radius={0}
+                  background={{ fill: "#F2F2F2", radius: 4 }}
+                />
+              )}
+              {visibleSeries.townhouse && (
+                <Bar
+                  dataKey="townhouse_sold"
+                  stackId="townhouse"
+                  fill="#80C1B3"
+                  barSize={12}
+                  radius={[4, 4, 0, 0] as [number, number, number, number]}
+                />
+              )}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

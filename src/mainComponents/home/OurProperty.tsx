@@ -173,7 +173,7 @@ const OurProperty = () => {
   };
 
   return (
-    <section className="xl:max-w-screen-2xl mx-auto px-6 py-16">
+    <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 py-16 overflow-clip">
       <Heading
         tagType="h2"
         type={IHeadingTypes.heading32}
