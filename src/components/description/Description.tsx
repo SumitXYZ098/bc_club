@@ -12,7 +12,8 @@ export enum IDescriptionTypes {
   dec14 = "dec14",
   dec16 = "dec16",
   dec1614 = "dec1614",
-  dec18= "dec18",
+  dec18 = "dec18",
+  dec12 = "dec12",
   description16 = "description14",
 }
 
@@ -24,8 +25,10 @@ const getDescriptionStyles = (type: IDescriptionTypes) => {
       return `md:text-base text-sm`;
     case IDescriptionTypes.dec16:
       return `xl:text-base text-sm`;
-      case IDescriptionTypes.dec18:
-        return `md:text-lg text-base`
+    case IDescriptionTypes.dec18:
+      return `md:text-lg text-base`;
+    case IDescriptionTypes.dec12:
+      return `md:text-xs text-[10px] leading-4`;
     case IDescriptionTypes.description16:
       return `text-base`;
     default:

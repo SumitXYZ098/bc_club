@@ -13,6 +13,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useAuthContext } from "../../auth/AuthContext";
+import ChartSignInOverlay from "@/src/components/common/charts/ChartSignInOverlay";
 
 /* ===== DUMMY DATA ===== */
 const data = [
@@ -177,6 +179,8 @@ const MonthlySaleChart = () => {
     return filtered;
   };
 
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
+
   return (
     <section>
       {/* FILTERS */}
@@ -228,7 +232,7 @@ const MonthlySaleChart = () => {
       </div>
 
       {/* CHART */}
-      <div className="bg-white rounded-2xl shadow p-6 mt-10">
+      <div className="bg-white rounded-2xl shadow p-6 mt-10 h-130">
         <div className="flex flex-col md:flex-row justify-between mb-10">
           <h3 className="text-sm font-medium text-gray-700 mb-4 md:mb-0">
             City Of Vancouver Median Sold Price in all Neighborhoods*
@@ -249,60 +253,67 @@ const MonthlySaleChart = () => {
         </div>
 
         {/*SCROLL WRAPPER */}
-        <div className="overflow-x-auto scrollbar-hide ">
-          <div className="min-w-175 md:min-w-full">
-         <ResponsiveContainer width="100%" height={380}>
-          <ComposedChart data={getFilteredData()}>
-            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}K`} />
-            <Tooltip />
+        <div className="overflow-x-auto scrollbar-hide h-full ">
+          <div className="min-w-175 md:min-w-full h-full relative">
+            {!isLoggedIn ? (
+              <ChartSignInOverlay onSignIn={() => setOpenLogin(true)} />
+            ) : (
+              <ResponsiveContainer width="100%" height={380}>
+                <ComposedChart data={getFilteredData()}>
+                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                  <YAxis
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(v) => `${v}K`}
+                  />
+                  <Tooltip />
 
-            <Bar
-              dataKey="sold"
-              name="Sold Count"
-              barSize={26}
-              fill="#244A7C"
-              radius={[6, 6, 0, 0]}
-            >
-              <LabelList
-                dataKey="sold"
-                position="top"
-                style={{
-                  fontSize: 11,
-                  fill: "#333",
-                  fontWeight: 500,
-                }}
-              />
-            </Bar>
-            <Legend />
+                  <Bar
+                    dataKey="sold"
+                    name="Sold Count"
+                    barSize={26}
+                    fill="#244A7C"
+                    radius={[6, 6, 0, 0]}
+                  >
+                    <LabelList
+                      dataKey="sold"
+                      position="top"
+                      style={{
+                        fontSize: 11,
+                        fill: "#333",
+                        fontWeight: 500,
+                      }}
+                    />
+                  </Bar>
+                  <Legend />
 
-            <Bar
-              dataKey="sold"
-              name="Sold Count"
-              barSize={26}
-              fill="#244A7C"
-              radius={[6, 6, 0, 0]}
-            />
+                  <Bar
+                    dataKey="sold"
+                    name="Sold Count"
+                    barSize={26}
+                    fill="#244A7C"
+                    radius={[6, 6, 0, 0]}
+                  />
 
-            <Line
-              type="monotone"
-              dataKey="price"
-              name={filters.propertyType}
-              stroke="#F5A623"
-              strokeWidth={2}
-              dot={{ r: 3 }}
-            />
+                  <Line
+                    type="monotone"
+                    dataKey="price"
+                    name={filters.propertyType}
+                    stroke="#F5A623"
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                  />
 
-            <Line
-              type="monotone"
-              dataKey="ma"
-              name="12-MA"
-              stroke="#2E7D32"
-              strokeWidth={2}
-              dot={{ r: 3 }}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
+                  <Line
+                    type="monotone"
+                    dataKey="ma"
+                    name="12-MA"
+                    stroke="#2E7D32"
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>

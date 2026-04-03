@@ -15,6 +15,7 @@ import {
   useRemoveFromWishlist,
   useToggleWishlist,
 } from "@/src/hooks/listing/useListingQueries";
+import dayjs from "dayjs";
 
 export interface PropertyCardProps {
   id: string;
@@ -89,15 +90,25 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
     removeFromWishlist.mutate(id);
   };
+  const displayPrice = isLogin ? `$${price.toLocaleString()}` : "$*,***,***";
+  const displayAddress = isLogin ? address : "Sign in to view address";
+  const displayTitle = isLogin ? title : "Property Details Restricted";
+  const displaySqft = isLogin ? `${sqft} sqft` : "---- sqft";
+  const displayBeds = isLogin ? beds : "---";
+  const displayBaths = isLogin ? baths : "---";
+  const displayMls = isLogin ? `MLS® ${mls}` : "MLS® *******";
+  const displayRealtor = isLogin
+    ? `Courtesy of: ${realtor}`
+    : "Courtesy of: **********";
 
   return (
     <Link
       href={`${!isLogin ? "#" : `/property-info/${id}`}`}
-      className={`w-full h-full flex`}
+      className="w-full h-full flex"
     >
       <div
         className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-auto w-full ${
-          isLogin && "group"
+          isLogin ? "group" : ""
         }`}
       >
         <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-full justify-between">
@@ -105,8 +116,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             <div className="w-full h-56 overflow-clip rounded-lg">
               <Image
                 src={image || Images.apartment}
-                alt={title}
-                className="w-full h-56 object-cover rounded-lg group-hover:scale-125 transition duration-300 ease-in-out"
+                alt={displayTitle}
+                className={`w-full h-56 object-cover rounded-lg transition duration-300 ease-in-out ${
+                  isLogin ? "group-hover:scale-125" : "blur-sm"
+                }`}
                 width={700}
                 height={403}
                 loading="eager"
@@ -145,7 +158,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 Price Drop {priceDrop}%
               </span>
             )}
-            {/* {priceDrop !== undefined && priceDrop > 0 && ( */}
+
             {isSold && (
               <span
                 className="absolute bottom-3 left-0 bg-red text-background pl-3 pr-7 pt-2 pb-2 text-xs h-auto font-medium"
@@ -167,28 +180,27 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 Expired
               </span>
             )}
-            {/* )} */}
           </div>
 
           <div className="space-y-3 mt-1">
-            <h3 className="font-bold text-xl">{title}</h3>
+            <h3 className="font-bold text-xl">{displayTitle}</h3>
             <div
               className={`flex justify-between ${
                 pathname === "/properties"
-                  ? "xl:flex-col gap-y-1 xl:items-start items-end-safe "
+                  ? "xl:flex-col gap-y-1 xl:items-start items-end-safe"
                   : "items-end-safe"
               }`}
             >
               <div className="flex flex-col">
                 <span className="text-xs text-lightWhite">List Price Now</span>
                 <p className="text-2xl font-bold text-primary">
-                  ${price.toLocaleString()}
+                  {displayPrice}
                 </p>
               </div>
               {/* Assessed Diff */}
               <p
-                className={`text-xs font-medium inline-flex items-center gap-1 p-1 rounded-md ${
-                  assessedDiff >= 0
+                className={`text-[10px] leading-4 inline-flex items-center gap-1 p-1 rounded-md ${
+                  assessedDiff < 0
                     ? "text-green bg-lightGreen"
                     : "text-red bg-lightRed"
                 }`}
@@ -205,10 +217,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                     height="20"
                     rx="2"
                     className={`${
-                      assessedDiff >= 0 ? "fill-green" : "fill-red"
+                      assessedDiff < 0 ? "fill-green" : "fill-red"
                     }`}
                   />
-                  {assessedDiff >= 0 ? (
+                  {assessedDiff > 0 ? (
                     <path
                       d="M15 7.5L12.3535 10.1465C12.2597 10.2402 12.1326 10.2929 12 10.2929C11.8674 10.2929 11.7403 10.2402 11.6465 10.1465L10.8535 9.3535C10.7597 9.25976 10.6326 9.20711 10.5 9.20711C10.3674 9.20711 10.2403 9.25976 10.1465 9.3535L8 11.5"
                       stroke="white"
@@ -231,11 +243,13 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                     strokeLinecap="round"
                   />
                 </svg>
-                {Math.abs(assessedDiff)}% than Assessed Value 2025
+                {Math.abs(assessedDiff)}% than Assessed Value {dayjs().year()}
               </p>
             </div>
 
-            <p className="text-lightWhite text-sm">{address}</p>
+            <p className="text-lightWhite text-sm line-clamp-1">
+              {displayAddress}
+            </p>
 
             {/* Specs */}
             <div
@@ -243,11 +257,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 pathname === "/properties" ? "gap-x-1" : "gap-3"
               }`}
             >
-              <div
-                className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                  pathname === "/properties" ? "w-full" : "w-full"
-                }`}
-              >
+              <div className="flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm w-full">
                 <Image
                   src={Icons.scale}
                   alt="sqft"
@@ -255,13 +265,9 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                   height={100}
                   className="w-5 h-5 object-contain"
                 />
-                <span>{sqft} sqft</span>
+                <span>{displaySqft}</span>
               </div>
-              <div
-                className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                  pathname === "/properties" ? "w-full" : "w-full"
-                }`}
-              >
+              <div className="flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm w-full">
                 <Image
                   src={Icons.bedroom}
                   alt="bedroom"
@@ -269,13 +275,9 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                   height={100}
                   className="w-5 h-5 object-contain"
                 />
-                <span>{beds}</span>
+                <span>{displayBeds}</span>
               </div>
-              <div
-                className={`flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm ${
-                  pathname === "/properties" ? "w-full" : "w-full"
-                }`}
-              >
+              <div className="flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm w-full">
                 <Image
                   src={Icons.bathtub}
                   alt="bathtub"
@@ -283,31 +285,34 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                   height={100}
                   className="w-5 h-5 object-contain"
                 />
-                <span>{baths}</span>
+                <span>{displayBaths}</span>
               </div>
             </div>
             <LineGradient />
-            <div className="w-full flex flex-row flex-wrap items-center justify-between">
+            <div className="w-full flex flex-row flex-wrap items-center justify-between gap-2">
               <Description
-                content={realtor}
-                type={IDescriptionTypes.dec14}
+                content={displayRealtor}
+                type={IDescriptionTypes.dec12}
                 customClasses="text-lightWhite"
               />
               <Description
-                content={`MLS® ${mls}`}
-                type={IDescriptionTypes.dec14}
+                content={displayMls}
+                type={IDescriptionTypes.dec12}
                 customClasses="text-lightWhite"
               />
             </div>
           </div>
         </div>
+
         {!isLogin && (
-          <div className="bg-[#FFFFFF1f] backdrop-blur-md w-full h-full absolute rounded-xl justify-center items-center-safe flex flex-col">
+          <div className="bg-[#FFFFFF1f] backdrop-blur-md w-full h-full absolute z-30 rounded-xl justify-center items-center-safe flex flex-col">
             <CustomButton
               label="Login Required"
               buttonType="primary"
               customClasses="font-bold py-4 px-18.5"
-              onClick={() => setOpenLogin(true)}
+              onClick={() => {
+                setOpenLogin(true);
+              }}
             />
           </div>
         )}

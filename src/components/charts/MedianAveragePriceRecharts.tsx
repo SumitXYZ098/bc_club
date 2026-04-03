@@ -11,15 +11,22 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
+import PoweredBy from "../common/poweredby/PoweredBy";
+import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
+import ChartSignInOverlay from "../common/charts/ChartSignInOverlay";
 
 /* -------------------------------
    1️⃣ Data Generation Logic
 -----------------------------------*/
 
 const generateMedianAveragePriceData = (range: string) => {
-  let totalDays = range === "6M" ? 180 : 90;
+  let totalDays = 30;
+  if (range === "12D") totalDays = 12;
+  else if (range === "1M") totalDays = 30;
+  else if (range === "3M") totalDays = 90;
+  else if (range === "6M") totalDays = 180;
   const startDate = dayjs().subtract(totalDays - 1, "day");
-  const points = 12;
+  const points = 12; // Image shows 12 groups
   const interval = (totalDays - 1) / (points - 1);
 
   return Array.from({ length: points }, (_, i) => {
@@ -82,7 +89,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const MedianAveragePriceRecharts = () => {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const [range, setRange] = useState("3M");
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
+  const [range, setRange] = useState("1M");
+
+  const isProtectedRange = useMemo(
+    () => !isLoggedIn && ["3M", "6M", "Custom"].includes(range),
+    [isLoggedIn, range],
+  );
 
   useEffect(() => {
     setIsMounted(true);
@@ -104,11 +117,17 @@ const MedianAveragePriceRecharts = () => {
           Median & Average Price
         </h2>
         <div className="flex items-center rounded-2xl gap-1">
-          {["3M", "6M"].map((r) => (
+          {["12D", "1M", "3M", "6M", "Custom"].map((r) => (
             <button
               key={r}
-              onClick={() => setRange(r)}
-              className={`px-7 py-2.5 rounded-xl text-base transition-all ${
+              onClick={() => {
+                if (r === "Custom") {
+                  router.push("/market-trends");
+                } else {
+                  setRange(r);
+                }
+              }}
+              className={`px-4 py-2 rounded-xl text-sm transition-all ${
                 range === r
                   ? "bg-[#FFA500] text-white shadow-sm"
                   : "text-black70 hover:bg-gray-200 bg-gray"
@@ -117,72 +136,73 @@ const MedianAveragePriceRecharts = () => {
               {r}
             </button>
           ))}
-          <button
-            onClick={() => router.push("/market-trends")}
-            className="px-7 py-2.5 rounded-xl text-base text-black70 hover:bg-gray-200 bg-gray transition-all"
-          >
-            Custom
-          </button>
         </div>
       </div>
 
       {/* Chart Area */}
-      <div className="w-full h-[400px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            margin={{ top: 20, right: 10, left: 0, bottom: 20 }}
-            barGap={2}
-          >
-            <CartesianGrid
-              vertical={false}
-              stroke="#F0F0F0"
-              strokeDasharray="0"
-            />
-            <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 13, fill: "#9CA3AF", fontWeight: 500 }}
-              dy={12}
-            />
-            <YAxis hide axisLine={false} tickLine={false} />
-            <Tooltip
-              cursor={{ fill: "transparent" }}
-              content={<CustomTooltip />}
-            />
-            <Bar
-              name="Median Price"
-              dataKey="median"
-              fill="#FFA500"
-              barSize={14}
-              radius={[4, 4, 0, 0]}
-            />
-            <Bar
-              name="Average Price"
-              dataKey="average"
-              fill="#1D4E89"
-              barSize={14}
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="w-full h-[400px] relative">
+        {isProtectedRange ? (
+          <ChartSignInOverlay onSignIn={() => setOpenLogin(true)} />
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              margin={{ top: 20, right: 10, left: 0, bottom: 20 }}
+              barGap={2}
+            >
+              <CartesianGrid
+                vertical={false}
+                stroke="#F0F0F0"
+                strokeDasharray="0"
+              />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 500 }}
+                dy={12}
+              />
+              <YAxis hide axisLine={false} tickLine={false} />
+              <Tooltip
+                cursor={{ fill: "transparent" }}
+                content={<CustomTooltip />}
+              />
+              <Bar
+                name="Median Price"
+                dataKey="median"
+                fill="#FFA500"
+                barSize={14}
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                name="Average Price"
+                dataKey="average"
+                fill="#1D4E89"
+                barSize={14}
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       {/* Legend Row */}
-      <div className="flex items-center justify-center gap-8">
-        {[
-          { label: "Median Price", color: "#FFA500" },
-          { label: "Average Price", color: "#1D4E89" },
-        ].map((item) => (
-          <div key={item.label} className="flex items-center gap-0.5">
-            <div
-              className="w-4 h-4"
-              style={{ backgroundColor: item.color, borderRadius: "4px" }}
-            />
-            <span className="text-xs text-black">{item.label}</span>
-          </div>
-        ))}
+      <div className="flex items-center justify-between gap-8">
+        <div className="flex items-center justify-center gap-8">
+          {[
+            { label: "Median Days", color: "#FFA500" },
+            { label: "Average Days", color: "#1D4E89" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-0.5">
+              <div
+                className="w-4 h-4"
+                style={{ backgroundColor: item.color, borderRadius: "4px" }}
+              />
+              <span className="text-xs text-black">{item.label}</span>
+            </div>
+          ))}
+        </div>
+        <PoweredBy className="justify-end" textStyle="text-xs!" />
       </div>
     </div>
   );

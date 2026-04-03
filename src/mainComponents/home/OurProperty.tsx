@@ -25,20 +25,20 @@ const OFFSET = 120;
 
 const swiperConfig = {
   spaceBetween: 12,
-  slidesPerView: 1.1,
+  slidesPerView: 1,
   autoplay: {
     delay: 0,
     disableOnInteraction: false,
     pauseOnMouseEnter: true,
   },
-  modules: [Autoplay, Pagination],
+  modules: [Pagination],
   loop: true,
   pagination: {
     clickable: true,
     dynamicBullets: true,
   },
   breakpoints: {
-    640: { slidesPerView: 1.8, spaceBetween: 20 },
+    640: { slidesPerView: 1.5, spaceBetween: 20 },
     1024: { slidesPerView: 3, spaceBetween: 32 },
   },
   speed: 3000,
@@ -159,9 +159,26 @@ const OurProperty = () => {
     if (!list.length) {
       return <p className="text-center py-10">No properties found</p>;
     }
+    // if (list.length <= 3) {
+    //   return (
+    //     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    //       {list.map((item) => (
+    //         <PropertiesCard
+    //           {...item}
+    //           isLogin={isLoginOverride ?? isLoggedIn}
+    //           isSold={isSold}
+    //           isExpired={isExpired}
+    //         />
+    //       ))}
+    //     </div>
+    //   );
+    // }
 
     return (
-      <Swiper {...swiperConfig} className="pt-3! pb-9! mySwiper w-full h-full">
+      <Swiper
+        {...swiperConfig}
+        className="pt-3! pb-9! mySwiper w-full h-full grid!"
+      >
         {list.map((item) => (
           <SwiperSlide key={item.id}>
             <PropertiesCard
@@ -219,10 +236,10 @@ const OurProperty = () => {
       </div>
 
       {/* Sections */}
-      <div className="space-y-10 mt-10">
+      <div className="space-y-10 mt-10 h-auto">
         <div
           ref={refs["Newly Listed properties"]}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 h-full"
         >
           <Heading
             tagType="h3"
@@ -234,7 +251,7 @@ const OurProperty = () => {
 
         <div
           ref={refs["Previously Listed Properties"]}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 "
         >
           <Heading
             tagType="h3"

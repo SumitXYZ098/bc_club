@@ -1,10 +1,16 @@
 import React from "react";
 
-const PoweredBy = ({ className }: { className?: string }) => {
+const PoweredBy = ({
+  className,
+  textStyle = "md:text-sm text-xs",
+}: {
+  className?: string;
+  textStyle?: string;
+}) => {
   return (
     <div className={`flex items-center gap-1 flex-nowrap ${className}`}>
-      <p className="text-black70 md:text-sm text-xs">Powered by data from</p>
-      <svg
+      <p className={`text-black70 ${textStyle}`}>Data Source:</p>
+      {/* <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
         height="20"
@@ -27,8 +33,8 @@ const PoweredBy = ({ className }: { className?: string }) => {
           d="M17.4014 2.36511C17.4014 1.90118 16.9568 1.56663 16.5111 1.69523L10.6761 3.37739C10.3775 3.46339 10.1719 3.73662 10.1719 4.04727L10.1723 17.6113C10.1723 18.002 10.4891 18.3186 10.8798 18.3186H16.6935C17.0843 18.3186 17.4013 18.0019 17.4013 17.6109L17.4014 2.36511Z"
           fill="#D3E023"
         />
-      </svg>
-      <p className="text-[#3B4E19] md:text-sm text-xs">Greater Vancouver Realtors</p>
+      </svg> */}
+      <p className={`text-[#3B4E19] ${textStyle}`}>FVREV Stats Centre</p>
     </div>
   );
 };

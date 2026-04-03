@@ -12,6 +12,8 @@ import {
   LabelList,
 } from "recharts";
 import { FiChevronDown } from "react-icons/fi";
+import { useAuthContext } from "../../auth/AuthContext";
+import ChartSignInOverlay from "@/src/components/common/charts/ChartSignInOverlay";
 
 /* ================= DATA ================= */
 const data = [
@@ -131,6 +133,9 @@ const MarketTrend = () => {
   const [property, setProperty] = useState("All Residential");
   const [neighborhood, setNeighborhood] = useState("All Neighborhoods");
   const [year, setYear] = useState("Select Year");
+
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
+
   return (
     <div className="space-y-10">
       <div className="bg-white rounded-2xl shadow p-5  gap-4 flex flex-nowrap md:flex-row flex-col mt-10">
@@ -157,83 +162,84 @@ const MarketTrend = () => {
       </div>
 
       <div className=" rounded-2xl bg-[#F5F6F8] p-4 pb-16">
-    <div className="h-130 rounded-xl">
-  {/* Header */}
-  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-    <h2 className="font-semibold text-sm md:w-85">
-      City of Vancouver / Median Sold Price in all Neighborhoods
-    </h2>
+        <div className="h-130 rounded-xl">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3 h-auto">
+            <h2 className="font-semibold text-sm md:w-85">
+              City of Vancouver / Median Sold Price in all Neighborhoods
+            </h2>
 
-    <div className="flex gap-3 text-xs flex-wrap">
-      <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
-        <span className="w-3 h-3 bg-blue-800 rounded"></span>
-        All Residential
-      </span>
-      <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
-        <span className="w-3 h-3 bg-green-500 rounded"></span>
-        12-MA
-      </span>
-      <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
-        <span className="w-3 h-3 bg-yellow-400 rounded"></span>
-        Sold Count
-      </span>
-    </div>
-  </div>
+            <div className="flex gap-3 text-xs flex-wrap">
+              <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
+                <span className="w-3 h-3 bg-blue-800 rounded"></span>
+                All Residential
+              </span>
+              <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
+                <span className="w-3 h-3 bg-green-500 rounded"></span>
+                12-MA
+              </span>
+              <span className="flex items-center gap-1 border border-borderColor p-1 rounded-lg">
+                <span className="w-3 h-3 bg-yellow-400 rounded"></span>
+                Sold Count
+              </span>
+            </div>
+          </div>
 
-  {/* X Scroll Wrapper */}
-  <div className="overflow-x-auto scrollbar-hide">
-    <div className="min-w-200 md:min-w-full">
-      <ResponsiveContainer width="100%" height={420}>
-        <ComposedChart data={data}>
-          <XAxis dataKey="month" />
+          {/* X Scroll Wrapper */}
+          <div className="overflow-x-auto scrollbar-hide h-full">
+            <div className="min-w-200 md:min-w-full relative h-full">
+              {!isLoggedIn ? (
+                <ChartSignInOverlay onSignIn={() => setOpenLogin(true)} />
+              ) : (
+                <ResponsiveContainer width="100%" height={420}>
+                  <ComposedChart data={data}>
+                    <XAxis dataKey="month" />
 
-          <YAxis
-            yAxisId="price"
-            tickFormatter={(v) => `${v / 1000}M`}
-          />
+                    <YAxis
+                      yAxisId="price"
+                      tickFormatter={(v) => `${v / 1000}M`}
+                    />
 
-          <YAxis
-            yAxisId="sold"
-            orientation="right"
-            tickFormatter={(v) => `${v}K`}
-          />
+                    <YAxis
+                      yAxisId="sold"
+                      orientation="right"
+                      tickFormatter={(v) => `${v}K`}
+                    />
 
-          <Tooltip />
+                    <Tooltip />
 
-          <Bar
-            yAxisId="sold"
-            name="Sold "
-            dataKey="sold"
-            barSize={30}
-            fill="#1f3a5f"
-            radius={[6, 6, 0, 0]}
-                  
-          >
-            <LabelList dataKey="sold" position="top" />
-          </Bar>
+                    <Bar
+                      yAxisId="sold"
+                      name="Sold "
+                      dataKey="sold"
+                      barSize={30}
+                      fill="#1f3a5f"
+                      radius={[6, 6, 0, 0]}
+                    >
+                      <LabelList dataKey="sold" position="top" />
+                    </Bar>
 
-          <Line
-            yAxisId="price"
-            dataKey="price"
-            stroke="#f59e0b"
-            strokeWidth={1}
-            dot={{r:3}}
-                 
-          />
+                    <Line
+                      yAxisId="price"
+                      dataKey="price"
+                      stroke="#f59e0b"
+                      strokeWidth={1}
+                      dot={{ r: 3 }}
+                    />
 
-          <Line
-            yAxisId="price"
-            dataKey="ma"
-            stroke="#22c55e"
-            strokeWidth={1}
-            dot={{r:3}}
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
-    </div>
-  </div>
-</div>
-
+                    <Line
+                      yAxisId="price"
+                      dataKey="ma"
+                      stroke="#22c55e"
+                      strokeWidth={1}
+                      dot={{ r: 3 }}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -10,24 +10,24 @@ export const citiesWeCover: LinkListProps = {
   title: "Cities We Cover",
   linkList: [
     {
-      label: "Surrey, BC",
-      href: "/surrey-bc",
-    },
-    {
       label: "Vancouver, BC",
       href: "/vancouver-bc",
     },
     {
-      label: "Burnaby, BC",
-      href: "/burnaby-bc",
+      label: "Surrey, BC",
+      href: "/surrey-bc",
     },
     {
-      label: "Coquitlam, BC",
-      href: "/coquitlam-bc",
+      label: "Victoria, BC",
+      href: "/victoria-bc",
     },
     {
-      label: "Langley, BC",
-      href: "/langley-bc",
+      label: "Kelowna, BC",
+      href: "/kelowna-bc",
+    },
+    {
+      label: "Prince George, BC",
+      href: "/prince-george-bc",
     },
   ],
 };
@@ -103,7 +103,7 @@ export const contactUs: LinkListProps = {
       label: "Live Chat",
       href: "/Live Chat",
     },
-     {
+    {
       label: "Renovation",
       href: "/renovation",
     },

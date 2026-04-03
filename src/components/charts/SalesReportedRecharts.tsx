@@ -14,8 +14,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
+import PoweredBy from "../common/poweredby/PoweredBy";
+import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
+import ChartSignInOverlay from "../common/charts/ChartSignInOverlay";
 
-const timeRanges = ["15D", "1M", "3M", "6M", "Custom"];
+const timeRanges = ["12D", "1M", "3M", "6M", "Custom"];
 type SeriesKey = "detached" | "apartment" | "townhouse";
 
 /* -------------------------------
@@ -138,7 +141,13 @@ const SummaryCard = ({ title, value }: { title: string; value: number }) => (
 const SalesReportedRecharts = ({ location }: { location: string }) => {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const [range, setRange] = useState("3M");
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
+  const [range, setRange] = useState("1M");
+
+  const isProtectedRange = useMemo(
+    () => !isLoggedIn && ["3M", "6M", "Custom"].includes(range),
+    [isLoggedIn, range],
+  );
   const [customStart, setCustomStart] = useState(
     dayjs().subtract(7, "day").toISOString(),
   );
@@ -249,101 +258,106 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
         <h2 className="text-xl font-bold text-black px-2">All Properties</h2>
 
         {/* Chart */}
-        <div className="w-full h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data.chartData}
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              barGap={6}
-            >
-              <CartesianGrid
-                vertical={false}
-                stroke="#F0F0F0"
-                strokeDasharray="0"
-              />
-              <XAxis
-                dataKey="name"
-                axisLine={false}
-                tickLine={false}
-                ticks={xTicks}
-                tick={{ fontSize: 12, fill: "#9CA3AF", fontWeight: 500 }}
-                dy={10}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                ticks={[0, 25, 50, 100]}
-                domain={[0, 100]}
-                tick={{ fontSize: 12, fill: "#9CA3AF", fontWeight: 500 }}
-              />
-              <Tooltip
-                cursor={{ fill: "transparent" }}
-                content={<CustomTooltip />}
-              />
+        <div className="w-full h-[350px] relative">
+          {isProtectedRange ? (
+            <ChartSignInOverlay onSignIn={() => setOpenLogin(true)} />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data.chartData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                barGap={6}
+              >
+                <CartesianGrid
+                  vertical={false}
+                  stroke="#F0F0F0"
+                  strokeDasharray="0"
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  ticks={xTicks}
+                  tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 500 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  ticks={[0, 25, 50, 100]}
+                  domain={[0, 100]}
+                  tick={{ fontSize: 12, fill: "#9CA3AF", fontWeight: 500 }}
+                />
+                <Tooltip
+                  cursor={{ fill: "transparent" }}
+                  content={<CustomTooltip />}
+                />
 
-              {visibleSeries.detached && (
-                <Bar
-                  dataKey="detached_listed"
-                  stackId="detached"
-                  fill="#FF0400"
-                  barSize={12}
-                  radius={0}
-                  background={{ fill: "#F2F2F2", radius: 4 }}
-                />
-              )}
-              {visibleSeries.detached && (
-                <Bar
-                  dataKey="detached_sold"
-                  stackId="detached"
-                  fill="#FF8A88"
-                  barSize={12}
-                  radius={[4, 4, 0, 0] as [number, number, number, number]}
-                />
-              )}
+                {visibleSeries.detached && (
+                  <Bar
+                    dataKey="detached_listed"
+                    stackId="detached"
+                    fill="#FF0400"
+                    barSize={12}
+                    radius={0}
+                    background={{ fill: "#F2F2F2", radius: 4 }}
+                  />
+                )}
+                {visibleSeries.detached && (
+                  <Bar
+                    dataKey="detached_sold"
+                    stackId="detached"
+                    fill="#FF8A88"
+                    barSize={12}
+                    radius={[4, 4, 0, 0] as [number, number, number, number]}
+                  />
+                )}
 
-              {visibleSeries.apartment && (
-                <Bar
-                  dataKey="apartment_listed"
-                  stackId="apartment"
-                  fill="#1D00FF"
-                  barSize={12}
-                  radius={0}
-                  background={{ fill: "#F2F2F2", radius: 4 }}
-                />
-              )}
-              {visibleSeries.apartment && (
-                <Bar
-                  dataKey="apartment_sold"
-                  stackId="apartment"
-                  fill="#8A88FF"
-                  barSize={12}
-                  radius={[4, 4, 0, 0] as [number, number, number, number]}
-                />
-              )}
+                {visibleSeries.apartment && (
+                  <Bar
+                    dataKey="apartment_listed"
+                    stackId="apartment"
+                    fill="#1D00FF"
+                    barSize={12}
+                    radius={0}
+                    background={{ fill: "#F2F2F2", radius: 4 }}
+                  />
+                )}
+                {visibleSeries.apartment && (
+                  <Bar
+                    dataKey="apartment_sold"
+                    stackId="apartment"
+                    fill="#8A88FF"
+                    barSize={12}
+                    radius={[4, 4, 0, 0] as [number, number, number, number]}
+                  />
+                )}
 
-              {visibleSeries.townhouse && (
-                <Bar
-                  dataKey="townhouse_listed"
-                  stackId="townhouse"
-                  fill="#007E64"
-                  barSize={12}
-                  radius={0}
-                  background={{ fill: "#F2F2F2", radius: 4 }}
-                />
-              )}
-              {visibleSeries.townhouse && (
-                <Bar
-                  dataKey="townhouse_sold"
-                  stackId="townhouse"
-                  fill="#80C1B3"
-                  barSize={12}
-                  radius={[4, 4, 0, 0] as [number, number, number, number]}
-                />
-              )}
-            </BarChart>
-          </ResponsiveContainer>
+                {visibleSeries.townhouse && (
+                  <Bar
+                    dataKey="townhouse_listed"
+                    stackId="townhouse"
+                    fill="#007E64"
+                    barSize={12}
+                    radius={0}
+                    background={{ fill: "#F2F2F2", radius: 4 }}
+                  />
+                )}
+                {visibleSeries.townhouse && (
+                  <Bar
+                    dataKey="townhouse_sold"
+                    stackId="townhouse"
+                    fill="#80C1B3"
+                    barSize={12}
+                    radius={[4, 4, 0, 0] as [number, number, number, number]}
+                  />
+                )}
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
+      <PoweredBy className="justify-end" />
     </div>
   );
 };
