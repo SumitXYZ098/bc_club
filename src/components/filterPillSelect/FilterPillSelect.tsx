@@ -31,9 +31,9 @@ export default function FilterPillSelect({
     <div
       className={`${pillBase} ${
         value === "any" ? pillInactive : pillActive
-      } relative w-full xl:flex hidden text-nowrap items-center gap-x-3`}
+      } relative w-full flex text-nowrap items-center gap-x-3`}
     >
-      <span>{label}:</span>
+      <span className="md:text-base text-xs">{label}:</span>
 
       <Select
         value={value}
@@ -44,7 +44,7 @@ export default function FilterPillSelect({
         sx={{
           "& .MuiSelect-select": {
             padding: 0,
-            fontSize: "14px",
+            fontSize: { xs: "12px", md: "14px" },
           },
         }}
       >

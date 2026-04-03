@@ -93,11 +93,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   return (
     <Link
       href={`${!isLogin ? "#" : `/property-info/${id}`}`}
-      className={`${
-        pathname === "/properties" || pathname === "/wishlist"
-          ? "md:w-[49%] w-full "
-          : "w-full"
-      }`}
+      className={`w-full h-full flex`}
     >
       <div
         className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-auto w-full ${

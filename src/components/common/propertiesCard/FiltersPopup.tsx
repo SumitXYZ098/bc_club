@@ -67,7 +67,7 @@ interface FiltersDialogProps {
 // ================= Component =================
 export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
-  const { filters, updateFilter } = useListingStore();
+  const { filters, updateFilter, clearFilters } = useListingStore();
 
   const [price, setPrice] = useState<[number | null, number | null]>([
     filters.minPrice ?? 0,
@@ -92,13 +92,6 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
   const [location, setLocation] = useState<string>(filters.location ?? "");
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "auto";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [open]);
-
-  useEffect(() => {
     if (open) {
       setPrice([filters.minPrice ?? 0, filters.maxPrice ?? 20000000]);
       setSqft([filters.minSqft ?? 0, filters.maxSqft ?? 15000]);
@@ -118,6 +111,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
   }, [open, filters]);
 
   const handleClearAll = () => {
+    clearFilters();
     setPrice([0, 20000000]);
     setSqft([0, 15000]);
     setBedrooms(null);
@@ -158,254 +152,246 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
         },
       }}
     >
-      {/* CENTER WRAPPER */}
+      {/* Popup Content */}
       <div
-        className="flex items-center justify-center z-9999 w-full"
-        onClick={onClose}
+        className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-10 md:pt-6 p-4 pb-0 w-full scrollbar-transparent"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* CARD */}
-        <div
-          className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-10 md:pt-6 p-4 pb-0 w-full scrollbar-hide"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between cursor-pointer mb-6">
-            <h2 className="text-xl font-medium  ">Filters</h2>
-            <button onClick={onClose}>
-              <FiX size={22} />
-            </button>
-          </div>
+        {/* Header */}
+        <div className="flex items-center justify-between cursor-pointer mb-6">
+          <h2 className="text-xl font-medium">Filters</h2>
+          <button onClick={onClose} aria-label="Close filters" autoFocus>
+            <FiX size={22} />
+          </button>
+        </div>
 
-          {/* Property Type Status */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            {[
-              { k: "forSale", l: "For Sale", i: Images.forSale },
-              { k: "sold", l: "Sold", i: Images.sold },
-              { k: "expired", l: "Expired", i: Images.expired },
-            ].map((s) => (
-              <button
-                key={s.k}
-                onClick={() => {
-                  if ((s.k === "sold" || s.k === "expired") && !isLoggedIn) {
-                    setOpenLogin(true);
-                    return;
-                  }
-                  setStatus(s.k);
-                }}
-                className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition ${
-                  status === s.k
-                    ? "bg-[#7c7c7c33] border-[#0F0F0F33]"
-                    : "border-[#0F0F0F33]"
-                }`}
-              >
-                <Image src={s.i} width={36} height={36} alt={s.l} />
-                <span className="text-sm font-medium">{s.l}</span>
-              </button>
-            ))}
-          </div>
-          <LineGradient />
-
-          {/* Location */}
-          <div className="mb-6 space-y-2 flex flex-col gap-y-1">
-            <label className="font-medium">Location</label>
-            <select
-              value={location || ""}
-              onChange={(e) => setLocation(e.target.value as string)}
-              className="w-full border border-[#33333333] rounded-xl px-2 py-2 focus:outline-none cursor-pointer text-sm"
+        {/* Property Type Status */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {[
+            { k: "forSale", l: "For Sale", i: Images.forSale },
+            { k: "sold", l: "Sold", i: Images.sold },
+            { k: "expired", l: "Expired", i: Images.expired },
+          ].map((s) => (
+            <button
+              key={s.k}
+              onClick={() => {
+                if ((s.k === "sold" || s.k === "expired") && !isLoggedIn) {
+                  setOpenLogin(true);
+                  return;
+                }
+                setStatus(s.k);
+              }}
+              className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition ${
+                status === s.k
+                  ? "bg-[#7c7c7c33] border-[#0F0F0F33]"
+                  : "border-[#0F0F0F33]"
+              }`}
             >
-              <option value="" disabled>
-                Select Location
+              <Image src={s.i} width={36} height={36} alt={s.l} />
+              <span className="text-sm font-medium">{s.l}</span>
+            </button>
+          ))}
+        </div>
+        <LineGradient />
+
+        {/* Location */}
+        <div className="mb-6 space-y-2 flex flex-col gap-y-1">
+          <label className="font-medium">Location</label>
+          <select
+            value={location || ""}
+            onChange={(e) => setLocation(e.target.value as string)}
+            className="w-full border border-[#33333333] rounded-xl px-2 py-2 focus:outline-none cursor-pointer text-sm"
+          >
+            <option value="" disabled>
+              Select Location
+            </option>
+            {[
+              "New Westminster",
+              "Vancouver",
+              "Surrey",
+              "White Rock",
+              "North Vancouver",
+              "Tsawwassen",
+              "Coquitlam",
+              "Burnaby",
+              "Port Moody",
+              "Maple Ridge",
+              "Richmond",
+              "Delta",
+              "Langley",
+              "Hope",
+              "Chilliwack",
+              "Abbotsford",
+              "Whistler",
+              "West Vancouver",
+              "Sechelt",
+              "Mission",
+              "Port Coquitlam",
+              "Agassiz",
+            ].map((item, idx) => (
+              <option key={idx} value={item}>
+                {item}
               </option>
-              {[
-                "New Westminster",
-                "Vancouver",
-                "Surrey",
-                "White Rock",
-                "North Vancouver",
-                "Tsawwassen",
-                "Coquitlam",
-                "Burnaby",
-                "Port Moody",
-                "Maple Ridge",
-                "Richmond",
-                "Delta",
-                "Langley",
-                "Hope",
-                "Chilliwack",
-                "Abbotsford",
-                "Whistler",
-                "West Vancouver",
-                "Sechelt",
-                "Mission",
-                "Port Coquitlam",
-                "Agassiz",
-              ].map((item, idx) => (
-                <option key={idx} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
-          <LineGradient />
+            ))}
+          </select>
+        </div>
+        <LineGradient />
 
-          {/* Price Range */}
-          <div className="md:mb-6 mb-3">
-            <h3 className="font-medium md:mb-3">Price Range</h3>
-            <div className="relative">
-              <PriceSlider
-                value={[price[0] ?? 1000, price[1] ?? 20000000]}
-                min={1000}
-                max={20000000}
-                step={2000}
-                onChange={(_, v) => setPrice(v as [number, number])}
-                disableSwap
-                valueLabelDisplay="auto"
-              />
+        {/* Price Range */}
+        <div className="md:mb-6 mb-3">
+          <h3 className="font-medium md:mb-3">Price Range</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[price[0] ?? 1000, price[1] ?? 20000000]}
+              min={1000}
+              max={20000000}
+              step={2000}
+              onChange={(_, v) => setPrice(v as [number, number])}
+              disableSwap
+              valueLabelDisplay="auto"
+            />
+          </div>
+
+          <div className="flex flex-row flex-wrap items-center mt-5 justify-between gap-x-0.5 sm:gap-4">
+            {/* Min */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Min Price
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <span className="text-secondary">$</span>
+                <span className="">{price[0]}</span>
+              </div>
             </div>
 
-            <div className="flex flex-row flex-wrap items-center mt-5 justify-between gap-x-0.5 sm:gap-4">
-              {/* Min */}
-              <div className="flex items-center gap-1 sm:gap-4 h-full">
-                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                  Min Price
-                </p>
-                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                  <span className="text-secondary">$</span>
-                  <span className="">{price[0]}</span>
-                </div>
-              </div>
+            {/* Divider */}
+            <LineGradient
+              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+              vr
+            />
 
-              {/* Divider */}
-              <LineGradient
-                customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
-                vr
-              />
-
-              {/* Max */}
-              <div className="flex items-center gap-1 sm:gap-4 h-full">
-                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                  Max Price
-                </p>
-                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                  {price[1] === 20000000 ? (
-                    <span className="">Max</span>
-                  ) : (
-                    <>
-                      <span className="text-secondary">$</span>
-                      <span className="">{price[1]}</span>
-                    </>
-                  )}
-                </div>
+            {/* Max */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Max Price
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                {price[1] === 20000000 ? (
+                  <span className="">Max</span>
+                ) : (
+                  <>
+                    <span className="text-secondary">$</span>
+                    <span className="">{price[1]}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
-          <LineGradient />
-          {/* Area Range */}
-          <div className="md:mb-6 mb-3">
-            <h3 className="font-medium md:mb-3">Area Range</h3>
-            <div className="relative">
-              <PriceSlider
-                value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
-                min={100}
-                max={15000}
-                step={100}
-                onChange={(_, v) => setSqft(v as [number, number])}
-                disableSwap
-                valueLabelDisplay="auto"
-              />
+        </div>
+        <LineGradient />
+        {/* Area Range */}
+        <div className="md:mb-6 mb-3">
+          <h3 className="font-medium md:mb-3">Area Range</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
+              min={100}
+              max={15000}
+              step={100}
+              onChange={(_, v) => setSqft(v as [number, number])}
+              disableSwap
+              valueLabelDisplay="auto"
+            />
+          </div>
+
+          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
+            {/* Min */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Min Sqft
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <span className="">{sqft[0]}</span>
+                <span className="text-secondary">sqft</span>
+              </div>
             </div>
 
-            <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
-              {/* Min */}
-              <div className="flex items-center gap-1 sm:gap-4 h-full">
-                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                  Min Sqft
-                </p>
-                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                  <span className="">{sqft[0]}</span>
-                  <span className="text-secondary">sqft</span>
-                </div>
-              </div>
+            {/* Divider */}
+            <LineGradient
+              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+              vr
+            />
 
-              {/* Divider */}
-              <LineGradient
-                customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
-                vr
-              />
-
-              {/* Max */}
-              <div className="flex items-center gap-1 sm:gap-4 h-full">
-                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                  Max Sqft
-                </p>
-                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                  {sqft[1] === 15000 ? (
-                    <span className="">Max</span>
-                  ) : (
-                    <>
-                      <span className="">{sqft[1]}</span>
-                      <span className="text-secondary">sqft</span>
-                    </>
-                  )}
-                </div>
+            {/* Max */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Max Sqft
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                {sqft[1] === 15000 ? (
+                  <span className="">Max</span>
+                ) : (
+                  <>
+                    <span className="">{sqft[1]}</span>
+                    <span className="text-secondary">sqft</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
-          <LineGradient />
+        </div>
+        <LineGradient />
 
-          {/* Property Info */}
-          <div className="mb-6 border-[#33333333] pt-5">
-            <h3 className="font-medium mb-4">Property Info</h3>
+        {/* Property Info */}
+        <div className="mb-6 border-[#33333333] pt-5">
+          <h3 className="font-medium mb-4">Property Info</h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {["Bedrooms", "Bathroom"].map((label, idx) => {
-                const value = idx === 0 ? bedrooms : bathrooms;
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {["Bedrooms", "Bathroom"].map((label, idx) => {
+              const value = idx === 0 ? bedrooms : bathrooms;
 
-                return (
-                  <div
-                    key={label}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="text-sm">{label}</span>
+              return (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-sm">{label}</span>
 
-                    <div className="flex items-center gap-3 border border-[rgba(15,15,15,0.12)] rounded-xl px-3 py-2">
-                      <button
-                        className="w-7 h-7 rounded-lg bg-[#30548729]"
-                        onClick={() => {
-                          const setter = idx === 0 ? setBedrooms : setBathrooms;
-                          const current = value ?? 0;
-                          if (current === 1) setter(null);
-                          else if (current > 1) setter(current - 1);
-                        }}
-                      >
-                        −
-                      </button>
+                  <div className="flex items-center gap-3 border border-[rgba(15,15,15,0.12)] rounded-xl px-3 py-2">
+                    <button
+                      className="w-7 h-7 rounded-lg bg-[#30548729]"
+                      onClick={() => {
+                        const setter = idx === 0 ? setBedrooms : setBathrooms;
+                        const current = value ?? 0;
+                        if (current === 1) setter(null);
+                        else if (current > 1) setter(current - 1);
+                      }}
+                    >
+                      −
+                    </button>
 
-                      <span className="text-sm min-w-6 text-center">
-                        {value ?? "any"}
-                      </span>
+                    <span className="text-sm min-w-6 text-center">
+                      {value ?? "any"}
+                    </span>
 
-                      <button
-                        className="w-7 h-7 rounded-lg bg-[#30548729]"
-                        onClick={() => {
-                          const setter = idx === 0 ? setBedrooms : setBathrooms;
-                          const current = value ?? 0;
-                          setter(current + 1);
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
+                    <button
+                      className="w-7 h-7 rounded-lg bg-[#30548729]"
+                      onClick={() => {
+                        const setter = idx === 0 ? setBedrooms : setBathrooms;
+                        const current = value ?? 0;
+                        setter(current + 1);
+                      }}
+                    >
+                      +
+                    </button>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
+        </div>
 
-          <LineGradient />
+        <LineGradient />
 
-          {/* Features */}
-          {/* <div className="mb-6  border-[#33333333] pt-5">
+        {/* Features */}
+        {/* <div className="mb-6  border-[#33333333] pt-5">
             <h3 className="font-bold mb-5">Features</h3>
             <div className="grid grid-cols-3 gap-4">
               {[
@@ -427,8 +413,8 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
           </div>
           <LineGradient /> */}
 
-          {/* Extra Features */}
-          {/* <div className="border-[#33333333] pt-2">
+        {/* Extra Features */}
+        {/* <div className="border-[#33333333] pt-2">
             <h3 className="font-medium mb-4">Features</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {[
@@ -448,31 +434,30 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
               ))}
             </div> */}
 
-          {/* Bottom single item */}
-          {/* <div className="mt-4 mb-5 ">
+        {/* Bottom single item */}
+        {/* <div className="mt-4 mb-5 ">
               <div className="flex items-center justify-center gap-2 px-3 py-3 border border-[rgba(15,15,15,0.12)] rounded-xl text-gray-400 text-xs">
                 <Image src={Icons.star} alt="" width={16} height={16} />
                 <span>Must Be on Favorites list</span>
               </div>
             </div>
           </div> */}
-          {/* <LineGradient /> */}
+        {/* <LineGradient /> */}
 
-          {/* Bottom Buttons */}
-          <div className="md:py-6 py-4 mt-2 border-[#0F0F0F1F] flex gap-4 sticky bottom-0 bg-background">
-            <CustomButton
-              buttonType="secondary"
-              label="Apply Filter"
-              customClasses="w-1/2"
-              onClick={handleApplyFilter}
-            />
-            <CustomButton
-              buttonType="disabled"
-              label="Clear All"
-              customClasses="w-1/2"
-              onClick={handleClearAll}
-            />
-          </div>
+        {/* Bottom Buttons */}
+        <div className="md:py-6 py-4 mt-2 border-[#0F0F0F1F] flex gap-4 sticky bottom-0 bg-background">
+          <CustomButton
+            buttonType="secondary"
+            label="Apply Filter"
+            customClasses="w-1/2"
+            onClick={handleApplyFilter}
+          />
+          <CustomButton
+            buttonType="disabled"
+            label="Clear All"
+            customClasses="w-1/2"
+            onClick={handleClearAll}
+          />
         </div>
       </div>
     </Dialog>

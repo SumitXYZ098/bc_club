@@ -72,7 +72,7 @@ export default function PropertiesListingPage() {
   const params: any = {
     "pagination[page]": page,
     "pagination[pageSize]": pageSize,
-    "filters[property_status][$notIn]": ["Expired"],
+    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
     "filters[property_sub_type][$notNull]": true,
     "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
@@ -209,7 +209,7 @@ export default function PropertiesListingPage() {
   };
 
   return (
-    <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
+    <div className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
       <div className="h-full mt-24">
         {(isWishlistPage ||
           (status && (status === "sold" || status === "expired"))) &&
@@ -297,94 +297,129 @@ export default function PropertiesListingPage() {
 
                 {/* Filters */}
                 {pathName === "/properties" && (
-                  <div className="flex justify-between items-center gap-4 flex-nowrap mb-6">
-                    <button
-                      onClick={() => setOpenFilters(true)}
-                      className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer xl:w-3/5 w-full"
-                    >
-                      {/* <FiFilter size={18} className="text-blue-600" /> */}
-                      <FilterListIcon sx={{ color: "#305487" }} />
-                      <span className="font-medium">Filters</span>
-                    </button>
+                  <div className="flex flex-wrap justify-between items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full">
+                    <div className="flex flex-row justify-between items-center gap-4 w-full xl:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenFilters(true);
+                        }}
+                        className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer w-full xl:w-fit"
+                      >
+                        <FilterListIcon sx={{ color: "#305487" }} />
+                        <span className="font-medium">Filters</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          clearFilters();
+                        }}
+                        className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
+                          activePrice !== "any" ||
+                          activeBedRoom !== "any" ||
+                          activeBathRoom !== "any" ||
+                          activeProperty !== "any" ||
+                          filters.status ||
+                          (filters.minPrice !== undefined &&
+                            filters.minPrice > 1000) ||
+                          (filters.maxPrice !== undefined &&
+                            filters.maxPrice < 20000000) ||
+                          (filters.minSqft !== undefined &&
+                            filters.minSqft > 100) ||
+                          (filters.maxSqft !== undefined &&
+                            filters.maxSqft < 15000) ||
+                          filters.location
+                            ? "bg-primary text-white"
+                            : "bg-white"
+                        }`}
+                      >
+                        <FiX size={16} />
+                        <span className="font-medium">Reset Filters</span>
+                      </button>
+                    </div>
 
                     {/* Price */}
-                    <FilterPillSelect
-                      label="Price"
-                      value={activePrice}
-                      onChange={setActivePrice}
-                      pillBase={pillBase}
-                      pillActive={pillActive}
-                      pillInactive={pillInactive}
-                      options={[
-                        { label: "Any", value: "any" },
-                        { label: "Low to High", value: "asc" },
-                        { label: "High to Low", value: "desc" },
-                      ]}
-                    />
+                    <div className="w-full flex flex-row xs:flex-nowrap flex-wrap justify-between items-center gap-4">
+                      <FilterPillSelect
+                        label="Price"
+                        value={activePrice}
+                        onChange={setActivePrice}
+                        pillBase={pillBase}
+                        pillActive={pillActive}
+                        pillInactive={pillInactive}
+                        options={[
+                          { label: "Any", value: "any" },
+                          { label: "Low to High", value: "asc" },
+                          { label: "High to Low", value: "desc" },
+                        ]}
+                      />
 
-                    {/* BedRoom */}
-                    <FilterPillSelect
-                      label="BedRoom"
-                      value={activeBedRoom}
-                      onChange={setActiveBedRoom}
-                      pillBase={pillBase}
-                      pillActive={pillActive}
-                      pillInactive={pillInactive}
-                      options={[
-                        { label: "Any", value: "any" },
-                        { label: "1", value: "1" },
-                        { label: "2", value: "2" },
-                        { label: "3", value: "3" },
-                        { label: "4+", value: "4" },
-                      ]}
-                    />
+                      {/* BedRoom */}
+                      <FilterPillSelect
+                        label="BedRoom"
+                        value={activeBedRoom}
+                        onChange={setActiveBedRoom}
+                        pillBase={pillBase}
+                        pillActive={pillActive}
+                        pillInactive={pillInactive}
+                        options={[
+                          { label: "Any", value: "any" },
+                          { label: "1", value: "1" },
+                          { label: "2", value: "2" },
+                          { label: "3", value: "3" },
+                          { label: "4+", value: "4" },
+                        ]}
+                      />
+                    </div>
+                    <div className="w-full flex flex-row sm:flex-nowrap flex-wrap justify-between items-center gap-4">
+                      {/* BathRoom */}
+                      <FilterPillSelect
+                        label="BathRoom"
+                        value={activeBathRoom}
+                        onChange={setActiveBathRoom}
+                        pillBase={pillBase}
+                        pillActive={pillActive}
+                        pillInactive={pillInactive}
+                        options={[
+                          { label: "Any", value: "any" },
+                          { label: "1", value: "1" },
+                          { label: "2", value: "2" },
+                          { label: "3", value: "3" },
+                          { label: "4+", value: "4" },
+                        ]}
+                      />
 
-                    {/* BathRoom */}
-                    <FilterPillSelect
-                      label="BathRoom"
-                      value={activeBathRoom}
-                      onChange={setActiveBathRoom}
-                      pillBase={pillBase}
-                      pillActive={pillActive}
-                      pillInactive={pillInactive}
-                      options={[
-                        { label: "Any", value: "any" },
-                        { label: "1", value: "1" },
-                        { label: "2", value: "2" },
-                        { label: "3", value: "3" },
-                        { label: "4+", value: "4" },
-                      ]}
-                    />
-
-                    {/* Property Type */}
-                    <FilterPillSelect
-                      label="Property Type"
-                      value={activeProperty}
-                      onChange={setActiveProperty}
-                      pillBase={pillBase}
-                      pillActive={pillActive}
-                      pillInactive={pillInactive}
-                      options={[
-                        { label: "Any", value: "any" },
-                        { label: "Apartment/Condo", value: "Apartment/Condo" },
-                        {
-                          label: "Single Family Residence",
-                          value: "Single Family Residence",
-                        },
-                        { label: "Townhouse", value: "Townhouse" },
-                        { label: "Half Duplex", value: "Half Duplex" },
-                        {
-                          label: "Row House (Non-Strata)",
-                          value: "Row House (Non-Strata)",
-                        },
-                      ]}
-                    />
-
+                      {/* Property Type */}
+                      <FilterPillSelect
+                        label="Property Type"
+                        value={activeProperty}
+                        onChange={setActiveProperty}
+                        pillBase={pillBase}
+                        pillActive={pillActive}
+                        pillInactive={pillInactive}
+                        options={[
+                          { label: "Any", value: "any" },
+                          {
+                            label: "Apartment/Condo",
+                            value: "Apartment/Condo",
+                          },
+                          {
+                            label: "Single Family Residence",
+                            value: "Single Family Residence",
+                          },
+                          { label: "Townhouse", value: "Townhouse" },
+                          { label: "Half Duplex", value: "Half Duplex" },
+                          {
+                            label: "Row House (Non-Strata)",
+                            value: "Row House (Non-Strata)",
+                          },
+                        ]}
+                      />
+                    </div>
                     <button
                       onClick={() => {
                         clearFilters();
                       }}
-                      className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
+                      className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
                         activePrice !== "any" ||
                         activeBedRoom !== "any" ||
                         activeBathRoom !== "any" ||
@@ -498,8 +533,8 @@ export default function PropertiesListingPage() {
                       />
                     </div>
 
-                    <div className="xl:w-[64%] w-full flex flex-col">
-                      <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
+                    <div className="xl:w-[64%] w-full flex flex-col h-full">
+                      <div className=" gap-7 grid grid-cols-1 md:grid-cols-2 justifyjustify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
                         {data.map((property: any) => (
                           <PropertiesCard
                             key={property.id}
@@ -537,6 +572,6 @@ export default function PropertiesListingPage() {
       </div>
 
       <FiltersPopup open={openFilters} onClose={() => setOpenFilters(false)} />
-    </section>
+    </div>
   );
 }

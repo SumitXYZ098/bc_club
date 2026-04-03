@@ -17,7 +17,7 @@ import { useAuthContext } from "../auth/AuthContext";
 
 const tabList = [
   "Newly Listed properties",
-  "Expired Properties",
+  "Previously Listed Properties",
   "Sold properties",
 ];
 
@@ -51,7 +51,7 @@ const OurProperty = () => {
 
   const refs = {
     "Newly Listed properties": useRef<HTMLDivElement>(null),
-    "Expired Properties": useRef<HTMLDivElement>(null),
+    "Previously Listed Properties": useRef<HTMLDivElement>(null),
     "Sold properties": useRef<HTMLDivElement>(null),
   };
 
@@ -104,7 +104,11 @@ const OurProperty = () => {
 
   const { data: newList = [], isLoading: isLoadingNew } = useGetListings(
     {
-      "filters[property_status][$notIn]": ["Expired"],
+      "filters[property_status][$notIn]": [
+        "Expired",
+        "Terminated",
+        "Cancelled",
+      ],
       "filters[raw_data][BCRES_SoldDate][$null]": true,
       "filters[property_sub_type][$notNull]": true,
     },
@@ -127,7 +131,7 @@ const OurProperty = () => {
   const { data: expiredList = [], isLoading: isLoadingExpired } =
     useGetListings(
       {
-        "filters[property_status][$eq]": "Expired",
+        "filters[property_status][$eq]": ["Expired", "Terminated", "Cancelled"],
       },
       {
         select: (res: any) =>
@@ -182,7 +186,7 @@ const OurProperty = () => {
       />
 
       {/* Tab  */}
-      <div className="xl:mt-13 md:mt-6 mt-4 w-full flex items-center-safe justify-between flex-col gap-y-2 md:flex-row xl:pr-16 md:pr-13 pr-6 ">
+      <div className="xl:mt-13 md:mt-6 mt-4 w-full flex items-center-safe justify-between flex-col gap-y-2 md:flex-row">
         <div className="w-full md:w-[70%] xl:w-[60%] flex flex-nowrap flex-row h-auto shadow-[0_0_20px_0_rgba(0,0,0,0.12)] gap-x-2 rounded-xl p-2">
           {tabList.map((item, idx) => (
             <CustomButton
@@ -228,11 +232,14 @@ const OurProperty = () => {
           {renderSlider(newList, isLoadingNew, true, false, false)}
         </div>
 
-        <div ref={refs["Expired Properties"]} className="flex flex-col gap-4">
+        <div
+          ref={refs["Previously Listed Properties"]}
+          className="flex flex-col gap-4"
+        >
           <Heading
             tagType="h3"
             type={IHeadingTypes.heading20}
-            content="Expired Properties"
+            content="Previously Listed Properties"
           />
           {renderSlider(expiredList, isLoadingExpired, isLoggedIn, false, true)}
         </div>
