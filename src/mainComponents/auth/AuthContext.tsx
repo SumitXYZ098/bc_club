@@ -28,8 +28,8 @@ interface AuthContextType {
   resetToken: string;
   setResetToken: (token: string) => void;
   isLoggedIn: boolean;
-  username: string;
-  loginUser: (username: string, token?: string, keepLoggedIn?: boolean) => void;
+  username: any;
+  loginUser: (username: any, token?: string, keepLoggedIn?: boolean) => void;
   logoutUser: () => void;
 }
 
@@ -60,15 +60,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const userCookie = Cookies.get("username");
     if (userCookie || Cookies.get("token")) {
       setIsLoggedIn(true);
-      if (userCookie) setUsername(userCookie);
+      if (userCookie) {
+        try {
+          setUsername(JSON.parse(userCookie));
+        } catch (error) {
+          setUsername(userCookie);
+        }
+      }
     }
   }, []);
 
-  const loginUser = (user: string, token?: string, keepLoggedIn?: boolean) => {
+  const loginUser = (user: any, token?: string, keepLoggedIn?: boolean) => {
     setIsLoggedIn(true);
     setUsername(user);
     const options = keepLoggedIn ? { expires: 30 } : undefined;
-    Cookies.set("username", user, options);
+    Cookies.set("username", JSON.stringify(user), options);
     if (token) Cookies.set("token", token, options);
   };
 

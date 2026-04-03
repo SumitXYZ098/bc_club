@@ -154,7 +154,7 @@ const Header = () => {
                   </svg>
                 </div>
                 <span className="text-primary font-bold uppercase">
-                  {username}
+                  {username && username?.fullName}
                 </span>
               </div>
               <div

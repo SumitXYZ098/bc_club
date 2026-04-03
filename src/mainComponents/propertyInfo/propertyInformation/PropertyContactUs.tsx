@@ -12,9 +12,11 @@ import {
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import BookingDialog from "./BookingDialog";
 
 const PropertyContactUs = ({ property }: { property: any }) => {
+  const [open, setOpen] = useState(false);
   return (
     <div className="w-full flex flex-col gap-y-4 p-6 border border-borderColor rounded-2xl ">
       <div className="flex items-center gap-x-1.5">
@@ -53,13 +55,25 @@ const PropertyContactUs = ({ property }: { property: any }) => {
             </Link>
           </div>
         </div>
-        <button className="px-4 py-2.5 border border-primary rounded-md text-primary text-base font-bold cursor-pointer">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="px-4 py-2.5 border border-primary rounded-md text-primary text-base font-bold cursor-pointer"
+        >
           Request a showing
         </button>
-        <Link href={'tel:0123456789'} className="px-4 py-2.5 text-center text-base font-bold bg-primary text-background rounded-md">
+        <Link
+          href={"tel:0123456789"}
+          className="px-4 py-2.5 text-center text-base font-bold bg-primary text-background rounded-md"
+        >
           Call Now
         </Link>
       </div>
+      <BookingDialog
+        property={property}
+        onClose={() => setOpen(false)}
+        open={open}
+      />
     </div>
   );
 };

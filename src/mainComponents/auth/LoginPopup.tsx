@@ -51,14 +51,8 @@ const LoginPopup = ({
         identifier: data.email,
         password: data.password,
       });
-      const userStr = data.email.split("@")[0].toUpperCase();
-      const actualUsername =
-        response?.user?.fullName ||
-        response?.user?.username ||
-        response?.username ||
-        userStr;
       loginUser(
-        actualUsername.toUpperCase(),
+        response.user,
         response?.jwt || response?.token,
         data.keepLoggedIn,
       );
@@ -93,13 +87,7 @@ const LoginPopup = ({
 
       if (data.message && data.token) {
         localStorage.setItem("token", data.token);
-        const userStr = data.email?.split("@")[0]?.toUpperCase() || "USER";
-        const actualUsername =
-          data?.user?.fullName ||
-          data.user?.username ||
-          data.username ||
-          userStr;
-        loginUser(actualUsername.toUpperCase(), data.token, false);
+        loginUser(data.user, data.token, false);
         onClose();
         toast.success("Login successful!");
       } else {
