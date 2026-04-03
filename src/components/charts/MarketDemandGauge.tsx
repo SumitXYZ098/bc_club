@@ -17,7 +17,7 @@ const describeArc = (
   cy: number,
   r: number,
   startAngle: number,
-  endAngle: number
+  endAngle: number,
 ) => {
   const start = polarToCartesian(cx, cy, r, startAngle);
   const end = polarToCartesian(cx, cy, r, endAngle);
@@ -100,19 +100,6 @@ const MarketDemandGauge: React.FC<MarketDemandGaugeProps> = ({ value }) => {
         })}
 
         {/* Needle */}
-        {/* <line
-          x1={100}
-          y1={100}
-          x2={100}
-          y2={42}
-          stroke={needleColor}
-          strokeWidth={4}
-          style={{
-            transformOrigin: "100px 100px",
-            transform: `rotate(${angle}deg)`,
-            transition: "transform 1s cubic-bezier(0.22, 1, 0.36, 1)",
-          }}
-        /> */}
         <path
           d="M96 100 L104 100 L101 52 L99 52 Z"
           fill={needleColor}

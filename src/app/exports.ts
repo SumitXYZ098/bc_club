@@ -34,6 +34,9 @@ const Icons = {
   vectorMap: "../vectorMap.svg",
   garage: "../garage.svg",
   calendar: "../calendar.svg",
+  grahp: "../grahp.svg",
+  upArrow: "../upArrow.svg",
+  downArrow: "../downArrow.svg",
 };
 
 const Images = {

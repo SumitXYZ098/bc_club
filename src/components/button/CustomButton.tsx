@@ -1,5 +1,6 @@
 "use client";
 import { ButtonProps } from "@mui/material";
+import Image from "next/image";
 import React from "react";
 
 interface CustomButtonProps extends ButtonProps {
@@ -13,6 +14,7 @@ interface CustomButtonProps extends ButtonProps {
     | "white-primary";
   customClasses?: string;
   disabled?: boolean;
+  startIcon?: string;
 }
 
 const getButtonStyle = (
@@ -21,7 +23,7 @@ const getButtonStyle = (
     | "secondary"
     | "disabled"
     | "secondary-outlined"
-    | "white-primary"
+    | "white-primary",
 ) => {
   switch (type) {
     case "primary":
@@ -45,15 +47,29 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   buttonType = "primary",
   customClasses,
   disabled,
+  startIcon,
+  onMouseEnter,
+  onMouseLeave,
 }) => {
   return (
     <button
-      className={` text-xs md:text-sm xl:text-base md:py-2.5 py-2.5 px-2.5 rounded-lg h-auto cursor-pointer ${getButtonStyle(
-        buttonType
+      className={`text-xs md:text-sm xl:text-base md:py-2.5 py-2.5 px-2.5 rounded-lg h-auto cursor-pointer ${getButtonStyle(
+        buttonType,
       )} ${customClasses}`}
       onClick={onClick}
       disabled={disabled}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
+      {startIcon && (
+        <Image
+          src={startIcon}
+          alt=""
+          width={100}
+          height={100}
+          className="md:w-6 md:h-6 w-4 h-4"
+        />
+      )}
       {label}
     </button>
   );

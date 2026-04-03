@@ -78,7 +78,8 @@ const HomePropertiesSold = () => {
           value={location}
           onChange={handleChange}
           sx={{
-            borderRadius: 10,
+            borderRadius: 3,
+            width: 180,
             "& .MuiOutlinedInput-notchedOutline , & .Mui-focused.MuiOutlinedInput-notchedOutline":
               {
                 borderWidth: "0 !important",
@@ -107,7 +108,7 @@ const HomePropertiesSold = () => {
                 {property.type}
               </h3>
               <div className="text-5xl font-bold text-primary mb-2">
-                {property.sold}+
+                {property.sold}
               </div>
               <div className="flex items-center gap-1">
                 <svg
@@ -160,7 +161,8 @@ const HomePropertiesSold = () => {
                     property.changePercent > 0 ? "text-green" : "text-red"
                   }`}
                 >
-                  {Math.abs(property.changePercent)}%
+                  {Math.abs(property.changePercent)}%{" "}
+                  {property.changePercent > 0 ? "More than" : "Less than"}
                 </span>
                 <span className="text-sm text-lightWhite">Last Year 2025</span>
               </div>

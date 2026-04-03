@@ -14,12 +14,12 @@ const SearchPropertyTab = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState<typeof dummyListings>(
-    []
+    [],
   );
   useEffect(() => {
     if (query.length > 1) {
       const filtered = dummyListings.filter((item) =>
-        item.address.toLowerCase().includes(query.toLowerCase())
+        item.address.toLowerCase().includes(query.toLowerCase()),
       );
       setFilteredResults(filtered);
       setShowDropdown(true);
@@ -51,7 +51,7 @@ const SearchPropertyTab = () => {
       </div>
       {activeTab === 0 && (
         <div
-          className={`border border-borderColor md:p-1.5 py-5 flex flex-row items-center justify-between relative  ${
+          className={`border border-borderColor md:p-1.5 p-1 flex flex-row items-center justify-between relative  ${
             showDropdown && filteredResults.length > 0
               ? "rounded-t-xl rounded-b-0"
               : "rounded-xl"
@@ -71,7 +71,7 @@ const SearchPropertyTab = () => {
               console.log("Search", search);
               setSearch("");
             }}
-            className="w-13 h-13 bg-secondary p-3.5 text-center flex items-center justify-center-safe rounded-xl cursor-pointer"
+            className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
           >
             <Image
               src={Icons.searchLine}
@@ -103,7 +103,7 @@ const SearchPropertyTab = () => {
       )}
       {activeTab === 1 && (
         <div
-          className={`border border-borderColor md:p-1.5 py-5 flex flex-row items-center justify-between relative  ${
+          className={`border border-borderColor md:px-1.5 p-1 flex flex-row items-center justify-between relative  ${
             showDropdown && filteredResults.length > 0
               ? "rounded-t-xl rounded-b-0"
               : "rounded-xl"
@@ -123,7 +123,7 @@ const SearchPropertyTab = () => {
               console.log("Search", search);
               setSearch("");
             }}
-            className="w-13 h-13 bg-secondary p-3.5 text-center flex items-center justify-center-safe rounded-xl cursor-pointer"
+            className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
           >
             <Image
               src={Icons.searchLine}

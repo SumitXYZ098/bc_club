@@ -1,9 +1,9 @@
 export const cities = [
   "Surrey, BC",
   "Vancouver, BC",
-  "Burnaby, BC",
-  "Coquitlam, BC",
-  "Langley, BC",
+  "Victoria, BC",
+  "Kelowna, BC",
+  "Prince George, BC",
 ];
 
 export interface PropertySoldData {
@@ -70,7 +70,7 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  "Burnaby, BC": [
+  "Victoria, BC": [
     {
       type: "Detached Homes",
       sold: 450,
@@ -97,7 +97,7 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  "Coquitlam, BC": [
+  "Kelowna, BC": [
     {
       type: "Detached Homes",
       sold: 390,
@@ -124,7 +124,7 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  "Langley, BC": [
+  "Prince George, BC": [
     {
       type: "Detached Homes",
       sold: 320,

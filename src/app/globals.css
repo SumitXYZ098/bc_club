@@ -149,6 +149,11 @@ body::-webkit-scrollbar {
   animation: popupSlide 0.3s ease-out;
 }
 
+.filter-secondary {
+  filter: invert(71%) sepia(85%) saturate(3025%) hue-rotate(6deg) brightness(101%)
+    contrast(101%);
+}
+
 .price-marker {
   background: #fff;
   padding: 6px 12px;
