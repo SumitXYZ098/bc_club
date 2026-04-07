@@ -20,6 +20,7 @@ import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 export const menulist = [
   { title: "Evaluation", href: "/home-estimation" },
   { title: "Market Trends", href: "/market-trends" },
+  { title: "Map Search", href: "/map-search" },
   { title: "Properties", href: "/properties" },
   { title: "Contact Us", href: "/contact-us" },
 ];
