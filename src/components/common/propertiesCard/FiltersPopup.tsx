@@ -154,7 +154,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
     >
       {/* Popup Content */}
       <div
-        className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-10 md:pt-6 p-4 pb-0 w-full scrollbar-transparent"
+        className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-6 md:pt-6 p-4 pb-0 w-full scrollbar-hide"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -363,6 +363,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
                         if (current === 1) setter(null);
                         else if (current > 1) setter(current - 1);
                       }}
+                      
                     >
                       −
                     </button>
@@ -445,7 +446,7 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
         {/* <LineGradient /> */}
 
         {/* Bottom Buttons */}
-        <div className="md:py-6 py-4 mt-2 border-[#0F0F0F1F] flex gap-4 sticky bottom-0 bg-background">
+        <div className="md:py-6 py-4 mt-2 border-[#0F0F0F1F] flex gap-4 sticky bottom-0 bg-background w-full">
           <CustomButton
             buttonType="secondary"
             label="Apply Filter"

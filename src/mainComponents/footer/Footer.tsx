@@ -9,7 +9,7 @@ import QuickLink from "./QuickLink";
 import { getCurrentYear } from "@/src/utilities/utilities";
 import NewsLetter from "./NewsLetter";
 import { usePathname } from "next/navigation";
-
+ 
 const Footer = () => {
   const pathName = usePathname();
   const currentYear = getCurrentYear();
@@ -91,8 +91,10 @@ const Footer = () => {
         </div>
       )}
 
+            {/* <LineGradient customClasses="bg-gradient-to-r from-white !to-white h-[2px] w-full" /> */}
+
       {/* CopyRight */}
-      <div className="w-full h-auto flex flex-col gap-y-1.5 md:flex-row justify-center md:justify-between items-center md:py-6 py-4 border-t border-white text-sm text-lightWhite text-center">
+      <div className="w-full h-auto flex flex-col gap-y-1.5 md:flex-row justify-center md:justify-between items-center md:py-6 py-4  text-sm text-lightWhite text-center border-t border-white">
         <span>
           &copy; {currentYear}, All Rights Reserved. Presented by Harjit Sidhu
           Personal Real Estate Corporation/

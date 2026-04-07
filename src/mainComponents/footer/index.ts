@@ -81,6 +81,10 @@ export const marketTrends: LinkListProps = {
       label: "Buyer vs Seller Market",
       href: "/Buyer vs Seller Market",
     },
+    {
+      label: "Map",
+      href: "/maps",
+    },
   ],
 };
 
