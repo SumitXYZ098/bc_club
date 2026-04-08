@@ -6,29 +6,28 @@ import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCar
 import { useGetListings } from "@/src/hooks/listing/useListingQueries";
 import { Images } from "@/src/app/exports";
 import { useListingStore } from "@/src/store/useListingStore";
-import { FiSearch, FiX, FiClock, FiPlus, FiMinus, FiMap, FiNavigation, FiLayers, FiMaximize, FiChevronDown, FiFilter } from "react-icons/fi";
+import { FiPlus, FiMinus, FiMap, FiNavigation, FiMaximize, FiChevronDown, FiFilter, FiLoader, FiCheck } from "react-icons/fi";
+import LineGradient from "@/src/components/common/lineGradient/LineGradient";
+import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
-// Green Circle Marker matching the screenshot
-function createPriceMarker(property: any) {
+// Marker Creator
+function createPriceMarker(property: any, onClick: () => void) {
   const el = document.createElement("div");
   el.className =
-    "price-marker flex items-center justify-center bg-[#58a65c] text-white font-bold text-[11px] rounded-full border-2 border-white shadow-md cursor-pointer hover:bg-[#4a8f4e] transition-all hover:scale-110";
-  el.style.width = "32px";
+    "price-marker flex items-center justify-center bg-[#58a65c] text-white font-bold text-[11px] rounded-full border-2 border-white shadow-md cursor-pointer hover:bg-[#4a8f4e] px-2 whitespace-nowrap";
+  
   el.style.height = "32px";
+  el.style.minWidth = "32px"; 
 
-  let shortLabel = "0";
-  if (property.price) {
-    if (property.price >= 1000000) {
-      shortLabel = Math.round(property.price / 1000000) + "M";
-    } else if (property.price >= 1000) {
-      const kVal = Math.round(property.price / 1000);
-      shortLabel = kVal > 999 ? "1M" : kVal.toString();
-    } else {
-      shortLabel = property.price.toString();
-    }
-  }
+  let fullPrice = property.price ? "$" + Number(property.price).toLocaleString() : "$0";
+  el.innerText = fullPrice;
 
-  el.innerText = shortLabel;
+  el.addEventListener("click", (e) => {
+    e.stopPropagation();
+    onClick();
+  });
+
   return el;
 }
 
@@ -36,27 +35,67 @@ export default function MapSearch() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapboxMap | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [sortBy, setSortBy] = useState("newest");
   const [visibleProperties, setVisibleProperties] = useState<any[]>([]);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  const { filters, updateFilter } = useListingStore();
-  const { search = "", location = "", status = "forSale", activePrice = "any", activeProperty = "any" } = filters;
+  // States for Custom Sort Dropdown
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortRef = useRef<HTMLDivElement>(null);
 
-  const setStatus = (val: string) => updateFilter("status", val);
-  const setActiveProperty = (val: string) => updateFilter("activeProperty", val);
+  const { getInstanceFilters, updateInstanceFilter } = useListingStore();
+  const filters = getInstanceFilters("map");
+  const { 
+    search = "", location = "", status = "forSale", activeProperty = "any",
+    minPrice, maxPrice, minSqft, maxSqft, activeBedRoom, activeBathRoom
+  } = filters;
 
-  const [commuteLocation, setCommuteLocation] = useState("");
-  const [commuteTime, setCommuteTime] = useState("10");
+  const setActiveProperty = (val: string) => updateInstanceFilter("map", "activeProperty", val);
 
+  // Close custom dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+        setIsSortOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const sortOptions = [
+    { label: "Newest First", value: "newest" },
+    { label: "Price: Low to High", value: "priceLow" },
+    { label: "Price: High to Low", value: "priceHigh" },
+  ];
+
+  const currentSortLabel = sortOptions.find(o => o.value === sortBy)?.label;
+
+  // API Params Logic
   const params: any = {
     "pagination[page]": 1,
     "pagination[pageSize]": 100,
     search: search,
+    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
+    "filters[property_sub_type][$notNull]": true,
+    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
-  if (status && status !== "any") params.propertyType = status;
-  if (location && location !== "") params.location = location;
-  if (activePrice && activePrice !== "any") params.price = activePrice;
+  if (status && status !== "any") {
+    params.propertyType = status;
+    delete params["filters[property_status][$notIn]"];
+    delete params["filters[raw_data][BCRES_SoldDate][$null]"];
+    delete params["filters[property_sub_type][$notNull]"];
+  }
+
+  if (location && location !== "" && location !== "British Columbia") params.location = location;
+  if (minPrice !== undefined) params.minPrice = minPrice;
+  if (maxPrice !== undefined && maxPrice !== 20000000) params.maxPrice = maxPrice;
+  if (minSqft !== undefined) params.minSqft = minSqft;
+  if (maxSqft !== undefined && maxSqft !== 15000) params.maxSqft = maxSqft;
+  if (activeBedRoom && activeBedRoom !== "any") params.bedrooms = activeBedRoom.replace("+", "");
+  if (activeBathRoom && activeBathRoom !== "any") params.bathrooms = activeBathRoom.replace("+", "");
+  if (activeProperty && activeProperty !== "any") params.type = activeProperty;
 
   const { data: queryData, isLoading } = useGetListings(params, {
     select: (res: any) => {
@@ -71,23 +110,24 @@ export default function MapSearch() {
           sqft: listing?.area ?? 0,
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
-          longitude: Number(listing.longitude),
-          latitude: Number(listing.latitude),
+          longitude: Number(listing.longitude || listing.Longitude || listing.raw_data?.Longitude || (listing.coordinates && listing.coordinates[0])),
+          latitude: Number(listing.latitude || listing.Latitude || listing.raw_data?.Latitude || (listing.coordinates && listing.coordinates[1])),
           isLogin: true
-        })).filter((l: any) => !isNaN(l.longitude) && !isNaN(l.latitude));
+        })).filter((l: any) => !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0);
     },
   });
 
   const properties = queryData || [];
 
+  // Initialize Map
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
     if (!mapContainerRef.current || mapRef.current) return;
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      center: [-79.38, 43.65],
-      zoom: 8,
+      center: [-123.1207, 49.2827],
+      zoom: 10,
       style: "mapbox://styles/mapbox/light-v11",
     });
 
@@ -97,15 +137,51 @@ export default function MapSearch() {
     return () => { map.remove(); mapRef.current = null; };
   }, []);
 
+  // Sync Map with Location Filter
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current || !properties.length) return;
+    if (!mapLoaded || !mapRef.current || !location) return;
+
+    const cityCoords: { [key: string]: [number, number] } = {
+      "Vancouver": [-123.1207, 49.2827],
+      "Burnaby": [-122.9805, 49.2488],
+      "Surrey": [-122.8490, 49.1913],
+      "Richmond": [-123.1336, 49.1666],
+      "Coquitlam": [-122.7722, 49.2838],
+      "Victoria": [-123.3656, 48.4284],
+      "Kelowna": [-119.4960, 49.8880],
+      "Abbotsford": [-122.3275, 49.0504],
+    };
+
+    const coords = cityCoords[location];
+
+    if (coords) {
+      mapRef.current.flyTo({ center: coords, zoom: 11, essential: true });
+    } else if (properties.length > 0 && location !== "British Columbia") {
+      mapRef.current.flyTo({
+        center: [properties[0].longitude, properties[0].latitude],
+        zoom: 11,
+        essential: true
+      });
+    }
+  }, [location, mapLoaded]);
+
+  // Update Markers and visible list with sorting
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current) return;
     const map = mapRef.current;
 
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
     properties.forEach((property: any) => {
-      const markerEl = createPriceMarker(property);
+      const markerEl = createPriceMarker(property, () => {
+        map.flyTo({
+          center: [property.longitude, property.latitude],
+          zoom: 16,
+          essential: true,
+        });
+      });
+
       const marker = new mapboxgl.Marker(markerEl)
         .setLngLat([property.longitude, property.latitude])
         .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`))
@@ -116,43 +192,46 @@ export default function MapSearch() {
     const updateVisibleProperties = () => {
       const bounds = map.getBounds();
       if (!bounds) return;
-      setVisibleProperties(properties.filter((p: any) => bounds.contains([p.longitude, p.latitude])));
+      let visible = properties.filter((p: any) => bounds.contains([p.longitude, p.latitude]));
+
+      if (sortBy === "priceLow") {
+        visible.sort((a: any, b: any) => a.price - b.price);
+      } else if (sortBy === "priceHigh") {
+        visible.sort((a: any, b: any) => b.price - a.price);
+      } else if (sortBy === "newest") {
+        visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
+      }
+
+      setVisibleProperties(visible);
     };
 
     map.on("moveend", updateVisibleProperties);
     updateVisibleProperties();
     return () => { map.off("moveend", updateVisibleProperties); };
-  }, [mapLoaded, properties]);
+  }, [mapLoaded, properties, sortBy]);
+
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
     <div className="w-full h-screen flex flex-col bg-white overflow-hidden mt-20">
       
-      {/* 1. TOP FILTER BAR (Exact Design) */}
+      {/* 1. TOP FILTER BAR */}
       <div className="z-30 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-1 border border-gray-300 rounded px-3 py-1.5 text-sm font-normal text-gray-700 cursor-pointer hover:bg-gray-50">
+        <FiltersPopup id="map" open={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+        
+        <div onClick={() => setIsFilterOpen(true)} className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer w-full xl:w-fit">
+          <FilterListIcon sx={{ color: "#305487" }} /> Filters
+        </div>
+
+        <div className="flex items-center gap-1 border border-gray-300 rounded px-3 py-1.5 text-sm font-normal text-gray-700 cursor-pointer hover:bg-gray-50 shrink-0">
           For Sale <FiChevronDown className="text-gray-400 ml-1" />
         </div>
 
-        <div className="flex items-center gap-1 border border-gray-300 rounded px-3 py-1.5 text-sm font-normal text-gray-700 cursor-pointer hover:bg-gray-50">
+        <div className="flex items-center gap-1 border border-gray-300 rounded px-3 py-1.5 text-sm font-normal text-gray-700 cursor-pointer hover:bg-gray-50 shrink-0">
           $ Price <FiChevronDown className="text-gray-400 ml-1" />
         </div>
 
-        <div className="flex items-center gap-1 border border-gray-300 rounded px-3 py-1.5 text-sm font-normal text-gray-700 cursor-pointer hover:bg-gray-50">
-          Beds & Baths <FiChevronDown className="text-gray-400 ml-1" />
-        </div>
-
-        <div className="flex bg-[#f3f4f6] rounded border p-1">
-          <button onClick={() => setStatus("forSale")} className={`px-4 py-1 text-sm font-bold transition rounded ${status === "forSale" ? "bg-primary text-white" : "text-gray-500"}`}>Active</button>
-          <button onClick={() => setStatus("any")} className={`flex items-center gap-1 px-4 py-1 text-sm font-bold transition rounded ${status === "any" ? "bg-primary text-white" : "text-gray-500"}`}>All <FiChevronDown className="text-[10px]" /></button>
-          <button onClick={() => setStatus("sold")} className={`px-4 py-1 text-sm font-bold transition rounded ${status === "sold" ? "bg-gray-400 text-white" : "text-gray-500"}`}>Sold</button>
-        </div>
-
-        <button className="px-4 py-1.5 border border-gray-300 rounded text-sm font-normal text-gray-700 bg-white">De-Listed</button>
-        <button className="px-4 py-1.5 border border-primary bg-primary text-white rounded text-sm font-bold">Price Changed</button>
-
-        <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded text-sm font-normal text-gray-700 cursor-pointer">
-          <FiClock className="text-gray-500" /> Travel Time
-        </div>
+        <button className="px-4 py-1.5 border border-primary bg-primary text-white rounded text-sm font-bold shrink-0">Price Changed</button>
 
         <div className="relative min-w-[180px]">
           <select value={activeProperty} onChange={(e) => setActiveProperty(e.target.value)} className="w-full appearance-none bg-white border border-gray-300 rounded px-4 py-1.5 text-sm font-normal outline-none cursor-pointer pr-8">
@@ -161,74 +240,98 @@ export default function MapSearch() {
           </select>
           <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
         </div>
-
-        <div className="ml-auto flex items-center gap-3">
-           <FiMaximize className="text-gray-500 cursor-pointer w-5 h-5" />
-           <FiFilter className="text-gray-500 cursor-pointer w-5 h-5" />
-           <button className="px-4 py-1.5 border border-gray-300 rounded text-sm font-bold bg-white shadow-sm">List view</button>
-        </div>
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         
         {/* 2. SIDEBAR - LEFT */}
-        <div className="w-[440px] flex flex-col bg-white border-r border-gray-200">
-          <div className="p-4 border-b flex justify-between items-center text-sm font-semibold">
-            <div className="text-gray-500 uppercase tracking-tight">Results: <span className="text-black font-bold">{visibleProperties.length}/{properties.length}</span></div>
-            <div className="flex items-center gap-1 text-gray-800 cursor-pointer">
-              Sort by: <span className="text-black font-bold">New to Old</span> <FiChevronDown className="text-gray-400" />
+        <div className="w-110 flex flex-col bg-white border-r border-gray-200 z-10">
+          <div className="p-4 flex justify-between items-center text-sm font-semibold">
+            <div className="text-gray-500 ">
+              Results: <span className="text-black ">
+                {isLoading ? "..." : `${visibleProperties.length}/${properties.length}`}
+              </span>
+            </div>
+
+            {/* --- PREMIUM CUSTOM SORT DROPDOWN --- */}
+            <div className="flex items-center gap-2" ref={sortRef}>
+              <span className="text-gray-400 text-[15px] font-bold ">Sort by:</span>
+              <div className="relative min-w-[160px]">
+                <div 
+                  onClick={() => setIsSortOpen(!isSortOpen)}
+                  className={`flex items-center justify-between px-3 py-2 bg-white border rounded-lg cursor-pointer transition-all duration-200 ${isSortOpen ? "border-primary shadow-md" : "border-gray-200 hover:border-gray-300 shadow-sm"}`}
+                >
+                  <span className="text-gray-800 text-sm font-bold">{currentSortLabel}</span>
+                  <FiChevronDown className={`text-gray-400 transition-transform duration-300 ${isSortOpen ? "rotate-180 text-primary" : ""}`} size={16} />
+                </div>
+
+                {isSortOpen && (
+                  <div className="absolute right-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-[999] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="py-1">
+                      {sortOptions.map((opt) => (
+                        <div
+                          key={opt.value}
+                          onClick={() => {
+                            setSortBy(opt.value);
+                            setIsSortOpen(false);
+                          }}
+                          className={`flex items-center justify-between px-4 py-3 text-sm cursor-pointer transition-colors ${sortBy === opt.value ? "bg-primary/5 text-primary font-bold" : "text-gray-600 hover:bg-gray-50"}`}
+                        >
+                          {opt.label}
+                          {sortBy === opt.value && <FiCheck className="text-primary" size={14} />}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+          <LineGradient />
 
           <div className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar bg-[#f8f9fa]">
-            {visibleProperties.map((p) => (
-              <div key={p.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                <PropertiesCard {...p} isLogin />
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center h-64 space-y-3">
+                <FiLoader className="w-8 h-8 text-primary animate-spin" />
+                <p className="text-gray-500 text-sm font-medium">Fetching properties...</p>
               </div>
-            ))}
+            ) : visibleProperties.length > 0 ? (
+              visibleProperties.map((p) => (
+                <div key={p.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                  <PropertiesCard {...p} isLogin isSold={status === "sold"} isExpired={status === "expired"} />
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
+                No properties found in this area.
+              </div>
+            )}
           </div>
         </div>
 
         {/* 3. MAP AREA - RIGHT */}
         <div className="flex-1 relative">
           <div ref={mapContainerRef} className="w-full h-full" />
-
-          {/* COMMUTE SEARCH OVERLAY */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-[94%] max-w-[850px]">
-            <div className="bg-white p-1.5 rounded-full shadow-2xl border border-gray-200 flex items-center gap-2">
-              <div className="flex items-center gap-2 flex-1 px-4 border-r border-gray-100">
-                <FiSearch className="text-gray-400 w-5 h-5" />
-                <input type="text" placeholder="Enter a location to find commute time and ..." className="w-full bg-transparent outline-none text-[13px] py-1.5" />
-              </div>
-              <div className="flex items-center gap-3 px-2 border-r border-gray-100 text-[12px] font-bold text-gray-500">
-                <span className="uppercase ml-1">Mode:</span>
-                <span className="text-gray-400 text-lg">🚗</span>
-                <span className="text-[#58a65c] text-xl border-b-2 border-[#58a65c]">🚶</span>
-                <span className="text-gray-400 text-lg">🚲</span>
-                <span className="text-gray-400 text-lg">🚌</span>
-              </div>
-              <div className="flex items-center gap-2 px-2 border-r border-gray-100 text-[12px] font-bold text-gray-500">
-                <span className="uppercase">Time</span>
-                <span className="bg-gray-50 px-2.5 py-1 border rounded text-black font-bold">10</span>
-                <span className="text-gray-400">:Mins</span>
-              </div>
-              <button className="bg-white text-gray-800 px-6 py-2 rounded-full text-xs font-bold border border-gray-300 hover:bg-gray-50 transition uppercase tracking-wider">Calculate</button>
-              <button className="p-2 text-red-400 bg-red-50 rounded-full mr-1"><FiX /></button>
+          
+           {isLoading && (
+            <div className="absolute inset-0 bg-white/30 backdrop-blur-[1px] z-20 pointer-events-none flex items-start justify-center pt-10">
+               <div className="bg-white px-4 py-2 rounded-full shadow-md border flex items-center gap-2">
+                  <FiLoader className="animate-spin text-primary" />
+                  <span className="text-xs font-bold text-gray-600">Updating Map...</span>
+               </div>
             </div>
-          </div>
+          )}
 
           {/* FLOATING MAP TOOLS */}
           <div className="absolute right-4 top-4 flex flex-col gap-2 z-10">
             <div className="flex flex-col bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden">
-               <button className="p-2.5 border-b hover:bg-gray-50" onClick={() => mapRef.current?.zoomIn()}><FiPlus className="w-5 h-5 text-gray-600" /></button>
-               <button className="p-2.5 hover:bg-gray-50" onClick={() => mapRef.current?.zoomOut()}><FiMinus className="w-5 h-5 text-gray-600" /></button>
+                <button className="p-2.5 border-b hover:bg-gray-50" onClick={() => mapRef.current?.zoomIn()}><FiPlus className="w-5 h-5 text-gray-600" /></button>
+                <button className="p-2.5 hover:bg-gray-50" onClick={() => mapRef.current?.zoomOut()}><FiMinus className="w-5 h-5 text-gray-600" /></button>
             </div>
             <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50"><FiMap className="w-5 h-5 text-gray-600" /></button>
             <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50"><FiNavigation className="w-5 h-5 text-gray-600" /></button>
             <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50"><FiMaximize className="w-5 h-5 text-gray-600" /></button>
-            <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50 text-[10px] font-bold text-gray-700">AUTO</button>
-            <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50 text-[14px] font-bold text-gray-700 underline">A</button>
           </div>
         </div>
       </div>

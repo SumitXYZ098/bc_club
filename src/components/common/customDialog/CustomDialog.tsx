@@ -36,6 +36,7 @@ export default function CustomDialog({
           },
           borderRadius: 5,
           margin: "24px",
+          
         },
       }}
     >

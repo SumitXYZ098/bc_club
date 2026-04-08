@@ -24,6 +24,7 @@ const LinkList: React.FC<LinkListProps> = ({ title, linkList }) => {
   );
 };
 
+
 const QuickLink = () => {
   return (
     <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-start justify-between gap-x-4 gap-y-6 xl:pt-2 xl:pb-7 md:pt-0 md:pb-5 pt-3 pb-6.5">

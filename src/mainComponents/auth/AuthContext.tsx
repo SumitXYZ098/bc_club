@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [resetToken, setResetToken] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
-  const { clearFilters } = useListingStore();
+  const { clearAllFilters } = useListingStore();
 
   useEffect(() => {
     const userCookie = Cookies.get("username");
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUsername("");
     Cookies.remove("username");
     Cookies.remove("token");
-    clearFilters();
+    clearAllFilters();
   };
 
   // OTP verified callback

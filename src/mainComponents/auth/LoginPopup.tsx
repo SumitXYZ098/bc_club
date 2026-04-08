@@ -105,6 +105,7 @@ const LoginPopup = ({
       onClose={onClose}
       title="WelCome Back"
       description="Log in to continue your home search"
+      
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}

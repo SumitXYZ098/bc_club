@@ -111,7 +111,7 @@ body::-webkit-scrollbar {
   stroke-width: 0 !important;
 }
 
-/* Hide scrollbar but keep scroll */
+/* Hide scrollbar  */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

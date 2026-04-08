@@ -28,7 +28,8 @@ export default function PropertiesListingPage() {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
   const [openFilters, setOpenFilters] = useState(false);
 
-  const { filters, updateFilter, clearFilters } = useListingStore();
+  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } = useListingStore();
+  const filters = getInstanceFilters("list");
 
   const search = filters.search || "";
   const isChip = filters.isChip || false;
@@ -46,19 +47,19 @@ export default function PropertiesListingPage() {
   const status = filters.status;
   const location = filters.location;
 
-  const setSearch = (val: string) => updateFilter("search", val);
-  const setIsChip = (val: boolean) => updateFilter("isChip", val);
-  const setActivePrice = (val: string) => updateFilter("activePrice", val);
+  const setSearch = (val: string) => updateInstanceFilter("list", "search", val);
+  const setIsChip = (val: boolean) => updateInstanceFilter("list", "isChip", val);
+  const setActivePrice = (val: string) => updateInstanceFilter("list", "activePrice", val);
   const setActiveBathRoom = (val: string) =>
-    updateFilter("activeBathRoom", val);
-  const setActiveBedRoom = (val: string) => updateFilter("activeBedRoom", val);
+    updateInstanceFilter("list", "activeBathRoom", val);
+  const setActiveBedRoom = (val: string) => updateInstanceFilter("list", "activeBedRoom", val);
   const setActiveProperty = (val: string) =>
-    updateFilter("activeProperty", val);
+    updateInstanceFilter("list", "activeProperty", val);
   const setPage = (val: number | ((prev: number) => number)) => {
     if (typeof val === "function") {
-      updateFilter("page", val(page));
+      updateInstanceFilter("list", "page", val(page));
     } else {
-      updateFilter("page", val);
+      updateInstanceFilter("list", "page", val);
     }
   };
 
@@ -311,7 +312,7 @@ export default function PropertiesListingPage() {
                       </button>
                       <button
                         onClick={() => {
-                          clearFilters();
+                          clearInstanceFilters("list");
                         }}
                         className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
                           activePrice !== "any" ||
@@ -417,7 +418,7 @@ export default function PropertiesListingPage() {
                     </div>
                     <button
                       onClick={() => {
-                        clearFilters();
+                        clearInstanceFilters("list");
                       }}
                       className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
                         activePrice !== "any" ||
@@ -462,8 +463,8 @@ export default function PropertiesListingPage() {
                         <Chip
                           label={`$${filters.minPrice} to ${filters.maxPrice === 20000000 ? "Max" : `$${filters.maxPrice}`}`}
                           onDelete={() => {
-                            updateFilter("minPrice", 0);
-                            updateFilter("maxPrice", 20000000);
+                            updateInstanceFilter("list", "minPrice", 0);
+                            updateInstanceFilter("list", "maxPrice", 20000000);
                           }}
                           className="bg-gray-100 text-sm"
                         />
@@ -475,8 +476,8 @@ export default function PropertiesListingPage() {
                         <Chip
                           label={`${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
                           onDelete={() => {
-                            updateFilter("minSqft", 0);
-                            updateFilter("maxSqft", 15000);
+                            updateInstanceFilter("list", "minSqft", 0);
+                            updateInstanceFilter("list", "maxSqft", 15000);
                           }}
                           className="bg-gray-100 text-sm"
                         />
@@ -485,7 +486,7 @@ export default function PropertiesListingPage() {
                         <Chip
                           label={filters.status}
                           onDelete={() => {
-                            updateFilter("status", "");
+                            updateInstanceFilter("list", "status", "");
                           }}
                           className="bg-gray-100 text-sm capitalize"
                         />
@@ -494,7 +495,7 @@ export default function PropertiesListingPage() {
                         <Chip
                           label={filters.location}
                           onDelete={() => {
-                            updateFilter("location", "");
+                            updateInstanceFilter("list", "location", "");
                           }}
                           className="bg-gray-100 text-sm"
                         />
@@ -571,7 +572,7 @@ export default function PropertiesListingPage() {
         )}
       </div>
 
-      <FiltersPopup open={openFilters} onClose={() => setOpenFilters(false)} />
+      <FiltersPopup id="list" open={openFilters} onClose={() => setOpenFilters(false)} />
     </div>
   );
 }

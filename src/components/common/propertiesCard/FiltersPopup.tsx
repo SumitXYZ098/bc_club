@@ -62,12 +62,15 @@ const PriceSlider = styled(Slider)({
 interface FiltersDialogProps {
   open: boolean;
   onClose: () => void;
+  id: string;
 }
 
 // ================= Component =================
-export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
+export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
-  const { filters, updateFilter, clearFilters } = useListingStore();
+  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } = useListingStore();
+  
+  const filters = getInstanceFilters(id);
 
   const [price, setPrice] = useState<[number | null, number | null]>([
     filters.minPrice ?? 0,
@@ -93,25 +96,26 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
 
   useEffect(() => {
     if (open) {
-      setPrice([filters.minPrice ?? 0, filters.maxPrice ?? 20000000]);
-      setSqft([filters.minSqft ?? 0, filters.maxSqft ?? 15000]);
+      const currentFilters = getInstanceFilters(id);
+      setPrice([currentFilters.minPrice ?? 0, currentFilters.maxPrice ?? 20000000]);
+      setSqft([currentFilters.minSqft ?? 0, currentFilters.maxSqft ?? 15000]);
       setBedrooms(
-        filters.activeBedRoom && filters.activeBedRoom !== "any"
-          ? Number(filters.activeBedRoom.replace("+", ""))
+        currentFilters.activeBedRoom && currentFilters.activeBedRoom !== "any"
+          ? Number(currentFilters.activeBedRoom.replace("+", ""))
           : null,
       );
       setBathrooms(
-        filters.activeBathRoom && filters.activeBathRoom !== "any"
-          ? Number(filters.activeBathRoom.replace("+", ""))
+        currentFilters.activeBathRoom && currentFilters.activeBathRoom !== "any"
+          ? Number(currentFilters.activeBathRoom.replace("+", ""))
           : null,
       );
-      setStatus(filters.status ?? "");
-      setLocation(filters.location ?? "");
+      setStatus(currentFilters.status ?? "");
+      setLocation(currentFilters.location ?? "");
     }
-  }, [open, filters]);
+  }, [open, id, getInstanceFilters]);
 
   const handleClearAll = () => {
-    clearFilters();
+    clearInstanceFilters(id);
     setPrice([0, 20000000]);
     setSqft([0, 15000]);
     setBedrooms(null);
@@ -122,20 +126,20 @@ export default function FiltersPopup({ open, onClose }: FiltersDialogProps) {
   };
 
   const handleApplyFilter = () => {
-    updateFilter("minPrice", price[0]);
-    updateFilter("maxPrice", price[1]);
-    updateFilter("minSqft", sqft[0]);
-    updateFilter("maxSqft", sqft[1]);
-    updateFilter(
+    updateInstanceFilter(id, "minPrice", price[0]);
+    updateInstanceFilter(id, "maxPrice", price[1]);
+    updateInstanceFilter(id, "minSqft", sqft[0]);
+    updateInstanceFilter(id, "maxSqft", sqft[1]);
+    updateInstanceFilter(id,
       "activeBedRoom",
       bedrooms ? (bedrooms >= 4 ? "4+" : bedrooms.toString()) : "any",
     );
-    updateFilter(
+    updateInstanceFilter(id,
       "activeBathRoom",
       bathrooms ? (bathrooms >= 4 ? "4+" : bathrooms.toString()) : "any",
     );
-    updateFilter("status", status);
-    updateFilter("location", location);
+    updateInstanceFilter(id, "status", status);
+    updateInstanceFilter(id, "location", location);
     onClose();
   };
 
