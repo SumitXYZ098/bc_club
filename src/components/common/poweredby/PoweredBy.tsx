@@ -34,7 +34,7 @@ const PoweredBy = ({
           fill="#D3E023"
         />
       </svg> */}
-      <p className={`text-[#3B4E19] ${textStyle}`}>FVREV Stats Centre</p>
+      <p className={`text-[#3B4E19] ${textStyle}`}>FVREB Stats Centre</p>
     </div>
   );
 };
