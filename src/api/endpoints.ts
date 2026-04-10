@@ -10,4 +10,5 @@ export const Endpoints = {
   addToFavourite: (id: string) => `${BASE_URL}/api/properties/${id}/favorite`,
   getFavouriteProperties: `${BASE_URL}/api/my-favorites`,
   me: `${BASE_URL}/api/users/me`,
+  importPropertyList: `${BASE_URL}/api/property-assignment-lists`,
 };

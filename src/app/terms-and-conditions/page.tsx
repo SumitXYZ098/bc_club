@@ -2,6 +2,7 @@ import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
+import ApiButton from "@/src/mainComponents/renovation/ApiButton";
 import React from "react";
 
 const page = () => {
@@ -340,6 +341,8 @@ const page = () => {
         <Heading tagType="h2" type={IHeadingTypes.heading32} content="" />
         <Description type={IDescriptionTypes.dec18} content="" />
       </div>
+
+      <ApiButton />
     </section>
   );
 };
