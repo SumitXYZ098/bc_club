@@ -9,7 +9,7 @@ const PoweredBy = ({
 }) => {
   return (
     <div className={`flex items-center gap-1 flex-nowrap ${className}`}>
-      <p className={`text-black70 ${textStyle}`}>Data Source:</p>
+      <p className={`text-black70 ${textStyle}`}>Source:</p>
       {/* <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
@@ -34,7 +34,7 @@ const PoweredBy = ({
           fill="#D3E023"
         />
       </svg> */}
-      <p className={`text-[#3B4E19] ${textStyle}`}>FVREB Stats Centre</p>
+      <p className={`text-[#3B4E19] ${textStyle}`}>Fraser Valley Real Estate Board</p>
     </div>
   );
 };

@@ -13,7 +13,7 @@ import {
   FiNavigation,
   FiMaximize,
   FiChevronDown,
-   FiLoader,
+  FiLoader,
   FiCheck,
 } from "react-icons/fi";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
@@ -22,6 +22,8 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
+import GetInTouchForm from "../getInTouch/GetInTouchForm";
+import GetInTouch from "../getInTouch/GetInTouch";
 
 // ================= Slider Theme =================
 const PriceSlider = styled(Slider)({
@@ -242,15 +244,15 @@ export default function MapSearch() {
           baths: listing?.bathrooms ?? 0,
           longitude: Number(
             listing.longitude ||
-              listing.Longitude ||
-              listing.raw_data?.Longitude ||
-              (listing.coordinates && listing.coordinates[0]),
+            listing.Longitude ||
+            listing.raw_data?.Longitude ||
+            (listing.coordinates && listing.coordinates[0]),
           ),
           latitude: Number(
             listing.latitude ||
-              listing.Latitude ||
-              listing.raw_data?.Latitude ||
-              (listing.coordinates && listing.coordinates[1]),
+            listing.Latitude ||
+            listing.raw_data?.Latitude ||
+            (listing.coordinates && listing.coordinates[1]),
           ),
           isLogin: true,
         }))
@@ -396,329 +398,326 @@ export default function MapSearch() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
-    <div className="w-full h-screen flex flex-col bg-white overflow-hidden mt-20">
-      {/* 1. TOP FILTER BAR */}
-      <div className="relative z-[1000] bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-2 overflow-x-auto md:overflow-visible no-scrollbar">
-        <FiltersPopup
-          id="map"
-          open={isFilterOpen}
-          onClose={() => setIsFilterOpen(false)}
-        />
-
-        <div
-          onClick={() => setIsFilterOpen(true)}
-          className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
-        >
-          <FilterListIcon sx={{ color: "#305487" }} /> Filters
-        </div>
-
-        <div
-          onClick={() => setStatus("forSale")}
-          className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "forSale"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          For Sale
-        </div>
-
-        <div
-          onClick={() => setStatus("sold")}
-          className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "sold"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          Sold
-        </div>
-
-        <div
-          onClick={() => setStatus("expired")}
-          className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "expired"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          Expired
-        </div>
-
-        <div className="relative" ref={priceRef}>
-          <div
-            onClick={() => setIsPriceOpen(!isPriceOpen)}
-            className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-              isPriceOpen
-                ? "border-primary bg-primary text-white"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            $ Price{" "}
-            <FiChevronDown
-              className={`text-gray-400 ml-1 transition-transform ${isPriceOpen ? "rotate-180 text-white" : ""}`}
-            />
-          </div>
-
-          {isPriceOpen && (
-            <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[400px] animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95">
-              <div className="md:mb-6 mb-3">
-                <div className="flex items-center justify-between md:mb-3">
-                  <h3 className="font-medium">Price Range</h3>
-                  <button
-                    onClick={() => setPrice([1000, 20000000])}
-                    className="text-xs font-bold text-white bg-secondary transition-all p-3 px-7 rounded-sm cursor-pointer"
-                  >
-                    Reset
-                  </button>
-                </div>
-                <div className="relative">
-                  <PriceSlider
-                    value={[price[0] ?? 1000, price[1] ?? 20000000]}
-                    min={1000}
-                    max={20000000}
-                    step={2000}
-                    onChange={(_, v) => setPrice(v as [number, number])}
-                    disableSwap
-                    valueLabelDisplay="auto"
-                  />
-                </div>
-
-                <div className="flex flex-row flex-wrap items-center mt-5 justify-between gap-4 w-full">
-                  <div className="flex flex-col flex-1 min-w-35">
-                    <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                      Min Price
-                    </p>
-                    <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 h-11 bg-white">
-                      <span className="text-secondary">$</span>
-                      <span>{price[0].toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col flex-1 min-w-35">
-                    <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                      Max Price
-                    </p>
-                    <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 h-11 bg-white">
-                      {price[1] === 20000000 ? (
-                        <span>Max</span>
-                      ) : (
-                        <>
-                          <span className="text-secondary">$</span>
-                          <span>{price[1].toLocaleString()}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="relative" ref={bedsRef}>
-          <div
-            onClick={() => setIsBedsOpen(!isBedsOpen)}
-            className={`flex items-center gap-1 border rounded-lg px-4 py-2 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
-              isBedsOpen
-                ? "border-primary bg-primary text-white shadow-md"
-                : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
-            }`}
-          >
-            Beds & Baths{" "}
-            <FiChevronDown
-              className={`ml-1.5 transition-transform duration-300 ${isBedsOpen ? "rotate-180" : "text-gray-400"}`}
-            />
-          </div>
-
-          {isBedsOpen && (
-            <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[380px] animate-in fade-in slide-in-from-top-3 duration-300">
-              <div className="mb-7">
-                <h3 className="font-bold text-gray-800 text-lg mb-4">
-                  Bedrooms
-                </h3>
-                <div className="flex flex-wrap gap-2.5">
-                  {["any", "1", "2", "3", "4+"].map((val) => (
-                    <button
-                      key={val}
-                      onClick={() => setActiveBedRoom(val)}
-                      className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
-                        activeBedRoom === val
-                          ? "bg-primary border-primary text-white shadow-sm"
-                          : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      {val === "any" ? "Any" : val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <LineGradient />
-
-              <div className="mb-2 mt-4">
-                <h3 className="font-bold text-gray-800 text-lg mb-4">
-                  Bathrooms
-                </h3>
-                <div className="flex flex-wrap gap-2.5">
-                  {["any", "1", "2", "3", "4+"].map((val) => (
-                    <button
-                      key={val}
-                      onClick={() => setActiveBathRoom(val)}
-                      className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
-                        activeBathRoom === val
-                          ? "bg-primary border-primary text-white shadow-sm"
-                          : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      {val === "any" ? "Any" : val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="relative min-w-50 shrink-0">
-          <FilterPillSelect
-            label="Property Type"
-            value={activeProperty}
-            onChange={setActiveProperty}
-            pillBase={pillBase}
-            pillActive={pillActive}
-            pillInactive={pillInactive}
-            options={[
-              { label: "Any", value: "any" },
-              { label: "Apartment/Condo", value: "Apartment/Condo" },
-              { label: "Single Family Residence", value: "Single Family Residence" },
-              { label: "Townhouse", value: "Townhouse" },
-              { label: "Half Duplex", value: "Half Duplex" },
-              { label: "Row House (Non-Strata)", value: "Row House (Non-Strata)" },
-            ]}
+    <>
+      <div className="w-full h-screen flex flex-col bg-white overflow-hidden mt-20">
+        {/* 1. TOP FILTER BAR */}
+        <div className="relative z-[1000] bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-2 overflow-x-auto md:overflow-visible no-scrollbar">
+          <FiltersPopup
+            id="map"
+            open={isFilterOpen}
+            onClose={() => setIsFilterOpen(false)}
           />
-        </div>
-      </div>
 
-      {/* MAIN CONTENT */}
-      <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative">
-        {/* 2. SIDEBAR - LEFT (Mobile: Full width, Desktop: 110 width) */}
-        <div className="w-full md:w-110 flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
-          <div className="p-4 flex justify-between items-center text-sm font-semibold border-b border-gray-50">
-            <div className="text-gray-500 ">
-              Results:{" "}
-              <span className="text-black ">
-                {isLoading
-                  ? "..."
-                  : `${visibleProperties.length}/${properties.length}`}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2" ref={sortRef}>
-              <span className="text-gray-400 text-[15px] font-bold hidden sm:inline">
-                Sort by:
-              </span>
-              <div className="relative min-w-40">
-                <div
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className={`flex items-center justify-between px-3 py-2 bg-white border rounded-lg cursor-pointer transition-all duration-200 ${isSortOpen ? "border-primary shadow-md" : "border-gray-200 hover:border-gray-300 shadow-sm"}`}
-                >
-                  <span className="text-gray-800 text-sm font-bold">
-                    {currentSortLabel}
-                  </span>
-                  <FiChevronDown
-                    className={`text-gray-400 transition-transform duration-300 ${isSortOpen ? "rotate-180 text-primary" : ""}`}
-                    size={16}
-                  />
-                </div>
-
-                {isSortOpen && (
-                  <div className="absolute right-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-999 overflow-hidden">
-                    <div className="py-1">
-                      {sortOptions.map((opt) => (
-                        <div
-                          key={opt.value}
-                          onClick={() => {
-                            setSortBy(opt.value);
-                            setIsSortOpen(false);
-                          }}
-                          className={`flex items-center justify-between px-4 py-3 text-sm cursor-pointer transition-colors ${sortBy === opt.value ? "bg-primary/5 text-primary font-bold" : "text-gray-600 hover:bg-gray-50"}`}
-                        >
-                          {opt.label}
-                          {sortBy === opt.value && (
-                            <FiCheck className="text-primary" size={14} />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div
+            onClick={() => setIsFilterOpen(true)}
+            className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
+          >
+            <FilterListIcon sx={{ color: "#305487" }} /> Filters
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar bg-[#f8f9fa]">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center h-64 space-y-3">
-                <FiLoader className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-gray-500 text-sm font-medium">Fetching properties...</p>
-              </div>
-            ) : visibleProperties.length > 0 ? (
-              visibleProperties.map((p) => (
-                <div
-                  key={p.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
-                >
-                  <PropertiesCard
-                    {...p}
-                    isLogin
-                    isSold={status === "sold"}
-                    isExpired={status === "expired"}
-                  />
+          <div
+            onClick={() => setStatus("forSale")}
+            className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "forSale"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+          >
+            For Sale
+          </div>
+
+          <div
+            onClick={() => setStatus("sold")}
+            className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "sold"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+          >
+            Sold
+          </div>
+
+          <div
+            onClick={() => setStatus("expired")}
+            className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "expired"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+          >
+            Expired
+          </div>
+
+          <div className="relative" ref={priceRef}>
+            <div
+              onClick={() => setIsPriceOpen(!isPriceOpen)}
+              className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${isPriceOpen
+                  ? "border-primary bg-primary text-white"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+            >
+              $ Price{" "}
+              <FiChevronDown
+                className={`text-gray-400 ml-1 transition-transform ${isPriceOpen ? "rotate-180 text-white" : ""}`}
+              />
+            </div>
+
+            {isPriceOpen && (
+              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[400px] animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95">
+                <div className="md:mb-6 mb-3">
+                  <div className="flex items-center justify-between md:mb-3">
+                    <h3 className="font-medium">Price Range</h3>
+                    <button
+                      onClick={() => setPrice([1000, 20000000])}
+                      className="text-xs font-bold text-white bg-secondary transition-all p-3 px-7 rounded-sm cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <PriceSlider
+                      value={[price[0] ?? 1000, price[1] ?? 20000000]}
+                      min={1000}
+                      max={20000000}
+                      step={2000}
+                      onChange={(_, v) => setPrice(v as [number, number])}
+                      disableSwap
+                      valueLabelDisplay="auto"
+                    />
+                  </div>
+
+                  <div className="flex flex-row flex-wrap items-center mt-5 justify-between gap-4 w-full">
+                    <div className="flex flex-col flex-1 min-w-35">
+                      <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                        Min Price
+                      </p>
+                      <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 h-11 bg-white">
+                        <span className="text-secondary">$</span>
+                        <span>{price[0].toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col flex-1 min-w-35">
+                      <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                        Max Price
+                      </p>
+                      <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 h-11 bg-white">
+                        {price[1] === 20000000 ? (
+                          <span>Max</span>
+                        ) : (
+                          <>
+                            <span className="text-secondary">$</span>
+                            <span>{price[1].toLocaleString()}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              ))
-            ) : (
-              <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
-                No properties found in this area.
               </div>
             )}
           </div>
-        </div>
 
-        {/* 3. MAP AREA - RIGHT (Hidden on Mobile) */}
-        <div className="hidden md:block flex-1 relative z-10">
-          <div ref={mapContainerRef} className="w-full h-full" />
+          <div className="relative" ref={bedsRef}>
+            <div
+              onClick={() => setIsBedsOpen(!isBedsOpen)}
+              className={`flex items-center gap-1 border rounded-lg px-4 py-2 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${isBedsOpen
+                  ? "border-primary bg-primary text-white shadow-md"
+                  : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
+                }`}
+            >
+              Beds & Baths{" "}
+              <FiChevronDown
+                className={`ml-1.5 transition-transform duration-300 ${isBedsOpen ? "rotate-180" : "text-gray-400"}`}
+              />
+            </div>
 
-          {isLoading && (
-            <div className="absolute inset-0 bg-white/30 backdrop-blur-[1px] z-20 pointer-events-none flex items-start justify-center pt-10">
-              <div className="bg-white px-4 py-2 rounded-full shadow-md flex items-center gap-2">
-                <FiLoader className="animate-spin text-primary" />
-                <span className="text-xs font-bold text-gray-600">Updating Map...</span>
+            {isBedsOpen && (
+              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[380px] animate-in fade-in slide-in-from-top-3 duration-300">
+                <div className="mb-7">
+                  <h3 className="font-bold text-gray-800 text-lg mb-4">
+                    Bedrooms
+                  </h3>
+                  <div className="flex flex-wrap gap-2.5">
+                    {["any", "1", "2", "3", "4+"].map((val) => (
+                      <button
+                        key={val}
+                        onClick={() => setActiveBedRoom(val)}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${activeBedRoom === val
+                            ? "bg-primary border-primary text-white shadow-sm"
+                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
+                          }`}
+                      >
+                        {val === "any" ? "Any" : val}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <LineGradient />
+
+                <div className="mb-2 mt-4">
+                  <h3 className="font-bold text-gray-800 text-lg mb-4">
+                    Bathrooms
+                  </h3>
+                  <div className="flex flex-wrap gap-2.5">
+                    {["any", "1", "2", "3", "4+"].map((val) => (
+                      <button
+                        key={val}
+                        onClick={() => setActiveBathRoom(val)}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${activeBathRoom === val
+                            ? "bg-primary border-primary text-white shadow-sm"
+                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
+                          }`}
+                      >
+                        {val === "any" ? "Any" : val}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          <div className="absolute right-4 top-4 flex flex-col gap-2 z-10">
-            <div className="flex flex-col bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden">
-              <button className="p-2.5 border-b hover:bg-gray-50" onClick={() => mapRef.current?.zoomIn()}>
-                <FiPlus className="w-5 h-5 text-gray-600" />
-              </button>
-              <button className="p-2.5 hover:bg-gray-50" onClick={() => mapRef.current?.zoomOut()}>
-                <FiMinus className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
-            <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
-              <FiMap className="w-5 h-5 text-gray-600" />
-            </button>
-            <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
-              <FiNavigation className="w-5 h-5 text-gray-600" />
-            </button>
-            <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
-              <FiMaximize className="w-5 h-5 text-gray-600" />
-            </button>
+          <div className="relative min-w-50 shrink-0">
+            <FilterPillSelect
+              label="Property Type"
+              value={activeProperty}
+              onChange={setActiveProperty}
+              pillBase={pillBase}
+              pillActive={pillActive}
+              pillInactive={pillInactive}
+              options={[
+                { label: "Any", value: "any" },
+                { label: "Apartment/Condo", value: "Apartment/Condo" },
+                { label: "Single Family Residence", value: "Single Family Residence" },
+                { label: "Townhouse", value: "Townhouse" },
+                { label: "Half Duplex", value: "Half Duplex" },
+                { label: "Row House (Non-Strata)", value: "Row House (Non-Strata)" },
+              ]}
+            />
           </div>
         </div>
+
+        {/* MAIN CONTENT */}
+        <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative">
+          {/* 2. SIDEBAR - LEFT (Mobile: Full width, Desktop: 110 width) */}
+          <div className="w-full md:w-110 flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
+            <div className="p-4 flex justify-between items-center text-sm font-semibold border-b border-gray-50">
+              <div className="text-gray-500 ">
+                Results:{" "}
+                <span className="text-black ">
+                  {isLoading
+                    ? "..."
+                    : `${visibleProperties.length}/${properties.length}`}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2" ref={sortRef}>
+                <span className="text-gray-400 text-[15px] font-bold hidden sm:inline">
+                  Sort by:
+                </span>
+                <div className="relative min-w-40">
+                  <div
+                    onClick={() => setIsSortOpen(!isSortOpen)}
+                    className={`flex items-center justify-between px-3 py-2 bg-white border rounded-lg cursor-pointer transition-all duration-200 ${isSortOpen ? "border-primary shadow-md" : "border-gray-200 hover:border-gray-300 shadow-sm"}`}
+                  >
+                    <span className="text-gray-800 text-sm font-bold">
+                      {currentSortLabel}
+                    </span>
+                    <FiChevronDown
+                      className={`text-gray-400 transition-transform duration-300 ${isSortOpen ? "rotate-180 text-primary" : ""}`}
+                      size={16}
+                    />
+                  </div>
+
+                  {isSortOpen && (
+                    <div className="absolute right-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-999 overflow-hidden">
+                      <div className="py-1">
+                        {sortOptions.map((opt) => (
+                          <div
+                            key={opt.value}
+                            onClick={() => {
+                              setSortBy(opt.value);
+                              setIsSortOpen(false);
+                            }}
+                            className={`flex items-center justify-between px-4 py-3 text-sm cursor-pointer transition-colors ${sortBy === opt.value ? "bg-primary/5 text-primary font-bold" : "text-gray-600 hover:bg-gray-50"}`}
+                          >
+                            {opt.label}
+                            {sortBy === opt.value && (
+                              <FiCheck className="text-primary" size={14} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar bg-[#f8f9fa]">
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center h-64 space-y-3">
+                  <FiLoader className="w-8 h-8 text-primary animate-spin" />
+                  <p className="text-gray-500 text-sm font-medium">Fetching properties...</p>
+                </div>
+              ) : visibleProperties.length > 0 ? (
+                visibleProperties.map((p) => (
+                  <div
+                    key={p.id}
+                    className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+                  >
+                    <PropertiesCard
+                      {...p}
+                      isLogin
+                      isSold={status === "sold"}
+                      isExpired={status === "expired"}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
+                  No properties found in this area.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 3. MAP AREA - RIGHT (Hidden on Mobile) */}
+          <div className="hidden md:block flex-1 relative z-10">
+            <div ref={mapContainerRef} className="w-full h-full" />
+
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/30 backdrop-blur-[1px] z-20 pointer-events-none flex items-start justify-center pt-10">
+                <div className="bg-white px-4 py-2 rounded-full shadow-md flex items-center gap-2">
+                  <FiLoader className="animate-spin text-primary" />
+                  <span className="text-xs font-bold text-gray-600">Updating Map...</span>
+                </div>
+              </div>
+            )}
+
+            <div className="absolute right-4 top-4 flex flex-col gap-2 z-10">
+              <div className="flex flex-col bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden">
+                <button className="p-2.5 border-b hover:bg-gray-50" onClick={() => mapRef.current?.zoomIn()}>
+                  <FiPlus className="w-5 h-5 text-gray-600" />
+                </button>
+                <button className="p-2.5 hover:bg-gray-50" onClick={() => mapRef.current?.zoomOut()}>
+                  <FiMinus className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+              <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
+                <FiMap className="w-5 h-5 text-gray-600" />
+              </button>
+              <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
+                <FiNavigation className="w-5 h-5 text-gray-600" />
+              </button>
+              <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
+                <FiMaximize className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
+      <GetInTouch />
+    </>
   );
 }

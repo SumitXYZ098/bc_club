@@ -164,7 +164,7 @@ const HomePropertiesSold = () => {
                   {Math.abs(property.changePercent)}%{" "}
                   {property.changePercent > 0 ? "More than" : "Less than"}
                 </span>
-                <span className="text-sm text-lightWhite">Last Year 2025</span>
+                <span className="text-sm text-lightWhite">March 2025</span>
               </div>
             </div>
 
