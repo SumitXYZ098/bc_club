@@ -269,12 +269,12 @@ export default function MapSearch() {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      center: [-123.1207, 49.2827],
-      zoom: 10,
-      style: "mapbox://styles/mapbox/light-v11",
-    });
+ const map = new mapboxgl.Map({
+  container: mapContainerRef.current,
+  center: [-123.1207, 49.2827],
+  zoom: 10,
+   style: "mapbox://styles/mapbox/streets-v12",  
+});
 
     map.on("load", () => setMapLoaded(true));
     mapRef.current = map;
@@ -407,16 +407,17 @@ export default function MapSearch() {
             onClose={() => setIsFilterOpen(false)}
           />
 
-          <div
-            onClick={() => setIsFilterOpen(true)}
-            className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
-          >
-            <FilterListIcon sx={{ color: "#305487" }} /> Filters
-          </div>
+        <div
+          onClick={() => setIsFilterOpen(true)}
+          className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
+        >
+          <FilterListIcon sx={{ color: "#305487" }} /> Filters
+        </div>
 
-          <div
-            onClick={() => setStatus("forSale")}
-            className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "forSale"
+        <div
+          onClick={() => setStatus("forSale")}
+          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
+            status === "forSale"
               ? "bg-primary text-white border-primary"
               : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
@@ -424,9 +425,10 @@ export default function MapSearch() {
             For Sale
           </div>
 
-          <div
-            onClick={() => setStatus("sold")}
-            className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "sold"
+        <div
+          onClick={() => setStatus("sold")}
+          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 bg-background  text-sm font-normal cursor-pointer shrink-0 transition-all ${
+            status === "sold"
               ? "bg-primary text-white border-primary"
               : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
@@ -434,9 +436,10 @@ export default function MapSearch() {
             Sold
           </div>
 
-          <div
-            onClick={() => setStatus("expired")}
-            className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "expired"
+        <div
+          onClick={() => setStatus("expired")}
+          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
+            status === "expired"
               ? "bg-primary text-white border-primary"
               : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
@@ -444,10 +447,11 @@ export default function MapSearch() {
             Expired
           </div>
 
-          <div className="relative" ref={priceRef}>
-            <div
-              onClick={() => setIsPriceOpen(!isPriceOpen)}
-              className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${isPriceOpen
+        <div className="relative" ref={priceRef}>
+          <div
+            onClick={() => setIsPriceOpen(!isPriceOpen)}
+            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all  ${
+              isPriceOpen
                 ? "border-primary bg-primary text-white"
                 : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
@@ -514,10 +518,11 @@ export default function MapSearch() {
             )}
           </div>
 
-          <div className="relative" ref={bedsRef}>
-            <div
-              onClick={() => setIsBedsOpen(!isBedsOpen)}
-              className={`flex items-center gap-1 border rounded-lg px-4 py-2 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${isBedsOpen
+        <div className="relative" ref={bedsRef}>
+          <div
+            onClick={() => setIsBedsOpen(!isBedsOpen)}
+            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
+              isBedsOpen
                 ? "border-primary bg-primary text-white shadow-md"
                 : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
                 }`}
