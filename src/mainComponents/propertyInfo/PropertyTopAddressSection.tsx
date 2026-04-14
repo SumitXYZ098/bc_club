@@ -36,6 +36,10 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
           </span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
           <span>MLS® {property?.mls_number || 'FPR345643E3'}</span>
+          <LineGradient vr customClasses="mx-2 md:block hidden" />
+          <span>Courtesy of: {property?.office_data?.OfficeName ||
+        property?.raw_data?.ListAOR ||
+        "Unknown" }</span>
         </div>
       </div>
       <div className="flex md:flex-col items-center md:items-end-safe gap-x-1.5 gap-y-3">
