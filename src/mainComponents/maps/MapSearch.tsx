@@ -22,7 +22,6 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import GetInTouchForm from "../getInTouch/GetInTouchForm";
 import GetInTouch from "../getInTouch/GetInTouch";
 
 // ================= Slider Theme =================
@@ -418,8 +417,8 @@ export default function MapSearch() {
           <div
             onClick={() => setStatus("forSale")}
             className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "forSale"
-                ? "bg-primary text-white border-primary"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              ? "bg-primary text-white border-primary"
+              : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
           >
             For Sale
@@ -428,8 +427,8 @@ export default function MapSearch() {
           <div
             onClick={() => setStatus("sold")}
             className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "sold"
-                ? "bg-primary text-white border-primary"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              ? "bg-primary text-white border-primary"
+              : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
           >
             Sold
@@ -438,8 +437,8 @@ export default function MapSearch() {
           <div
             onClick={() => setStatus("expired")}
             className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "expired"
-                ? "bg-primary text-white border-primary"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              ? "bg-primary text-white border-primary"
+              : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
           >
             Expired
@@ -449,8 +448,8 @@ export default function MapSearch() {
             <div
               onClick={() => setIsPriceOpen(!isPriceOpen)}
               className={`flex items-center gap-1 border rounded px-3 py-1.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${isPriceOpen
-                  ? "border-primary bg-primary text-white"
-                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                ? "border-primary bg-primary text-white"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
             >
               $ Price{" "}
@@ -519,8 +518,8 @@ export default function MapSearch() {
             <div
               onClick={() => setIsBedsOpen(!isBedsOpen)}
               className={`flex items-center gap-1 border rounded-lg px-4 py-2 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${isBedsOpen
-                  ? "border-primary bg-primary text-white shadow-md"
-                  : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
+                ? "border-primary bg-primary text-white shadow-md"
+                : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
                 }`}
             >
               Beds & Baths{" "}
@@ -541,8 +540,8 @@ export default function MapSearch() {
                         key={val}
                         onClick={() => setActiveBedRoom(val)}
                         className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${activeBedRoom === val
-                            ? "bg-primary border-primary text-white shadow-sm"
-                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
+                          ? "bg-primary border-primary text-white shadow-sm"
+                          : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
                           }`}
                       >
                         {val === "any" ? "Any" : val}
@@ -563,8 +562,8 @@ export default function MapSearch() {
                         key={val}
                         onClick={() => setActiveBathRoom(val)}
                         className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${activeBathRoom === val
-                            ? "bg-primary border-primary text-white shadow-sm"
-                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
+                          ? "bg-primary border-primary text-white shadow-sm"
+                          : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
                           }`}
                       >
                         {val === "any" ? "Any" : val}
@@ -717,7 +716,6 @@ export default function MapSearch() {
         </div>
 
       </div>
-      <GetInTouch />
-    </>
+      <GetInTouch /></>
   );
 }
