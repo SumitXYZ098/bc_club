@@ -8,6 +8,8 @@ export async function getListings(params: any): Promise<any> {
       params,
     });
 
+    console.log("API Response:", res.data); // Log the API response for debugging
+
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

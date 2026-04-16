@@ -309,12 +309,9 @@ export default function MapSearch() {
 
   // API Params Logic
   const params: any = {
-    "pagination[page]": 1,
-    "pagination[pageSize]": 100,
     search: search,
-    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
+    "filters[property_status]": "Active",
     "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   if (status && status !== "any") {
@@ -454,57 +451,67 @@ export default function MapSearch() {
   }, [properties, mapLoaded]);
 
   // Update Markers and visible list with sorting
+
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current) return;
-    const map = mapRef.current;
+  if (!mapLoaded || !mapRef.current) return;
 
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
+  const map = mapRef.current;
 
-    properties.forEach((property: any) => {
-      const markerEl = createPriceMarker(property, () => {
-        map.flyTo({
-          center: [property.longitude, property.latitude],
-          zoom: 16,
-          essential: true,
-        });
+  markersRef.current.forEach((m) => m.remove());
+  markersRef.current = [];
+
+  properties.forEach((property: any) => {
+    const markerEl = createPriceMarker(property, () => {
+      map.flyTo({
+        center: [property.longitude, property.latitude],
+        zoom: 16,
+        essential: true,
       });
-
-      const marker = new mapboxgl.Marker(markerEl)
-        .setLngLat([property.longitude, property.latitude])
-        .setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(
-            `<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`,
-          ),
-        )
-        .addTo(map);
-      markersRef.current.push(marker);
     });
 
-    const updateVisibleProperties = () => {
-      const bounds = map.getBounds();
-      if (!bounds) return;
-      let visible = properties.filter((p: any) =>
-        bounds.contains([p.longitude, p.latitude]),
-      );
+    const marker = new mapboxgl.Marker(markerEl)
+      .setLngLat([property.longitude, property.latitude])
+      .setPopup(
+        new mapboxgl.Popup({ offset: 25 }).setHTML(
+          `<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`
+        )
+      )
+      .addTo(map);
 
-      if (sortBy === "priceLow") {
-        visible.sort((a: any, b: any) => a.price - b.price);
-      } else if (sortBy === "priceHigh") {
-        visible.sort((a: any, b: any) => b.price - a.price);
-      } else if (sortBy === "newest") {
-        visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
+    markersRef.current.push(marker);
+  });
+
+  const updateVisibleProperties = () => {
+    const bounds = map.getBounds();
+    if (!bounds) return;
+
+    let visible = properties.filter((p: any) =>
+      bounds.contains([p.longitude, p.latitude])
+    );
+
+    if (sortBy === "priceLow") {
+      visible.sort((a: any, b: any) => a.price - b.price);
+    } else if (sortBy === "priceHigh") {
+      visible.sort((a: any, b: any) => b.price - a.price);
+    } else if (sortBy === "newest") {
+      visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
+    }
+
+    setVisibleProperties((prev: any) => {
+      if (JSON.stringify(prev) === JSON.stringify(visible)) {
+        return prev;
       }
+      return visible;
+    });
+  };
 
-      setVisibleProperties(visible);
-    };
+  map.on("moveend", updateVisibleProperties);
+  updateVisibleProperties();
 
-    map.on("moveend", updateVisibleProperties);
-    updateVisibleProperties();
-    return () => {
-      map.off("moveend", updateVisibleProperties);
-    };
-  }, [mapLoaded, properties, sortBy]);
+  return () => {
+    map.off("moveend", updateVisibleProperties);
+  };
+}, [mapLoaded, properties, sortBy]);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
