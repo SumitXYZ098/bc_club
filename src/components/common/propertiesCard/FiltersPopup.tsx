@@ -69,7 +69,7 @@ interface FiltersDialogProps {
 export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } = useListingStore();
-  
+
   const filters = getInstanceFilters(id);
 
   const [price, setPrice] = useState<[number | null, number | null]>([
@@ -185,11 +185,10 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                 }
                 setStatus(s.k);
               }}
-              className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition ${
-                status === s.k
+              className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition ${status === s.k
                   ? "bg-[#7c7c7c33] border-[#0F0F0F33]"
                   : "border-[#0F0F0F33]"
-              }`}
+                }`}
             >
               <Image src={s.i} width={36} height={36} alt={s.l} />
               <span className="text-sm font-medium">{s.l}</span>
@@ -210,28 +209,78 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
               Select Location
             </option>
             {[
-              "New Westminster",
-              "Vancouver",
-              "Surrey",
-              "White Rock",
-              "North Vancouver",
-              "Tsawwassen",
-              "Coquitlam",
-              "Burnaby",
-              "Port Moody",
-              "Maple Ridge",
-              "Richmond",
-              "Delta",
-              "Langley",
-              "Hope",
-              "Chilliwack",
-              "Abbotsford",
-              "Whistler",
-              "West Vancouver",
-              "Sechelt",
-              "Mission",
-              "Port Coquitlam",
-              "Agassiz",
+              'Abbotsford',
+              'Aberdeen',
+              'Agassiz',
+              'Anmore',
+              'Belcarra',
+              'Birken',
+              'Boston Bar / Lytton',
+              'Bowen Island',
+              'Brackendale',
+              'Britannia Beach',
+              'Burnaby',
+              'Cadreb Other',
+              'Chilliwack',
+              'Columbia Valley',
+              'Coquitlam',
+              'Cultus Lake',
+              "D'Arcy",
+              'Delta',
+              'Downtown',
+              'Egmont',
+              'Furry Creek',
+              'Gabriola Island',
+              'Galiano Island',
+              'Gambier Island',
+              'Garden Bay',
+              'Gibsons',
+              'Halfmoon Bay',
+              'Harrison Hot Springs',
+              'Harrison Mills',
+              'Hope',
+              'Keats Island',
+              'Ladner',
+              'Langdale',
+              'Langley',
+              'Lindell Beach',
+              'Lions Bay',
+              'Madeira Park',
+              'Maple Ridge',
+              'Mayne Island',
+              'Mission',
+              'Nelson Island',
+              'New Westminster',
+              'No City Value',
+              'North Vancouver',
+              'Pemberton',
+              'Pender Harbour',
+              'Pender Island',
+              'Pitt Meadows',
+              'Port Coquitlam',
+              'Port Moody',
+              'Richmond',
+              'Roberts Creek',
+              'Rosedale',
+              'Ryder Lake',
+              'Salt Spring Island',
+              'Sardis',
+              'Sardis - Chwk River Valley',
+              'Sardis - Greendale',
+              'Saturna Island',
+              'Sechelt',
+              'Squamish',
+              'Sunshine Valley',
+              'Surrey',
+              'Tsawwassen',
+              'University Endowment Lands',
+              'Vancouver',
+              'Vanderhoof',
+              'West Vancouver',
+              'Whistler',
+              'White Rock',
+              'Yale',
+              'Yarrow'
             ].map((item, idx) => (
               <option key={idx} value={item}>
                 {item}
@@ -367,7 +416,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                         if (current === 1) setter(null);
                         else if (current > 1) setter(current - 1);
                       }}
-                      
+
                     >
                       −
                     </button>

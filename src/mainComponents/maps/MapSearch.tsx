@@ -197,12 +197,9 @@ export default function MapSearch() {
 
   // API Params Logic
   const params: any = {
-    "pagination[page]": 1,
-    "pagination[pageSize]": 100,
     search: search,
-    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
+    "filters[property_status]": "Active",
     "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   if (status && status !== "any") {
@@ -269,12 +266,12 @@ export default function MapSearch() {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
     if (!mapContainerRef.current || mapRef.current) return;
 
- const map = new mapboxgl.Map({
-  container: mapContainerRef.current,
-  center: [-123.1207, 49.2827],
-  zoom: 10,
-   style: "mapbox://styles/mapbox/streets-v12",  
-});
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      center: [-123.1207, 49.2827],
+      zoom: 10,
+      style: "mapbox://styles/mapbox/streets-v12",
+    });
 
     map.on("load", () => setMapLoaded(true));
     mapRef.current = map;
@@ -342,57 +339,67 @@ export default function MapSearch() {
   }, [properties, mapLoaded]);
 
   // Update Markers and visible list with sorting
+
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current) return;
-    const map = mapRef.current;
+  if (!mapLoaded || !mapRef.current) return;
 
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
+  const map = mapRef.current;
 
-    properties.forEach((property: any) => {
-      const markerEl = createPriceMarker(property, () => {
-        map.flyTo({
-          center: [property.longitude, property.latitude],
-          zoom: 16,
-          essential: true,
-        });
+  markersRef.current.forEach((m) => m.remove());
+  markersRef.current = [];
+
+  properties.forEach((property: any) => {
+    const markerEl = createPriceMarker(property, () => {
+      map.flyTo({
+        center: [property.longitude, property.latitude],
+        zoom: 16,
+        essential: true,
       });
-
-      const marker = new mapboxgl.Marker(markerEl)
-        .setLngLat([property.longitude, property.latitude])
-        .setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(
-            `<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`,
-          ),
-        )
-        .addTo(map);
-      markersRef.current.push(marker);
     });
 
-    const updateVisibleProperties = () => {
-      const bounds = map.getBounds();
-      if (!bounds) return;
-      let visible = properties.filter((p: any) =>
-        bounds.contains([p.longitude, p.latitude]),
-      );
+    const marker = new mapboxgl.Marker(markerEl)
+      .setLngLat([property.longitude, property.latitude])
+      .setPopup(
+        new mapboxgl.Popup({ offset: 25 }).setHTML(
+          `<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`
+        )
+      )
+      .addTo(map);
 
-      if (sortBy === "priceLow") {
-        visible.sort((a: any, b: any) => a.price - b.price);
-      } else if (sortBy === "priceHigh") {
-        visible.sort((a: any, b: any) => b.price - a.price);
-      } else if (sortBy === "newest") {
-        visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
+    markersRef.current.push(marker);
+  });
+
+  const updateVisibleProperties = () => {
+    const bounds = map.getBounds();
+    if (!bounds) return;
+
+    let visible = properties.filter((p: any) =>
+      bounds.contains([p.longitude, p.latitude])
+    );
+
+    if (sortBy === "priceLow") {
+      visible.sort((a: any, b: any) => a.price - b.price);
+    } else if (sortBy === "priceHigh") {
+      visible.sort((a: any, b: any) => b.price - a.price);
+    } else if (sortBy === "newest") {
+      visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
+    }
+
+    setVisibleProperties((prev: any) => {
+      if (JSON.stringify(prev) === JSON.stringify(visible)) {
+        return prev;
       }
+      return visible;
+    });
+  };
 
-      setVisibleProperties(visible);
-    };
+  map.on("moveend", updateVisibleProperties);
+  updateVisibleProperties();
 
-    map.on("moveend", updateVisibleProperties);
-    updateVisibleProperties();
-    return () => {
-      map.off("moveend", updateVisibleProperties);
-    };
-  }, [mapLoaded, properties, sortBy]);
+  return () => {
+    map.off("moveend", updateVisibleProperties);
+  };
+}, [mapLoaded, properties, sortBy]);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -407,53 +414,49 @@ export default function MapSearch() {
             onClose={() => setIsFilterOpen(false)}
           />
 
-        <div
-          onClick={() => setIsFilterOpen(true)}
-          className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
-        >
-          <FilterListIcon sx={{ color: "#305487" }} /> Filters
-        </div>
+          <div
+            onClick={() => setIsFilterOpen(true)}
+            className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
+          >
+            <FilterListIcon sx={{ color: "#305487" }} /> Filters
+          </div>
 
-        <div
-          onClick={() => setStatus("forSale")}
-          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "forSale"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+          <div
+            onClick={() => setStatus("forSale")}
+            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "forSale"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
           >
             For Sale
           </div>
 
-        <div
-          onClick={() => setStatus("sold")}
-          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 bg-background  text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "sold"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+          <div
+            onClick={() => setStatus("sold")}
+            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 bg-background  text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "sold"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
           >
             Sold
           </div>
 
-        <div
-          onClick={() => setStatus("expired")}
-          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "expired"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+          <div
+            onClick={() => setStatus("expired")}
+            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${status === "expired"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
           >
             Expired
           </div>
 
-        <div className="relative" ref={priceRef}>
-          <div
-            onClick={() => setIsPriceOpen(!isPriceOpen)}
-            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all  ${
-              isPriceOpen
-                ? "border-primary bg-primary text-white"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+          <div className="relative" ref={priceRef}>
+            <div
+              onClick={() => setIsPriceOpen(!isPriceOpen)}
+              className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all  ${isPriceOpen
+                  ? "border-primary bg-primary text-white"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
             >
               $ Price{" "}
@@ -518,13 +521,12 @@ export default function MapSearch() {
             )}
           </div>
 
-        <div className="relative" ref={bedsRef}>
-          <div
-            onClick={() => setIsBedsOpen(!isBedsOpen)}
-            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
-              isBedsOpen
-                ? "border-primary bg-primary text-white shadow-md"
-                : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
+          <div className="relative" ref={bedsRef}>
+            <div
+              onClick={() => setIsBedsOpen(!isBedsOpen)}
+              className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${isBedsOpen
+                  ? "border-primary bg-primary text-white shadow-md"
+                  : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
                 }`}
             >
               Beds & Baths{" "}
