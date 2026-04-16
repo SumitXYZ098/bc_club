@@ -64,7 +64,7 @@ export default function PropertiesListingPage() {
   };
 
   const pillBase =
-    "pl-4 pr-2 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none font-medium cursor-pointer border transition w-full";
+    "pl-4 pr-2 py-3 bg-white rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none font-medium cursor-pointer border transition w-full";
 
   const pillActive = "border-primary text-primary ring-1 ring-blue-200";
 
@@ -305,7 +305,7 @@ export default function PropertiesListingPage() {
                         onClick={() => {
                           setOpenFilters(true);
                         }}
-                        className="px-6 py-3 bg-background rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer w-full xl:w-fit"
+                        className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer w-full xl:w-fit"
                       >
                         <FilterListIcon sx={{ color: "#305487" }} />
                         <span className="font-medium">Filters</span>
@@ -314,7 +314,7 @@ export default function PropertiesListingPage() {
                         onClick={() => {
                           clearInstanceFilters("list");
                         }}
-                        className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
+                        className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
                           activePrice !== "any" ||
                           activeBedRoom !== "any" ||
                           activeBathRoom !== "any" ||
@@ -420,7 +420,7 @@ export default function PropertiesListingPage() {
                       onClick={() => {
                         clearInstanceFilters("list");
                       }}
-                      className={`px-4 py-3 text-sm rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
+                      className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
                         activePrice !== "any" ||
                         activeBedRoom !== "any" ||
                         activeBathRoom !== "any" ||
@@ -526,16 +526,16 @@ export default function PropertiesListingPage() {
                   </div>
                 ) : (
                   <div className="flex justify-between items-start mb-10 w-full ">
-                    <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
+                    {/* <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
                       <PropertiesMap
                         locations={listingData}
                         zoom={8}
                         center={[-122.89, 49.28]}
                       />
-                    </div>
+                    </div> */}
 
-                    <div className="xl:w-[64%] w-full flex flex-col h-full">
-                      <div className=" gap-7 grid grid-cols-1 md:grid-cols-2 justifyjustify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
+                    <div className=" w-full flex flex-col h-full">
+                      <div className=" gap-7 grid grid-cols-1 md:grid-cols-3 justifyjustify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
                         {data.map((property: any) => (
                           <PropertiesCard
                             key={property.id}

@@ -10,50 +10,20 @@ export const saleBC: GetInTouchLinkListProps = {
   title: "Homes for Sale in BC",
   linkList: [
     {
-      label: "Homes For Sale in Ontario",
-      href: "/Homes For Sale in Ontario",
-    },
-    {
-      label: "Homes For Sale in GTA",
-      href: "/Homes For Sale in GTA",
-    },
-    {
-      label: "Homes For Sale in Toronto",
-      href: "/Homes For Sale in Toronto",
-    },
-    {
-      label: "Homes For Sale in Hamilton",
-      href: "/Homes For Sale in Hamilton",
-    },
-    {
-      label: "Homes For Sale in Ottawa",
-      href: "/Homes For Sale in Ottawa",
-    },
-    {
-      label: "Homes For Sale in Brampton",
-      href: "/Homes For Sale in Brampton",
-    },
-    {
-      label: "Homes For Sale in Barrie",
-      href: "/Homes For Sale in Barrie",
-    },
-    {
-      label: "Ontario Sitemap",
-      href: "/Ontario Sitemap",
-    },
-  ],
-};
-
-export const soldBC: GetInTouchLinkListProps = {
-  title: "Homes for Sold in BC",
-  linkList: [
-    {
       label: "Homes For Sale in Vancouver",
       href: "/Homes For Sale in Vancouver",
     },
     {
-      label: "Homes For sold in British Columbia",
-      href: "/Homes For sold in British Columbia",
+      label: "Homes For Sale in Burnaby",
+      href: "/Homes For Sale in Burnaby",
+    },
+    {
+      label: "Homes For Sale in Surrey",
+      href: "/Homes For Sale in Surrey",
+    },
+    {
+      label: "Homes For Sale in Richmond",
+      href: "/Homes For Sale in Richmond",
     },
     {
       label: "Homes For Sale in Victoria",
@@ -68,54 +38,84 @@ export const soldBC: GetInTouchLinkListProps = {
       href: "/Homes For Sale in Abbotsford",
     },
     {
-      label: "Homes For Sale in White Rock",
-      href: "/Homes For Sale in White Rock",
+      label: "Homes For Sale in Coquitlam",
+      href: "/Homes For Sale in Coquitlam",
+    },
+  ],
+};
+
+export const soldBC: GetInTouchLinkListProps = {
+  title: "Homes for Sold in BC",
+  linkList: [
+    {
+      label: "Homes For sold in Vancouver",
+      href: "/Homes For sold in Vancouver",
     },
     {
-      label: "Homes For Sale in Nanaimo",
-      href: "/Homes For Sale in Nanaimo",
+      label: "Homes For sold in Victoria",
+      href: "/Homes For sold in Victoria",
     },
     {
-      label: "British Columbia Sitemap",
-      href: "/British Columbia Sitemap",
+      label: "Homes For sold in Kelowna",
+      href: "/Homes For sold in Kelowna",
+    },
+    {
+      label: "Homes For sold in Abbotsford",
+      href: "/Homes For sold in Abbotsford",
+    },
+    {
+      label: "Homes For sold in Nanaimo",
+      href: "/Homes For sold in Nanaimo",
+    },
+    {
+      label: "Homes For sold in White Rock",
+      href: "/Homes For sold in White Rock",
+    },
+    {
+      label: "Homes For sold in Kamloops",
+      href: "/Homes For sold in Kamloops",
+    },
+    {
+      label: "Homes For sold in Maple Ridge",
+      href: "/Homes For sold in Maple Ridge",
     },
   ],
 };
 
 export const realEstateBC: GetInTouchLinkListProps = {
-  title: "Homes for Real Estate Mark in BC",
+  title: "Homes for Real Estate Market in BC",
   linkList: [
     {
-      label: "Homes For Sale in Nova Scotia",
-      href: "/Homes For Sale in Nova Scotia",
+      label: "Homes For Sale in Langley",
+      href: "/Homes For Sale in Langley",
     },
     {
-      label: "Homes For Sale in Milton",
-      href: "/Homes For Sale in Milton",
+      label: "Homes For Sale in Delta",
+      href: "/Homes For Sale in Delta",
     },
     {
-      label: "Homes For Sale in Cambridge",
-      href: "/Homes For Sale in Cambridge",
+      label: "Homes For Sale in North Vancouver",
+      href: "/Homes For Sale in North Vancouver",
     },
     {
-      label: "Homes For Sale in Halifax",
-      href: "/Homes For Sale in Halifax",
+      label: "Homes For Sale in West Vancouver",
+      href: "/Homes For Sale in West Vancouver",
     },
     {
-      label: "Homes For Sale in Dartmouth",
-      href: "/Homes For Sale in Dartmouth",
+      label: "Homes For Sale in Port Coquitlam",
+      href: "/Homes For Sale in Port Coquitlam",
     },
     {
-      label: "Homes For Sale in Cape Breton",
-      href: "/Homes For Sale in Cape Breton",
+      label: "Homes For Sale in New Westminster",
+      href: "/Homes For Sale in New Westminster",
     },
     {
-      label: "Homes For Sale in Sydney",
-      href: "/Homes For Sale in Sydney",
+      label: "Homes For Sale in Chilliwack",
+      href: "/Homes For Sale in Chilliwack",
     },
     {
-      label: "Nova Scotia Sitemap",
-      href: "/Nova Scotia Sitemap",
+      label: "British Columbia Sitemap",
+      href: "/British Columbia Sitemap",
     },
   ],
 };

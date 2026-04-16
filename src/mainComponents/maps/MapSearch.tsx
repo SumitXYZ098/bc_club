@@ -15,6 +15,7 @@ import {
   FiChevronDown,
   FiLoader,
   FiCheck,
+  FiX,
 } from "react-icons/fi";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
@@ -23,6 +24,7 @@ import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import GetInTouch from "../getInTouch/GetInTouch";
+import CustomButton from "@/src/components/button/CustomButton";
 
 // ================= Slider Theme =================
 const PriceSlider = styled(Slider)({
@@ -106,7 +108,7 @@ export default function MapSearch() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  const { getInstanceFilters, updateInstanceFilter } = useListingStore();
+  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } = useListingStore();
   const filters = getInstanceFilters("map");
   const {
     search = "",
@@ -136,18 +138,18 @@ export default function MapSearch() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // States for Price Range Toggle
-  const [isPriceOpen, setIsPriceOpen] = useState(false);
-  const priceRef = useRef<HTMLDivElement>(null);
+  // States for Price & Area Toggle
+  const [isPriceAreaOpen, setIsPriceAreaOpen] = useState(false);
+  const priceAreaRef = useRef<HTMLDivElement>(null);
 
-  // Close price toggle when clicking outside
+  // Close price & area dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        priceRef.current &&
-        !priceRef.current.contains(event.target as Node)
+        priceAreaRef.current &&
+        !priceAreaRef.current.contains(event.target as Node)
       ) {
-        setIsPriceOpen(false);
+        setIsPriceAreaOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -175,13 +177,123 @@ export default function MapSearch() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // States for Location Toggle
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const locationRef = useRef<HTMLDivElement>(null);
+
+  // Close location toggle when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        locationRef.current &&
+        !locationRef.current.contains(event.target as Node)
+      ) {
+        setIsLocationOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const setActiveBedRoom = (val: string) =>
     updateInstanceFilter("map", "activeBedRoom", val);
   const setActiveBathRoom = (val: string) =>
     updateInstanceFilter("map", "activeBathRoom", val);
 
+  const setLocation = (val: string) =>
+    updateInstanceFilter("map", "location", val);
+
+  const sqft = [minSqft ?? 100, maxSqft ?? 15000];
+  const setSqft = (val: [number, number]) => {
+    updateInstanceFilter("map", "minSqft", val[0]);
+    updateInstanceFilter("map", "maxSqft", val[1]);
+  };
+
+  // ── Reset All Filters ────────────────────────────────────────────────────
+  const resetAllFilters = () => {
+    clearInstanceFilters("map");
+    setSortBy("newest");
+  };
+
+  // ── Active Filter Pills ──────────────────────────────────────────────────
+  const activeFilterPills: { label: string; onRemove: () => void }[] = [];
+
+  if (status && status !== "forSale") {
+    const statusLabel = status === "sold" ? "Sold" : status === "expired" ? "Expired" : status;
+    activeFilterPills.push({
+      label: `Status: ${statusLabel}`,
+      onRemove: () => updateInstanceFilter("map", "status", "forSale"),
+    });
+  }
+
+  if (location && location !== "") {
+    activeFilterPills.push({
+      label: `Location: ${location}`,
+      onRemove: () => updateInstanceFilter("map", "location", ""),
+    });
+  }
+
+  if (minPrice !== undefined && minPrice > 1000) {
+    activeFilterPills.push({
+      label: `Min Price: $${minPrice.toLocaleString()}`,
+      onRemove: () => updateInstanceFilter("map", "minPrice", 1000),
+    });
+  }
+
+  if (maxPrice !== undefined && maxPrice < 20000000) {
+    activeFilterPills.push({
+      label: `Max Price: $${maxPrice.toLocaleString()}`,
+      onRemove: () => updateInstanceFilter("map", "maxPrice", 20000000),
+    });
+  }
+
+  if (minSqft !== undefined && minSqft > 100) {
+    activeFilterPills.push({
+      label: `Min Area: ${minSqft} sqft`,
+      onRemove: () => updateInstanceFilter("map", "minSqft", 100),
+    });
+  }
+
+  if (maxSqft !== undefined && maxSqft < 15000) {
+    activeFilterPills.push({
+      label: `Max Area: ${maxSqft} sqft`,
+      onRemove: () => updateInstanceFilter("map", "maxSqft", 15000),
+    });
+  }
+
+  if (activeBedRoom && activeBedRoom !== "any") {
+    activeFilterPills.push({
+      label: `Beds: ${activeBedRoom}`,
+      onRemove: () => updateInstanceFilter("map", "activeBedRoom", "any"),
+    });
+  }
+
+  if (activeBathRoom && activeBathRoom !== "any") {
+    activeFilterPills.push({
+      label: `Baths: ${activeBathRoom}`,
+      onRemove: () => updateInstanceFilter("map", "activeBathRoom", "any"),
+    });
+  }
+
+  if (activeProperty && activeProperty !== "any") {
+    activeFilterPills.push({
+      label: `Type: ${activeProperty}`,
+      onRemove: () => updateInstanceFilter("map", "activeProperty", "any"),
+    });
+  }
+
+  if (sortBy !== "newest") {
+    const sortLabel = sortBy === "priceLow" ? "Price: Low→High" : "Price: High→Low";
+    activeFilterPills.push({
+      label: `Sort: ${sortLabel}`,
+      onRemove: () => setSortBy("newest"),
+    });
+  }
+
+  const hasActiveFilters = activeFilterPills.length > 0;
+
   const pillBase =
-    "pl-4 pr-2 py-3 bg-white rounded-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none font-medium cursor-pointer border transition w-full";
+    "pl-4 pr-2 py-3 bg-white rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none font-medium cursor-pointer border transition w-full";
 
   const pillActive = "border-primary text-primary ring-1 ring-blue-200";
 
@@ -243,15 +355,15 @@ export default function MapSearch() {
           baths: listing?.bathrooms ?? 0,
           longitude: Number(
             listing.longitude ||
-            listing.Longitude ||
-            listing.raw_data?.Longitude ||
-            (listing.coordinates && listing.coordinates[0]),
+              listing.Longitude ||
+              listing.raw_data?.Longitude ||
+              (listing.coordinates && listing.coordinates[0]),
           ),
           latitude: Number(
             listing.latitude ||
-            listing.Latitude ||
-            listing.raw_data?.Latitude ||
-            (listing.coordinates && listing.coordinates[1]),
+              listing.Latitude ||
+              listing.raw_data?.Latitude ||
+              (listing.coordinates && listing.coordinates[1]),
           ),
           isLogin: true,
         }))
@@ -269,12 +381,12 @@ export default function MapSearch() {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
     if (!mapContainerRef.current || mapRef.current) return;
 
- const map = new mapboxgl.Map({
-  container: mapContainerRef.current,
-  center: [-123.1207, 49.2827],
-  zoom: 10,
-   style: "mapbox://styles/mapbox/streets-v12",  
-});
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      center: [-123.1207, 49.2827],
+      zoom: 10,
+      style: "mapbox://styles/mapbox/streets-v12",
+    });
 
     map.on("load", () => setMapLoaded(true));
     mapRef.current = map;
@@ -407,101 +519,105 @@ export default function MapSearch() {
             onClose={() => setIsFilterOpen(false)}
           />
 
-        <div
-          onClick={() => setIsFilterOpen(true)}
-          className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
-        >
-          <FilterListIcon sx={{ color: "#305487" }} /> Filters
-        </div>
+          <div
+            onClick={() => setIsFilterOpen(true)}
+            className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
+          >
+            <FilterListIcon sx={{ color: "#305487" }} /> Filters
+          </div>
 
-        <div
-          onClick={() => setStatus("forSale")}
-          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "forSale"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
+          <div
+            onClick={() => setStatus("forSale")}
+            className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
+              status === "forSale"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+            }`}
           >
             For Sale
           </div>
 
-        <div
-          onClick={() => setStatus("sold")}
-          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 bg-background  text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "sold"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
+          <div
+            onClick={() => setStatus("sold")}
+            className={`flex items-center gap-1 border rounded-[10px] px-4 py-2.5 bg-background  text-sm font-normal cursor-pointer shrink-0 transition-all ${
+              status === "sold"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+            }`}
           >
             Sold
           </div>
 
-        <div
-          onClick={() => setStatus("expired")}
-          className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            status === "expired"
-              ? "bg-primary text-white border-primary"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
+          <div
+            onClick={() => setStatus("expired")}
+            className={`flex items-center gap-1 border rounded-[10px] px-4 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
+              status === "expired"
+                ? "bg-primary text-white border-primary"
+                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+            }`}
           >
             Expired
           </div>
 
-        <div className="relative" ref={priceRef}>
-          <div
-            onClick={() => setIsPriceOpen(!isPriceOpen)}
-            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all  ${
-              isPriceOpen
-                ? "border-primary bg-primary text-white"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
+          <div className="relative" ref={priceAreaRef}>
+            <div
+              onClick={() => setIsPriceAreaOpen(!isPriceAreaOpen)}
+              className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all  ${
+                isPriceAreaOpen
+                  ? "border-primary bg-primary text-white"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
             >
-              $ Price{" "}
+              Price & Area{" "}
               <FiChevronDown
-                className={`text-gray-400 ml-1 transition-transform ${isPriceOpen ? "rotate-180 text-white" : ""}`}
+                className={`text-gray-400 ml-1 transition-transform ${isPriceAreaOpen ? "rotate-180 text-white" : ""}`}
               />
             </div>
 
-            {isPriceOpen && (
-              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[400px] animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95">
-                <div className="md:mb-6 mb-3">
+            {isPriceAreaOpen && (
+              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[450px] animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95 max-h-[80vh] overflow-y-auto no-scrollbar">
+                {/* Price Section */}
+                <div className="md:mb-8 mb-5">
                   <div className="flex items-center justify-between md:mb-3">
-                    <h3 className="font-medium">Price Range</h3>
+                    <h3 className="font-bold text-gray-800 text-lg">
+                      Price Range
+                    </h3>
+
                     <button
                       onClick={() => setPrice([1000, 20000000])}
-                      className="text-xs font-bold text-white bg-secondary transition-all p-3 px-7 rounded-sm cursor-pointer"
+                      className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
-                      Reset
+                      Reset Price
                     </button>
                   </div>
-                  <div className="relative">
+                  <div className="relative px-2">
                     <PriceSlider
                       value={[price[0] ?? 1000, price[1] ?? 20000000]}
                       min={1000}
                       max={20000000}
-                      step={2000}
+                      step={20000}
                       onChange={(_, v) => setPrice(v as [number, number])}
                       disableSwap
                       valueLabelDisplay="auto"
                     />
                   </div>
 
-                  <div className="flex flex-row flex-wrap items-center mt-5 justify-between gap-4 w-full">
-                    <div className="flex flex-col flex-1 min-w-35">
-                      <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                  <div className="flex flex-row items-center mt-5 justify-between gap-4 w-full">
+                    <div className="flex flex-col flex-1">
+                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
                         Min Price
                       </p>
-                      <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 h-11 bg-white">
+                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
                         <span className="text-secondary">$</span>
                         <span>{price[0].toLocaleString()}</span>
                       </div>
                     </div>
 
-                    <div className="flex flex-col flex-1 min-w-35">
-                      <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                    <div className="flex flex-col flex-1">
+                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
                         Max Price
                       </p>
-                      <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 h-11 bg-white">
+                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
                         {price[1] === 20000000 ? (
                           <span>Max</span>
                         ) : (
@@ -514,18 +630,76 @@ export default function MapSearch() {
                     </div>
                   </div>
                 </div>
+
+                <LineGradient />
+
+                {/* Area Section */}
+                <div className="md:mb-2 mb-2 mt-2">
+                  <div className="flex items-center justify-between md:mb-3">
+                    <h3 className="font-bold text-gray-800 text-lg">
+                      Area Range
+                    </h3>
+                    <button
+                      onClick={() => setSqft([100, 15000])}
+                      className="text-xs font-bold text-primary hover:underline cursor-pointer"
+                    >
+                      Reset Area
+                    </button>
+                  </div>
+                  <div className="relative px-2">
+                    <PriceSlider
+                      value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
+                      min={100}
+                      max={15000}
+                      step={100}
+                      onChange={(_, v) => setSqft(v as [number, number])}
+                      disableSwap
+                      valueLabelDisplay="auto"
+                    />
+                  </div>
+
+                  <div className="flex flex-row items-center mt-5 justify-between gap-4 w-full">
+                    <div className="flex flex-col flex-1">
+                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
+                        Min Sqft
+                      </p>
+                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
+                        <span>{sqft[0]}</span>
+                        <span className="text-secondary text-[10px]">sqft</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col flex-1">
+                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
+                        Max Sqft
+                      </p>
+                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
+                        {sqft[1] === 15000 ? (
+                          <span>Max</span>
+                        ) : (
+                          <>
+                            <span>{sqft[1]}</span>
+                            <span className="text-secondary text-[10px]">
+                              sqft
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
 
-        <div className="relative" ref={bedsRef}>
-          <div
-            onClick={() => setIsBedsOpen(!isBedsOpen)}
-            className={`flex items-center gap-1 border rounded-[10px] px-9 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
-              isBedsOpen
-                ? "border-primary bg-primary text-white shadow-md"
-                : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
-                }`}
+          <div className="relative" ref={bedsRef}>
+            <div
+              onClick={() => setIsBedsOpen(!isBedsOpen)}
+              className={`flex items-center gap-1 border rounded-[10px] px-7 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
+                isBedsOpen
+                  ? "border-primary bg-primary text-white shadow-md"
+                  : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
+              }`}
             >
               Beds & Baths{" "}
               <FiChevronDown
@@ -544,10 +718,11 @@ export default function MapSearch() {
                       <button
                         key={val}
                         onClick={() => setActiveBedRoom(val)}
-                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${activeBedRoom === val
-                          ? "bg-primary border-primary text-white shadow-sm"
-                          : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                          }`}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
+                          activeBedRoom === val
+                            ? "bg-primary border-primary text-white shadow-sm"
+                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
+                        }`}
                       >
                         {val === "any" ? "Any" : val}
                       </button>
@@ -566,10 +741,11 @@ export default function MapSearch() {
                       <button
                         key={val}
                         onClick={() => setActiveBathRoom(val)}
-                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${activeBathRoom === val
-                          ? "bg-primary border-primary text-white shadow-sm"
-                          : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                          }`}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
+                          activeBathRoom === val
+                            ? "bg-primary border-primary text-white shadow-sm"
+                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
+                        }`}
                       >
                         {val === "any" ? "Any" : val}
                       </button>
@@ -591,14 +767,107 @@ export default function MapSearch() {
               options={[
                 { label: "Any", value: "any" },
                 { label: "Apartment/Condo", value: "Apartment/Condo" },
-                { label: "Single Family Residence", value: "Single Family Residence" },
+                {
+                  label: "Single Family Residence",
+                  value: "Single Family Residence",
+                },
                 { label: "Townhouse", value: "Townhouse" },
                 { label: "Half Duplex", value: "Half Duplex" },
-                { label: "Row House (Non-Strata)", value: "Row House (Non-Strata)" },
+                {
+                  label: "Row House (Non-Strata)",
+                  value: "Row House (Non-Strata)",
+                },
               ]}
             />
           </div>
+
+          <div className="relative" ref={locationRef}>
+            <div
+              onClick={() => setIsLocationOpen(!isLocationOpen)}
+              className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
+                isLocationOpen
+                  ? "border-primary bg-primary text-white"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {location || "Location"}{" "}
+              <FiChevronDown
+                className={`text-gray-400 ml-1 transition-transform ${isLocationOpen ? "rotate-180 text-white" : ""}`}
+              />
+            </div>
+
+            {isLocationOpen && (
+              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 w-[92vw] md:w-60 animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95">
+                <div className="max-h-80 overflow-y-auto no-scrollbar p-2">
+                  {[
+                    "British Columbia",
+                    "Vancouver",
+                    "Burnaby",
+                    "Surrey",
+                    "Richmond",
+                    "Victoria",
+                    "Kelowna",
+                    "Abbotsford",
+                    "White Rock",
+                    "Nanaimo",
+                    "Coquitlam",
+                    "New Westminster",
+                    "North Vancouver",
+                    "West Vancouver",
+                    "Langley",
+                    "Delta",
+                    "Maple Ridge",
+                    "Chilliwack",
+                  ].map((loc) => (
+                    <div
+                      key={loc}
+                      onClick={() => {
+                        setLocation(loc === "British Columbia" ? "" : loc);
+                        setIsLocationOpen(false);
+                      }}
+                      className={`px-4 py-2.5 text-sm cursor-pointer rounded-lg transition-colors ${location === loc || (loc === "British Columbia" && !location) ? "bg-primary/10 text-primary font-bold" : "text-gray-600 hover:bg-gray-50"}`}
+                    >
+                      {loc}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* ACTIVE FILTER PILLS ROW */}
+        {hasActiveFilters && (
+          <div className="relative z-[999] bg-[#f8faff] border-b border-gray-100 px-4 py-2 flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide shrink-0 mr-1">
+              Active:
+            </span>
+
+            {activeFilterPills.map((pill, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-1.5 bg-primary/10 border border-primary/25 text-primary text-xs font-semibold px-3 py-1.5 rounded-full animate-in fade-in duration-200"
+              >
+                <span>{pill.label}</span>
+                <button
+                  onClick={pill.onRemove}
+                  className="ml-0.5 hover:bg-primary/20 rounded-full p-0.5 transition-colors cursor-pointer"
+                  aria-label="Remove filter"
+                >
+                  <FiX size={11} />
+                </button>
+              </div>
+            ))}
+
+            <button
+              onClick={resetAllFilters}
+              className="ml-auto flex items-center gap-1.5 bg-primary text-white text-xs font-bold px-4 py-2.5 rounded-[10px] transition-all duration-200 shrink-0 cursor-pointer"
+            >
+              <FiX size={12} />
+              Reset All
+            </button>
+          </div>
+        )}
 
         {/* MAIN CONTENT */}
         <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative">
@@ -661,7 +930,9 @@ export default function MapSearch() {
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center h-64 space-y-3">
                   <FiLoader className="w-8 h-8 text-primary animate-spin" />
-                  <p className="text-gray-500 text-sm font-medium">Fetching properties...</p>
+                  <p className="text-gray-500 text-sm font-medium">
+                    Fetching properties...
+                  </p>
                 </div>
               ) : visibleProperties.length > 0 ? (
                 visibleProperties.map((p) => (
@@ -693,17 +964,25 @@ export default function MapSearch() {
               <div className="absolute inset-0 bg-white/30 backdrop-blur-[1px] z-20 pointer-events-none flex items-start justify-center pt-10">
                 <div className="bg-white px-4 py-2 rounded-full shadow-md flex items-center gap-2">
                   <FiLoader className="animate-spin text-primary" />
-                  <span className="text-xs font-bold text-gray-600">Updating Map...</span>
+                  <span className="text-xs font-bold text-gray-600">
+                    Updating Map...
+                  </span>
                 </div>
               </div>
             )}
 
             <div className="absolute right-4 top-4 flex flex-col gap-2 z-10">
               <div className="flex flex-col bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden">
-                <button className="p-2.5 border-b hover:bg-gray-50" onClick={() => mapRef.current?.zoomIn()}>
+                <button
+                  className="p-2.5 border-b hover:bg-gray-50"
+                  onClick={() => mapRef.current?.zoomIn()}
+                >
                   <FiPlus className="w-5 h-5 text-gray-600" />
                 </button>
-                <button className="p-2.5 hover:bg-gray-50" onClick={() => mapRef.current?.zoomOut()}>
+                <button
+                  className="p-2.5 hover:bg-gray-50"
+                  onClick={() => mapRef.current?.zoomOut()}
+                >
                   <FiMinus className="w-5 h-5 text-gray-600" />
                 </button>
               </div>
@@ -719,8 +998,8 @@ export default function MapSearch() {
             </div>
           </div>
         </div>
-
       </div>
-      <GetInTouch /></>
+      <GetInTouch />
+    </>
   );
 }

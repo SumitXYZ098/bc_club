@@ -273,7 +273,7 @@ const EstimateCostForm = () => {
               />
             </div>
 
-            {/* Property Type */}
+            {/*    */}
             <div className="flex flex-col gap-y-3">
               <label className="md:text-2xl text-xl font-bold opacity-50">
                 Property Type
