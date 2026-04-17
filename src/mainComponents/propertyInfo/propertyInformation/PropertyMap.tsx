@@ -91,7 +91,7 @@ const PropertyMap = ({
             {address.split(",")[0]}, {city}, {state}
             {address.split("BC").slice(-1)[0]}, Canada
           </p>
-          <p className="text-xs text-gray-400">No reviews</p>
+          <p className="text-xs text-gray-400">No reviews</p> 
         </div>
 
         <div className="flex items-center gap-2">

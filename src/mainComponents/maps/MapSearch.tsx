@@ -25,6 +25,7 @@ import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import GetInTouch from "../getInTouch/GetInTouch";
 import CustomButton from "@/src/components/button/CustomButton";
+import { usePathname } from "next/navigation";
 
 // ================= Slider Theme =================
 const PriceSlider = styled(Slider)({
@@ -103,12 +104,15 @@ export default function MapSearch() {
   const [sortBy, setSortBy] = useState("newest");
   const [visibleProperties, setVisibleProperties] = useState<any[]>([]);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const pathName = usePathname();
+  const isWishlistPage = pathName === "/wishlist";
 
   // States for Custom Sort Dropdown
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } = useListingStore();
+  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
+    useListingStore();
   const filters = getInstanceFilters("map");
   const {
     search = "",
@@ -219,7 +223,8 @@ export default function MapSearch() {
   const activeFilterPills: { label: string; onRemove: () => void }[] = [];
 
   if (status && status !== "forSale") {
-    const statusLabel = status === "sold" ? "Sold" : status === "expired" ? "Expired" : status;
+    const statusLabel =
+      status === "sold" ? "Sold" : status === "expired" ? "Expired" : status;
     activeFilterPills.push({
       label: `Status: ${statusLabel}`,
       onRemove: () => updateInstanceFilter("map", "status", "forSale"),
@@ -283,7 +288,8 @@ export default function MapSearch() {
   }
 
   if (sortBy !== "newest") {
-    const sortLabel = sortBy === "priceLow" ? "Price: Low→High" : "Price: High→Low";
+    const sortLabel =
+      sortBy === "priceLow" ? "Price: Low→High" : "Price: High→Low";
     activeFilterPills.push({
       label: `Sort: ${sortLabel}`,
       onRemove: () => setSortBy("newest"),
@@ -293,7 +299,7 @@ export default function MapSearch() {
   const hasActiveFilters = activeFilterPills.length > 0;
 
   const pillBase =
-    "pl-4 pr-2 py-3 bg-white rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] appearance-none font-medium cursor-pointer border transition w-full";
+    "pl-4 pr-2 py-3 bg-white rounded-[10px] appearance-none font-medium cursor-pointer border transition w-full";
 
   const pillActive = "border-primary text-primary ring-1 ring-blue-200";
 
@@ -338,32 +344,56 @@ export default function MapSearch() {
     select: (res: any) => {
       const listings = res?.data || [];
       return listings
-        .map((listing: any) => ({
-          id: listing.documentId || Math.random().toString(),
-          image: listing?.media?.[0]?.MediaURL || Images.apartment,
-          title: listing?.property_sub_type || "Property",
-          price: listing?.price || 0,
-          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-          address: listing?.address
-            ? `${listing?.address}, ${listing?.city || ""}`
-            : listing?.city || "",
-          sqft: listing?.area ?? 0,
-          beds: listing?.bedrooms ?? 0,
-          baths: listing?.bathrooms ?? 0,
-          longitude: Number(
-            listing.longitude ||
-              listing.Longitude ||
-              listing.raw_data?.Longitude ||
-              (listing.coordinates && listing.coordinates[0]),
+        .map(
+          (listing: any) => (
+            console.log(
+              "longitude:",
+              listing?.longitude,
+              " latitude:",
+              listing?.latitude,
+            ),
+            {
+              id: listing.documentId || Math.random().toString(),
+              image: listing?.media?.[0]?.MediaURL || Images.apartment,
+              title: listing?.property_sub_type || "Property",
+              price: listing?.price || 0,
+              daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+              address: listing?.address
+                ? `${listing?.address}, ${listing?.city || ""}`
+                : listing?.city || "",
+              sqft: listing?.area ?? 0,
+              beds: listing?.bedrooms ?? 0,
+              baths: listing?.bathrooms ?? 0,
+              longitude: listing?.longitude,
+              latitude: listing?.latitude,
+              priceDrop:
+                listing.PreviousListPrice &&
+                listing.PreviousListPrice > listing.ListPrice
+                  ? Number(
+                      (
+                        (listing.PreviousListPrice - listing.ListPrice) /
+                        listing.ListPrice
+                      ).toFixed(1),
+                    )
+                  : undefined,
+              assessedDiff: listing.ListPrice
+                ? Number(
+                    (
+                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                      listing.ListPrice
+                    ).toFixed(1),
+                  )
+                : 0,
+              mls: listing?.mls_number,
+              realtor:
+                listing?.office_data?.OfficeName ||
+                listing?.raw_data?.ListAOR ||
+                "Unknown",
+              isLogin: false,
+              isFavourite: listing?.is_favorite || isWishlistPage,
+            }
           ),
-          latitude: Number(
-            listing.latitude ||
-              listing.Latitude ||
-              listing.raw_data?.Latitude ||
-              (listing.coordinates && listing.coordinates[1]),
-          ),
-          isLogin: true,
-        }))
+        )
         .filter(
           (l: any) =>
             !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,
@@ -453,65 +483,65 @@ export default function MapSearch() {
   // Update Markers and visible list with sorting
 
   useEffect(() => {
-  if (!mapLoaded || !mapRef.current) return;
+    if (!mapLoaded || !mapRef.current) return;
 
-  const map = mapRef.current;
+    const map = mapRef.current;
 
-  markersRef.current.forEach((m) => m.remove());
-  markersRef.current = [];
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current = [];
 
-  properties.forEach((property: any) => {
-    const markerEl = createPriceMarker(property, () => {
-      map.flyTo({
-        center: [property.longitude, property.latitude],
-        zoom: 16,
-        essential: true,
+    properties.forEach((property: any) => {
+      const markerEl = createPriceMarker(property, () => {
+        map.flyTo({
+          center: [property.longitude, property.latitude],
+          zoom: 16,
+          essential: true,
+        });
       });
-    });
 
-    const marker = new mapboxgl.Marker(markerEl)
-      .setLngLat([property.longitude, property.latitude])
-      .setPopup(
-        new mapboxgl.Popup({ offset: 25 }).setHTML(
-          `<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`
+      const marker = new mapboxgl.Marker(markerEl)
+        .setLngLat([property.longitude, property.latitude])
+        .setPopup(
+          new mapboxgl.Popup({ offset: 25 }).setHTML(
+            `<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`,
+          ),
         )
-      )
-      .addTo(map);
+        .addTo(map);
 
-    markersRef.current.push(marker);
-  });
-
-  const updateVisibleProperties = () => {
-    const bounds = map.getBounds();
-    if (!bounds) return;
-
-    let visible = properties.filter((p: any) =>
-      bounds.contains([p.longitude, p.latitude])
-    );
-
-    if (sortBy === "priceLow") {
-      visible.sort((a: any, b: any) => a.price - b.price);
-    } else if (sortBy === "priceHigh") {
-      visible.sort((a: any, b: any) => b.price - a.price);
-    } else if (sortBy === "newest") {
-      visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
-    }
-
-    setVisibleProperties((prev: any) => {
-      if (JSON.stringify(prev) === JSON.stringify(visible)) {
-        return prev;
-      }
-      return visible;
+      markersRef.current.push(marker);
     });
-  };
 
-  map.on("moveend", updateVisibleProperties);
-  updateVisibleProperties();
+    const updateVisibleProperties = () => {
+      const bounds = map.getBounds();
+      if (!bounds) return;
 
-  return () => {
-    map.off("moveend", updateVisibleProperties);
-  };
-}, [mapLoaded, properties, sortBy]);
+      let visible = properties.filter((p: any) =>
+        bounds.contains([p.longitude, p.latitude]),
+      );
+
+      if (sortBy === "priceLow") {
+        visible.sort((a: any, b: any) => a.price - b.price);
+      } else if (sortBy === "priceHigh") {
+        visible.sort((a: any, b: any) => b.price - a.price);
+      } else if (sortBy === "newest") {
+        visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
+      }
+
+      setVisibleProperties((prev: any) => {
+        if (JSON.stringify(prev) === JSON.stringify(visible)) {
+          return prev;
+        }
+        return visible;
+      });
+    };
+
+    map.on("moveend", updateVisibleProperties);
+    updateVisibleProperties();
+
+    return () => {
+      map.off("moveend", updateVisibleProperties);
+    };
+  }, [mapLoaded, properties, sortBy]);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -519,7 +549,7 @@ export default function MapSearch() {
     <>
       <div className="w-full h-screen flex flex-col bg-white overflow-hidden mt-20">
         {/* 1. TOP FILTER BAR */}
-        <div className="relative z-[1000] bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-2 overflow-x-auto md:overflow-visible no-scrollbar">
+        <div className="flex flex-wrap md:justify-start  justify-center items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full pl-5 mt-4">
           <FiltersPopup
             id="map"
             open={isFilterOpen}
@@ -943,10 +973,7 @@ export default function MapSearch() {
                 </div>
               ) : visibleProperties.length > 0 ? (
                 visibleProperties.map((p) => (
-                  <div
-                    key={p.id}
-                    className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
-                  >
+                  <div key={p.id} className="">
                     <PropertiesCard
                       {...p}
                       isLogin
