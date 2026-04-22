@@ -16,6 +16,7 @@ import { useListingStore } from "@/src/store/useListingStore";
 import {
   useGetListings,
   useGetWishlistProperties,
+  useGetActiveListings,
 } from "@/src/hooks/listing/useListingQueries";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "../auth/AuthContext";
@@ -28,7 +29,8 @@ export default function PropertiesListingPage() {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
   const [openFilters, setOpenFilters] = useState(false);
 
-  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } = useListingStore();
+  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
+    useListingStore();
   const filters = getInstanceFilters("list");
 
   const search = filters.search || "";
@@ -47,12 +49,16 @@ export default function PropertiesListingPage() {
   const status = filters.status;
   const location = filters.location;
 
-  const setSearch = (val: string) => updateInstanceFilter("list", "search", val);
-  const setIsChip = (val: boolean) => updateInstanceFilter("list", "isChip", val);
-  const setActivePrice = (val: string) => updateInstanceFilter("list", "activePrice", val);
+  const setSearch = (val: string) =>
+    updateInstanceFilter("list", "search", val);
+  const setIsChip = (val: boolean) =>
+    updateInstanceFilter("list", "isChip", val);
+  const setActivePrice = (val: string) =>
+    updateInstanceFilter("list", "activePrice", val);
   const setActiveBathRoom = (val: string) =>
     updateInstanceFilter("list", "activeBathRoom", val);
-  const setActiveBedRoom = (val: string) => updateInstanceFilter("list", "activeBedRoom", val);
+  const setActiveBedRoom = (val: string) =>
+    updateInstanceFilter("list", "activeBedRoom", val);
   const setActiveProperty = (val: string) =>
     updateInstanceFilter("list", "activeProperty", val);
   const setPage = (val: number | ((prev: number) => number)) => {
@@ -128,18 +134,15 @@ export default function PropertiesListingPage() {
 
     const properties: PropertyCardProps[] = listings.map((listing: any) => ({
       id: listing.documentId,
-      image: listing?.media?.[0]?.MediaURL,
+      image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
       title: listing?.property_sub_type,
       price: listing?.price,
       daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-      address: listing?.address
-        ? `${listing?.address}, ${listing?.city}, ${listing?.state}`
-        : `${listing?.city}, ${listing?.state}` || "",
-      sqft: listing?.area ?? 0,
+      address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
+      sqft: listing?.area ?? listing?.lot_size_area ?? 0,
       beds: listing?.bedrooms ?? 0,
       baths: listing?.bathrooms ?? 0,
       priceDrop:
-        listing.PreviousListPrice &&
         listing.PreviousListPrice > listing.ListPrice
           ? Number(
               (
@@ -156,26 +159,34 @@ export default function PropertiesListingPage() {
             ).toFixed(1),
           )
         : 0,
-      mls: listing?.mls_number,
+      mls: listing?.mls_number ?? listing?.listing_id,
       realtor:
         listing?.office_data?.OfficeName ||
         listing?.raw_data?.ListAOR ||
         "Unknown",
-      isLogin: false,
       isFavourite: listing?.is_favorite || isWishlistPage,
     }));
 
     return { properties, listings, pagination };
   };
 
-  const {
-    data: queryData,
-    isLoading: loading,
-    error,
-  } = useGetListings(params, {
-    select,
-    enabled: !isWishlistPage,
-  });
+  const isForSale = status === "forSale" || !status;
+  const { data: queryDataNormal, isLoading: loadingNormal } = useGetListings(
+    params,
+    {
+      select,
+      enabled: !isWishlistPage && !isForSale,
+    },
+  );
+
+  const { data: queryDataActive, isLoading: loadingActive } =
+    useGetActiveListings({
+      select,
+      enabled: !isWishlistPage && isForSale,
+    });
+
+  const queryData = isForSale ? queryDataActive : queryDataNormal;
+  const loading = isForSale ? loadingActive : loadingNormal;
 
   const {
     data: wishlistData,
@@ -444,7 +455,7 @@ export default function PropertiesListingPage() {
                     </button>
                   </div>
                 )}
-                {(filters.status ||
+                {((filters.status && filters.status !== "forSale") ||
                   (filters.minPrice !== undefined && filters.minPrice > 1000) ||
                   (filters.maxPrice !== undefined &&
                     filters.maxPrice < 20000000) ||
@@ -482,11 +493,11 @@ export default function PropertiesListingPage() {
                           className="bg-gray-100 text-sm"
                         />
                       ) : null}
-                      {filters.status && (
+                      {filters.status && filters.status !== "forSale" && (
                         <Chip
                           label={filters.status}
                           onDelete={() => {
-                            updateInstanceFilter("list", "status", "");
+                            updateInstanceFilter("list", "status", "forSale");
                           }}
                           className="bg-gray-100 text-sm capitalize"
                         />
@@ -572,7 +583,11 @@ export default function PropertiesListingPage() {
         )}
       </div>
 
-      <FiltersPopup id="list" open={openFilters} onClose={() => setOpenFilters(false)} />
+      <FiltersPopup
+        id="list"
+        open={openFilters}
+        onClose={() => setOpenFilters(false)}
+      />
     </div>
   );
 }

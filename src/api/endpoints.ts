@@ -11,4 +11,5 @@ export const Endpoints = {
   getFavouriteProperties: `${BASE_URL}/api/my-favorites`,
   me: `${BASE_URL}/api/users/me`,
   importPropertyList: `${BASE_URL}/api/property-assignment-lists`,
+  getActivePropertyLists: `${BASE_URL}/api/active-listings`
 };

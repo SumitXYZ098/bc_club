@@ -3,7 +3,10 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl, { Map as MapboxMap } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCard";
-import { useGetListings } from "@/src/hooks/listing/useListingQueries";
+import {
+  useGetListings,
+  useGetActiveListings,
+} from "@/src/hooks/listing/useListingQueries";
 import { Images } from "@/src/app/exports";
 import { useListingStore } from "@/src/store/useListingStore";
 import {
@@ -26,6 +29,7 @@ import { styled } from "@mui/material/styles";
 import GetInTouch from "../getInTouch/GetInTouch";
 import CustomButton from "@/src/components/button/CustomButton";
 import { usePathname } from "next/navigation";
+import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 
 // ================= Slider Theme =================
 const PriceSlider = styled(Slider)({
@@ -127,9 +131,26 @@ export default function MapSearch() {
     activeBathRoom,
   } = filters;
 
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
+
   const setActiveProperty = (val: string) =>
     updateInstanceFilter("map", "activeProperty", val);
-  const setStatus = (val: string) => updateInstanceFilter("map", "status", val);
+
+  const setStatus = (val: string) => {
+    if ((val === "sold" || val === "expired") && !isLoggedIn) {
+      setOpenLogin(true);
+      return;
+    }
+    updateInstanceFilter("map", "status", val);
+  };
+
+  // Enforce restriction if status is set externally (e.g. via GetInTouch or store initial state)
+  useEffect(() => {
+    if ((status === "sold" || status === "expired") && !isLoggedIn) {
+      updateInstanceFilter("map", "status", "forSale");
+      setOpenLogin(true);
+    }
+  }, [status, isLoggedIn, updateInstanceFilter, setOpenLogin]);
 
   // Close custom dropdown when clicking outside
   useEffect(() => {
@@ -340,66 +361,135 @@ export default function MapSearch() {
     params.bathrooms = activeBathRoom.replace("+", "");
   if (activeProperty && activeProperty !== "any") params.type = activeProperty;
 
-  const { data: queryData, isLoading } = useGetListings(params, {
-    select: (res: any) => {
-      const listings = res?.data || [];
-      return listings
-        .map(
-          (listing: any) => (
-            console.log(
-              "longitude:",
-              listing?.longitude,
-              " latitude:",
-              listing?.latitude,
-            ),
-            {
-              id: listing.documentId || Math.random().toString(),
-              image: listing?.media?.[0]?.MediaURL || Images.apartment,
-              title: listing?.property_sub_type || "Property",
-              price: listing?.price || 0,
-              daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-              address: listing?.address
-                ? `${listing?.address}, ${listing?.city || ""}`
-                : listing?.city || "",
-              sqft: listing?.area ?? 0,
-              beds: listing?.bedrooms ?? 0,
-              baths: listing?.bathrooms ?? 0,
-              longitude: listing?.longitude,
-              latitude: listing?.latitude,
-              priceDrop:
-                listing.PreviousListPrice &&
-                listing.PreviousListPrice > listing.ListPrice
+  const isForSale = status === "forSale" || !status;
+  const { data: queryDataNormal, isLoading: isLoadingNormal } = useGetListings(
+    params,
+    {
+      select: (res: any) => {
+        const listings = res?.data || [];
+        return listings
+          .map(
+            (listing: any) => (
+              console.log(
+                "longitude:",
+                listing?.longitude,
+                " latitude:",
+                listing?.latitude,
+              ),
+             
+              {
+                id: listing.documentId || Math.random().toString(),
+                image: listing?.media?.[0]?.MediaURL || Images.apartment,
+                title: listing?.property_sub_type || "Property",
+                price: listing?.price || 0,
+                daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+                address: listing?.address
+                  ? `${listing?.address}, ${listing?.city || ""}`
+                  : listing?.city || "",
+                sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+                beds: listing?.bedrooms ?? 0,
+                baths: listing?.bathrooms ?? 0,
+                longitude: listing?.longitude,
+                latitude: listing?.latitude,
+                priceDrop:
+                  listing.PreviousListPrice &&
+                  listing.PreviousListPrice > listing.ListPrice
+                    ? Number(
+                        (
+                          (listing.PreviousListPrice - listing.ListPrice) /
+                          listing.ListPrice
+                        ).toFixed(1),
+                      )
+                    : undefined,
+                assessedDiff: listing.ListPrice
                   ? Number(
                       (
-                        (listing.PreviousListPrice - listing.ListPrice) /
+                        (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
                         listing.ListPrice
                       ).toFixed(1),
                     )
-                  : undefined,
-              assessedDiff: listing.ListPrice
-                ? Number(
-                    (
-                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                      listing.ListPrice
-                    ).toFixed(1),
-                  )
-                : 0,
-              mls: listing?.mls_number,
-              realtor:
-                listing?.office_data?.OfficeName ||
-                listing?.raw_data?.ListAOR ||
-                "Unknown",
-              isLogin: false,
-              isFavourite: listing?.is_favorite || isWishlistPage,
-            }
-          ),
-        )
-        .filter(
-          (l: any) =>
-            !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,
-        );
+                  : 0,
+                mls: listing?.mls_number,
+                realtor:
+                  listing?.office_data?.OfficeName ||
+                  listing?.raw_data?.ListAOR ||
+                  "Unknown",
+                isLogin: false,
+                isFavourite: listing?.is_favorite || isWishlistPage,
+              }
+            ),
+          )
+          .filter(
+            (l: any) =>
+              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,
+         
+          );
+      },
+      enabled: !isForSale,
     },
-  });
+  );
+
+  const { data: queryDataActive, isLoading: isLoadingActive } =
+    useGetActiveListings({
+      select: (res: any) => {
+        const listings = res?.data || [];
+        return listings
+          .map(
+            (listing: any) => (
+              console.log(
+                "longitude:",
+                listing?.longitude,
+                " latitude:",
+                listing?.latitude,
+              ),
+              {
+                id: listing.documentId,
+                image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
+                title: listing?.property_sub_type,
+                price: listing?.price || 0,
+                daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+                address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
+                sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+                beds: listing?.bedrooms ?? 0,
+                baths: listing?.bathrooms ?? 0,
+                priceDrop:
+                  listing.PreviousListPrice > listing.ListPrice
+                    ? Number(
+                        (
+                          (listing.PreviousListPrice - listing.ListPrice) /
+                          listing.ListPrice
+                        ).toFixed(1),
+                      )
+                    : undefined,
+                assessedDiff: listing.ListPrice
+                  ? Number(
+                      (
+                        (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                        listing.ListPrice
+                      ).toFixed(1),
+                    )
+                  : 0,
+                longitude: listing?.longitude,
+                latitude: listing?.latitude,
+                mls: listing?.mls_number ?? listing?.listing_id,
+                realtor:
+                  listing?.office_data?.OfficeName ||
+                  listing?.raw_data?.ListAOR ||
+                  "Unknown",
+                isFavourite: listing?.is_favorite || isWishlistPage,
+              }
+            ),
+          )
+          .filter(
+            (l: any) =>
+              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,
+          );
+      },
+      enabled: isForSale,
+    });
+
+  const queryData = isForSale ? queryDataActive : queryDataNormal;
+  const isLoading = isForSale ? isLoadingActive : isLoadingNormal;
 
   const properties = queryData || [];
 
@@ -976,7 +1066,7 @@ export default function MapSearch() {
                   <div key={p.id} className="">
                     <PropertiesCard
                       {...p}
-                      isLogin
+                      isLogin={isLoggedIn || status === "forSale"}
                       isSold={status === "sold"}
                       isExpired={status === "expired"}
                     />

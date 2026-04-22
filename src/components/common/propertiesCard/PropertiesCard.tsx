@@ -90,7 +90,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
     removeFromWishlist.mutate(id);
   };
-  const displayPrice = isLogin ? `$${price.toLocaleString()}` : "$*,***,***";
+  const displayPrice = isLogin ? `$${price?.toLocaleString()}` : "$*,***,***";
   const displayAddress = isLogin ? address : "Sign in to view address";
   const displayTitle = isLogin ? title : "Property Details Restricted";
   const displaySqft = isLogin ? `${sqft} sqft` : "---- sqft";
@@ -100,6 +100,11 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   const displayRealtor = isLogin
     ? `Courtesy of: ${realtor}`
     : "Courtesy of: **********";
+
+
+  const img = image ? image : Images.apartment;
+
+  console.log("IMAGE:", img);
 
   return (
     <Link
@@ -114,16 +119,20 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
         <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-full justify-between">
           <div className="relative">
             <div className="w-full h-56 overflow-clip rounded-lg">
-              <Image
-                src={image || Images.apartment}
-                alt={displayTitle}
-                className={`w-full h-56 object-cover rounded-lg transition duration-300 ease-in-out ${
-                  isLogin ? "group-hover:scale-125" : "blur-sm"
-                }`}
-                width={700}
-                height={403}
-                loading="eager"
-              />
+              {img ? (
+                <Image
+                  src={img}
+                  alt={displayTitle}
+                  className={`w-full h-56 object-cover rounded-lg transition duration-300 ease-in-out ${
+                    isLogin ? "group-hover:scale-125" : "blur-sm"
+                  }`}
+                  width={700}
+                  height={403}
+                  loading="eager"
+                />
+              ) : (
+                <div className="w-full h-56 bg-gray-200 rounded-lg animate-pulse" />
+              )}
             </div>
 
             {/* Favorite Icon */}

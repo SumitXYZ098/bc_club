@@ -34,7 +34,7 @@ const DEFAULT_FILTERS: FilterState = {
   maxSqft: 15000,
   activeBedRoom: "any",
   activeBathRoom: "any",
-  status: ""
+  status: "forSale"
 };
 
 export const useListingStore = create<ListingState>((set, get) => ({

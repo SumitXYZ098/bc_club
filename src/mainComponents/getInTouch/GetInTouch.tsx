@@ -12,6 +12,7 @@ import Image from "next/image";
 import { Icons } from "@/src/app/exports";
 import { usePathname, useRouter } from "next/navigation";
 import { useListingStore } from "@/src/store/useListingStore";
+import { useAuthContext } from "../auth/AuthContext";
 
 const GetInTouchLink: React.FC<
   GetInTouchLinkListProps & {
@@ -25,7 +26,7 @@ const GetInTouchLink: React.FC<
         className={`font-bold text-base ${onTitleClick ? "cursor-pointer hover:text-primary transition-all underline-offset-4 hover:underline" : ""}`}
         onClick={() => onTitleClick?.(title)}
       >
-        {title}
+        {title} 
       </span>
       <ul className="list-none flex flex-col text-sm text-lightWhite space-y-4">
         {linkList.map((item, idx) => (
@@ -46,6 +47,7 @@ const GetInTouch = () => {
   const path = usePathname();
   const router = useRouter();
   const { updateInstanceFilter } = useListingStore();
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
 
   const handleTitleClick = (title: string) => {
     let status = "forSale";
@@ -53,6 +55,11 @@ const GetInTouch = () => {
       status = "sold";
     } else if (title.toLowerCase().includes("market")) {
       status = "expired";
+    }
+
+    if ((status === "sold" || status === "expired") && !isLoggedIn) {
+      setOpenLogin(true);
+      return;
     }
 
     updateInstanceFilter("map", "status", status);
@@ -69,6 +76,11 @@ const GetInTouch = () => {
     let status = "forSale";
     if (label.toLowerCase().includes("sold")) {
       status = "sold";
+    }
+
+    if (status === "sold" && !isLoggedIn) {
+      setOpenLogin(true);
+      return;
     }
 
     // Extract city/location from "Homes For Sale in Vancouver"

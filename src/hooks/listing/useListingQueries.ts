@@ -12,6 +12,7 @@ import {
   getMe,
   addToFavourite,
   removeFromFavourite,
+  getActiveListings,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -38,6 +39,21 @@ export function useGetListings<TData = any>(
     ...options,
   });
 }
+
+export function useGetActiveListings<TData = any>(
+
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: listingKeys.lists(),
+    queryFn: () => getActiveListings(),
+    ...options,
+  });
+}
+
 
 export function useGetListingById<TData = any>(
   id: string,

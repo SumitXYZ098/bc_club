@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         hostname: "dvvjkgh94f2v6.cloudfront.net",
         pathname: "**",
       },
+        {
+        protocol: "https",
+        hostname: "ddfcdn.realtor.ca",
+        pathname: "**",
+      },
     ],
   },
   turbopack: {

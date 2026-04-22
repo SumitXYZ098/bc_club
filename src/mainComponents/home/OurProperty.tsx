@@ -12,7 +12,7 @@ import PropertiesCard, {
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 
-import { useGetListings } from "@/src/hooks/listing/useListingQueries";
+import { useGetActiveListings, useGetListings } from "@/src/hooks/listing/useListingQueries";
 import { useAuthContext } from "../auth/AuthContext";
 
 const tabList = [
@@ -72,12 +72,12 @@ const OurProperty = () => {
   // 🔹 Mapping Function
   const mapProperty = (listing: any): PropertyCardProps => ({
     id: listing.documentId,
-    image: listing?.media?.[0]?.MediaURL,
+    image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
     address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
-    sqft: listing?.area ?? 0,
+    sqft: listing?.area ?? listing?.lot_size_area ?? 0,
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
     priceDrop:
@@ -97,7 +97,8 @@ const OurProperty = () => {
         ).toFixed(1),
       )
       : 0,
-    mls: listing?.mls_number,
+    mls: listing?.mls_number ?? listing?.listing_id
+,
     realtor:
       listing?.office_data?.OfficeName ||
       listing?.raw_data?.ListAOR ||
@@ -105,21 +106,10 @@ const OurProperty = () => {
     isFavourite: listing?.is_favorite || false,
   });
 
-  const { data: newList = [], isLoading: isLoadingNew } = useGetListings(
-    {
-      "filters[property_status][$notIn]": [
-        "Expired",
-        "Terminated",
-        "Cancelled",
-      ],
-      "filters[raw_data][BCRES_SoldDate][$null]": true,
-      "filters[property_sub_type][$notNull]": true,
-
-      "filters[city][$containsi]": city,
-    },
+  const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
     {
       select: (res: any) => {
-        // console.log("📦 API Response:", res);
+        console.log("📦 API Response:", res);
         // console.log("🏙️ Current City Filter:", city);
 
         return (

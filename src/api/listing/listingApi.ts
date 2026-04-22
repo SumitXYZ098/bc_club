@@ -19,6 +19,21 @@ export async function getListings(params: any): Promise<any> {
   }
 }
 
+// GETACTIVELIST API
+
+export async function getActiveListings(): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getActivePropertyLists);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data.error.message);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+
 export async function getListingById(id: string): Promise<any> {
   try {
     const res = await axios.get(Endpoints.getListingById(id));
