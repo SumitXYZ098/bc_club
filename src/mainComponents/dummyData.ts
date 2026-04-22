@@ -264,7 +264,7 @@ export const getPropertyDetailsRows = (property: any) => [
       {
         data: {
           label: "Status",
-          value:  "-",
+          value:  property?.standard_status || "-",
         },
       },
     ],
@@ -272,7 +272,7 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Floor Area",
-      value: property?.area ? `${property.area} sqft` : "-",
+      value: property?.lot_size_area || property?.area ? `${property?.lot_size_area || property?.area} ${property?.lot_size_units || 'sqft'}` : "-",
     },
     subRows: [
       {
@@ -317,7 +317,7 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "MLS Number",
-      value: property?.mls_number || "-",
+      value: property?.listing_id || property?.mls_number || "-",
     },
   },
   {

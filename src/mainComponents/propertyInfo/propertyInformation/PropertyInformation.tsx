@@ -52,7 +52,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
     {
       icon: Icons.scale,
       label: "Area Size",
-      value: property?.area || "Na",
+      value: property?.lot_size_area || property?.area || "Na",
     },
   ];
 
@@ -86,7 +86,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
             <Description
               type={IDescriptionTypes.dec1614}
               customClasses="text-black70/50"
-              content={property?.raw_data?.PublicRemarks || "No Description"}
+              content={property?.public_remarks || property?.raw_data?.PublicRemarks || "No Description"}
             />
           </div>
 
@@ -141,7 +141,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
               </Link>
             </div>
             <PropertyMap
-              location={[property.longitude, property.latitude]}
+              location={[Number(property.longitude), Number(property.latitude)]}
               address={property.address}
               city={property.city}
               state={property.state}

@@ -33,11 +33,23 @@ export async function getActiveListings(): Promise<any> {
   }
 }
 
+export async function getActiveListingById(id: string): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getActiveListingById(id));
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
 
 export async function getListingById(id: string): Promise<any> {
   try {
     const res = await axios.get(Endpoints.getListingById(id));
-    return res;
+    return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error?.message || "API error");

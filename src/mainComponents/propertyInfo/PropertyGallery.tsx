@@ -14,6 +14,11 @@ export default function PropertyGallery({ images }: Props) {
   const [index, setIndex] = useState(0);
 
   const visibleImages = images.slice(0, 5);
+  
+  const getImageUrl = (img: any) => {
+    if (typeof img === "string") return img;
+    return img?.MediaURL || "";
+  };
 
   return (
     <>
@@ -28,7 +33,7 @@ export default function PropertyGallery({ images }: Props) {
           }}
         >
           <Image
-            src={images[0].MediaURL}
+            src={getImageUrl(images[0])}
             alt="Property image"
             width={1020}
             height={450}
@@ -51,7 +56,7 @@ export default function PropertyGallery({ images }: Props) {
                 }}
               >
                 <Image
-                  src={img.MediaURL}
+                  src={getImageUrl(img)}
                   alt={`Thumbnail ${i + 1}`}
                   width={450}
                   height={300}
@@ -77,7 +82,7 @@ export default function PropertyGallery({ images }: Props) {
         open={open}
         close={() => setOpen(false)}
         index={index}
-        slides={images.map((img) => ({ src: img.MediaURL }))}
+        slides={images.map((img) => ({ src: getImageUrl(img) }))}
       />
     </>
   );
