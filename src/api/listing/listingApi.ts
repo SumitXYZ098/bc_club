@@ -21,9 +21,9 @@ export async function getListings(params: any): Promise<any> {
 
 // GETACTIVELIST API
 
-export async function getActiveListings(): Promise<any> {
+export async function getActiveListings(params?: any): Promise<any> {
   try {
-    const res = await axios.get(Endpoints.getActivePropertyLists);
+    const res = await axios.get(Endpoints.getActivePropertyLists, { params });
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -55,6 +55,18 @@ export async function getListingById(id: string): Promise<any> {
       throw new Error(error.response?.data?.error?.message || "API error");
     }
     throw new Error("An unexpected error occurred");
+  }
+}
+
+export async function getUnifiedListingById(id: string): Promise<any> {
+  try {
+    // Try active listing first
+    const res = await getActiveListingById(id);
+    return res;
+  } catch (error) {
+    // If it fails, try normal listing
+    const res = await getListingById(id);
+    return res;
   }
 }
 

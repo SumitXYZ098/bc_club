@@ -37,7 +37,7 @@ export default function Maps() {
         return listings
           .map((listing: any) => ({
             id: listing.documentId || Math.random().toString(),
-            image: listing?.media?.[0]?.MediaURL || Images.apartment,
+            image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
             title: listing?.property_sub_type || "Property",
             price: listing?.price || 0,
             daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,

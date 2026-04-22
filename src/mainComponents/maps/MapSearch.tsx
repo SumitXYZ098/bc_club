@@ -335,35 +335,38 @@ export default function MapSearch() {
   const currentSortLabel = sortOptions.find((o) => o.value === sortBy)?.label;
 
   // API Params Logic
-  const params: any = {
-    search: search,
-    "filters[property_status]": "Active",
+  const commonParams: any = {};
+  if (search) commonParams.search = search;
+  if (location && location !== "" && location !== "British Columbia") commonParams.location = location;
+  if (minPrice !== undefined) commonParams.minPrice = minPrice;
+  if (maxPrice !== undefined && maxPrice !== 20000000) commonParams.maxPrice = maxPrice;
+  if (minSqft !== undefined) commonParams.minSqft = minSqft;
+  if (maxSqft !== undefined && maxSqft !== 15000) commonParams.maxSqft = maxSqft;
+  if (activeBedRoom && activeBedRoom !== "any") commonParams.bedrooms = activeBedRoom.replace("+", "");
+  if (activeBathRoom && activeBathRoom !== "any") commonParams.bathrooms = activeBathRoom.replace("+", "");
+  if (activeProperty && activeProperty !== "any") commonParams.type = activeProperty;
+
+  const normalParams: any = {
+    ...commonParams,
+    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
     "filters[property_sub_type][$notNull]": true,
+    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
-  if (status && status !== "any") {
-    params.propertyType = status;
-    delete params["filters[property_status][$notIn]"];
-    delete params["filters[raw_data][BCRES_SoldDate][$null]"];
-    delete params["filters[property_sub_type][$notNull]"];
-  }
+  const activeParams: any = { ...commonParams };
 
-  if (location && location !== "" && location !== "British Columbia")
-    params.location = location;
-  if (minPrice !== undefined) params.minPrice = minPrice;
-  if (maxPrice !== undefined && maxPrice !== 20000000)
-    params.maxPrice = maxPrice;
-  if (minSqft !== undefined) params.minSqft = minSqft;
-  if (maxSqft !== undefined && maxSqft !== 15000) params.maxSqft = maxSqft;
-  if (activeBedRoom && activeBedRoom !== "any")
-    params.bedrooms = activeBedRoom.replace("+", "");
-  if (activeBathRoom && activeBathRoom !== "any")
-    params.bathrooms = activeBathRoom.replace("+", "");
-  if (activeProperty && activeProperty !== "any") params.type = activeProperty;
+  if (status && status !== "any") {
+    if (status !== "forSale") {
+      normalParams.propertyType = status;
+    }
+    delete normalParams["filters[property_status][$notIn]"];
+    delete normalParams["filters[raw_data][BCRES_SoldDate][$null]"];
+    delete normalParams["filters[property_sub_type][$notNull]"];
+  }
 
   const isForSale = status === "forSale" || !status;
   const { data: queryDataNormal, isLoading: isLoadingNormal } = useGetListings(
-    params,
+    normalParams,
     {
       select: (res: any) => {
         const listings = res?.data || [];
@@ -379,7 +382,7 @@ export default function MapSearch() {
              
               {
                 id: listing.documentId || Math.random().toString(),
-                image: listing?.media?.[0]?.MediaURL || Images.apartment,
+                image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
                 title: listing?.property_sub_type || "Property",
                 price: listing?.price || 0,
                 daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
@@ -430,56 +433,54 @@ export default function MapSearch() {
   );
 
   const { data: queryDataActive, isLoading: isLoadingActive } =
-    useGetActiveListings({
+    useGetActiveListings(activeParams, {
       select: (res: any) => {
         const listings = res?.data || [];
         return listings
-          .map(
-            (listing: any) => (
-              console.log(
-                "longitude:",
-                listing?.longitude,
-                " latitude:",
-                listing?.latitude,
-              ),
-              {
-                id: listing.documentId,
-                image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
-                title: listing?.property_sub_type,
-                price: listing?.price || 0,
-                daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-                address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
-                sqft: listing?.area ?? listing?.lot_size_area ?? 0,
-                beds: listing?.bedrooms ?? 0,
-                baths: listing?.bathrooms ?? 0,
-                priceDrop:
-                  listing.PreviousListPrice > listing.ListPrice
-                    ? Number(
-                        (
-                          (listing.PreviousListPrice - listing.ListPrice) /
-                          listing.ListPrice
-                        ).toFixed(1),
-                      )
-                    : undefined,
-                assessedDiff: listing.ListPrice
+          .map((listing: any) => {
+            return {
+              id: listing.documentId || listing.id,
+              image:
+                typeof listing?.media?.[0] === "string"
+                  ? listing.media[0]
+                  : listing?.media?.[0]?.MediaURL || Images.apartment,
+              title: listing?.property_sub_type || "Property",
+              price: listing?.price || 0,
+              daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+              address:
+                listing?.address && listing?.city
+                  ? `${listing?.address}, ${listing?.city}, ${listing?.state || ""}`
+                  : listing?.address || listing?.city || "",
+              sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+              beds: listing?.bedrooms ?? 0,
+              baths: listing?.bathrooms ?? 0,
+              priceDrop:
+                listing.PreviousListPrice > listing.ListPrice
                   ? Number(
                       (
-                        (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                        (listing.PreviousListPrice - listing.ListPrice) /
                         listing.ListPrice
                       ).toFixed(1),
                     )
-                  : 0,
-                longitude: listing?.longitude,
-                latitude: listing?.latitude,
-                mls: listing?.mls_number ?? listing?.listing_id,
-                realtor:
-                  listing?.office_data?.OfficeName ||
-                  listing?.raw_data?.ListAOR ||
-                  "Unknown",
-                isFavourite: listing?.is_favorite || isWishlistPage,
-              }
-            ),
-          )
+                  : undefined,
+              assessedDiff: listing.ListPrice
+                ? Number(
+                    (
+                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                      listing.ListPrice
+                    ).toFixed(1),
+                  )
+                : 0,
+              longitude: listing?.longitude,
+              latitude: listing?.latitude,
+              mls: listing?.mls_number ?? listing?.listing_id,
+              realtor:
+                listing?.office_data?.OfficeName ||
+                listing?.raw_data?.ListAOR ||
+                "Unknown",
+              isFavourite: listing?.is_favorite || isWishlistPage,
+            };
+          })
           .filter(
             (l: any) =>
               !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,

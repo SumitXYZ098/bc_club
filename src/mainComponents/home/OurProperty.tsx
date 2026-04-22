@@ -72,7 +72,7 @@ const OurProperty = () => {
   // 🔹 Mapping Function
   const mapProperty = (listing: any): PropertyCardProps => ({
     id: listing.documentId,
-    image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
+    image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
@@ -107,6 +107,7 @@ const OurProperty = () => {
   });
 
   const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
+    {},
     {
       select: (res: any) => {
         console.log("📦 API Response:", res);
