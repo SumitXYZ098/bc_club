@@ -180,7 +180,7 @@ export default function PropertiesListingPage() {
   );
 
   const { data: queryDataActive, isLoading: loadingActive } =
-    useGetActiveListings({
+    useGetActiveListings( params,{
       select,
       enabled: !isWishlistPage && isForSale,
     });

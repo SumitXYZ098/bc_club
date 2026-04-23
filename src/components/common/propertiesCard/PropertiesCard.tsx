@@ -9,13 +9,13 @@ import CustomButton from "../../button/CustomButton";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
-import { getTimeAgo } from "@/src/utilities/utilities";
 import {
   useGetMe,
   useRemoveFromWishlist,
   useToggleWishlist,
 } from "@/src/hooks/listing/useListingQueries";
 import dayjs from "dayjs";
+import { getTime } from "@/src/utilities/utilities";
 
 export interface PropertyCardProps {
   id: string;
@@ -152,7 +152,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             {/* Days Ago */}
             {daysAgo !== 0 && (
               <span className="absolute top-3 right-3 bg-background text-primary px-3 py-1.5 text-sm rounded-full">
-                {getTimeAgo(daysAgo)}
+                {getTime(daysAgo)}
               </span>
             )}
 

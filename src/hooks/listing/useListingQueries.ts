@@ -42,14 +42,15 @@ export function useGetListings<TData = any>(
 }
 
 export function useGetActiveListings<TData = any>(
+  params: any,
   options?: Omit<
     UseQueryOptions<any, Error, TData, any>,
     "queryKey" | "queryFn"
   >,
 ) {
   return useQuery<any, Error, TData, any>({
-    queryKey: listingKeys.lists(),
-    queryFn: () => getActiveListings(),
+    queryKey: listingKeys.list(params),
+    queryFn: () => getActiveListings(params),
     ...options,
   });
 }

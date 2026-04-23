@@ -2,8 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
+
+import "swiper/css/navigation";
 
 import CustomButton from "@/src/components/button/CustomButton";
 import PropertiesCard, {
@@ -27,11 +30,11 @@ const swiperConfig = {
   spaceBetween: 12,
   slidesPerView: 1,
   autoplay: {
-    delay: 0,
+    delay: 4000,
     disableOnInteraction: false,
     pauseOnMouseEnter: true,
   },
-  modules: [Pagination],
+  modules: [Pagination, Navigation, Autoplay],
   loop: true,
   pagination: {
     clickable: true,
@@ -41,7 +44,7 @@ const swiperConfig = {
     640: { slidesPerView: 1.5, spaceBetween: 20 },
     1024: { slidesPerView: 3, spaceBetween: 32 },
   },
-  speed: 3000,
+  speed: 800,
 };
 
 const OurProperty = () => {
@@ -72,12 +75,12 @@ const OurProperty = () => {
   // 🔹 Mapping Function
   const mapProperty = (listing: any): PropertyCardProps => ({
     id: listing.documentId,
-    image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
+    image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
     address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
-    sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+    sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
     priceDrop:
@@ -107,6 +110,7 @@ const OurProperty = () => {
   });
 
   const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
+    {},
     {
       select: (res: any) => {
         console.log("📦 API Response:", res);
@@ -132,7 +136,7 @@ const OurProperty = () => {
   const { data: expiredList = [], isLoading: isLoadingExpired } =
     useGetListings(
       {
-        "filters[property_status][$eq]": ["Expired", "Terminated", "Cancelled"],
+        "filters[property_status][$eq]": ["Expired"],
       },
       {
         select: (res: any) =>
@@ -216,6 +220,7 @@ const OurProperty = () => {
     isLoginOverride?: boolean,
     isSold?: boolean,
     isExpired?: boolean,
+    navId?: string,
   ) => {
     if (isLoading) {
       return (
@@ -246,21 +251,39 @@ const OurProperty = () => {
     // }
 
     return (
-      <Swiper
-        {...swiperConfig}
-        className="pt-3! pb-9! mySwiper w-full h-full grid!"
-      >
-        {list.map((item) => (
-          <SwiperSlide key={item.id}>
-            <PropertiesCard
-              {...item}
-              isLogin={isLoginOverride ?? isLoggedIn}
-              isSold={isSold}
-              isExpired={isExpired}
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="relative group/slider">
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-10 flex justify-between pointer-events-none px-2 md:-mx-4">
+          <button
+            className={`${navId}-prev pointer-events-auto bg-background/80 backdrop-blur-sm border border-borderColor p-3 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-all duration-300 opacity-0 group-hover/slider:opacity-100 disabled:opacity-0`}
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            className={`${navId}-next pointer-events-auto bg-background/80 backdrop-blur-sm border border-borderColor p-3 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-all duration-300 opacity-0 group-hover/slider:opacity-100 disabled:opacity-0`}
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+        <Swiper
+          {...swiperConfig}
+          navigation={{
+            prevEl: `.${navId}-prev`,
+            nextEl: `.${navId}-next`,
+          }}
+          className="pt-3! pb-9! mySwiper w-full h-full grid!"
+        >
+          {list.map((item) => (
+            <SwiperSlide key={item.id}>
+              <PropertiesCard
+                {...item}
+                isLogin={isLoginOverride ?? isLoggedIn}
+                isSold={isSold}
+                isExpired={isExpired}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     );
   };
 
@@ -318,7 +341,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Newly Listed Properties"
           />
-          {renderSlider(newList, isLoadingNew, true, false, false)}
+          {renderSlider(newList, isLoadingNew, true, false, false, "newly-listed")}
         </div>
 
         <div
@@ -330,7 +353,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Previously Listed Properties"
           />
-          {renderSlider(expiredList, isLoadingExpired, isLoggedIn, false, true)}
+          {renderSlider(expiredList, isLoadingExpired, isLoggedIn, false, true, "expired")}
         </div>
 
         <div ref={refs["Sold properties"]} className="flex flex-col gap-4">
@@ -339,7 +362,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Sold Properties"
           />
-          {renderSlider(soldList, isLoadingSold, isLoggedIn, true, false)}
+          {renderSlider(soldList, isLoadingSold, isLoggedIn, true, false, "sold")}
         </div>
       </div>
     </section>

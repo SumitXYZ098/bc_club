@@ -26,6 +26,7 @@
     "apexcharts": "^5.10.4",
     "axios": "^1.14.0",
     "dayjs": "^1.11.20",
+    "esri-leaflet": "^3.0.19",
     "firebase": "^12.11.0",
     "framer-motion": "^12.38.0",
     "js-cookie": "^3.0.5",

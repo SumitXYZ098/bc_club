@@ -83,15 +83,22 @@ const PriceSlider = styled(Slider)({
 function createPriceMarker(property: any, onClick: () => void) {
   const el = document.createElement("div");
   el.className =
-    "price-marker flex items-center justify-center bg-[#58a65c] text-white font-bold text-[11px] rounded-full border-2 border-white shadow-md cursor-pointer hover:bg-[#4a8f4e] px-2 whitespace-nowrap";
+    "price-marker flex items-center justify-center bg-primary text-white font-bold text-[12px] rounded-full border-2 border-white shadow-lg cursor-pointer hover:bg-secondary transition-all px-3 py-1 whitespace-nowrap gap-1.5";
 
-  el.style.height = "32px";
-  el.style.minWidth = "32px";
+  el.style.height = "36px";
+  el.style.minWidth = "60px";
 
   let fullPrice = property.price
     ? "$" + Number(property.price).toLocaleString()
     : "$0";
-  el.innerText = fullPrice;
+
+  el.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span>${fullPrice}</span>
+  `;
 
   el.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -105,6 +112,7 @@ export default function MapSearch() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapboxMap | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [isSatellite, setIsSatellite] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
   const [visibleProperties, setVisibleProperties] = useState<any[]>([]);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -342,10 +350,17 @@ export default function MapSearch() {
   };
 
   if (status && status !== "any") {
-    params.propertyType = status;
-    delete params["filters[property_status][$notIn]"];
+    delete params["filters[property_status]"];
     delete params["filters[raw_data][BCRES_SoldDate][$null]"];
     delete params["filters[property_sub_type][$notNull]"];
+
+    if (status === "sold") {
+      params["filters[raw_data][BCRES_SoldDate][$notNull]"] = true;
+    } else if (status === "expired") {
+      params["filters[property_status][$eq]"] = "Expired";
+    } else if (status === "forSale") {
+      params["filters[property_status]"] = "Active";
+    }
   }
 
   if (location && location !== "" && location !== "British Columbia")
@@ -356,9 +371,9 @@ export default function MapSearch() {
   if (minSqft !== undefined) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft !== 15000) params.maxSqft = maxSqft;
   if (activeBedRoom && activeBedRoom !== "any")
-    params.bedrooms = activeBedRoom.replace("+", "");
+    params.beds= activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")
-    params.bathrooms = activeBathRoom.replace("+", "");
+    params.baths = activeBathRoom.replace("+", "");
   if (activeProperty && activeProperty !== "any") params.type = activeProperty;
 
   const isForSale = status === "forSale" || !status;
@@ -376,7 +391,6 @@ export default function MapSearch() {
                 " latitude:",
                 listing?.latitude,
               ),
-             
               {
                 id: listing.documentId || Math.random().toString(),
                 image: listing?.media?.[0]?.MediaURL || Images.apartment,
@@ -422,7 +436,6 @@ export default function MapSearch() {
           .filter(
             (l: any) =>
               !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,
-         
           );
       },
       enabled: !isForSale,
@@ -430,7 +443,7 @@ export default function MapSearch() {
   );
 
   const { data: queryDataActive, isLoading: isLoadingActive } =
-    useGetActiveListings({
+    useGetActiveListings(params, {
       select: (res: any) => {
         const listings = res?.data || [];
         return listings
@@ -444,12 +457,12 @@ export default function MapSearch() {
               ),
               {
                 id: listing.documentId,
-                image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
+                image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
                 title: listing?.property_sub_type,
                 price: listing?.price || 0,
                 daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
                 address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
-                sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+                sqft: listing?.area ?? listing?.Living_area ?? 0,
                 beds: listing?.bedrooms ?? 0,
                 baths: listing?.bathrooms ?? 0,
                 priceDrop:
@@ -474,7 +487,7 @@ export default function MapSearch() {
                 mls: listing?.mls_number ?? listing?.listing_id,
                 realtor:
                   listing?.office_data?.OfficeName ||
-                  listing?.raw_data?.ListAOR ||
+                  listing?.raw_data?.OriginatingSystemName ||
                   "Unknown",
                 isFavourite: listing?.is_favorite || isWishlistPage,
               }
@@ -514,6 +527,40 @@ export default function MapSearch() {
     };
   }, []);
 
+  // ── Auto Satellite View on Zoom ──────────────────────────────────────────
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current) return;
+    const map = mapRef.current;
+
+    const handleZoom = () => {
+      const zoom = map.getZoom();
+      if (zoom >= 17 && !isSatellite) {
+        map.setStyle("mapbox://styles/mapbox/satellite-streets-v12");
+        setIsSatellite(true);
+      } else if (zoom < 17 && isSatellite) {
+        map.setStyle("mapbox://styles/mapbox/streets-v12");
+        setIsSatellite(false);
+      }
+    };
+
+    map.on("zoom", handleZoom);
+    return () => {
+      map.off("zoom", handleZoom);
+    };
+  }, [mapLoaded, isSatellite]);
+
+  const toggleMapStyle = () => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+    if (isSatellite) {
+      map.setStyle("mapbox://styles/mapbox/streets-v12");
+      setIsSatellite(false);
+    } else {
+      map.setStyle("mapbox://styles/mapbox/satellite-streets-v12");
+      setIsSatellite(true);
+    }
+  };
+
   // Sync Map with Location Filter
   useEffect(() => {
     if (!mapLoaded || !mapRef.current || !location) return;
@@ -541,6 +588,39 @@ export default function MapSearch() {
       });
     }
   }, [location, mapLoaded]);
+
+  const handleGeolocation = () => {
+    if (!mapRef.current) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        mapRef.current?.flyTo({
+          center: [longitude, latitude],
+          zoom: 15,
+          essential: true,
+        });
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        alert("Please enable location services to use this feature.");
+      },
+    );
+  };
+
+  const handleFitBounds = () => {
+    if (!mapRef.current || properties.length === 0) return;
+    const bounds = new mapboxgl.LngLatBounds();
+    properties.forEach((p: any) => {
+      if (p.longitude && p.latitude) {
+        bounds.extend([p.longitude, p.latitude]);
+      }
+    });
+    mapRef.current.fitBounds(bounds, {
+      padding: 50,
+      maxZoom: 15,
+      duration: 1000,
+    });
+  };
 
   // Fit bounds to show all properties when status/properties change
   useEffect(() => {
@@ -1110,13 +1190,24 @@ export default function MapSearch() {
                   <FiMinus className="w-5 h-5 text-gray-600" />
                 </button>
               </div>
-              <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
-                <FiMap className="w-5 h-5 text-gray-600" />
+              <button
+                onClick={toggleMapStyle}
+                className={`p-2.5 rounded-md shadow-lg border transition-colors ${isSatellite ? "bg-primary text-white border-primary" : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"}`}
+              >
+                <FiMap className="w-5 h-5" />
               </button>
-              <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
+              <button
+                onClick={handleGeolocation}
+                className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                title="Current Location"
+              >
                 <FiNavigation className="w-5 h-5 text-gray-600" />
               </button>
-              <button className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50">
+              <button
+                onClick={handleFitBounds}
+                className="p-2.5 bg-white rounded-md shadow-lg border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                title="Fit all properties"
+              >
                 <FiMaximize className="w-5 h-5 text-gray-600" />
               </button>
             </div>
