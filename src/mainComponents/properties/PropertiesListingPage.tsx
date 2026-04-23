@@ -134,7 +134,7 @@ export default function PropertiesListingPage() {
 
     const properties: PropertyCardProps[] = listings.map((listing: any) => ({
       id: listing.documentId,
-      image: listing?.media?.[0] ?? listing?.media[0]?.MediaURL,
+      image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
       title: listing?.property_sub_type,
       price: listing?.price,
       daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,

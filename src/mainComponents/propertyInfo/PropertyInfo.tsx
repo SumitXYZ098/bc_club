@@ -4,15 +4,15 @@ import PropertyGallery from "./PropertyGallery";
 import PropertyInformation from "./propertyInformation/PropertyInformation";
 import GetInTouch from "../getInTouch/GetInTouch";
 import { propertyImages } from "@/src/mainComponents/dummyData";
-import { useGetActiveListingById } from "@/src/hooks/listing/useListingQueries";
+import { useGetUnifiedListingById } from "@/src/hooks/listing/useListingQueries";
 
 const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const {
     data: listing,
     isLoading: loading,
     error,
-  } = useGetActiveListingById(paramsId, {
-    select: (res: any) => res?.data,
+  } = useGetUnifiedListingById(paramsId, {
+    select: (res: any) => res?.data || res,
   });
 
   if (loading)
@@ -27,7 +27,12 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
         {error.message || "An error occurred"}
       </div>
     );
-  if (!listing) return null;
+  if (!listing)
+    return (
+      <div className="p-10 text-gray-500 xl:max-w-screen-2xl mx-auto w-full h-[50svh] flex justify-center items-center">
+        Property not found
+      </div>
+    );
 
   return (
     <>

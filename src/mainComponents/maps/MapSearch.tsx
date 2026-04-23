@@ -343,10 +343,22 @@ export default function MapSearch() {
   const currentSortLabel = sortOptions.find((o) => o.value === sortBy)?.label;
 
   // API Params Logic
+  const commonParams: any = {};
+  if (search) commonParams.search = search;
+  if (location && location !== "" && location !== "British Columbia") commonParams.location = location;
+  if (minPrice !== undefined) commonParams.minPrice = minPrice;
+  if (maxPrice !== undefined && maxPrice !== 20000000) commonParams.maxPrice = maxPrice;
+  if (minSqft !== undefined) commonParams.minSqft = minSqft;
+  if (maxSqft !== undefined && maxSqft !== 15000) commonParams.maxSqft = maxSqft;
+  if (activeBedRoom && activeBedRoom !== "any") commonParams.bedrooms = activeBedRoom.replace("+", "");
+  if (activeBathRoom && activeBathRoom !== "any") commonParams.bathrooms = activeBathRoom.replace("+", "");
+  if (activeProperty && activeProperty !== "any") commonParams.type = activeProperty;
+
   const params: any = {
-    search: search,
-    "filters[property_status]": "Active",
+    ...commonParams,
+    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
     "filters[property_sub_type][$notNull]": true,
+    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   if (status && status !== "any") {
@@ -393,7 +405,7 @@ export default function MapSearch() {
               ),
               {
                 id: listing.documentId || Math.random().toString(),
-                image: listing?.media?.[0]?.MediaURL || Images.apartment,
+                image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
                 title: listing?.property_sub_type || "Property",
                 price: listing?.price || 0,
                 daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
@@ -477,7 +489,7 @@ export default function MapSearch() {
                 assessedDiff: listing.ListPrice
                   ? Number(
                       (
-                        (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                        (listing.PreviousListPrice - listing.ListPrice) /
                         listing.ListPrice
                       ).toFixed(1),
                     )

@@ -58,6 +58,18 @@ export async function getListingById(id: string): Promise<any> {
   }
 }
 
+export async function getUnifiedListingById(id: string): Promise<any> {
+  try {
+    // Try active listing first
+    const res = await getActiveListingById(id);
+    return res;
+  } catch (error) {
+    // If it fails, try normal listing
+    const res = await getListingById(id);
+    return res;
+  }
+}
+
 // Add to favourite property
 export async function addToFavourite(id: string): Promise<any> {
   const token = Cookies.get("token");

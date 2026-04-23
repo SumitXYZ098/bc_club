@@ -14,6 +14,7 @@ import {
   removeFromFavourite,
   getActiveListings,
   getActiveListingById,
+  getUnifiedListingById,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -42,14 +43,14 @@ export function useGetListings<TData = any>(
 }
 
 export function useGetActiveListings<TData = any>(
-  params: any,
+  params?: any,
   options?: Omit<
     UseQueryOptions<any, Error, TData, any>,
     "queryKey" | "queryFn"
   >,
 ) {
   return useQuery<any, Error, TData, any>({
-    queryKey: listingKeys.list(params),
+    queryKey: listingKeys.list(params || {}),
     queryFn: () => getActiveListings(params),
     ...options,
   });
@@ -81,6 +82,21 @@ export function useGetListingById<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: listingKeys.detail(id),
     queryFn: () => getListingById(id),
+    enabled: !!id,
+    ...options,
+  });
+}
+
+export function useGetUnifiedListingById<TData = any>(
+  id: string,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: listingKeys.detail(id),
+    queryFn: () => getUnifiedListingById(id),
     enabled: !!id,
     ...options,
   });
