@@ -365,14 +365,6 @@ export default function MapSearch() {
     delete params["filters[property_status]"];
     delete params["filters[raw_data][BCRES_SoldDate][$null]"];
     delete params["filters[property_sub_type][$notNull]"];
-
-    if (status === "sold") {
-      params["filters[raw_data][BCRES_SoldDate][$notNull]"] = true;
-    } else if (status === "expired") {
-      params["filters[property_status][$eq]"] = "Expired";
-    } else if (status === "forSale") {
-      params["filters[property_status]"] = "Active";
-    }
   }
 
   if (location && location !== "" && location !== "British Columbia")
