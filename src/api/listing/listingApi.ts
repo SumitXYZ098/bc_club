@@ -36,8 +36,10 @@ export async function getActiveListings(params?:any): Promise<any> {
 export async function getActiveListingById(id: string): Promise<any> {
   try {
     const res = await axios.get(Endpoints.getActiveListingById(id));
+    console.log("Active Listing API Response:", res.data);
     return res.data;
   } catch (error) {
+    console.error("Error fetching active listing:", error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error?.message || "API error");
     }
@@ -49,8 +51,10 @@ export async function getActiveListingById(id: string): Promise<any> {
 export async function getListingById(id: string): Promise<any> {
   try {
     const res = await axios.get(Endpoints.getListingById(id));
+    console.log("Listing API Response:", res.data);
     return res.data;
   } catch (error) {
+    console.error("Error fetching listing:", error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error?.message || "API error");
     }

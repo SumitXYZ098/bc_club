@@ -12,7 +12,7 @@ export const Endpoints = {
   me: `${BASE_URL}/api/users/me`,
   importPropertyList: `${BASE_URL}/api/property-assignment-lists`,
   getActivePropertyLists: `${BASE_URL}/api/ddf-listings`,
-  getActiveListingById: (id: string) => `/api/active-listings/${id}`,
+  getActiveListingById: (id: string) => `${BASE_URL}/api/ddf-listings/${id}`,
   addDdfFavorite: (id: string) => `${BASE_URL}/api/ddf-listings/add-favorite/${id}`,
   removeDdfFavorite: (id: string) => `${BASE_URL}/api/ddf-listings/remove-favorite/${id}`,
   getMyDdfFavorites: `${BASE_URL}/api/ddf-listings/my-favorites`,

@@ -9,7 +9,7 @@ export async function GET(
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/active-listings/${id}`);
+    const response = await axios.get(`${BASE_URL}/api/ddf-listings/${id}`);
     return NextResponse.json(response.data);
   } catch (error: any) {
     console.error("Error fetching active listing:", error?.response?.data || error.message);
