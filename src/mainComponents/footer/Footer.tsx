@@ -38,7 +38,8 @@ const Footer = () => {
             <span className="text-2xl font-bold md:text-5xl">BCClub</span>
           </Link>
           <Description
-            content="We ara a lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat..."
+            content="BC RealeState Market helps you explore, buy, and sell properties across British Columbia with confidence and ease.
+From market insights to home valuation, we guide you every step of your real estate journey...."
             type={IDescriptionTypes.dec16}
             customClasses="text-lightWhite"
           />

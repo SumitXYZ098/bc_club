@@ -13,6 +13,8 @@ import {
   useGetMe,
   useRemoveFromWishlist,
   useToggleWishlist,
+  useToggleDdfWishlist,
+  useRemoveDdfWishlist,
 } from "@/src/hooks/listing/useListingQueries";
 import dayjs from "dayjs";
 import { getTime } from "@/src/utilities/utilities";
@@ -35,6 +37,7 @@ export interface PropertyCardProps {
   isExpired?: boolean;
   isSold?: boolean;
   isFavourite?: boolean;
+  isDdf?: boolean;
 }
 
 const PropertiesCard: React.FC<PropertyCardProps> = ({
@@ -55,15 +58,34 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   isSold,
   isFavourite: isFavouriteProp,
   isLogin: isLoginProp,
+  isDdf,
 }) => {
   const pathname = usePathname();
   const { data: me } = useGetMe();
-  const toggleWishlist = useToggleWishlist();
-  const removeFromWishlist = useRemoveFromWishlist();
+  const normalToggle = useToggleWishlist();
+  const ddfToggle = useToggleDdfWishlist();
+  const toggleWishlist = isDdf ? ddfToggle : normalToggle;
+
+  const normalRemove = useRemoveFromWishlist();
+  const ddfRemove = useRemoveDdfWishlist();
+  const removeFromWishlist = isDdf ? ddfRemove : normalRemove;
+
+  const [localIsFavourite, setLocalIsFavourite] = React.useState(false);
 
   const isFavourite =
-    me?.favorites?.some((item: any) => item.documentId === id) ??
-    (isFavouriteProp || false);
+    me?.favorites?.some(
+      (item: any) =>
+        item.documentId === id ||
+        String(item.id) === String(id) ||
+        String(item) === String(id),
+    ) ||
+    isFavouriteProp ||
+    false;
+
+  // Sync local state with global/prop state
+  React.useEffect(() => {
+    setLocalIsFavourite(isFavourite);
+  }, [isFavourite]);
 
   const { setOpenLogin, isLoggedIn } = useAuthContext();
   const isLogin = isLoginProp ?? isLoggedIn;
@@ -72,6 +94,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
+    console.log("Toggle Wishlist Clicked:", { id, isDdf });
+
     if (toggleWishlist.isPending) return;
 
     if (!isLogin) {
@@ -79,6 +103,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
       return;
     }
 
+    setLocalIsFavourite(true);
     toggleWishlist.mutate(id);
   };
 
@@ -88,9 +113,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
     if (removeFromWishlist.isPending) return;
 
+    setLocalIsFavourite(false);
     removeFromWishlist.mutate(id);
   };
-  const displayPrice = isLogin ? `$${price?.toLocaleString()}` : "$*,***,***";
+  const displayPrice = isLogin ? `$${Number(price || 0).toLocaleString()}` : "$*,***,***";
   const displayAddress = isLogin ? address : "Sign in to view address";
   const displayTitle = isLogin ? title : "Property Details Restricted";
   const displaySqft = isLogin ? `${sqft} sqft` : "---- sqft";
@@ -139,12 +165,14 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             {!isExpired && !isSold && isLoggedIn && (
               <button
                 onClick={
-                  isFavourite ? handleRemoveFromWishlist : handleToggleWishlist
+                  localIsFavourite ? handleRemoveFromWishlist : handleToggleWishlist
                 }
                 className="absolute top-3 left-3 bg-background p-2 rounded-full shadow z-20 cursor-pointer"
               >
                 <Heart
-                  className={`w-5 h-5 ${isFavourite ? "text-red fill-red" : "text-primary"}`}
+                  className="w-5 h-5"
+                  color={localIsFavourite ? "var(--red)" : "var(--primary)"}
+                  fill={localIsFavourite ? "var(--red)" : "none"}
                 />
               </button>
             )}

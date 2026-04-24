@@ -79,25 +79,29 @@ const PriceSlider = styled(Slider)({
   },
 });
 
+// Helper to abbreviate price (e.g. $1.2M, $649K)
+function formatPriceAbbreviated(price: number) {
+  if (!price) return "$0";
+  if (price >= 1000000) {
+    return "$" + (price / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+  }
+  if (price >= 1000) {
+    return "$" + Math.round(price / 1000) + "K";
+  }
+  return "$" + price.toLocaleString();
+}
+
 // Marker Creator
 function createPriceMarker(property: any, onClick: () => void) {
   const el = document.createElement("div");
   el.className =
-    "price-marker flex items-center justify-center bg-primary text-white font-bold text-[12px] rounded-full border-2 border-white shadow-lg cursor-pointer hover:bg-secondary transition-all px-3 py-1 whitespace-nowrap gap-1.5";
+    "price-marker relative flex items-center justify-center bg-white text-gray-900 font-bold text-[14px] border border-gray-200 shadow-lg cursor-pointer transition-all px-4 py-1.5 whitespace-nowrap rounded-[10px]";
 
-  el.style.height = "36px";
-  el.style.minWidth = "60px";
-
-  let fullPrice = property.price
-    ? "$" + Number(property.price).toLocaleString()
-    : "$0";
+  let abbreviatedPrice = formatPriceAbbreviated(Number(property.price));
 
   el.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-      <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-    <span>${fullPrice}</span>
+    <span class="relative z-10">${abbreviatedPrice}</span>
+    <div class="price-marker-carrot absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b border-r border-gray-200 rotate-45"></div>
   `;
 
   el.addEventListener("click", (e) => {
@@ -269,14 +273,14 @@ export default function MapSearch() {
 
   if (minPrice !== undefined && minPrice > 1000) {
     activeFilterPills.push({
-      label: `Min Price: $${minPrice.toLocaleString()}`,
+      label: `Min Price: $${Number(minPrice).toLocaleString()}`,
       onRemove: () => updateInstanceFilter("map", "minPrice", 1000),
     });
   }
 
   if (maxPrice !== undefined && maxPrice < 20000000) {
     activeFilterPills.push({
-      label: `Max Price: $${maxPrice.toLocaleString()}`,
+      label: `Max Price: $${Number(maxPrice).toLocaleString()}`,
       onRemove: () => updateInstanceFilter("map", "maxPrice", 20000000),
     });
   }
@@ -356,15 +360,24 @@ export default function MapSearch() {
 
   const params: any = {
     ...commonParams,
+    "pagination[page]": 1,
+    "pagination[pageSize]": 500,
     "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
     "filters[property_sub_type][$notNull]": true,
     "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   if (status && status !== "any") {
-    delete params["filters[property_status]"];
+    params.propertyType = status;
+    delete params["filters[property_status][$notIn]"];
     delete params["filters[raw_data][BCRES_SoldDate][$null]"];
     delete params["filters[property_sub_type][$notNull]"];
+    
+    if (status === "sold") {
+      params["filters[raw_data][BCRES_SoldDate][$notNull]"] = true;
+    } else if (status === "expired") {
+      params["filters[property_status][$eq]"] = "Expired";
+    }
   }
 
   if (location && location !== "" && location !== "British Columbia")
@@ -434,12 +447,13 @@ export default function MapSearch() {
                   "Unknown",
                 isLogin: false,
                 isFavourite: listing?.is_favorite || isWishlistPage,
+                isDdf: false,
               }
             ),
           )
           .filter(
             (l: any) =>
-              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,
+              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
           );
       },
       enabled: !isForSale,
@@ -494,12 +508,13 @@ export default function MapSearch() {
                   listing?.raw_data?.OriginatingSystemName ||
                   "Unknown",
                 isFavourite: listing?.is_favorite || isWishlistPage,
+                isDdf: true,
               }
             ),
           )
           .filter(
             (l: any) =>
-              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0,
+              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
           );
       },
       enabled: isForSale,
@@ -673,11 +688,11 @@ export default function MapSearch() {
         });
       });
 
-      const marker = new mapboxgl.Marker(markerEl)
+      const marker = new mapboxgl.Marker({ element: markerEl, anchor: "bottom" })
         .setLngLat([property.longitude, property.latitude])
         .setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(
-            `<div style="padding:5px"><b>$${property.price.toLocaleString()}</b></div>`,
+          new mapboxgl.Popup({ offset: 35 }).setHTML(
+            `<div style="padding:5px"><b>$${Number(property.price).toLocaleString()}</b></div>`,
           ),
         )
         .addTo(map);
@@ -689,9 +704,7 @@ export default function MapSearch() {
       const bounds = map.getBounds();
       if (!bounds) return;
 
-      let visible = properties.filter((p: any) =>
-        bounds.contains([p.longitude, p.latitude]),
-      );
+      let visible = properties.filter((p: any) => bounds.contains([p.longitude, p.latitude]) && Number(p.price) > 0);
 
       if (sortBy === "priceLow") {
         visible.sort((a: any, b: any) => a.price - b.price);
@@ -1094,7 +1107,7 @@ export default function MapSearch() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2" ref={sortRef}>
+              {/* <div className="flex items-center gap-2" ref={sortRef}>
                 <span className="text-gray-400 text-[15px] font-bold hidden sm:inline">
                   Sort by:
                 </span>
@@ -1134,7 +1147,7 @@ export default function MapSearch() {
                     </div>
                   )}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar bg-[#f8f9fa]">
@@ -1153,6 +1166,7 @@ export default function MapSearch() {
                       isLogin={isLoggedIn || status === "forSale"}
                       isSold={status === "sold"}
                       isExpired={status === "expired"}
+                      isDdf={p.isDdf}
                     />
                   </div>
                 ))

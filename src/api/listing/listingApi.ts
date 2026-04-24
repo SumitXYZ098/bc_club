@@ -145,3 +145,77 @@ export async function getMe(): Promise<any> {
     throw new Error("An unexpected error occurred");
   }
 }
+
+// DDF Favorites
+export async function addDdfFavorite(id: string): Promise<any> {
+  const token = Cookies.get("token");
+  const userCookie = Cookies.get("username");
+  let userId = null;
+
+  if (userCookie) {
+    try {
+      const user = JSON.parse(userCookie);
+      userId = user.id || user.documentId;
+    } catch (e) {
+      console.error("Error parsing user cookie", e);
+    }
+  }
+
+  console.log("DDF Favorite Payload:", { DocumentID: id, userId: userId });
+
+  try {
+    const res = await axios.post(
+      Endpoints.addDdfFavorite(id),
+      {
+        DocumentID: id,
+        userId: userId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    console.log("DDF Favorite Response:", res.data);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+export async function removeDdfFavorite(id: string): Promise<any> {
+  const token = Cookies.get("token");
+  try {
+    const res = await axios.delete(Endpoints.removeDdfFavorite(id), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+export async function getMyDdfFavorites(): Promise<any> {
+  const token = Cookies.get("token");
+  try {
+    const res = await axios.get(Endpoints.getMyDdfFavorites, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}

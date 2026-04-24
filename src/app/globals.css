@@ -157,22 +157,28 @@ body::-webkit-scrollbar {
 .price-marker {
   background: #fff;
     padding: 6px 12px;
-    border-radius: 999px;
+    border-radius: 10px;
     font-weight: 600;
     font-size: 14px;
     color: #222;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     border: 1px solid #e5e5e5;
-  white-space: nowrap;
 }
+
+.price-marker, .price-marker-carrot {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out !important;
+}
+
 .price-marker:hover {
-  padding: 8px 14px;
-  font-weight: 700;
-  font-size: 16px;
-  transition: all;
-  transition-duration: 500ms;
-  transition-timing-function: ease-in-out;
+  background-color: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+}
+
+.price-marker:hover .price-marker-carrot {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 
 .mapboxgl-popup-content {

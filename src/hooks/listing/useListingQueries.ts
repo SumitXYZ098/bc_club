@@ -11,10 +11,13 @@ import {
   getFavouriteProperties,
   getMe,
   addToFavourite,
-  removeFromFavourite,
-  getActiveListings,
   getActiveListingById,
   getUnifiedListingById,
+  addDdfFavorite,
+  removeDdfFavorite,
+  getMyDdfFavorites,
+  removeFromFavourite,
+  getActiveListings,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -139,10 +142,10 @@ export function useToggleWishlist() {
       const previousMe = queryClient.getQueryData(listingKeys.me());
 
       queryClient.setQueryData(listingKeys.me(), (old: any) => {
-        if (!old || !old.favorites) return old;
-        const favorites = [...old.favorites];
+        if (!old) return old;
+        const favorites = old.favorites ? [...old.favorites] : [];
         const index = favorites.findIndex(
-          (item: any) => item.documentId === newId,
+          (item: any) => (item.documentId || item.id || item) === newId,
         );
 
         if (index > -1) {
@@ -155,7 +158,7 @@ export function useToggleWishlist() {
       });
 
       return { previousMe };
-    },
+    },  
     onError: (error: any, __, context: any) => {
       if (context?.previousMe) {
         queryClient.setQueryData(listingKeys.me(), context.previousMe);
@@ -168,9 +171,7 @@ export function useToggleWishlist() {
     },
     onSuccess: (resp) => {
       if (resp) {
-        console.log(
-          `Property ${resp.message === "Added to Favorites" ? "added to" : "removed from"} wishlist`,
-        );
+        toast.success(resp.message || "Wishlist updated");
       }
     },
   });
@@ -188,23 +189,16 @@ export function useRemoveFromWishlist() {
       const previousWishlist = queryClient.getQueryData(listingKeys.wishlist());
 
       queryClient.setQueryData(listingKeys.me(), (old: any) => {
-        if (!old || !old.favorites) return old;
-        const favorites = [...old.favorites];
-        const index = favorites.findIndex(
-          (item: any) => item.documentId === newId,
-        );
-
-        if (index > -1) {
-          favorites.splice(index, 1);
-        }
-
-        return { ...old, favorites };
+        if (!old) return old;
+        const favorites = old.favorites ? [...old.favorites] : [];
+        const newFavorites = favorites.filter((item: any) => (item.documentId || item.id || item) !== newId);
+        return { ...old, favorites: newFavorites };
       });
 
       queryClient.setQueryData(listingKeys.wishlist(), (old: any) => {
         if (!old || !old.data) return old;
         const newData = old.data.filter(
-          (item: any) => item.documentId !== newId,
+          (item: any) => (item.documentId || item.id) !== newId,
         );
         return { ...old, data: newData };
       });
@@ -229,9 +223,111 @@ export function useRemoveFromWishlist() {
     },
     onSuccess: (resp) => {
       if (resp) {
-        console.log(
-          `Property ${resp.message === "Removed from favorites" ? "removed from" : "added to"} wishlist`,
+        toast.success(resp.message || "Removed from wishlist");
+      }
+    },
+  });
+}
+
+export function useGetMyDdfFavorites<TData = any>(
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: [...listingKeys.wishlist(), "ddf"],
+    queryFn: () => getMyDdfFavorites(),
+    ...options,
+  });
+}
+
+export function useToggleDdfWishlist() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => addDdfFavorite(id),
+    onMutate: async (newId) => {
+      await queryClient.cancelQueries({ queryKey: listingKeys.me() });
+      const previousMe = queryClient.getQueryData(listingKeys.me());
+
+      queryClient.setQueryData(listingKeys.me(), (old: any) => {
+        if (!old) return old;
+        const favorites = old.favorites ? [...old.favorites] : [];
+        const index = favorites.findIndex(
+          (item: any) => (item.documentId || item.id || item) === newId,
         );
+
+        if (index > -1) {
+          favorites.splice(index, 1);
+        } else {
+          favorites.push({ documentId: newId });
+        }
+
+        return { ...old, favorites };
+      });
+
+      return { previousMe };
+    },
+    onError: (error: any, __, context: any) => {
+      if (context?.previousMe) {
+        queryClient.setQueryData(listingKeys.me(), context.previousMe);
+      }
+      toast.error(error.message || "Failed to update wishlist");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: listingKeys.me() });
+      queryClient.invalidateQueries({ queryKey: [...listingKeys.wishlist(), "ddf"] });
+    },
+    onSuccess: (resp) => {
+      if (resp) {
+        toast.success("Added to favorites");
+      }
+    },
+  });
+}
+
+export function useRemoveDdfWishlist() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => removeDdfFavorite(id),
+    onMutate: async (newId) => {
+      await queryClient.cancelQueries({ queryKey: listingKeys.me() });
+      await queryClient.cancelQueries({ queryKey: [...listingKeys.wishlist(), "ddf"] });
+
+      const previousMe = queryClient.getQueryData(listingKeys.me());
+      const previousWishlist = queryClient.getQueryData([...listingKeys.wishlist(), "ddf"]);
+
+      queryClient.setQueryData(listingKeys.me(), (old: any) => {
+        if (!old) return old;
+        const favorites = old.favorites ? [...old.favorites] : [];
+        const newFavorites = favorites.filter((item: any) => (item.documentId || item.id || item) !== newId);
+        return { ...old, favorites: newFavorites };
+      });
+
+      queryClient.setQueryData([...listingKeys.wishlist(), "ddf"], (old: any) => {
+        if (!old || !old.data) return old;
+        const newData = old.data.filter((item: any) => (item.documentId || item.id) !== newId);
+        return { ...old, data: newData };
+      });
+
+      return { previousMe, previousWishlist };
+    },
+    onError: (error: any, __, context: any) => {
+      if (context?.previousMe) {
+        queryClient.setQueryData(listingKeys.me(), context.previousMe);
+      }
+      if (context?.previousWishlist) {
+        queryClient.setQueryData([...listingKeys.wishlist(), "ddf"], context.previousWishlist);
+      }
+      toast.error(error.message || "Failed to remove from wishlist");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: listingKeys.me() });
+      queryClient.invalidateQueries({ queryKey: [...listingKeys.wishlist(), "ddf"] });
+    },
+    onSuccess: (resp) => {
+      if (resp) {
+        toast.success("Removed from favorites");
       }
     },
   });

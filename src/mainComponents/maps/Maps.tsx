@@ -14,7 +14,7 @@ function createPriceMarker(property: any) {
   const el = document.createElement("div");
   el.className =
     "price-marker bg-white px-2 py-1 rounded-full shadow-md border border-primary text-primary font-bold text-xs cursor-pointer hover:bg-primary hover:text-white transition-all";
-  el.innerText = `$${property.price ? property.price.toLocaleString() : "..."}`;
+  el.innerText = `$${property.price ? Number(property.price).toLocaleString() : "..."}`;
   return el;
 }
 
@@ -75,7 +75,7 @@ export default function Maps() {
             longitude: Number(listing.longitude),
             latitude: Number(listing.latitude),
           }))
-          .filter((l: any) => !isNaN(l.longitude) && !isNaN(l.latitude));
+          .filter((l: any) => !isNaN(l.longitude) && !isNaN(l.latitude) && Number(l.price) > 0);
       },
     },
   );
@@ -135,7 +135,7 @@ export default function Maps() {
                   <img src="${property.image}" alt="${property.title}" style="width: 100%; height: 100%; object-fit: cover;" />
                 </div>
                 <div style="padding: 12px 2px 4px 2px; display: flex; flex-direction: column; gap: 4px;">
-                  <h3 style="margin: 0; color: #305487; font-size: 18px; font-weight: 700;">$${property.price.toLocaleString()}</h3>
+                  <h3 style="margin: 0; color: #305487; font-size: 18px; font-weight: 700;">$${Number(property.price).toLocaleString()}</h3>
                   <p style="margin: 0; font-size: 14px; font-weight: 700; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${property.title}</p>
                   <p style="margin: 0; font-size: 12px; color: #6e6e6e; line-height: 1.4; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${property.address}</p>
                 </div>

@@ -3,13 +3,7 @@ import { usePathname } from "next/navigation";
 const PropertyCardSkeleton = () => {
   const pathname = usePathname();
   return (
-    <div
-      className={`${
-        pathname === "/properties" || pathname === "/wishlist"
-          ? "md:w-[49%] w-full"
-          : "w-full"
-      }`}
-    >
+    <div className="w-full">
       <div className="relative rounded-xl flex overflow-hidden border border-borderColor h-auto w-full animate-pulse">
         <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-full justify-between">
           {/* Image */}

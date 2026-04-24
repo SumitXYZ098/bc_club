@@ -14,26 +14,41 @@ export const getTime = (
   const now = dayjs();
   const target = dayjs(timestamp);
 
-  const minutes = now.diff(target, "minute");
-  const hours = now.diff(target, "hour");
-  const days = now.diff(target, "day");
-  const months = now.diff(target, "month");
-  const years = now.diff(target, "year");
+  // ❗ invalid date handle
+  if (!target.isValid()) return "";
 
+  let minutes = now.diff(target, "minute");
+  let hours = now.diff(target, "hour");
+  let days = now.diff(target, "day");
+
+  // ❗ future date fix
+  if (minutes < 0) return "just now";
+
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  // ✅ SHORT MODE
   if (mode === "short") {
-    if (minutes < 60) return `${minutes}min`;
-    if (hours < 24) return `${hours}H`;
-    if (days < 30) return `${days}D`;
-    if (months < 12) return `${months}M`;
-    return `${years}Y`;
+    if (minutes < 1) return "now";
+    if (minutes < 60) return `${minutes}m`;
+    if (hours < 24) return `${hours}h`;
+    if (days < 30) return `${days}d`;
+    if (months < 12) return `${months}mo`;
+    return `${years}y`;
   }
 
-  // long mode (time ago)
+  // ✅ LONG MODE (natural language)
+
+  if (minutes < 1) return "just now";
+
   if (minutes < 60)
     return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
 
   if (hours < 24)
     return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+
+  // 👇 special case
+  if (days === 1) return "yesterday";
 
   if (days < 30)
     return `${days} day${days !== 1 ? "s" : ""} ago`;

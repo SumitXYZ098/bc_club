@@ -26,7 +26,7 @@ const GetInTouchLink: React.FC<
         className={`font-bold text-base ${onTitleClick ? "cursor-pointer hover:text-primary transition-all underline-offset-4 hover:underline" : ""}`}
         onClick={() => onTitleClick?.(title)}
       >
-        {title} 
+        {title}
       </span>
       <ul className="list-none flex flex-col text-sm text-lightWhite space-y-4">
         {linkList.map((item, idx) => (
@@ -114,7 +114,10 @@ const GetInTouch = () => {
           <Description
             type={IDescriptionTypes.dec16}
             customClasses="text-black70 md:text-start text-center md:mt-5 mt-4"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc placerat odio enim, eu pellentesque libero tempus ac. Praesent tempor, tellus sed ullamcorper interdum, orci metus luctus enim, in laoreet ipsum ipsum ac eros. Pellentesque a risus sapien. Morbi nisi justo, semper auctor auctor eu, pharetra non velit. Quisque eu tincidunt dolor. Phasellus tempor, lorem ut pharetra porttitor, est augue convallis tortor, a pellentesque sem leo aliquam tellus. In at sapien id dolor iaculis scelerisque nec nec felis."
+            content="At BC RealeState Market, we’re here to help you with all your real estate needs across British Columbia. Whether you are buying, selling, or exploring market trends, our team is ready to assist you. Get expert advice on property search, home estimation, and neighborhood insights.
+We proudly serve Vancouver, Surrey, Victoria, Kelowna, and Prince George.
+Reach out to us today and let’s make your real estate journey simple and successful.
+ "
           />
           <div className="flex flex-row items-center-safe gap-x-3 md:mt-6 mt-4">
             <div className="bg-secondary cursor-pointer md:p-1.5 p-1 rounded-lg md:w-12.5 md:h-12.5 w-10 h-10">

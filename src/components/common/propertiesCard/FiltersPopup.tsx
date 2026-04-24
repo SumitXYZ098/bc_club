@@ -206,7 +206,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
             className="w-full border border-[#33333333] rounded-xl px-2 py-2 focus:outline-none cursor-pointer text-sm"
           >
             <option value="" disabled>
-              Select Location
+          All Cities
             </option>
             {[
               'Abbotsford',

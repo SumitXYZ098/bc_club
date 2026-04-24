@@ -73,7 +73,7 @@ const OurProperty = () => {
   };
 
   // 🔹 Mapping Function
-  const mapProperty = (listing: any): PropertyCardProps => ({
+  const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
     id: listing.documentId,
     image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
     title: listing?.property_sub_type,
@@ -107,6 +107,7 @@ const OurProperty = () => {
       listing?.raw_data?.ListAOR ||
       "Unknown",
     isFavourite: listing?.is_favorite || false,
+    isDdf: !!isDdf,
   });
 
   const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
@@ -117,7 +118,9 @@ const OurProperty = () => {
         // console.log("🏙️ Current City Filter:", city);
 
         return (
-          res?.data?.filter((l: any) => l?.address).map(mapProperty) || []
+          res?.data
+            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+            .map((l: any) => mapProperty(l, true)) || []
         );
       },
     },
@@ -129,7 +132,9 @@ const OurProperty = () => {
     },
     {
       select: (res: any) =>
-        res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
+        res?.data
+          ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+          .map((l: any) => mapProperty(l, false)) || [],
     },
   );
 
@@ -140,7 +145,9 @@ const OurProperty = () => {
       },
       {
         select: (res: any) =>
-          res?.data?.filter((l: any) => l?.address).map(mapProperty) || [],
+          res?.data
+            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+            .map((l: any) => mapProperty(l, false)) || [],
       },
     );
 

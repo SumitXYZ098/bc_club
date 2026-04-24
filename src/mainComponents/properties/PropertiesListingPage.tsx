@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import { Box, Chip, Pagination } from "@mui/material";
@@ -17,6 +17,7 @@ import {
   useGetListings,
   useGetWishlistProperties,
   useGetActiveListings,
+  useGetMyDdfFavorites,
 } from "@/src/hooks/listing/useListingQueries";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "../auth/AuthContext";
@@ -53,8 +54,10 @@ export default function PropertiesListingPage() {
     updateInstanceFilter("list", "search", val);
   const setIsChip = (val: boolean) =>
     updateInstanceFilter("list", "isChip", val);
-  const setActivePrice = (val: string) =>
+  const setActivePrice = (val: string) => {
+    console.log("Setting Active Price:", val);
     updateInstanceFilter("list", "activePrice", val);
+  };
   const setActiveBathRoom = (val: string) =>
     updateInstanceFilter("list", "activeBathRoom", val);
   const setActiveBedRoom = (val: string) =>
@@ -76,17 +79,29 @@ export default function PropertiesListingPage() {
 
   const pillInactive = "border-[#30548733] text-gray-800";
 
+  const isForSale = !status || status === "forSale";
+
   const params: any = {
     "pagination[page]": page,
     "pagination[pageSize]": pageSize,
-    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
-    "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
+
+  if (!isForSale) {
+    // These filters are only for standard properties
+    params["filters[property_status][$notIn]"] = ["Expired", "Terminated", "Cancelled"];
+    params["filters[property_sub_type][$notNull]"] = true;
+    params["filters[raw_data][BCRES_SoldDate][$null]"] = true;
+  }
 
   // price sorting
   if (activePrice && activePrice !== "any") {
-    params.price = activePrice;
+    if (isForSale) {
+      // DDF API specifically uses price=asc/desc
+      params.price = activePrice;
+    } else {
+      // Standard Strapi API uses sort=field:direction
+      params.sort = `price:${activePrice}`;
+    }
   }
 
   // bedroom filter
@@ -117,14 +132,15 @@ export default function PropertiesListingPage() {
 
   if (status && status !== "any") {
     params.propertyType = status;
-    delete params["filters[property_status][$notIn]"];
-    delete params["filters[raw_data][BCRES_SoldDate][$null]"];
-    delete params["filters[property_sub_type][$notNull]"];
+  } else if (isForSale) {
+    params.propertyType = "forSale";
   }
 
   if (location && location !== "") {
     params.location = location;
   }
+
+  console.log("FINAL PROPERTY PARAMS:", params);
 
   const select = (res: any) => {
     const listings = res?.data || [];
@@ -132,7 +148,7 @@ export default function PropertiesListingPage() {
       pageCount: res?.count ? Math.ceil(res.count / pageSize) : 1,
     };
 
-    const properties: PropertyCardProps[] = listings.map((listing: any) => ({
+    let properties: PropertyCardProps[] = listings.map((listing: any) => ({
       id: listing.documentId,
       image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
       title: listing?.property_sub_type,
@@ -165,13 +181,20 @@ export default function PropertiesListingPage() {
         listing?.raw_data?.ListAOR ||
         "Unknown",
       isFavourite: listing?.is_favorite || isWishlistPage,
-    }));
+      isDdf: isForSale,
+    })).filter((p: any) => Number(p.price) > 0);
+
+    // Explicit client-side sort to guarantee order regardless of API behavior
+    if (activePrice === "asc") {
+      properties.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+    } else if (activePrice === "desc") {
+      properties.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+    }
 
     return { properties, listings, pagination };
   };
 
-  const isForSale = status === "forSale" || !status;
-  const { data: queryDataNormal, isLoading: loadingNormal } = useGetListings(
+  const { data: queryDataNormal, isLoading: isLoadingNormal } = useGetListings(
     params,
     {
       select,
@@ -179,41 +202,99 @@ export default function PropertiesListingPage() {
     },
   );
 
-  const { data: queryDataActive, isLoading: loadingActive } =
+  const { data: queryDataActive, isLoading: isLoadingActive } =
     useGetActiveListings( params,{
       select,
       enabled: !isWishlistPage && isForSale,
     });
 
   const queryData = isForSale ? queryDataActive : queryDataNormal;
-  const loading = isForSale ? loadingActive : loadingNormal;
+  const loading = isForSale ? isLoadingActive : isLoadingNormal;
 
   const {
     data: wishlistData,
     isLoading: wishlistLoading,
-    error: wishlistError,
     refetch: refetchWishlist,
   } = useGetWishlistProperties({
-    select,
+    select: (res) => select(res),
+    enabled: isWishlistPage && isLoggedIn,
+  });
+
+  const {
+    data: ddfWishlistData,
+    isLoading: ddfWishlistLoading,
+    refetch: refetchDdfWishlist,
+  } = useGetMyDdfFavorites({
+    select: (res) => {
+        // Force isDdf to true for this response
+        const listings = res?.data || [];
+        const properties = listings.map((listing: any) => ({
+          ...listing,
+          id: listing.documentId,
+          image: typeof listing?.media?.[0] === "string" ? listing.media[0] : (listing?.media?.[0]?.MediaURL || listing?.media_url?.[0]),
+          title: listing?.property_sub_type,
+          price: listing?.price,
+          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+          address: listing?.address,
+          city: listing?.city,
+          province: listing?.state,
+          area: listing?.area,
+          sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+          beds: listing?.bedrooms ?? 0,
+          baths: listing?.bathrooms ?? 0,
+          mls: listing?.mls_number ?? listing?.listing_id,
+          realtor: listing?.realtor_name || listing?.raw_data?.ListAOR || "Unknown",
+          assessedDiff: listing?.assessed_diff || 0,
+          isLogin: true,
+          isFavourite: true,
+          isDdf: true,
+        })).filter((p: any) => Number(p.price) > 0);
+        return { properties };
+    },
     enabled: isWishlistPage && isLoggedIn,
   });
 
   useEffect(() => {
     if (isWishlistPage && isLoggedIn) {
       refetchWishlist();
+      refetchDdfWishlist();
     }
-  }, [isWishlistPage, isLoggedIn, refetchWishlist]);
+  }, [isWishlistPage, isLoggedIn, refetchWishlist, refetchDdfWishlist]);
 
   const data = isWishlistPage
-    ? wishlistData?.properties || []
+    ? [...(wishlistData?.properties || []), ...(ddfWishlistData?.properties || [])]
     : queryData?.properties || [];
+
   const listingData = isWishlistPage
-    ? wishlistData?.listings || []
+    ? [...(wishlistData?.listings || []), ...(ddfWishlistData?.properties || [])]
     : queryData?.listings || [];
+
   const pageCount = isWishlistPage
     ? wishlistData?.pagination?.pageCount || 1
     : queryData?.pagination?.pageCount || 1;
-  const isLoading = isWishlistPage ? wishlistLoading : loading;
+    
+  const isLoading = isWishlistPage ? (wishlistLoading || ddfWishlistLoading) : loading;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 🚀 Scroll to top of the container on filter change
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [
+    search,
+    activePrice,
+    activeBathRoom,
+    activeBedRoom,
+    activeProperty,
+    minPrice,
+    maxPrice,
+    minSqft,
+    maxSqft,
+    status,
+    location,
+    page,
+  ]);
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -324,6 +405,7 @@ export default function PropertiesListingPage() {
                       <button
                         onClick={() => {
                           clearInstanceFilters("list");
+                          scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                         className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
                           activePrice !== "any" ||
@@ -359,7 +441,7 @@ export default function PropertiesListingPage() {
                         pillActive={pillActive}
                         pillInactive={pillInactive}
                         options={[
-                          { label: "Any", value: "any" },
+                          { label: "Sort By", value: "any" },
                           { label: "Low to High", value: "asc" },
                           { label: "High to Low", value: "desc" },
                         ]}
@@ -430,6 +512,7 @@ export default function PropertiesListingPage() {
                     <button
                       onClick={() => {
                         clearInstanceFilters("list");
+                        scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                       className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
                         activePrice !== "any" ||
@@ -472,7 +555,7 @@ export default function PropertiesListingPage() {
                       (filters.maxPrice !== undefined &&
                         filters.maxPrice < 20000000) ? (
                         <Chip
-                          label={`$${filters.minPrice} to ${filters.maxPrice === 20000000 ? "Max" : `$${filters.maxPrice}`}`}
+                          label={`$${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
                           onDelete={() => {
                             updateInstanceFilter("list", "minPrice", 0);
                             updateInstanceFilter("list", "maxPrice", 20000000);
@@ -515,14 +598,14 @@ export default function PropertiesListingPage() {
                   </div>
                 )}
 
-                {/* Map + List */}
+                {/* Property Grid */}
                 {isLoading ? (
                   <div className="flex justify-between items-start mb-10 w-full">
-                    <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
-                      <div className="w-full h-full flex justify-center items-center animate-pulse bg-gray-200 rounded-xl" />
-                    </div>
-                    <div className="xl:w-[64%] w-full flex flex-col">
-                      <div className="flex flex-wrap gap-y-7 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
+                    <div className="w-full flex flex-col h-full">
+                      <div
+                        ref={scrollRef}
+                        className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3"
+                      >
                         {Array.from({ length: 6 }).map((_, i) => (
                           <PropertyCardSkeleton key={i} />
                         ))}
@@ -536,17 +619,12 @@ export default function PropertiesListingPage() {
                     </h3>
                   </div>
                 ) : (
-                  <div className="flex justify-between items-start mb-10 w-full ">
-                    {/* <div className="xl:flex h-[65svh] w-full xl:w-[40%] hidden">
-                      <PropertiesMap
-                        locations={listingData}
-                        zoom={8}
-                        center={[-122.89, 49.28]}
-                      />
-                    </div> */}
-
-                    <div className=" w-full flex flex-col h-full">
-                      <div className=" gap-7 grid grid-cols-1 md:grid-cols-3 justifyjustify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3">
+                  <div className="flex justify-between items-start mb-10 w-full">
+                    <div className="w-full flex flex-col h-full">
+                      <div
+                        ref={scrollRef}
+                        className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3"
+                      >
                         {data.map((property: any) => (
                           <PropertiesCard
                             key={property.id}
@@ -554,6 +632,7 @@ export default function PropertiesListingPage() {
                             isLogin
                             isSold={status === "sold"}
                             isExpired={status === "expired"}
+                            isDdf={property.isDdf}
                           />
                         ))}
                       </div>
