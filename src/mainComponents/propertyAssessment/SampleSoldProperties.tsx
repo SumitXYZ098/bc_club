@@ -9,6 +9,7 @@ import { useAuthContext } from "../auth/AuthContext";
 import axios from "axios";
 import { getListings } from "@/src/api/listing/listingApi";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+import { getOfficeName } from "@/src/utilities/utilities";
 
 const SampleSoldProperties = () => {
   const [soldList, setSoldList] = useState<PropertyCardProps[]>([]);
@@ -64,7 +65,7 @@ const SampleSoldProperties = () => {
                   )
                 : 0,
               mls: listing?.mls_number,
-              realtor: listing?.raw_data?.ListAOR || "Unknown",
+              realtor: getOfficeName(listing),
             };
           });
 

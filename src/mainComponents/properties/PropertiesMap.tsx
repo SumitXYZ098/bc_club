@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Images } from "@/src/app/exports";
+import { getOfficeName } from "@/src/utilities/utilities";
 
 interface SimpleMapProps {
   center?: [number, number];
@@ -67,7 +68,7 @@ const PropertiesMap: React.FC<SimpleMapProps> = ({
               : `${property?.city}, ${property?.state}`
           }</p>
           <div class="combine"><span class="mls"><strong>MLS® ${property?.mls_number}</strong></span>
-          <span class="aor"><strong>${property?.raw_data?.ListAOR || "Unknown"}</strong></span>
+          <span class="aor"><strong>${getOfficeName(property)}</strong></span>
           </div>
         </div>
       </div></a>`),

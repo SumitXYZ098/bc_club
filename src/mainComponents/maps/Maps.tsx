@@ -8,6 +8,7 @@ import PropertiesCard, {
 import { useGetListings } from "@/src/hooks/listing/useListingQueries";
 import { Images } from "@/src/app/exports";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
+import { getOfficeName } from "@/src/utilities/utilities";
 
 // Function definition remains the same
 function createPriceMarker(property: any) {
@@ -66,10 +67,7 @@ export default function Maps() {
                 )
               : 0,
             mls: listing?.mls_number || "N/A",
-            realtor:
-              listing?.office_data?.OfficeName ||
-              listing?.raw_data?.ListAOR ||
-              "Unknown",
+            realtor: getOfficeName(listing),
             isLogin: true,
             isFavourite: listing?.is_favorite || false,
             longitude: Number(listing.longitude),
@@ -121,28 +119,38 @@ export default function Maps() {
       const lat = property.latitude;
 
       const markerEl = createPriceMarker(property);
+      const popup = new mapboxgl.Popup({
+        offset: 25,
+        closeButton: false,
+        closeOnClick: true,
+      }).setHTML(
+        `<div style="cursor: pointer; text-decoration: none; color: inherit; display: block; width: 220px; font-family: 'Inter', sans-serif;">
+          <div style="overflow: hidden;">
+            <div style="width: 100%; height: 130px; overflow: hidden; border-radius: 8px;">
+              <img src="${property.image}" alt="${property.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="padding: 12px 2px 4px 2px; display: flex; flex-direction: column; gap: 4px;">
+              <h3 style="margin: 0; color: #305487; font-size: 18px; font-weight: 700;">$${Number(property.price).toLocaleString()}</h3>
+              <p style="margin: 0; font-size: 14px; font-weight: 700; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${property.title}</p>
+              <p style="margin: 0; font-size: 12px; color: #6e6e6e; line-height: 1.4; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${property.address}</p>
+            </div>
+          </div>
+        </div>`,
+      );
+
+      popup.on("open", () => {
+        const el = popup.getElement();
+        if (el) {
+          el.style.cursor = "pointer";
+          el.addEventListener("click", () => {
+            window.location.href = `/property-info/${property.id}`;
+          });
+        }
+      });
+
       const marker = new mapboxgl.Marker(markerEl)
         .setLngLat([lng, lat])
-        .setPopup(
-          new mapboxgl.Popup({
-            offset: 25,
-            closeButton: false,
-            closeOnClick: true,
-          }).setHTML(
-            `<a href="/property-info/${property.id}" style="text-decoration: none; color: inherit; display: block; width: 220px; font-family: 'Inter', sans-serif;">
-              <div style="overflow: hidden;">
-                <div style="width: 100%; height: 130px; overflow: hidden; border-radius: 8px;">
-                  <img src="${property.image}" alt="${property.title}" style="width: 100%; height: 100%; object-fit: cover;" />
-                </div>
-                <div style="padding: 12px 2px 4px 2px; display: flex; flex-direction: column; gap: 4px;">
-                  <h3 style="margin: 0; color: #305487; font-size: 18px; font-weight: 700;">$${Number(property.price).toLocaleString()}</h3>
-                  <p style="margin: 0; font-size: 14px; font-weight: 700; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${property.title}</p>
-                  <p style="margin: 0; font-size: 12px; color: #6e6e6e; line-height: 1.4; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${property.address}</p>
-                </div>
-              </div>
-            </a>`,
-          ),
-        )
+        .setPopup(popup)
         .addTo(map);
 
       markersRef.current.push(marker);

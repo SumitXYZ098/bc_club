@@ -18,6 +18,7 @@ import {
   getMyDdfFavorites,
   removeFromFavourite,
   getActiveListings,
+  getMapZoomListings,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -55,6 +56,20 @@ export function useGetActiveListings<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: listingKeys.list(params || {}),
     queryFn: () => getActiveListings(params),
+    ...options,
+  });
+}
+
+export function useGetMapZoomListings<TData = any>(
+  params?: any,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["mapZoomListings", params || {}],
+    queryFn: () => getMapZoomListings(params),
     ...options,
   });
 }
@@ -166,7 +181,6 @@ export function useToggleWishlist() {
       toast.error(error.message || "Failed to update wishlist");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: listingKeys.me() });
       queryClient.invalidateQueries({ queryKey: listingKeys.wishlist() });
     },
     onSuccess: (resp) => {
@@ -218,7 +232,6 @@ export function useRemoveFromWishlist() {
       toast.error(error.message || "Failed to update wishlist");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: listingKeys.me() });
       queryClient.invalidateQueries({ queryKey: listingKeys.wishlist() });
     },
     onSuccess: (resp) => {
@@ -275,7 +288,6 @@ export function useToggleDdfWishlist() {
       toast.error(error.message || "Failed to update wishlist");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: listingKeys.me() });
       queryClient.invalidateQueries({ queryKey: [...listingKeys.wishlist(), "ddf"] });
     },
     onSuccess: (resp) => {
@@ -322,7 +334,6 @@ export function useRemoveDdfWishlist() {
       toast.error(error.message || "Failed to remove from wishlist");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: listingKeys.me() });
       queryClient.invalidateQueries({ queryKey: [...listingKeys.wishlist(), "ddf"] });
     },
     onSuccess: (resp) => {

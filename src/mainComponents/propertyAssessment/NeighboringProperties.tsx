@@ -9,6 +9,7 @@ import { getListings } from "@/src/api/listing/listingApi";
 import axios from "axios";
 import { useAuthContext } from "../auth/AuthContext";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+import { getOfficeName } from "@/src/utilities/utilities";
 
 const NeighboringProperties = () => {
   const [data, setData] = useState<PropertyCardProps[]>([]);
@@ -64,7 +65,7 @@ const NeighboringProperties = () => {
                   )
                 : 0,
               mls: listing?.mls_number,
-              realtor: listing?.raw_data?.ListAOR || "Unknown",
+              realtor: getOfficeName(listing),
             };
           });
 

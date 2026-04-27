@@ -4,11 +4,16 @@ import Cookies from "js-cookie";
 
 export async function getListings(params: any): Promise<any> {
   try {
+    // Explicitly request office_name along with existing populations
+    const enhancedParams = { ...params };
+    // Usually Strapi might need explicit fields if they are somehow excluded
+    if (!enhancedParams.populate) enhancedParams.populate = "*";
+    
     const res = await axios.get(Endpoints.getListing, {
-      params,
+      params: enhancedParams,
     });
 
-    console.log("API Response:", res.data); // Log the API response for debugging
+    console.log("🚀 Debug [getListings]: Verifying office_name in response...", res.data?.data?.[0]?.office_name);
 
     return res.data;
   } catch (error) {
@@ -23,11 +28,31 @@ export async function getListings(params: any): Promise<any> {
 
 export async function getActiveListings(params?:any): Promise<any> {
   try {
-    const res = await axios.get(Endpoints.getActivePropertyLists, { params });
+    const enhancedParams = { ...params };
+    if (!enhancedParams.populate) enhancedParams.populate = "*";
+
+    const res = await axios.get(Endpoints.getActivePropertyLists, { params: enhancedParams });
+    
+    console.log("🚀 Debug [getActiveListings]: Verifying office_name in response...", res.data?.data?.[0]?.office_name);
+
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data.error.message);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+export async function getMapZoomListings(params?: any): Promise<any> {
+  try {
+    console.log("🚀 Fetching /api/map-zoom with params:", params);
+    const res = await axios.get(Endpoints.mapZoom, { params });
+    console.log("🚀 Response from /api/map-zoom:", res.data);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
     }
     throw new Error("An unexpected error occurred");
   }

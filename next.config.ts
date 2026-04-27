@@ -20,6 +20,16 @@ const nextConfig: NextConfig = {
         hostname: "ddfcdn.realtor.ca",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "my.matterport.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "nationwiderealty.ca",
+        pathname: "**",
+      },
     ],
   },
   turbopack: {

@@ -16,6 +16,7 @@ import PropertyCardSkeleton from "@/src/components/common/propertiesCard/Propert
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 
 import { useGetActiveListings, useGetListings } from "@/src/hooks/listing/useListingQueries";
+import { getOfficeName } from "@/src/utilities/utilities";
 import { useAuthContext } from "../auth/AuthContext";
 
 const tabList = [
@@ -102,10 +103,7 @@ const OurProperty = () => {
       : 0,
     mls: listing?.mls_number ?? listing?.listing_id
 ,
-    realtor:
-      listing?.office_data?.OfficeName ||
-      listing?.raw_data?.ListAOR ||
-      "Unknown",
+    realtor: getOfficeName(listing),
     isFavourite: listing?.is_favorite || false,
     isDdf: !!isDdf,
   });

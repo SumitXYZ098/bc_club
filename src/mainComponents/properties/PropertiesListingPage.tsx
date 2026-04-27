@@ -23,6 +23,7 @@ import { usePathname } from "next/navigation";
 import { useAuthContext } from "../auth/AuthContext";
 import CustomButton from "../../components/button/CustomButton";
 import Link from "next/link";
+import { getOfficeName } from "@/src/utilities/utilities";
 
 export default function PropertiesListingPage() {
   const pathName = usePathname();
@@ -36,7 +37,7 @@ export default function PropertiesListingPage() {
 
   const search = filters.search || "";
   const isChip = filters.isChip || false;
-  const activePrice = filters.activePrice || "any";
+  const activePrice = filters.activePrice || "newest";
   const activeBathRoom = filters.activeBathRoom || "any";
   const activeBedRoom = filters.activeBedRoom || "any";
   const activeProperty = filters.activeProperty || "any";
@@ -93,14 +94,17 @@ export default function PropertiesListingPage() {
     params["filters[raw_data][BCRES_SoldDate][$null]"] = true;
   }
 
-  // price sorting
+  // sorting
   if (activePrice && activePrice !== "any") {
     if (isForSale) {
-      // DDF API specifically uses price=asc/desc
-      params.price = activePrice;
+      if (activePrice === 'newest') params.sort = 'date:desc';
+      else if (activePrice === 'oldest') params.sort = 'date:asc';
+      else if (activePrice === 'asc') params.sort = 'price:asc';
+      else if (activePrice === 'desc') params.sort = 'price:desc';
     } else {
-      // Standard Strapi API uses sort=field:direction
-      params.sort = `price:${activePrice}`;
+      if (activePrice === 'newest') params.sort = 'createdAt:desc';
+      else if (activePrice === 'oldest') params.sort = 'createdAt:asc';
+      else params.sort = `price:${activePrice}`;
     }
   }
 
@@ -176,10 +180,7 @@ export default function PropertiesListingPage() {
           )
         : 0,
       mls: listing?.mls_number ?? listing?.listing_id,
-      realtor:
-        listing?.office_data?.OfficeName ||
-        listing?.raw_data?.ListAOR ||
-        "Unknown",
+      realtor: getOfficeName(listing),
       isFavourite: listing?.is_favorite || isWishlistPage,
       isDdf: isForSale,
     })).filter((p: any) => Number(p.price) > 0);
@@ -189,6 +190,18 @@ export default function PropertiesListingPage() {
       properties.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
     } else if (activePrice === "desc") {
       properties.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+    } else if (activePrice === "newest") {
+      properties.sort((a, b) => {
+        const dateA = a.daysAgo ? new Date(a.daysAgo).getTime() : 0;
+        const dateB = b.daysAgo ? new Date(b.daysAgo).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (activePrice === "oldest") {
+      properties.sort((a, b) => {
+        const dateA = a.daysAgo ? new Date(a.daysAgo).getTime() : 0;
+        const dateB = b.daysAgo ? new Date(b.daysAgo).getTime() : 0;
+        return dateA - dateB;
+      });
     }
 
     return { properties, listings, pagination };
@@ -243,7 +256,7 @@ export default function PropertiesListingPage() {
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
           mls: listing?.mls_number ?? listing?.listing_id,
-          realtor: listing?.realtor_name || listing?.raw_data?.ListAOR || "Unknown",
+          realtor: getOfficeName(listing),
           assessedDiff: listing?.assessed_diff || 0,
           isLogin: true,
           isFavourite: true,
@@ -434,14 +447,15 @@ export default function PropertiesListingPage() {
                     {/* Price */}
                     <div className="w-full flex flex-row xs:flex-nowrap flex-wrap justify-between items-center gap-4">
                       <FilterPillSelect
-                        label="Price"
+                        label="Sort By"
                         value={activePrice}
                         onChange={setActivePrice}
                         pillBase={pillBase}
                         pillActive={pillActive}
                         pillInactive={pillInactive}
                         options={[
-                          { label: "Sort By", value: "any" },
+                          { label: "Newest First", value: "newest" },
+                          { label: "Oldest First", value: "oldest" },
                           { label: "Low to High", value: "asc" },
                           { label: "High to Low", value: "desc" },
                         ]}
@@ -456,7 +470,7 @@ export default function PropertiesListingPage() {
                         pillActive={pillActive}
                         pillInactive={pillInactive}
                         options={[
-                          { label: "Any", value: "any" },
+                          { label: "All", value: "any" },
                           { label: "1", value: "1" },
                           { label: "2", value: "2" },
                           { label: "3", value: "3" },
@@ -474,7 +488,7 @@ export default function PropertiesListingPage() {
                         pillActive={pillActive}
                         pillInactive={pillInactive}
                         options={[
-                          { label: "Any", value: "any" },
+                          { label: "All", value: "any" },
                           { label: "1", value: "1" },
                           { label: "2", value: "2" },
                           { label: "3", value: "3" },
@@ -490,23 +504,32 @@ export default function PropertiesListingPage() {
                         pillBase={pillBase}
                         pillActive={pillActive}
                         pillInactive={pillInactive}
-                        options={[
-                          { label: "Any", value: "any" },
-                          {
-                            label: "Apartment/Condo",
-                            value: "Apartment/Condo",
-                          },
-                          {
-                            label: "Single Family Residence",
-                            value: "Single Family Residence",
-                          },
-                          { label: "Townhouse", value: "Townhouse" },
-                          { label: "Half Duplex", value: "Half Duplex" },
-                          {
-                            label: "Row House (Non-Strata)",
-                            value: "Row House (Non-Strata)",
-                          },
-                        ]}
+                        options={
+                          status === "sold" || status === "expired"
+                            ? [
+                                { label: "All", value: "any" },
+                                { label: "Apartment/Condo", value: "Apartment/Condo" },
+                                {
+                                  label: "Single Family Residence",
+                                  value: "Single Family Residence",
+                                },
+                                { label: "Townhouse", value: "Townhouse" },
+                                { label: "Half Duplex", value: "Half Duplex" },
+                                {
+                                  label: "Row House (Non-Strata)",
+                                  value: "Row House (Non-Strata)",
+                                },
+                              ]
+                            : [
+                                { label: "All", value: "any" },
+                                { label: "Single-Family", value: "Single-Family" },
+                                { label: "Multi-Family", value: "Multi-Family" },
+                                { label: "Office", value: "Office" },
+                                { label: "Business", value: "Business" },
+                                { label: "Agriculture", value: "Agriculture" },
+                                { label: "Vacant Land", value: "Vacant Land" },
+                              ]
+                        }
                       />
                     </div>
                     <button

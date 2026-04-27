@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FiX } from "react-icons/fi";
+import { FiX, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import Image from "next/image";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
@@ -8,6 +8,55 @@ import { Icons, Images } from "@/src/app/exports";
 import LineGradient from "../lineGradient/LineGradient";
 import CustomButton from "../../button/CustomButton";
 import { Dialog } from "@mui/material";
+
+// ================= Constants =================
+const ALL_CITIES = [
+  // Core Metro Vancouver
+  'Vancouver', 'Burnaby', 'Richmond', 'Surrey', 'Coquitlam',
+  'Port Coquitlam', 'Port Moody', 'New Westminster',
+  'North Vancouver', 'West Vancouver',
+
+  // Fraser Valley
+  'Abbotsford', 'Chilliwack', 'Mission', 'Agassiz', 'Hope',
+  'Langley', 'Maple Ridge', 'Pitt Meadows', 'Delta', 'White Rock',
+  'Tsawwassen', 'Ladner', 'Yarrow', 'Rosedale', 'Greendale',
+
+  // Vancouver Island (important missing earlier)
+  'Victoria', 'Langford', 'Saanich', 'Nanaimo', 'Courtenay',
+  'Comox', 'Campbell River', 'Parksville', 'Duncan', 'Sidney',
+
+  // Interior BC
+  'Kelowna', 'Kamloops', 'Prince George', 'Vernon',
+  'Penticton', 'Salmon Arm', 'Nelson', 'Castlegar', 'Trail',
+
+  // Sea-to-Sky
+  'Squamish', 'Whistler', 'Pemberton', 'Britannia Beach', 'Lions Bay',
+
+  // Sunshine Coast
+  'Sechelt', 'Gibsons', 'Madeira Park', 'Roberts Creek', 'Egmont',
+
+  // Islands
+  'Salt Spring Island', 'Pender Island', 'Mayne Island',
+  'Galiano Island', 'Saturna Island', 'Gabriola Island',
+  'Bowen Island', 'Gambier Island', 'Keats Island',
+
+  // Small / Rural / Edge cases
+  'Anmore', 'Belcarra', "D'Arcy", 'Birken', 'Brackendale',
+  'Furry Creek', 'Halfmoon Bay', 'Garden Bay',
+  'Harrison Hot Springs', 'Harrison Mills',
+  'Cultus Lake', 'Lindell Beach', 'Sunshine Valley',
+  'Boston Bar', 'Lytton', 'Yale', 'Vanderhoof',
+
+  // DDF-specific / MLS weird values (optional keep)
+  'Sardis', 'Sardis - Chwk River Valley', 'Sardis - Greendale',
+  'University Endowment Lands',
+  'Columbia Valley'
+];
+
+const POPULAR_CITIES = [
+  'Vancouver', 'Surrey', 'Burnaby', 'Coquitlam', 
+  'Richmond', 'Langley', 'Abbotsford', 'Delta'
+];
 import { useListingStore } from "@/src/store/useListingStore";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 
@@ -93,6 +142,9 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
   );
   const [status, setStatus] = useState<string>(filters.status ?? "");
   const [location, setLocation] = useState<string>(filters.location ?? "");
+  
+  const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
+  const [expandedCityGroup, setExpandedCityGroup] = useState<'all' | 'popular' | null>('popular');
 
   useEffect(() => {
     if (open) {
@@ -200,93 +252,106 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
         {/* Location */}
         <div className="mb-6 space-y-2 flex flex-col gap-y-1">
           <label className="font-medium">Location</label>
-          <select
-            value={location || ""}
-            onChange={(e) => setLocation(e.target.value as string)}
-            className="w-full border border-[#33333333] rounded-xl px-2 py-2 focus:outline-none cursor-pointer text-sm"
-          >
-            <option value="" disabled>
-          All Cities
-            </option>
-            {[
-              'Abbotsford',
-              'Aberdeen',
-              'Agassiz',
-              'Anmore',
-              'Belcarra',
-              'Birken',
-              'Boston Bar / Lytton',
-              'Bowen Island',
-              'Brackendale',
-              'Britannia Beach',
-              'Burnaby',
-              'Cadreb Other',
-              'Chilliwack',
-              'Columbia Valley',
-              'Coquitlam',
-              'Cultus Lake',
-              "D'Arcy",
-              'Delta',
-              'Downtown',
-              'Egmont',
-              'Furry Creek',
-              'Gabriola Island',
-              'Galiano Island',
-              'Gambier Island',
-              'Garden Bay',
-              'Gibsons',
-              'Halfmoon Bay',
-              'Harrison Hot Springs',
-              'Harrison Mills',
-              'Hope',
-              'Keats Island',
-              'Ladner',
-              'Langdale',
-              'Langley',
-              'Lindell Beach',
-              'Lions Bay',
-              'Madeira Park',
-              'Maple Ridge',
-              'Mayne Island',
-              'Mission',
-              'Nelson Island',
-              'New Westminster',
-              'No City Value',
-              'North Vancouver',
-              'Pemberton',
-              'Pender Harbour',
-              'Pender Island',
-              'Pitt Meadows',
-              'Port Coquitlam',
-              'Port Moody',
-              'Richmond',
-              'Roberts Creek',
-              'Rosedale',
-              'Ryder Lake',
-              'Salt Spring Island',
-              'Sardis',
-              'Sardis - Chwk River Valley',
-              'Sardis - Greendale',
-              'Saturna Island',
-              'Sechelt',
-              'Squamish',
-              'Sunshine Valley',
-              'Surrey',
-              'Tsawwassen',
-              'University Endowment Lands',
-              'Vancouver',
-              'Vanderhoof',
-              'West Vancouver',
-              'Whistler',
-              'White Rock',
-              'Yale',
-              'Yarrow'
-            ].map((item, idx) => (
-              <option key={idx} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
+          <div className="relative w-full">
+            <div
+              onClick={() => setLocationDropdownOpen(!locationDropdownOpen)}
+              className="w-full border border-[#33333333] rounded-xl px-3 py-2 cursor-pointer text-sm flex justify-between items-center bg-white"
+            >
+              <span className={location ? "text-black" : "text-gray-500"}>
+                {location || "All Locations"}
+              </span>
+              <span className="text-gray-400">
+                {locationDropdownOpen ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
+              </span>
+            </div>
+
+            {locationDropdownOpen && (
+              <div className="absolute top-full mt-1 w-full bg-white border border-[#33333333] shadow-lg rounded-xl z-50 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hide py-2">
+
+                  {/* Popular Group */}
+                <div>
+                  <div
+                    onClick={() =>
+                      setExpandedCityGroup(
+                        expandedCityGroup === "popular" ? null : "popular"
+                      )
+                    }
+                    className="px-4 py-2 bg-gray-50/80 font-medium text-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center"
+                  >
+                    <span>Popular Cities</span>
+                    <span className="text-gray-500">
+                      {expandedCityGroup === "popular" ? (
+                        <FiChevronUp />
+                      ) : (
+                        <FiChevronDown />
+                      )}
+                    </span>
+                  </div>
+                  {expandedCityGroup === "popular" && (
+                    <div className="py-1 flex flex-col">
+                      {POPULAR_CITIES.map((city) => (
+                        <div
+                          key={`pop-${city}`}
+                          className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 ${
+                            location === city ? "bg-gray-100 font-medium" : ""
+                          }`}
+                          onClick={() => {
+                            setLocation(city);
+                            setLocationDropdownOpen(false);
+                          }}
+                        >
+                          {city}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {/* All Cities Group */}
+                <div className="mb-1">
+                  <div
+                    onClick={() =>
+                      setExpandedCityGroup(expandedCityGroup === "all" ? null : "all")
+                    }
+                    className="px-4 py-2 bg-gray-50/80 font-medium text-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center"
+                  >
+                    <span>All Cities</span>
+                    <span className="text-gray-500">
+                      {expandedCityGroup === "all" ? <FiChevronUp /> : <FiChevronDown />}
+                    </span>
+                  </div>
+                  {expandedCityGroup === "all" && (
+                    <div className="py-1 flex flex-col">
+                      {/* <div
+                        className="px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 text-gray-500"
+                        onClick={() => {
+                          setLocation("");
+                          setLocationDropdownOpen(false);
+                        }}
+                      >
+                        All Locations
+                      </div> */}
+                      {ALL_CITIES.map((city) => (
+                        <div
+                          key={`all-${city}`}
+                          className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 ${
+                            location === city ? "bg-gray-100 font-medium" : ""
+                          }`}
+                          onClick={() => {
+                            setLocation(city);
+                            setLocationDropdownOpen(false);
+                          }}
+                        >
+                          {city}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+               
+              </div>
+            )}
+          </div>
         </div>
         <LineGradient />
 

@@ -11,6 +11,7 @@ import {
   LocationRippleFilled,
 } from "@fluentui/react-icons";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
+import { getOfficeName } from "@/src/utilities/utilities";
 
 const PropertyTopAddressSection = ({ property }: { property: any }) => {
   return (
@@ -37,9 +38,7 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
           <LineGradient vr customClasses="mx-2 md:block hidden" />
           <span>MLS® {property?.listing_id || property?.mls_number || 'FPR345643E3'}</span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
-          <span>Courtesy of: {property?.office_data?.OfficeName ||
-        property?.raw_data?.ListAOR ||
-        "Unknown" }</span>
+          <span>Courtesy of: {getOfficeName(property)}</span>
         </div>
       </div>
       <div className="flex md:flex-col items-center md:items-end-safe gap-x-1.5 gap-y-3">

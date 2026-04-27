@@ -1,11 +1,13 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import mapboxgl, { Map as MapboxMap } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import Supercluster from "supercluster";
 import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCard";
 import {
   useGetListings,
   useGetActiveListings,
+  useGetMapZoomListings,
 } from "@/src/hooks/listing/useListingQueries";
 import { Images } from "@/src/app/exports";
 import { useListingStore } from "@/src/store/useListingStore";
@@ -23,6 +25,7 @@ import {
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import { getOfficeName } from "@/src/utilities/utilities";
 import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
@@ -95,17 +98,12 @@ function formatPriceAbbreviated(price: number) {
 function createPriceMarker(property: any, onClick: () => void) {
   const el = document.createElement("div");
   el.className =
-    "price-marker relative flex items-center justify-center bg-white text-gray-900 font-bold text-[14px] border border-gray-200 shadow-lg cursor-pointer transition-all px-4 py-1.5 whitespace-nowrap rounded-[10px]";
-
+    "price-marker bg-white px-2 py-1 rounded-full shadow-md border border-primary text-primary font-bold text-xs cursor-pointer hover:bg-primary hover:text-white transition-all";
+  
   let abbreviatedPrice = formatPriceAbbreviated(Number(property.price));
+  el.innerText = abbreviatedPrice;
 
-  el.innerHTML = `
-    <span class="relative z-10">${abbreviatedPrice}</span>
-    <div class="price-marker-carrot absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b border-r border-gray-200 rotate-45"></div>
-  `;
-
-  el.addEventListener("click", (e) => {
-    e.stopPropagation();
+  el.addEventListener("click", () => {
     onClick();
   });
 
@@ -120,12 +118,17 @@ export default function MapSearch() {
   const [sortBy, setSortBy] = useState("newest");
   const [visibleProperties, setVisibleProperties] = useState<any[]>([]);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const superclusterRef = useRef<Supercluster | null>(null);
   const pathName = usePathname();
   const isWishlistPage = pathName === "/wishlist";
 
   // States for Custom Sort Dropdown
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
+  const [mapBounds, setMapBounds] = useState<{ north: number; south: number; east: number; west: number , zoom: number } | null>(null);
+  const [mapZoomVal, setMapZoomVal] = useState<number | null>(null);
+  const mapBoundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [fitBoundsDone, setFitBoundsDone] = useState(false);
 
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
     useListingStore();
@@ -155,6 +158,10 @@ export default function MapSearch() {
     }
     updateInstanceFilter("map", "status", val);
   };
+
+  useEffect(() => {
+    setFitBoundsDone(false);
+  }, [search, location, status, activeProperty, minPrice, maxPrice, minSqft, maxSqft, activeBedRoom, activeBathRoom]);
 
   // Enforce restriction if status is set externally (e.g. via GetInTouch or store initial state)
   useEffect(() => {
@@ -357,6 +364,31 @@ export default function MapSearch() {
   if (activeBedRoom && activeBedRoom !== "any") commonParams.bedrooms = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any") commonParams.bathrooms = activeBathRoom.replace("+", "");
   if (activeProperty && activeProperty !== "any") commonParams.type = activeProperty;
+  if (status && status !== "any") commonParams.propertyType = status;
+  
+  const mapZoomParams = useMemo(() => {
+    const p: any = {};
+    if (mapBounds) {
+      p.north = mapBounds.north;
+      p.south = mapBounds.south;
+      p.east = mapBounds.east;
+      p.west = mapBounds.west;
+      if (mapZoomVal !== null) {
+        p.zoom = mapZoomVal;
+      }
+    }
+    return p;
+  }, [mapBounds, mapZoomVal]);
+
+  if (mapBounds) {
+    commonParams.north = mapBounds.north;
+    commonParams.south = mapBounds.south;
+    commonParams.east = mapBounds.east;
+    commonParams.west = mapBounds.west;
+    if (mapZoomVal !== null) {
+      commonParams.zoom = mapZoomVal;
+    }
+  }
 
   const params: any = {
     ...commonParams,
@@ -400,14 +432,15 @@ export default function MapSearch() {
       select: (res: any) => {
         const listings = res?.data || [];
         return listings
-          .map(
-            (listing: any) => (
-              console.log(
-                "longitude:",
-                listing?.longitude,
-                " latitude:",
-                listing?.latitude,
-              ),
+        .map(
+          (listing: any) => (
+            console.log(
+              "longitude:",
+              listing?.longitude,
+              " latitude:",
+              listing?.latitude,
+            ),
+           
               {
                 id: listing.documentId || Math.random().toString(),
                 image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
@@ -415,8 +448,8 @@ export default function MapSearch() {
                 price: listing?.price || 0,
                 daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
                 address: listing?.address
-                  ? `${listing?.address}, ${listing?.city || ""}`
-                  : listing?.city || "",
+                ? `${listing?.address}, ${listing?.city || ""}`
+                : listing?.city || "",
                 sqft: listing?.area ?? listing?.lot_size_area ?? 0,
                 beds: listing?.bedrooms ?? 0,
                 baths: listing?.bathrooms ?? 0,
@@ -441,10 +474,7 @@ export default function MapSearch() {
                     )
                   : 0,
                 mls: listing?.mls_number,
-                realtor:
-                  listing?.office_data?.OfficeName ||
-                  listing?.raw_data?.ListAOR ||
-                  "Unknown",
+                realtor: getOfficeName(listing),
                 isLogin: false,
                 isFavourite: listing?.is_favorite || isWishlistPage,
                 isDdf: false,
@@ -456,12 +486,12 @@ export default function MapSearch() {
               !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
           );
       },
-      enabled: !isForSale,
+      enabled: false,
     },
   );
 
-  const { data: queryDataActive, isLoading: isLoadingActive } =
-    useGetActiveListings(params, {
+  const { data: queryDataActive, isLoading: isLoadingActive, isFetching: isFetchingActive } =
+    useGetMapZoomListings(mapZoomParams, {
       select: (res: any) => {
         const listings = res?.data || [];
         return listings
@@ -474,39 +504,25 @@ export default function MapSearch() {
                 listing?.latitude,
               ),
               {
-                id: listing.documentId,
-                image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
-                title: listing?.property_sub_type,
-                price: listing?.price || 0,
+                id: listing.documentId || listing.id?.toString(),
+                image: typeof listing?.media_url === "string"
+                  ? listing.media_url
+                  : Array.isArray(listing?.media_url)
+                  ? listing.media_url[0]
+                  : listing?.media?.[0]?.MediaURL,
+                title: listing?.property_sub_type || "Property",
+                price: Number(listing?.price) || 0,
                 daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-                address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
+                address: listing?.address || `${listing?.city || ""}`,
                 sqft: listing?.area ?? listing?.Living_area ?? 0,
                 beds: listing?.bedrooms ?? 0,
                 baths: listing?.bathrooms ?? 0,
-                priceDrop:
-                  listing.PreviousListPrice > listing.ListPrice
-                    ? Number(
-                        (
-                          (listing.PreviousListPrice - listing.ListPrice) /
-                          listing.ListPrice
-                        ).toFixed(1),
-                      )
-                    : undefined,
-                assessedDiff: listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.PreviousListPrice - listing.ListPrice) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : 0,
-                longitude: listing?.longitude,
-                latitude: listing?.latitude,
+                priceDrop: undefined,
+                assessedDiff: 0,
+                longitude: Number(listing?.longitude),
+                latitude: Number(listing?.latitude),
                 mls: listing?.mls_number ?? listing?.listing_id,
-                realtor:
-                  listing?.office_data?.OfficeName ||
-                  listing?.raw_data?.OriginatingSystemName ||
-                  "Unknown",
+                realtor: listing?.office_name ?? getOfficeName(listing),
                 isFavourite: listing?.is_favorite || isWishlistPage,
                 isDdf: true,
               }
@@ -517,12 +533,16 @@ export default function MapSearch() {
               !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
           );
       },
-      enabled: isForSale,
+      enabled: !!mapBounds,
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
     });
-
-  const queryData = isForSale ? queryDataActive : queryDataNormal;
-  const isLoading = isForSale ? isLoadingActive : isLoadingNormal;
-
+ 
+  const queryData = queryDataActive;
+  const isLoading = isLoadingActive || isFetchingActive;
+ 
   const properties = queryData || [];
 
   // Initialize Map
@@ -546,7 +566,46 @@ export default function MapSearch() {
     };
   }, []);
 
-  // ── Auto Satellite View on Zoom ──────────────────────────────────────────
+  // Update mapBounds state when user pans or zooms (Debounced)
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current) return;
+    const map = mapRef.current;
+
+    const handleBounds = () => {
+      const bounds = map.getBounds();
+      if (bounds) {
+        if (mapBoundsTimeoutRef.current) {
+          clearTimeout(mapBoundsTimeoutRef.current);
+        }
+        mapBoundsTimeoutRef.current = setTimeout(() => {
+          setMapBounds({
+            north: bounds.getNorth(),
+            south: bounds.getSouth(),
+            east: bounds.getEast(),
+            west: bounds.getWest(),
+            zoom: map.getZoom(),
+          });
+          setMapZoomVal(Math.round(map.getZoom()));
+        }, 300);
+      }
+    };
+
+    map.on("moveend", handleBounds);
+    map.on("zoomend", handleBounds);
+    
+    // Set initial bounds
+    handleBounds();
+
+    return () => {
+      map.off("moveend", handleBounds);
+      map.off("zoomend", handleBounds);
+      if (mapBoundsTimeoutRef.current) {
+        clearTimeout(mapBoundsTimeoutRef.current);
+      }
+    };
+  }, [mapLoaded]);
+
+  // Auto Satellite View on Zoom 
   useEffect(() => {
     if (!mapLoaded || !mapRef.current) return;
     const map = mapRef.current;
@@ -643,7 +702,7 @@ export default function MapSearch() {
 
   // Fit bounds to show all properties when status/properties change
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current || properties.length === 0) return;
+    if (!mapLoaded || !mapRef.current || properties.length === 0 || fitBoundsDone) return;
 
     const bounds = new mapboxgl.LngLatBounds();
     let hasValidPoints = false;
@@ -666,8 +725,9 @@ export default function MapSearch() {
         maxZoom: 13,
         duration: 1500,
       });
+      setFitBoundsDone(true);
     }
-  }, [properties, mapLoaded]);
+  }, [properties, mapLoaded, fitBoundsDone]);
 
   // Update Markers and visible list with sorting
 
@@ -676,34 +736,153 @@ export default function MapSearch() {
 
     const map = mapRef.current;
 
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
+    // 1. Initialize supercluster
+    const points = properties
+      .filter((p: any) => !isNaN(Number(p.longitude)) && !isNaN(Number(p.latitude)) && Number(p.price) > 0)
+      .map((p: any) => ({
+        type: "Feature",
+        properties: { cluster: false, propertyId: p.id, propertyData: p },
+        geometry: { type: "Point", coordinates: [Number(p.longitude), Number(p.latitude)] }
+      }));
 
-    properties.forEach((property: any) => {
-      const markerEl = createPriceMarker(property, () => {
-        map.flyTo({
-          center: [property.longitude, property.latitude],
-          zoom: 16,
-          essential: true,
-        });
+    if (!superclusterRef.current) {
+      superclusterRef.current = new Supercluster({
+        radius: 60,
+        maxZoom: 9, // at zoom >= 10, it will stop clustering and show individual prices
       });
+    }
 
-      const marker = new mapboxgl.Marker({ element: markerEl, anchor: "bottom" })
-        .setLngLat([property.longitude, property.latitude])
-        .setPopup(
-          new mapboxgl.Popup({ offset: 35 }).setHTML(
-            `<div style="padding:5px"><b>$${Number(property.price).toLocaleString()}</b></div>`,
-          ),
-        )
-        .addTo(map);
+    superclusterRef.current.load(points as any);
 
-      markersRef.current.push(marker);
-    });
-
-    const updateVisibleProperties = () => {
+    const updateMapMarkersAndVisible = () => {
       const bounds = map.getBounds();
       if (!bounds) return;
 
+      const zoom = Math.floor(map.getZoom());
+      const bbox = [
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth()
+      ] as [number, number, number, number];
+
+      // Remove old markers
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
+
+      const clusters = superclusterRef.current!.getClusters(bbox, zoom);
+
+      clusters.forEach((cluster) => {
+        const [longitude, latitude] = cluster.geometry.coordinates;
+        const isCluster = cluster.properties?.cluster;
+
+        if (isCluster) {
+          const count = cluster.properties.point_count;
+          const size = count < 10 ? 30 : count < 100 ? 40 : 50;
+
+          const el = document.createElement("div");
+          el.className = "cursor-pointer";
+          el.style.width = `${size}px`;
+          el.style.height = `${size}px`;
+
+          el.innerHTML = `
+            <div class="flex items-center justify-center bg-primary text-white font-bold text-sm rounded-full shadow-lg border-2 border-white w-full h-full transition-transform hover:scale-110">
+              ${count}
+            </div>
+          `;
+
+          el.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const expansionZoom = superclusterRef.current!.getClusterExpansionZoom(cluster.id as number);
+            map.flyTo({
+              center: [longitude, latitude],
+              zoom: expansionZoom,
+            essential: true,
+            });
+          });
+
+          const m = new mapboxgl.Marker({ element: el })
+            .setLngLat([longitude, latitude] as [number, number])
+            .addTo(map);
+          markersRef.current.push(m);
+        } else {
+          // Individual property
+          const property = cluster.properties.propertyData;
+          let markerEl: HTMLElement;
+          let anchorPos: mapboxgl.Anchor = "center";
+
+          if (zoom >= 10) {
+            markerEl = createPriceMarker(property, () => {});
+          } else {
+            markerEl = document.createElement("div");
+            markerEl.className = "cursor-pointer";
+            markerEl.style.width = "30px";
+            markerEl.style.height = "30px";
+
+            markerEl.innerHTML = `
+              <div class="flex items-center justify-center bg-primary text-white font-bold text-sm rounded-full shadow-lg border-2 border-white w-full h-full transition-transform hover:scale-110">
+                1
+              </div>
+            `;
+            
+            markerEl.addEventListener("click", (e) => {
+              e.stopPropagation();
+              map.flyTo({
+                center: [property.longitude, property.latitude],
+                zoom: 12, 
+                essential: true,
+              });
+            });
+          }
+
+          const marker = new mapboxgl.Marker(markerEl)
+            .setLngLat([property.longitude, property.latitude]);
+
+          if (zoom >= 10) {
+            const imageSrc = property?.image || Images.apartment;
+            const price = property?.price ? `$${Number(property.price).toLocaleString()}` : "Price upon request";
+            const title = property?.title || "Property";
+            const address = property?.address || "Address not available";
+
+            const popup = new mapboxgl.Popup({
+              offset: 25,
+              closeButton: false,
+              closeOnClick: true,
+            }).setHTML(
+              `<div style="cursor: pointer; text-decoration: none; color: inherit; display: block; width: 220px; font-family: 'Inter', sans-serif;">
+                <div style="overflow: hidden;">
+                  <div style="width: 100%; height: 130px; overflow: hidden; border-radius: 8px; background-color: #f1f5f9; position: relative;">
+                    <div style="position: absolute; inset: 0; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite;"></div>
+                    <img src="${imageSrc}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 10;" onload="this.previousElementSibling.style.display='none'" />
+                  </div>
+                  <div style="padding: 12px 2px 4px 2px; display: flex; flex-direction: column; gap: 4px;">
+                    <h3 style="margin: 0; color: #305487; font-size: 18px; font-weight: 700;">${price}</h3>
+                    <p style="margin: 0; font-size: 14px; font-weight: 700; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${title}</p>
+                    <p style="margin: 0; font-size: 12px; color: #6e6e6e; line-height: 1.4; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${address}</p>
+                  </div>
+                </div>
+              </div>`
+            );
+
+            popup.on("open", () => {
+              const el = popup.getElement();
+              if (el) {
+                el.style.cursor = "pointer";
+                el.addEventListener("click", () => {
+                  window.location.href = `/property-info/${property?.id || ""}`;
+                });
+              }
+            });
+
+            marker.setPopup(popup);
+          }
+
+          marker.addTo(map);
+          markersRef.current.push(marker);
+        }
+      });
+
+      // Update Sidebar visibility state
       let visible = properties.filter((p: any) => bounds.contains([p.longitude, p.latitude]) && Number(p.price) > 0);
 
       if (sortBy === "priceLow") {
@@ -722,11 +901,13 @@ export default function MapSearch() {
       });
     };
 
-    map.on("moveend", updateVisibleProperties);
-    updateVisibleProperties();
+    map.on("moveend", updateMapMarkersAndVisible);
+    map.on("zoomend", updateMapMarkersAndVisible);
+    updateMapMarkersAndVisible();
 
     return () => {
-      map.off("moveend", updateVisibleProperties);
+      map.off("moveend", updateMapMarkersAndVisible);
+      map.off("zoomend", updateMapMarkersAndVisible);
     };
   }, [mapLoaded, properties, sortBy]);
 
@@ -988,20 +1169,32 @@ export default function MapSearch() {
               pillBase={pillBase}
               pillActive={pillActive}
               pillInactive={pillInactive}
-              options={[
-                { label: "Any", value: "any" },
-                { label: "Apartment/Condo", value: "Apartment/Condo" },
-                {
-                  label: "Single Family Residence",
-                  value: "Single Family Residence",
-                },
-                { label: "Townhouse", value: "Townhouse" },
-                { label: "Half Duplex", value: "Half Duplex" },
-                {
-                  label: "Row House (Non-Strata)",
-                  value: "Row House (Non-Strata)",
-                },
-              ]}
+              options={
+                status === "sold" || status === "expired"
+                  ? [
+                      { label: "Any", value: "any" },
+                      { label: "Apartment/Condo", value: "Apartment/Condo" },
+                      {
+                        label: "Single Family Residence",
+                        value: "Single Family Residence",
+                      },
+                      { label: "Townhouse", value: "Townhouse" },
+                      { label: "Half Duplex", value: "Half Duplex" },
+                      {
+                        label: "Row House (Non-Strata)",
+                        value: "Row House (Non-Strata)",
+                      },
+                    ]
+                  : [
+                      { label: "Any", value: "any" },
+                      { label: "Single-Family", value: "Single-Family" },
+                      { label: "Multi-Family", value: "Multi-Family" },
+                      { label: "Office", value: "Office" },
+                      { label: "Business", value: "Business" },
+                      { label: "Agriculture", value: "Agriculture" },
+                      { label: "Vacant Land", value: "Vacant Land" },
+                    ]
+              }
             />
           </div>
 
