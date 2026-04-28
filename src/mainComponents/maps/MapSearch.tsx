@@ -336,68 +336,65 @@ export default function MapSearch() {
 
   const isForSale = status === "forSale";
 
-  const { data: queryDataNormal, isLoading: isLoadingNormal, isFetching: isFetchingNormal } = useGetListings(
-    params,
-    {
-      select: (res: any) => {
-        const listings = res?.data || [];
-        return listings
-          .map(
-            (listing: any) => (
-              {
-                id: listing.documentId || Math.random().toString(),
-                image:
-                  typeof listing?.media?.[0] === "string"
-                    ? listing.media[0]
-                    : listing?.media?.[0]?.MediaURL,
-                title: listing?.property_sub_type || "Property",
-                price: listing?.price || 0,
-                daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-                address: listing?.address
-                  ? `${listing?.address}, ${listing?.city || ""}`
-                  : listing?.city || "",
-                sqft: listing?.area ?? listing?.lot_size_area ?? 0,
-                beds: listing?.bedrooms ?? 0,
-                baths: listing?.bathrooms ?? 0,
-                longitude: listing?.longitude,
-                latitude: listing?.latitude,
-                priceDrop:
-                  listing.PreviousListPrice &&
-                  listing.PreviousListPrice > listing.ListPrice
-                    ? Number(
-                        (
-                          (listing.PreviousListPrice - listing.ListPrice) /
-                          listing.ListPrice
-                        ).toFixed(1),
-                      )
-                    : undefined,
-                assessedDiff: listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : 0,
-                mls: listing?.mls_number,
-                realtor: getOfficeName(listing),
-                isLogin: false,
-                isFavourite: listing?.is_favorite || isWishlistPage,
-                isDdf: false,
-              }
-            ),
-          )
-          .filter(
-            (l: any) =>
-              !isNaN(l.longitude) &&
-              !isNaN(l.latitude) &&
-              l.longitude !== 0 &&
-              Number(l.price) > 0,
-          );
-      },
-      enabled: !isForSale && !!mapBounds,
+  const {
+    data: queryDataNormal,
+    isLoading: isLoadingNormal,
+    isFetching: isFetchingNormal,
+  } = useGetListings(params, {
+    select: (res: any) => {
+      const listings = res?.data || [];
+      return listings
+        .map((listing: any) => ({
+          id: listing.documentId || Math.random().toString(),
+          image:
+            typeof listing?.media?.[0] === "string"
+              ? listing.media[0]
+              : listing?.media?.[0]?.MediaURL,
+          title: listing?.property_sub_type || "Property",
+          price: listing?.price || 0,
+          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+          address: listing?.address
+            ? `${listing?.address}, ${listing?.city || ""}`
+            : listing?.city || "",
+          sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+          beds: listing?.bedrooms ?? 0,
+          baths: listing?.bathrooms ?? 0,
+          longitude: listing?.longitude,
+          latitude: listing?.latitude,
+          priceDrop:
+            listing.PreviousListPrice &&
+            listing.PreviousListPrice > listing.ListPrice
+              ? Number(
+                  (
+                    (listing.PreviousListPrice - listing.ListPrice) /
+                    listing.ListPrice
+                  ).toFixed(1),
+                )
+              : undefined,
+          assessedDiff: listing.ListPrice
+            ? Number(
+                (
+                  (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                  listing.ListPrice
+                ).toFixed(1),
+              )
+            : 0,
+          mls: listing?.mls_number,
+          realtor: getOfficeName(listing),
+          isLogin: false,
+          isFavourite: listing?.is_favorite || isWishlistPage,
+          isDdf: false,
+        }))
+        .filter(
+          (l: any) =>
+            !isNaN(l.longitude) &&
+            !isNaN(l.latitude) &&
+            l.longitude !== 0 &&
+            Number(l.price) > 0,
+        );
     },
-  );
+    enabled: !isForSale && !!mapBounds,
+  });
 
   const {
     data: queryDataActive,
@@ -447,7 +444,9 @@ export default function MapSearch() {
   });
 
   const queryData = isForSale ? queryDataActive : queryDataNormal;
-  const isLoading = isForSale ? isLoadingActive || isFetchingActive : isLoadingNormal || isFetchingNormal;
+  const isLoading = isForSale
+    ? isLoadingActive || isFetchingActive
+    : isLoadingNormal || isFetchingNormal;
 
   const properties = queryData || [];
 
@@ -459,7 +458,7 @@ export default function MapSearch() {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       center: [-123.1207, 49.2827],
-      zoom: 1,
+      zoom: 5,
       style: "mapbox://styles/mapbox/streets-v11",
     });
 
