@@ -13,8 +13,6 @@ export async function getListings(params: any): Promise<any> {
       params: enhancedParams,
     });
 
-    console.log("🚀 Debug [getListings]: Verifying office_name in response...", res.data?.data?.[0]?.office_name);
-
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -32,9 +30,6 @@ export async function getActiveListings(params?:any): Promise<any> {
     if (!enhancedParams.populate) enhancedParams.populate = "*";
 
     const res = await axios.get(Endpoints.getActivePropertyLists, { params: enhancedParams });
-    
-    console.log("🚀 Debug [getActiveListings]: Verifying office_name in response...", res.data?.data?.[0]?.office_name);
-
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

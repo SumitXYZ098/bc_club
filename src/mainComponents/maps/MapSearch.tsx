@@ -301,11 +301,8 @@ export default function MapSearch() {
   }
 
   const params: any = {
-    ...commonParams,
     "pagination[page]": 1,
     "pagination[pageSize]": 500,
-    "filters[property_status][$eq]": "Active",
-    "filters[property_sub_type][$notNull]": true,
   };
 
   if (status && status !== "any") {
@@ -313,33 +310,33 @@ export default function MapSearch() {
     delete params["filters[property_status][$eq]"];
     delete params["filters[property_sub_type][$notNull]"];
 
-    if (status === "sold") {
-      params["filters[property_status][$eq]"] = "Closed";
-      params["filters[property_sub_type][$notNull]"] = true;
-    } else if (status === "expired") {
-      params["filters[property_status][$eq]"] = "Expired";
-      params["filters[property_sub_type][$notNull]"] = true;
-    } else if (status === "forSale") {
-      params["filters[property_status][$eq]"] = "Active";
-      params["filters[property_sub_type][$notNull]"] = true;
-    }
+    // if (status === "sold") {
+    //   params["filters[property_status][$eq]"] = "Closed";
+    //   params["filters[property_sub_type][$notNull]"] = true;
+    // } else if (status === "expired") {
+    //   params["filters[property_status][$eq]"] = "Expired";
+    //   params["filters[property_sub_type][$notNull]"] = true;
+    // } else if (status === "forSale") {
+    //   params["filters[property_status][$eq]"] = "Active";
+    //   params["filters[property_sub_type][$notNull]"] = true;
+    // }
   }
 
   if (location && location !== "" && location !== "British Columbia")
     params.location = location;
-  if (minPrice !== undefined) params.minPrice = minPrice;
-  if (maxPrice !== undefined && maxPrice !== 20000000)
-    params.maxPrice = maxPrice;
-  if (minSqft !== undefined) params.minSqft = minSqft;
-  if (maxSqft !== undefined && maxSqft !== 15000) params.maxSqft = maxSqft;
+  if (minPrice !== undefined && minPrice > 1000) params.minPrice = minPrice;
+  if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
+  if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
+  if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
   if (activeBedRoom && activeBedRoom !== "any")
     params.beds = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")
     params.baths = activeBathRoom.replace("+", "");
   if (activeProperty && activeProperty !== "any") params.type = activeProperty;
 
-  const isForSale = status === "forSale" || !status;
-  const { data: queryDataNormal, isLoading: isLoadingNormal } = useGetListings(
+  const isForSale = status === "forSale";
+
+  const { data: queryDataNormal, isLoading: isLoadingNormal, isFetching: isFetchingNormal } = useGetListings(
     params,
     {
       select: (res: any) => {
@@ -347,12 +344,6 @@ export default function MapSearch() {
         return listings
           .map(
             (listing: any) => (
-              console.log(
-                "longitude:",
-                listing?.longitude,
-                " latitude:",
-                listing?.latitude,
-              ),
               {
                 id: listing.documentId || Math.random().toString(),
                 image:
@@ -404,7 +395,7 @@ export default function MapSearch() {
               Number(l.price) > 0,
           );
       },
-      enabled: false,
+      enabled: !isForSale && !!mapBounds,
     },
   );
 
@@ -448,15 +439,15 @@ export default function MapSearch() {
             Number(l.price) > 0,
         );
     },
-    enabled: !!mapBounds,
+    enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
 
-  const queryData = queryDataActive;
-  const isLoading = isLoadingActive || isFetchingActive;
+  const queryData = isForSale ? queryDataActive : queryDataNormal;
+  const isLoading = isForSale ? isLoadingActive || isFetchingActive : isLoadingNormal || isFetchingNormal;
 
   const properties = queryData || [];
 
@@ -573,7 +564,7 @@ export default function MapSearch() {
 
     if (coords) {
       mapRef.current.flyTo({ center: coords, zoom: 11, essential: true });
-    } else if (properties.length > 0 && location !== "British Columbia") {
+    } else if (properties?.length > 0 && location !== "British Columbia") {
       mapRef.current.flyTo({
         center: [properties[0].longitude, properties[0].latitude],
         zoom: 11,
@@ -601,9 +592,9 @@ export default function MapSearch() {
   };
 
   const handleFitBounds = () => {
-    if (!mapRef.current || properties.length === 0) return;
+    if (!mapRef.current || properties?.length === 0) return;
     const bounds = new mapboxgl.LngLatBounds();
-    properties.forEach((p: any) => {
+    properties?.forEach((p: any) => {
       if (p.longitude && p.latitude) {
         bounds.extend([p.longitude, p.latitude]);
       }
@@ -620,7 +611,7 @@ export default function MapSearch() {
     if (
       !mapLoaded ||
       !mapRef.current ||
-      properties.length === 0 ||
+      properties?.length === 0 ||
       fitBoundsDone
     )
       return;
@@ -628,7 +619,7 @@ export default function MapSearch() {
     const bounds = new mapboxgl.LngLatBounds();
     let hasValidPoints = false;
 
-    properties.forEach((p: any) => {
+    properties?.forEach((p: any) => {
       if (
         p.longitude &&
         p.latitude &&
@@ -659,7 +650,7 @@ export default function MapSearch() {
 
     // 1. Initialize supercluster
     const points = properties
-      .filter(
+      ?.filter(
         (p: any) =>
           !isNaN(Number(p.longitude)) &&
           !isNaN(Number(p.latitude)) &&
