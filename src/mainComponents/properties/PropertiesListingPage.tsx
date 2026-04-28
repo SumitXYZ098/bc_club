@@ -229,7 +229,7 @@ export default function PropertiesListingPage() {
     isLoading: wishlistLoading,
     refetch: refetchWishlist,
   } = useGetWishlistProperties({
-    select: (res) => select(res),
+    select,
     enabled: isWishlistPage && isLoggedIn,
   });
 
@@ -238,7 +238,7 @@ export default function PropertiesListingPage() {
     isLoading: ddfWishlistLoading,
     refetch: refetchDdfWishlist,
   } = useGetMyDdfFavorites({
-    select: (res) => {
+    select: (res ) => {
         // Force isDdf to true for this response
         const listings = res?.data || [];
         const properties = listings.map((listing: any) => ({
