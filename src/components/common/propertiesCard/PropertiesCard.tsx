@@ -326,18 +326,23 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               </div>
             </div>
             <LineGradient />
-            <div className="w-full flex flex-row flex-wrap items-center justify-between gap-2">
-              <Description
-                content={displayRealtor}
-                type={IDescriptionTypes.dec12}
-                customClasses="text-lightWhite"
-              />
-              <Description
-                content={displayMls}
-                type={IDescriptionTypes.dec12}
-                customClasses="text-lightWhite"
-              />
-            </div>
+         <div className="w-full flex flex-row flex-wrap items-center justify-between gap-2">
+  <div className="min-w-0 flex-1">
+    <Description
+      content={displayRealtor}
+      type={IDescriptionTypes.dec12}
+      customClasses="text-lightWhite truncate"
+    />
+  </div>
+
+  <div className="min-w-0 shrink-0">
+    <Description
+      content={displayMls}
+      type={IDescriptionTypes.dec12}
+      customClasses="text-lightWhite"
+    />
+  </div>
+</div>
           </div>
         </div>
 

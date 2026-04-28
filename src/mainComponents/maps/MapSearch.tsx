@@ -80,7 +80,7 @@ const PriceSlider = styled(Slider)({
       transform: "rotate(180deg)",
     },
   },
-});
+})
 
 // Helper to abbreviate price (e.g. $1.2M, $649K)
 function formatPriceAbbreviated(price: number) {
@@ -99,7 +99,7 @@ function createPriceMarker(property: any, onClick: () => void) {
   const el = document.createElement("div");
   el.className =
     "price-marker bg-white px-2 py-1 rounded-full shadow-md border border-primary text-primary font-bold text-xs cursor-pointer hover:bg-primary hover:text-white transition-all";
-  
+
   let abbreviatedPrice = formatPriceAbbreviated(Number(property.price));
   el.innerText = abbreviatedPrice;
 
@@ -125,7 +125,13 @@ export default function MapSearch() {
   // States for Custom Sort Dropdown
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
-  const [mapBounds, setMapBounds] = useState<{ north: number; south: number; east: number; west: number , zoom: number } | null>(null);
+  const [mapBounds, setMapBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+    zoom: number;
+  } | null>(null);
   const [mapZoomVal, setMapZoomVal] = useState<number | null>(null);
   const mapBoundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [fitBoundsDone, setFitBoundsDone] = useState(false);
@@ -161,7 +167,18 @@ export default function MapSearch() {
 
   useEffect(() => {
     setFitBoundsDone(false);
-  }, [search, location, status, activeProperty, minPrice, maxPrice, minSqft, maxSqft, activeBedRoom, activeBathRoom]);
+  }, [
+    search,
+    location,
+    status,
+    activeProperty,
+    minPrice,
+    maxPrice,
+    minSqft,
+    maxSqft,
+    activeBedRoom,
+    activeBathRoom,
+  ]);
 
   // Enforce restriction if status is set externally (e.g. via GetInTouch or store initial state)
   useEffect(() => {
@@ -356,18 +373,46 @@ export default function MapSearch() {
   // API Params Logic
   const commonParams: any = {};
   if (search) commonParams.search = search;
-  if (location && location !== "" && location !== "British Columbia") commonParams.location = location;
+  if (location && location !== "" && location !== "British Columbia")
+    commonParams.location = location;
   if (minPrice !== undefined) commonParams.minPrice = minPrice;
-  if (maxPrice !== undefined && maxPrice !== 20000000) commonParams.maxPrice = maxPrice;
+  if (maxPrice !== undefined && maxPrice !== 20000000)
+    commonParams.maxPrice = maxPrice;
   if (minSqft !== undefined) commonParams.minSqft = minSqft;
-  if (maxSqft !== undefined && maxSqft !== 15000) commonParams.maxSqft = maxSqft;
-  if (activeBedRoom && activeBedRoom !== "any") commonParams.bedrooms = activeBedRoom.replace("+", "");
-  if (activeBathRoom && activeBathRoom !== "any") commonParams.bathrooms = activeBathRoom.replace("+", "");
-  if (activeProperty && activeProperty !== "any") commonParams.type = activeProperty;
+  if (maxSqft !== undefined && maxSqft !== 15000)
+    commonParams.maxSqft = maxSqft;
+  if (activeBedRoom && activeBedRoom !== "any")
+    commonParams.bedrooms = activeBedRoom.replace("+", "");
+  if (activeBathRoom && activeBathRoom !== "any")
+    commonParams.bathrooms = activeBathRoom.replace("+", "");
+  if (activeProperty && activeProperty !== "any")
+    commonParams.type = activeProperty;
   if (status && status !== "any") commonParams.propertyType = status;
-  
+
   const mapZoomParams = useMemo(() => {
     const p: any = {};
+
+    if (search) p.search = search;
+    if (location && location !== "" && location !== "British Columbia")
+      p.location = location;
+    if (minPrice !== undefined && minPrice > 1000) p.minPrice = minPrice;
+    if (maxPrice !== undefined && maxPrice < 20000000) p.maxPrice = maxPrice;
+    if (minSqft !== undefined && minSqft > 100) p.minSqft = minSqft;
+    if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
+
+    if (activeBedRoom && activeBedRoom !== "any") {
+      p.beds = activeBedRoom.replace("+", "");
+      p.bedrooms = activeBedRoom.replace("+", "");
+    }
+    if (activeBathRoom && activeBathRoom !== "any") {
+      p.baths = activeBathRoom.replace("+", "");
+      p.bathrooms = activeBathRoom.replace("+", "");
+    }
+    if (activeProperty && activeProperty !== "any") p.type = activeProperty;
+    if (status && status !== "forSale" && status !== "any") {
+      p.propertyType = status;
+    }
+
     if (mapBounds) {
       p.north = mapBounds.north;
       p.south = mapBounds.south;
@@ -378,7 +423,20 @@ export default function MapSearch() {
       }
     }
     return p;
-  }, [mapBounds, mapZoomVal]);
+  }, [
+    mapBounds,
+    mapZoomVal,
+    search,
+    location,
+    minPrice,
+    maxPrice,
+    minSqft,
+    maxSqft,
+    activeBedRoom,
+    activeBathRoom,
+    activeProperty,
+    status,
+  ]);
 
   if (mapBounds) {
     commonParams.north = mapBounds.north;
@@ -404,7 +462,7 @@ export default function MapSearch() {
     delete params["filters[property_status][$notIn]"];
     delete params["filters[raw_data][BCRES_SoldDate][$null]"];
     delete params["filters[property_sub_type][$notNull]"];
-    
+
     if (status === "sold") {
       params["filters[raw_data][BCRES_SoldDate][$notNull]"] = true;
     } else if (status === "expired") {
@@ -420,7 +478,7 @@ export default function MapSearch() {
   if (minSqft !== undefined) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft !== 15000) params.maxSqft = maxSqft;
   if (activeBedRoom && activeBedRoom !== "any")
-    params.beds= activeBedRoom.replace("+", "");
+    params.beds = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")
     params.baths = activeBathRoom.replace("+", "");
   if (activeProperty && activeProperty !== "any") params.type = activeProperty;
@@ -432,24 +490,26 @@ export default function MapSearch() {
       select: (res: any) => {
         const listings = res?.data || [];
         return listings
-        .map(
-          (listing: any) => (
-            console.log(
-              "longitude:",
-              listing?.longitude,
-              " latitude:",
-              listing?.latitude,
-            ),
-           
+          .map(
+            (listing: any) => (
+              console.log(
+                "longitude:",
+                listing?.longitude,
+                " latitude:",
+                listing?.latitude,
+              ),
               {
                 id: listing.documentId || Math.random().toString(),
-                image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
+                image:
+                  typeof listing?.media?.[0] === "string"
+                    ? listing.media[0]
+                    : listing?.media?.[0]?.MediaURL,
                 title: listing?.property_sub_type || "Property",
                 price: listing?.price || 0,
                 daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
                 address: listing?.address
-                ? `${listing?.address}, ${listing?.city || ""}`
-                : listing?.city || "",
+                  ? `${listing?.address}, ${listing?.city || ""}`
+                  : listing?.city || "",
                 sqft: listing?.area ?? listing?.lot_size_area ?? 0,
                 beds: listing?.bedrooms ?? 0,
                 baths: listing?.bathrooms ?? 0,
@@ -483,66 +543,76 @@ export default function MapSearch() {
           )
           .filter(
             (l: any) =>
-              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
+              !isNaN(l.longitude) &&
+              !isNaN(l.latitude) &&
+              l.longitude !== 0 &&
+              Number(l.price) > 0,
           );
       },
       enabled: false,
     },
   );
 
-  const { data: queryDataActive, isLoading: isLoadingActive, isFetching: isFetchingActive } =
-    useGetMapZoomListings(mapZoomParams, {
-      select: (res: any) => {
-        const listings = res?.data || [];
-        return listings
-          .map(
-            (listing: any) => (
-              console.log(
-                "longitude:",
-                listing?.longitude,
-                " latitude:",
-                listing?.latitude,
-              ),
-              {
-                id: listing.documentId || listing.id?.toString(),
-                image: typeof listing?.media_url === "string"
+  const {
+    data: queryDataActive,
+    isLoading: isLoadingActive,
+    isFetching: isFetchingActive,
+  } = useGetMapZoomListings(mapZoomParams, {
+    select: (res: any) => {
+      const listings = res?.data || [];
+      return listings
+        .map(
+          (listing: any) => (
+            console.log(
+              "longitude:",
+              listing?.longitude,
+              " latitude:",
+              listing?.latitude,
+            ),
+            {
+              id: listing.documentId || listing.id?.toString(),
+              image:
+                typeof listing?.media_url === "string"
                   ? listing.media_url
                   : Array.isArray(listing?.media_url)
-                  ? listing.media_url[0]
-                  : listing?.media?.[0]?.MediaURL,
-                title: listing?.property_sub_type || "Property",
-                price: Number(listing?.price) || 0,
-                daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-                address: listing?.address || `${listing?.city || ""}`,
-                sqft: listing?.area ?? listing?.Living_area ?? 0,
-                beds: listing?.bedrooms ?? 0,
-                baths: listing?.bathrooms ?? 0,
-                priceDrop: undefined,
-                assessedDiff: 0,
-                longitude: Number(listing?.longitude),
-                latitude: Number(listing?.latitude),
-                mls: listing?.mls_number ?? listing?.listing_id,
-                realtor: listing?.office_name ?? getOfficeName(listing),
-                isFavourite: listing?.is_favorite || isWishlistPage,
-                isDdf: true,
-              }
-            ),
-          )
-          .filter(
-            (l: any) =>
-              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
-          );
-      },
-      enabled: !!mapBounds,
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-    });
- 
+                    ? listing.media_url[0]
+                    : listing?.media?.[0]?.MediaURL,
+              title: listing?.property_sub_type || "Property",
+              price: Number(listing?.price) || 0,
+              daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+              address: listing?.address || `${listing?.city || ""}`,
+              sqft: listing?.area ?? listing?.Living_area ?? 0,
+              beds: listing?.bedrooms ?? 0,
+              baths: listing?.bathrooms ?? 0,
+              priceDrop: undefined,
+              assessedDiff: 0,
+              longitude: Number(listing?.longitude),
+              latitude: Number(listing?.latitude),
+              mls: listing?.mls_number ?? listing?.listing_id,
+              realtor: listing?.office_name ?? getOfficeName(listing),
+              isFavourite: listing?.is_favorite || isWishlistPage,
+              isDdf: true,
+            }
+          ),
+        )
+        .filter(
+          (l: any) =>
+            !isNaN(l.longitude) &&
+            !isNaN(l.latitude) &&
+            l.longitude !== 0 &&
+            Number(l.price) > 0,
+        );
+    },
+    enabled: !!mapBounds,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  });
+
   const queryData = queryDataActive;
   const isLoading = isLoadingActive || isFetchingActive;
- 
+
   const properties = queryData || [];
 
   // Initialize Map
@@ -553,8 +623,8 @@ export default function MapSearch() {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       center: [-123.1207, 49.2827],
-      zoom: 10,
-      style: "mapbox://styles/mapbox/streets-v12",
+      zoom: 1,
+      style: "mapbox://styles/mapbox/streets-v11",
     });
 
     map.on("load", () => setMapLoaded(true));
@@ -592,7 +662,7 @@ export default function MapSearch() {
 
     map.on("moveend", handleBounds);
     map.on("zoomend", handleBounds);
-    
+
     // Set initial bounds
     handleBounds();
 
@@ -605,7 +675,7 @@ export default function MapSearch() {
     };
   }, [mapLoaded]);
 
-  // Auto Satellite View on Zoom 
+  // Auto Satellite View on Zoom
   useEffect(() => {
     if (!mapLoaded || !mapRef.current) return;
     const map = mapRef.current;
@@ -702,7 +772,13 @@ export default function MapSearch() {
 
   // Fit bounds to show all properties when status/properties change
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current || properties.length === 0 || fitBoundsDone) return;
+    if (
+      !mapLoaded ||
+      !mapRef.current ||
+      properties.length === 0 ||
+      fitBoundsDone
+    )
+      return;
 
     const bounds = new mapboxgl.LngLatBounds();
     let hasValidPoints = false;
@@ -738,11 +814,19 @@ export default function MapSearch() {
 
     // 1. Initialize supercluster
     const points = properties
-      .filter((p: any) => !isNaN(Number(p.longitude)) && !isNaN(Number(p.latitude)) && Number(p.price) > 0)
+      .filter(
+        (p: any) =>
+          !isNaN(Number(p.longitude)) &&
+          !isNaN(Number(p.latitude)) &&
+          Number(p.price) > 0,
+      )
       .map((p: any) => ({
         type: "Feature",
         properties: { cluster: false, propertyId: p.id, propertyData: p },
-        geometry: { type: "Point", coordinates: [Number(p.longitude), Number(p.latitude)] }
+        geometry: {
+          type: "Point",
+          coordinates: [Number(p.longitude), Number(p.latitude)],
+        },
       }));
 
     if (!superclusterRef.current) {
@@ -763,7 +847,7 @@ export default function MapSearch() {
         bounds.getWest(),
         bounds.getSouth(),
         bounds.getEast(),
-        bounds.getNorth()
+        bounds.getNorth(),
       ] as [number, number, number, number];
 
       // Remove old markers
@@ -793,11 +877,14 @@ export default function MapSearch() {
 
           el.addEventListener("click", (e) => {
             e.stopPropagation();
-            const expansionZoom = superclusterRef.current!.getClusterExpansionZoom(cluster.id as number);
+            const expansionZoom =
+              superclusterRef.current!.getClusterExpansionZoom(
+                cluster.id as number,
+              );
             map.flyTo({
               center: [longitude, latitude],
               zoom: expansionZoom,
-            essential: true,
+              essential: true,
             });
           });
 
@@ -824,23 +911,27 @@ export default function MapSearch() {
                 1
               </div>
             `;
-            
+
             markerEl.addEventListener("click", (e) => {
               e.stopPropagation();
               map.flyTo({
                 center: [property.longitude, property.latitude],
-                zoom: 12, 
+                zoom: 12,
                 essential: true,
               });
             });
           }
 
-          const marker = new mapboxgl.Marker(markerEl)
-            .setLngLat([property.longitude, property.latitude]);
+          const marker = new mapboxgl.Marker(markerEl).setLngLat([
+            property.longitude,
+            property.latitude,
+          ]);
 
           if (zoom >= 10) {
             const imageSrc = property?.image || Images.apartment;
-            const price = property?.price ? `$${Number(property.price).toLocaleString()}` : "Price upon request";
+            const price = property?.price
+              ? `$${Number(property.price).toLocaleString()}`
+              : "Price upon request";
             const title = property?.title || "Property";
             const address = property?.address || "Address not available";
 
@@ -861,7 +952,7 @@ export default function MapSearch() {
                     <p style="margin: 0; font-size: 12px; color: #6e6e6e; line-height: 1.4; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${address}</p>
                   </div>
                 </div>
-              </div>`
+              </div>`,
             );
 
             popup.on("open", () => {
@@ -883,7 +974,10 @@ export default function MapSearch() {
       });
 
       // Update Sidebar visibility state
-      let visible = properties.filter((p: any) => bounds.contains([p.longitude, p.latitude]) && Number(p.price) > 0);
+      let visible = properties.filter(
+        (p: any) =>
+          bounds.contains([p.longitude, p.latitude]) && Number(p.price) > 0,
+      );
 
       if (sortBy === "priceLow") {
         visible.sort((a: any, b: any) => a.price - b.price);

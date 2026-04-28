@@ -179,7 +179,7 @@ export default function PropertiesListingPage() {
             ).toFixed(1),
           )
         : 0,
-      mls: listing?.mls_number ?? listing?.listing_id,
+      mls: listing?.mls_number ?? listing?.listing_id ?? listing?.raw_data?.ListingID ?? listing?.raw_data?.MLS ?? listing?.MlsNumber ?? listing?.raw_data?.MlsNumber ?? "N/A",
       realtor: getOfficeName(listing),
       isFavourite: listing?.is_favorite || isWishlistPage,
       isDdf: isForSale,
@@ -255,7 +255,7 @@ export default function PropertiesListingPage() {
           sqft: listing?.area ?? listing?.lot_size_area ?? 0,
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
-          mls: listing?.mls_number ?? listing?.listing_id,
+          mls: listing?.mls_number ?? listing?.listing_id ?? listing?.raw_data?.ListingID ?? listing?.raw_data?.MLS ?? listing?.MlsNumber ?? listing?.raw_data?.MlsNumber ?? "N/A",
           realtor: getOfficeName(listing),
           assessedDiff: listing?.assessed_diff || 0,
           isLogin: true,
