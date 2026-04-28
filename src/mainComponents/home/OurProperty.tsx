@@ -126,7 +126,7 @@ const OurProperty = () => {
 
   const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
     {
-      "filters[raw_data][BCRES_SoldDate][$notNull]": true,
+      "filters[property_status][$eq]": "Closed",
     },
     {
       select: (res: any) =>

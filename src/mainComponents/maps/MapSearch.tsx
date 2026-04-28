@@ -29,8 +29,6 @@ import CustomButton from "@/src/components/button/CustomButton";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 
-
-
 export default function MapSearch() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapboxMap | null>(null);
@@ -42,7 +40,6 @@ export default function MapSearch() {
   const superclusterRef = useRef<Supercluster | null>(null);
   const pathName = usePathname();
   const isWishlistPage = pathName === "/wishlist";
-
 
   const [mapBounds, setMapBounds] = useState<{
     north: number;
@@ -107,19 +104,11 @@ export default function MapSearch() {
     }
   }, [status, isLoggedIn, updateInstanceFilter, setOpenLogin]);
 
-
-
-
-
   const price = [minPrice ?? 1000, maxPrice ?? 20000000];
   const setPrice = (val: [number, number]) => {
     updateInstanceFilter("map", "minPrice", val[0]);
     updateInstanceFilter("map", "maxPrice", val[1]);
   };
-
-
-
-
 
   const setActiveBedRoom = (val: string) =>
     updateInstanceFilter("map", "activeBedRoom", val);
@@ -256,6 +245,28 @@ export default function MapSearch() {
 
   const mapZoomParams = useMemo(() => {
     const p: any = {};
+
+    if (search) p.search = search;
+    if (location && location !== "" && location !== "British Columbia")
+      p.location = location;
+    if (minPrice !== undefined && minPrice > 1000) p.minPrice = minPrice;
+    if (maxPrice !== undefined && maxPrice < 20000000) p.maxPrice = maxPrice;
+    if (minSqft !== undefined && minSqft > 100) p.minSqft = minSqft;
+    if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
+
+    if (activeBedRoom && activeBedRoom !== "any") {
+      p.beds = activeBedRoom.replace("+", "");
+      p.bedrooms = activeBedRoom.replace("+", "");
+    }
+    if (activeBathRoom && activeBathRoom !== "any") {
+      p.baths = activeBathRoom.replace("+", "");
+      p.bathrooms = activeBathRoom.replace("+", "");
+    }
+    if (activeProperty && activeProperty !== "any") p.type = activeProperty;
+    if (status && status !== "forSale" && status !== "any") {
+      p.propertyType = status;
+    }
+
     if (mapBounds) {
       p.north = mapBounds.north;
       p.south = mapBounds.south;
@@ -266,7 +277,20 @@ export default function MapSearch() {
       }
     }
     return p;
-  }, [mapBounds, mapZoomVal]);
+  }, [
+    mapBounds,
+    mapZoomVal,
+    search,
+    location,
+    minPrice,
+    maxPrice,
+    minSqft,
+    maxSqft,
+    activeBedRoom,
+    activeBathRoom,
+    activeProperty,
+    status,
+  ]);
 
   if (mapBounds) {
     commonParams.north = mapBounds.north;
@@ -282,21 +306,24 @@ export default function MapSearch() {
     ...commonParams,
     "pagination[page]": 1,
     "pagination[pageSize]": 500,
-    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
+    "filters[property_status][$eq]": "Active",
     "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   if (status && status !== "any") {
     params.propertyType = status;
-    delete params["filters[property_status][$notIn]"];
-    delete params["filters[raw_data][BCRES_SoldDate][$null]"];
+    delete params["filters[property_status][$eq]"];
     delete params["filters[property_sub_type][$notNull]"];
 
     if (status === "sold") {
-      params["filters[raw_data][BCRES_SoldDate][$notNull]"] = true;
+      params["filters[property_status][$eq]"] = "Closed";
+      params["filters[property_sub_type][$notNull]"] = true;
     } else if (status === "expired") {
       params["filters[property_status][$eq]"] = "Expired";
+      params["filters[property_sub_type][$notNull]"] = true;
+    } else if (status === "forSale") {
+      params["filters[property_status][$eq]"] = "Active";
+      params["filters[property_sub_type][$notNull]"] = true;
     }
   }
 
@@ -391,40 +418,30 @@ export default function MapSearch() {
     select: (res: any) => {
       const listings = res?.data || [];
       return listings
-        .map(
-          (listing: any) => (
-            console.log(
-              "longitude:",
-              listing?.longitude,
-              " latitude:",
-              listing?.latitude,
-            ),
-            {
-              id: listing.documentId || listing.id?.toString(),
-              image:
-                typeof listing?.media_url === "string"
-                  ? listing.media_url
-                  : Array.isArray(listing?.media_url)
-                    ? listing.media_url[0]
-                    : listing?.media?.[0]?.MediaURL,
-              title: listing?.property_sub_type || "Property",
-              price: Number(listing?.price) || 0,
-              daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-              address: listing?.address || `${listing?.city || ""}`,
-              sqft: listing?.area ?? listing?.Living_area ?? 0,
-              beds: listing?.bedrooms ?? 0,
-              baths: listing?.bathrooms ?? 0,
-              priceDrop: undefined,
-              assessedDiff: 0,
-              longitude: Number(listing?.longitude),
-              latitude: Number(listing?.latitude),
-              mls: listing?.mls_number ?? listing?.listing_id,
-              realtor: listing?.office_name ?? getOfficeName(listing),
-              isFavourite: listing?.is_favorite || isWishlistPage,
-              isDdf: true,
-            }
-          ),
-        )
+        .map((listing: any) => ({
+          id: listing.doucumentId,
+          image:
+            typeof listing?.media_url === "string"
+              ? listing.media_url
+              : Array.isArray(listing?.media_url)
+                ? listing.media_url[0]
+                : listing?.media?.[0]?.MediaURL,
+          title: listing?.property_sub_type || "Property",
+          price: Number(listing?.price) || 0,
+          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+          address: listing?.address || `${listing?.city || ""}`,
+          sqft: listing?.area ?? listing?.Living_area ?? 0,
+          beds: listing?.bedrooms ?? 0,
+          baths: listing?.bathrooms ?? 0,
+          priceDrop: undefined,
+          assessedDiff: 0,
+          longitude: Number(listing?.longitude),
+          latitude: Number(listing?.latitude),
+          mls: listing?.mls_number ?? listing?.listing_id,
+          realtor: listing?.office_name ?? getOfficeName(listing),
+          isFavourite: listing?.is_favorite || isWishlistPage,
+          isDdf: true,
+        }))
         .filter(
           (l: any) =>
             !isNaN(l.longitude) &&
@@ -453,8 +470,8 @@ export default function MapSearch() {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       center: [-123.1207, 49.2827],
-      zoom: 10,
-      style: "mapbox://styles/mapbox/streets-v12",
+      zoom: 1,
+      style: "mapbox://styles/mapbox/streets-v11",
     });
 
     map.on("load", () => setMapLoaded(true));
@@ -834,7 +851,6 @@ export default function MapSearch() {
       map.off("zoomend", updateMapMarkersAndVisible);
     };
   }, [mapLoaded, properties, sortBy]);
-
 
   return (
     <>

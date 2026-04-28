@@ -88,14 +88,12 @@ export default function PropertiesListingPage() {
   };
 
   if (!isForSale) {
-    // These filters are only for standard properties
-    params["filters[property_status][$notIn]"] = [
-      "Expired",
-      "Terminated",
-      "Cancelled",
-    ];
     params["filters[property_sub_type][$notNull]"] = true;
-    params["filters[raw_data][BCRES_SoldDate][$null]"] = true;
+    if (status === "sold") {
+      params["filters[property_status][$eq]"] = "Closed";
+    } else if (status === "expired") {
+      params["filters[property_status][$eq]"] = "Expired";
+    }
   }
 
   // sorting
@@ -157,7 +155,7 @@ export default function PropertiesListingPage() {
 
     let properties: PropertyCardProps[] = listings
       .map((listing: any) => ({
-        id: listing.documentId,
+        id: listing.doucumentId || listing.id?.toString(),
         image:
           typeof listing?.media?.[0] === "string"
             ? listing.media[0]
@@ -186,7 +184,14 @@ export default function PropertiesListingPage() {
               ).toFixed(1),
             )
           : 0,
-        mls: listing?.mls_number ?? listing?.listing_id,
+        mls:
+          listing?.mls_number ??
+          listing?.listing_id ??
+          listing?.raw_data?.ListingID ??
+          listing?.raw_data?.MLS ??
+          listing?.MlsNumber ??
+          listing?.raw_data?.MlsNumber ??
+          "N/A",
         realtor: getOfficeName(listing),
         isFavourite: listing?.is_favorite || isWishlistPage,
         isDdf: isForSale,
@@ -241,7 +246,7 @@ export default function PropertiesListingPage() {
     isLoading: wishlistLoading,
     refetch: refetchWishlist,
   } = useGetWishlistProperties({
-    select: (res) => select(res),
+    select,
     enabled: isWishlistPage && isLoggedIn,
   });
 
@@ -256,7 +261,7 @@ export default function PropertiesListingPage() {
       const properties = listings
         .map((listing: any) => ({
           ...listing,
-          id: listing.documentId,
+          id: listing.doucumentId,
           image:
             typeof listing?.media?.[0] === "string"
               ? listing.media[0]
@@ -271,7 +276,14 @@ export default function PropertiesListingPage() {
           sqft: listing?.area ?? listing?.lot_size_area ?? 0,
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
-          mls: listing?.mls_number ?? listing?.listing_id,
+          mls:
+            listing?.mls_number ??
+            listing?.listing_id ??
+            listing?.raw_data?.ListingID ??
+            listing?.raw_data?.MLS ??
+            listing?.MlsNumber ??
+            listing?.raw_data?.MlsNumber ??
+            "N/A",
           realtor: getOfficeName(listing),
           assessedDiff: listing?.assessed_diff || 0,
           isLogin: true,

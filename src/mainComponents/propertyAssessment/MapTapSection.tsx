@@ -15,9 +15,8 @@ const MapTapSection = () => {
   const [activeTab, setActiveTab] = useState<number>(1);
   const [listingData, setListingData] = useState<any[]>([]);
   const params: any = {
-    "filters[property_status][$notIn]": ["Rented", "Expired"],
+    "filters[property_status][$eq]": "Active",
     "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   useLayoutEffect(() => {
