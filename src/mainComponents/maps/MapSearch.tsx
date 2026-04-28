@@ -452,21 +452,24 @@ export default function MapSearch() {
     ...commonParams,
     "pagination[page]": 1,
     "pagination[pageSize]": 500,
-    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
+    "filters[property_status][$eq]": "Active",
     "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   if (status && status !== "any") {
     params.propertyType = status;
-    delete params["filters[property_status][$notIn]"];
-    delete params["filters[raw_data][BCRES_SoldDate][$null]"];
+    delete params["filters[property_status][$eq]"];
     delete params["filters[property_sub_type][$notNull]"];
 
     if (status === "sold") {
-      params["filters[raw_data][BCRES_SoldDate][$notNull]"] = true;
+      params["filters[property_status][$eq]"] = "Closed";
+      params["filters[property_sub_type][$notNull]"] = true;
     } else if (status === "expired") {
       params["filters[property_status][$eq]"] = "Expired";
+      params["filters[property_sub_type][$notNull]"] = true;
+    } else if (status === "forSale") {
+      params["filters[property_status][$eq]"] = "Active";
+      params["filters[property_sub_type][$notNull]"] = true;
     }
   }
 
@@ -563,14 +566,8 @@ export default function MapSearch() {
       return listings
         .map(
           (listing: any) => (
-            console.log(
-              "longitude:",
-              listing?.longitude,
-              " latitude:",
-              listing?.latitude,
-            ),
             {
-              id: listing.documentId || listing.id?.toString(),
+              id: listing.doucumentId,
               image:
                 typeof listing?.media_url === "string"
                   ? listing.media_url

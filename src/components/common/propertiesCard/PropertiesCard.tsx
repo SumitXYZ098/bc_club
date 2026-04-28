@@ -130,7 +130,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
   const img = image ? image : Images.apartment;
 
-  console.log("IMAGE:", img);
+ 
 
   return (
     <Link

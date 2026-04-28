@@ -18,9 +18,8 @@ const NeighboringProperties = () => {
   const { isLoggedIn } = useAuthContext();
 
   const params: any = {
-    "filters[property_status][$notIn]": ["Rented", "Expired"],
+    "filters[property_status][$eq]": "Active",
     "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   useLayoutEffect(() => {
