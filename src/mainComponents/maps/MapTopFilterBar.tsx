@@ -279,7 +279,7 @@ export default function MapTopFilterBar({
                         : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
                     }`}
                   >
-                    {val === "any" ? "Any" : val}
+                    {val === "any" ? "All" : val}
                   </button>
                 ))}
               </div>
@@ -302,7 +302,7 @@ export default function MapTopFilterBar({
                         : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
                     }`}
                   >
-                    {val === "any" ? "Any" : val}
+                    {val === "any" ? "All" : val}
                   </button>
                 ))}
               </div>
@@ -322,7 +322,7 @@ export default function MapTopFilterBar({
           options={
             status === "sold" || status === "expired"
               ? [
-                  { label: "Any", value: "any" },
+                  { label: "All", value: "any" },
                   { label: "Apartment/Condo", value: "Apartment/Condo" },
                   {
                     label: "Single Family Residence",
@@ -336,7 +336,7 @@ export default function MapTopFilterBar({
                   },
                 ]
               : [
-                  { label: "Any", value: "any" },
+                  { label: "All", value: "any" },
                   { label: "Single-Family", value: "Single-Family" },
                   { label: "Multi-Family", value: "Multi-Family" },
                   { label: "Office", value: "Office" },

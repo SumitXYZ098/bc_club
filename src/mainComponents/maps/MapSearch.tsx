@@ -256,11 +256,9 @@ export default function MapSearch() {
 
     if (activeBedRoom && activeBedRoom !== "any") {
       p.beds = activeBedRoom.replace("+", "");
-      p.bedrooms = activeBedRoom.replace("+", "");
     }
     if (activeBathRoom && activeBathRoom !== "any") {
       p.baths = activeBathRoom.replace("+", "");
-      p.bathrooms = activeBathRoom.replace("+", "");
     }
     if (activeProperty && activeProperty !== "any") p.type = activeProperty;
     if (status && status !== "forSale" && status !== "any") {
