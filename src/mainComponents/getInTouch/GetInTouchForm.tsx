@@ -18,11 +18,6 @@ export default function GetInTouchForm() {
     reset,
   } = useForm<FormValues>();
 
-  //   const onSubmit = (data: FormValues) => {
-  //     console.log("Form Submitted:", data);
-  //     reset();
-  //   };
-
   const onSubmit = async (data: FormValues) => {
     try {
       const formData = {
