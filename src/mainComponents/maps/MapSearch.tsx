@@ -17,98 +17,17 @@ import {
   FiMap,
   FiNavigation,
   FiMaximize,
-  FiChevronDown,
   FiLoader,
-  FiCheck,
-  FiX,
 } from "react-icons/fi";
-import LineGradient from "@/src/components/common/lineGradient/LineGradient";
-import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { getOfficeName } from "@/src/utilities/utilities";
-import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
-import Slider from "@mui/material/Slider";
-import { styled } from "@mui/material/styles";
 import GetInTouch from "../getInTouch/GetInTouch";
+import MapTopFilterBar from "./MapTopFilterBar";
+import MapActiveFilters from "./MapActiveFilters";
+import MapSidebar from "./MapSidebar";
+import { createPriceMarker } from "./mapUtils";
 import CustomButton from "@/src/components/button/CustomButton";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
-
-// ================= Slider Theme =================
-const PriceSlider = styled(Slider)({
-  color: "#E8A200",
-  height: 6,
-  padding: "14px 0",
-
-  "& .MuiSlider-thumb": {
-    height: 18,
-    width: 18,
-    backgroundColor: "#E8A200",
-    border: "3px solid #fff",
-    boxShadow: "0 2px 6px rgba(0,0,0,.25)",
-    "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-      boxShadow: "inherit",
-    },
-    "&::before": {
-      display: "none",
-    },
-  },
-  "& .MuiSlider-track": {
-    height: 12,
-  },
-
-  "& .MuiSlider-rail": {
-    height: 12,
-    opacity: 1,
-    backgroundColor: "#e5e5e5",
-    borderRadius: 10,
-  },
-  "& .MuiSlider-valueLabel": {
-    lineHeight: 1.2,
-    fontSize: 12,
-    background: "unset",
-    padding: "0 10px",
-    width: "fit-content",
-    height: 32,
-    borderRadius: 20,
-    backgroundColor: "#E8A200",
-    transform: "translate(0%, 10%) rotate(180deg) scale(0)",
-    "&.MuiSlider-valueLabelOpen": {
-      transform: "translate(0%, 10%) rotate(180deg) scale(1)",
-    },
-    "& > *": {
-      transform: "rotate(180deg)",
-    },
-  },
-});
-
-// Helper to abbreviate price (e.g. $1.2M, $649K)
-function formatPriceAbbreviated(price: number) {
-  if (!price) return "$0";
-  if (price >= 1000000) {
-    return "$" + (price / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
-  }
-  if (price >= 1000) {
-    return "$" + Math.round(price / 1000) + "K";
-  }
-  return "$" + price.toLocaleString();
-}
-
-// Marker Creator
-function createPriceMarker(property: any, onClick: () => void) {
-  const el = document.createElement("div");
-  el.className =
-    "price-marker bg-white px-2 py-1 rounded-full shadow-md border border-primary text-primary font-bold text-xs cursor-pointer hover:bg-primary hover:text-white transition-all";
-  
-  let abbreviatedPrice = formatPriceAbbreviated(Number(property.price));
-  el.innerText = abbreviatedPrice;
-
-  el.addEventListener("click", () => {
-    onClick();
-  });
-
-  return el;
-}
 
 export default function MapSearch() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -122,10 +41,13 @@ export default function MapSearch() {
   const pathName = usePathname();
   const isWishlistPage = pathName === "/wishlist";
 
-  // States for Custom Sort Dropdown
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const sortRef = useRef<HTMLDivElement>(null);
-  const [mapBounds, setMapBounds] = useState<{ north: number; south: number; east: number; west: number , zoom: number } | null>(null);
+  const [mapBounds, setMapBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+    zoom: number;
+  } | null>(null);
   const [mapZoomVal, setMapZoomVal] = useState<number | null>(null);
   const mapBoundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [fitBoundsDone, setFitBoundsDone] = useState(false);
@@ -161,7 +83,18 @@ export default function MapSearch() {
 
   useEffect(() => {
     setFitBoundsDone(false);
-  }, [search, location, status, activeProperty, minPrice, maxPrice, minSqft, maxSqft, activeBedRoom, activeBathRoom]);
+  }, [
+    search,
+    location,
+    status,
+    activeProperty,
+    minPrice,
+    maxPrice,
+    minSqft,
+    maxSqft,
+    activeBedRoom,
+    activeBathRoom,
+  ]);
 
   // Enforce restriction if status is set externally (e.g. via GetInTouch or store initial state)
   useEffect(() => {
@@ -171,73 +104,11 @@ export default function MapSearch() {
     }
   }, [status, isLoggedIn, updateInstanceFilter, setOpenLogin]);
 
-  // Close custom dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
-        setIsSortOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // States for Price & Area Toggle
-  const [isPriceAreaOpen, setIsPriceAreaOpen] = useState(false);
-  const priceAreaRef = useRef<HTMLDivElement>(null);
-
-  // Close price & area dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        priceAreaRef.current &&
-        !priceAreaRef.current.contains(event.target as Node)
-      ) {
-        setIsPriceAreaOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const price = [minPrice ?? 1000, maxPrice ?? 20000000];
   const setPrice = (val: [number, number]) => {
     updateInstanceFilter("map", "minPrice", val[0]);
     updateInstanceFilter("map", "maxPrice", val[1]);
   };
-
-  // States for Beds & Baths Toggle
-  const [isBedsOpen, setIsBedsOpen] = useState(false);
-  const bedsRef = useRef<HTMLDivElement>(null);
-
-  // Close beds toggle when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (bedsRef.current && !bedsRef.current.contains(event.target as Node)) {
-        setIsBedsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // States for Location Toggle
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
-  const locationRef = useRef<HTMLDivElement>(null);
-
-  // Close location toggle when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        locationRef.current &&
-        !locationRef.current.contains(event.target as Node)
-      ) {
-        setIsLocationOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const setActiveBedRoom = (val: string) =>
     updateInstanceFilter("map", "activeBedRoom", val);
@@ -356,18 +227,44 @@ export default function MapSearch() {
   // API Params Logic
   const commonParams: any = {};
   if (search) commonParams.search = search;
-  if (location && location !== "" && location !== "British Columbia") commonParams.location = location;
+  if (location && location !== "" && location !== "British Columbia")
+    commonParams.location = location;
   if (minPrice !== undefined) commonParams.minPrice = minPrice;
-  if (maxPrice !== undefined && maxPrice !== 20000000) commonParams.maxPrice = maxPrice;
+  if (maxPrice !== undefined && maxPrice !== 20000000)
+    commonParams.maxPrice = maxPrice;
   if (minSqft !== undefined) commonParams.minSqft = minSqft;
-  if (maxSqft !== undefined && maxSqft !== 15000) commonParams.maxSqft = maxSqft;
-  if (activeBedRoom && activeBedRoom !== "any") commonParams.bedrooms = activeBedRoom.replace("+", "");
-  if (activeBathRoom && activeBathRoom !== "any") commonParams.bathrooms = activeBathRoom.replace("+", "");
-  if (activeProperty && activeProperty !== "any") commonParams.type = activeProperty;
+  if (maxSqft !== undefined && maxSqft !== 15000)
+    commonParams.maxSqft = maxSqft;
+  if (activeBedRoom && activeBedRoom !== "any")
+    commonParams.bedrooms = activeBedRoom.replace("+", "");
+  if (activeBathRoom && activeBathRoom !== "any")
+    commonParams.bathrooms = activeBathRoom.replace("+", "");
+  if (activeProperty && activeProperty !== "any")
+    commonParams.type = activeProperty;
   if (status && status !== "any") commonParams.propertyType = status;
-  
+
   const mapZoomParams = useMemo(() => {
     const p: any = {};
+
+    if (search) p.search = search;
+    if (location && location !== "" && location !== "British Columbia")
+      p.location = location;
+    if (minPrice !== undefined && minPrice > 1000) p.minPrice = minPrice;
+    if (maxPrice !== undefined && maxPrice < 20000000) p.maxPrice = maxPrice;
+    if (minSqft !== undefined && minSqft > 100) p.minSqft = minSqft;
+    if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
+
+    if (activeBedRoom && activeBedRoom !== "any") {
+      p.beds = activeBedRoom.replace("+", "");
+    }
+    if (activeBathRoom && activeBathRoom !== "any") {
+      p.baths = activeBathRoom.replace("+", "");
+    }
+    if (activeProperty && activeProperty !== "any") p.type = activeProperty;
+    if (status && status !== "forSale" && status !== "any") {
+      p.propertyType = status;
+    }
+
     if (mapBounds) {
       p.north = mapBounds.north;
       p.south = mapBounds.south;
@@ -378,7 +275,20 @@ export default function MapSearch() {
       }
     }
     return p;
-  }, [mapBounds, mapZoomVal]);
+  }, [
+    mapBounds,
+    mapZoomVal,
+    search,
+    location,
+    minPrice,
+    maxPrice,
+    minSqft,
+    maxSqft,
+    activeBedRoom,
+    activeBathRoom,
+    activeProperty,
+    status,
+  ]);
 
   if (mapBounds) {
     commonParams.north = mapBounds.north;
@@ -391,158 +301,153 @@ export default function MapSearch() {
   }
 
   const params: any = {
-    ...commonParams,
     "pagination[page]": 1,
     "pagination[pageSize]": 500,
-    "filters[property_status][$notIn]": ["Expired", "Terminated", "Cancelled"],
-    "filters[property_sub_type][$notNull]": true,
-    "filters[raw_data][BCRES_SoldDate][$null]": true,
   };
 
   if (status && status !== "any") {
     params.propertyType = status;
-    delete params["filters[property_status][$notIn]"];
-    delete params["filters[raw_data][BCRES_SoldDate][$null]"];
+    delete params["filters[property_status][$eq]"];
     delete params["filters[property_sub_type][$notNull]"];
-    
-    if (status === "sold") {
-      params["filters[raw_data][BCRES_SoldDate][$notNull]"] = true;
-    } else if (status === "expired") {
-      params["filters[property_status][$eq]"] = "Expired";
-    }
+
+    // if (status === "sold") {
+    //   params["filters[property_status][$eq]"] = "Closed";
+    //   params["filters[property_sub_type][$notNull]"] = true;
+    // } else if (status === "expired") {
+    //   params["filters[property_status][$eq]"] = "Expired";
+    //   params["filters[property_sub_type][$notNull]"] = true;
+    // } else if (status === "forSale") {
+    //   params["filters[property_status][$eq]"] = "Active";
+    //   params["filters[property_sub_type][$notNull]"] = true;
+    // }
   }
 
   if (location && location !== "" && location !== "British Columbia")
     params.location = location;
-  if (minPrice !== undefined) params.minPrice = minPrice;
-  if (maxPrice !== undefined && maxPrice !== 20000000)
-    params.maxPrice = maxPrice;
-  if (minSqft !== undefined) params.minSqft = minSqft;
-  if (maxSqft !== undefined && maxSqft !== 15000) params.maxSqft = maxSqft;
+  if (minPrice !== undefined && minPrice > 1000) params.minPrice = minPrice;
+  if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
+  if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
+  if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
   if (activeBedRoom && activeBedRoom !== "any")
-    params.beds= activeBedRoom.replace("+", "");
+    params.beds = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")
     params.baths = activeBathRoom.replace("+", "");
   if (activeProperty && activeProperty !== "any") params.type = activeProperty;
 
-  const isForSale = status === "forSale" || !status;
-  const { data: queryDataNormal, isLoading: isLoadingNormal } = useGetListings(
-    params,
-    {
-      select: (res: any) => {
-        const listings = res?.data || [];
-        return listings
-        .map(
-          (listing: any) => (
-            console.log(
-              "longitude:",
-              listing?.longitude,
-              " latitude:",
-              listing?.latitude,
-            ),
-           
-              {
-                id: listing.documentId || Math.random().toString(),
-                image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
-                title: listing?.property_sub_type || "Property",
-                price: listing?.price || 0,
-                daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-                address: listing?.address
-                ? `${listing?.address}, ${listing?.city || ""}`
-                : listing?.city || "",
-                sqft: listing?.area ?? listing?.lot_size_area ?? 0,
-                beds: listing?.bedrooms ?? 0,
-                baths: listing?.bathrooms ?? 0,
-                longitude: listing?.longitude,
-                latitude: listing?.latitude,
-                priceDrop:
-                  listing.PreviousListPrice &&
-                  listing.PreviousListPrice > listing.ListPrice
-                    ? Number(
-                        (
-                          (listing.PreviousListPrice - listing.ListPrice) /
-                          listing.ListPrice
-                        ).toFixed(1),
-                      )
-                    : undefined,
-                assessedDiff: listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : 0,
-                mls: listing?.mls_number,
-                realtor: getOfficeName(listing),
-                isLogin: false,
-                isFavourite: listing?.is_favorite || isWishlistPage,
-                isDdf: false,
-              }
-            ),
-          )
-          .filter(
-            (l: any) =>
-              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
-          );
-      },
-      enabled: false,
-    },
-  );
+  const isForSale = status === "forSale";
 
-  const { data: queryDataActive, isLoading: isLoadingActive, isFetching: isFetchingActive } =
-    useGetMapZoomListings(mapZoomParams, {
-      select: (res: any) => {
-        const listings = res?.data || [];
-        return listings
-          .map(
-            (listing: any) => (
-              console.log(
-                "longitude:",
-                listing?.longitude,
-                " latitude:",
-                listing?.latitude,
-              ),
-              {
-                id: listing.documentId || listing.id?.toString(),
-                image: typeof listing?.media_url === "string"
-                  ? listing.media_url
-                  : Array.isArray(listing?.media_url)
-                  ? listing.media_url[0]
-                  : listing?.media?.[0]?.MediaURL,
-                title: listing?.property_sub_type || "Property",
-                price: Number(listing?.price) || 0,
-                daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-                address: listing?.address || `${listing?.city || ""}`,
-                sqft: listing?.area ?? listing?.Living_area ?? 0,
-                beds: listing?.bedrooms ?? 0,
-                baths: listing?.bathrooms ?? 0,
-                priceDrop: undefined,
-                assessedDiff: 0,
-                longitude: Number(listing?.longitude),
-                latitude: Number(listing?.latitude),
-                mls: listing?.mls_number ?? listing?.listing_id,
-                realtor: listing?.office_name ?? getOfficeName(listing),
-                isFavourite: listing?.is_favorite || isWishlistPage,
-                isDdf: true,
-              }
-            ),
-          )
-          .filter(
-            (l: any) =>
-              !isNaN(l.longitude) && !isNaN(l.latitude) && l.longitude !== 0 && Number(l.price) > 0,
-          );
-      },
-      enabled: !!mapBounds,
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-    });
- 
-  const queryData = queryDataActive;
-  const isLoading = isLoadingActive || isFetchingActive;
- 
+  const {
+    data: queryDataNormal,
+    isLoading: isLoadingNormal,
+    isFetching: isFetchingNormal,
+  } = useGetListings(params, {
+    select: (res: any) => {
+      const listings = res?.data || [];
+      return listings
+        .map((listing: any) => ({
+          id: listing.documentId || Math.random().toString(),
+          image:
+            typeof listing?.media?.[0] === "string"
+              ? listing.media[0]
+              : listing?.media?.[0]?.MediaURL,
+          title: listing?.property_sub_type || "Property",
+          price: listing?.price || 0,
+          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+          address: listing?.address
+            ? `${listing?.address}, ${listing?.city || ""}`
+            : listing?.city || "",
+          sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+          beds: listing?.bedrooms ?? 0,
+          baths: listing?.bathrooms ?? 0,
+          longitude: listing?.longitude,
+          latitude: listing?.latitude,
+          priceDrop:
+            listing.PreviousListPrice &&
+            listing.PreviousListPrice > listing.ListPrice
+              ? Number(
+                  (
+                    (listing.PreviousListPrice - listing.ListPrice) /
+                    listing.ListPrice
+                  ).toFixed(1),
+                )
+              : undefined,
+          assessedDiff: listing.ListPrice
+            ? Number(
+                (
+                  (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                  listing.ListPrice
+                ).toFixed(1),
+              )
+            : 0,
+          mls: listing?.mls_number,
+          realtor: getOfficeName(listing),
+          isLogin: false,
+          isFavourite: listing?.is_favorite || isWishlistPage,
+          isDdf: false,
+        }))
+        .filter(
+          (l: any) =>
+            !isNaN(l.longitude) &&
+            !isNaN(l.latitude) &&
+            l.longitude !== 0 &&
+            Number(l.price) > 0,
+        );
+    },
+    enabled: !isForSale && !!mapBounds,
+  });
+
+  const {
+    data: queryDataActive,
+    isLoading: isLoadingActive,
+    isFetching: isFetchingActive,
+  } = useGetMapZoomListings(mapZoomParams, {
+    select: (res: any) => {
+      const listings = res?.data || [];
+      return listings
+        .map((listing: any) => ({
+          id: listing.doucumentId,
+          image:
+            typeof listing?.media_url === "string"
+              ? listing.media_url
+              : Array.isArray(listing?.media_url)
+                ? listing.media_url[0]
+                : listing?.media?.[0]?.MediaURL,
+          title: listing?.property_sub_type || "Property",
+          price: Number(listing?.price) || 0,
+          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+          address: listing?.address || `${listing?.city || ""}`,
+          sqft: listing?.area ?? listing?.Living_area ?? 0,
+          beds: listing?.bedrooms ?? 0,
+          baths: listing?.bathrooms ?? 0,
+          priceDrop: undefined,
+          assessedDiff: 0,
+          longitude: Number(listing?.longitude),
+          latitude: Number(listing?.latitude),
+          mls: listing?.mls_number ?? listing?.listing_id,
+          realtor: listing?.office_name ?? getOfficeName(listing),
+          isFavourite: listing?.is_favorite || isWishlistPage,
+          isDdf: true,
+        }))
+        .filter(
+          (l: any) =>
+            !isNaN(l.longitude) &&
+            !isNaN(l.latitude) &&
+            l.longitude !== 0 &&
+            Number(l.price) > 0,
+        );
+    },
+    enabled: isForSale && !!mapBounds,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  });
+
+  const queryData = isForSale ? queryDataActive : queryDataNormal;
+  const isLoading = isForSale
+    ? isLoadingActive || isFetchingActive
+    : isLoadingNormal || isFetchingNormal;
+
   const properties = queryData || [];
 
   // Initialize Map
@@ -553,8 +458,8 @@ export default function MapSearch() {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       center: [-123.1207, 49.2827],
-      zoom: 10,
-      style: "mapbox://styles/mapbox/streets-v12",
+      zoom: 5,
+      style: "mapbox://styles/mapbox/streets-v11",
     });
 
     map.on("load", () => setMapLoaded(true));
@@ -592,7 +497,7 @@ export default function MapSearch() {
 
     map.on("moveend", handleBounds);
     map.on("zoomend", handleBounds);
-    
+
     // Set initial bounds
     handleBounds();
 
@@ -605,7 +510,7 @@ export default function MapSearch() {
     };
   }, [mapLoaded]);
 
-  // Auto Satellite View on Zoom 
+  // Auto Satellite View on Zoom
   useEffect(() => {
     if (!mapLoaded || !mapRef.current) return;
     const map = mapRef.current;
@@ -658,7 +563,7 @@ export default function MapSearch() {
 
     if (coords) {
       mapRef.current.flyTo({ center: coords, zoom: 11, essential: true });
-    } else if (properties.length > 0 && location !== "British Columbia") {
+    } else if (properties?.length > 0 && location !== "British Columbia") {
       mapRef.current.flyTo({
         center: [properties[0].longitude, properties[0].latitude],
         zoom: 11,
@@ -686,9 +591,9 @@ export default function MapSearch() {
   };
 
   const handleFitBounds = () => {
-    if (!mapRef.current || properties.length === 0) return;
+    if (!mapRef.current || properties?.length === 0) return;
     const bounds = new mapboxgl.LngLatBounds();
-    properties.forEach((p: any) => {
+    properties?.forEach((p: any) => {
       if (p.longitude && p.latitude) {
         bounds.extend([p.longitude, p.latitude]);
       }
@@ -702,12 +607,18 @@ export default function MapSearch() {
 
   // Fit bounds to show all properties when status/properties change
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current || properties.length === 0 || fitBoundsDone) return;
+    if (
+      !mapLoaded ||
+      !mapRef.current ||
+      properties?.length === 0 ||
+      fitBoundsDone
+    )
+      return;
 
     const bounds = new mapboxgl.LngLatBounds();
     let hasValidPoints = false;
 
-    properties.forEach((p: any) => {
+    properties?.forEach((p: any) => {
       if (
         p.longitude &&
         p.latitude &&
@@ -738,11 +649,19 @@ export default function MapSearch() {
 
     // 1. Initialize supercluster
     const points = properties
-      .filter((p: any) => !isNaN(Number(p.longitude)) && !isNaN(Number(p.latitude)) && Number(p.price) > 0)
+      ?.filter(
+        (p: any) =>
+          !isNaN(Number(p.longitude)) &&
+          !isNaN(Number(p.latitude)) &&
+          Number(p.price) > 0,
+      )
       .map((p: any) => ({
         type: "Feature",
         properties: { cluster: false, propertyId: p.id, propertyData: p },
-        geometry: { type: "Point", coordinates: [Number(p.longitude), Number(p.latitude)] }
+        geometry: {
+          type: "Point",
+          coordinates: [Number(p.longitude), Number(p.latitude)],
+        },
       }));
 
     if (!superclusterRef.current) {
@@ -763,7 +682,7 @@ export default function MapSearch() {
         bounds.getWest(),
         bounds.getSouth(),
         bounds.getEast(),
-        bounds.getNorth()
+        bounds.getNorth(),
       ] as [number, number, number, number];
 
       // Remove old markers
@@ -793,11 +712,14 @@ export default function MapSearch() {
 
           el.addEventListener("click", (e) => {
             e.stopPropagation();
-            const expansionZoom = superclusterRef.current!.getClusterExpansionZoom(cluster.id as number);
+            const expansionZoom =
+              superclusterRef.current!.getClusterExpansionZoom(
+                cluster.id as number,
+              );
             map.flyTo({
               center: [longitude, latitude],
               zoom: expansionZoom,
-            essential: true,
+              essential: true,
             });
           });
 
@@ -824,23 +746,27 @@ export default function MapSearch() {
                 1
               </div>
             `;
-            
+
             markerEl.addEventListener("click", (e) => {
               e.stopPropagation();
               map.flyTo({
                 center: [property.longitude, property.latitude],
-                zoom: 12, 
+                zoom: 12,
                 essential: true,
               });
             });
           }
 
-          const marker = new mapboxgl.Marker(markerEl)
-            .setLngLat([property.longitude, property.latitude]);
+          const marker = new mapboxgl.Marker(markerEl).setLngLat([
+            property.longitude,
+            property.latitude,
+          ]);
 
           if (zoom >= 10) {
             const imageSrc = property?.image || Images.apartment;
-            const price = property?.price ? `$${Number(property.price).toLocaleString()}` : "Price upon request";
+            const price = property?.price
+              ? `$${Number(property.price).toLocaleString()}`
+              : "Price upon request";
             const title = property?.title || "Property";
             const address = property?.address || "Address not available";
 
@@ -861,7 +787,7 @@ export default function MapSearch() {
                     <p style="margin: 0; font-size: 12px; color: #6e6e6e; line-height: 1.4; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${address}</p>
                   </div>
                 </div>
-              </div>`
+              </div>`,
             );
 
             popup.on("open", () => {
@@ -883,7 +809,10 @@ export default function MapSearch() {
       });
 
       // Update Sidebar visibility state
-      let visible = properties.filter((p: any) => bounds.contains([p.longitude, p.latitude]) && Number(p.price) > 0);
+      let visible = properties.filter(
+        (p: any) =>
+          bounds.contains([p.longitude, p.latitude]) && Number(p.price) > 0,
+      );
 
       if (sortBy === "priceLow") {
         visible.sort((a: any, b: any) => a.price - b.price);
@@ -911,465 +840,47 @@ export default function MapSearch() {
     };
   }, [mapLoaded, properties, sortBy]);
 
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
   return (
     <>
       <div className="w-full h-screen flex flex-col bg-white overflow-hidden mt-20">
         {/* 1. TOP FILTER BAR */}
-        <div className="flex flex-wrap md:justify-start  justify-center items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full pl-5 mt-4">
-          <FiltersPopup
-            id="map"
-            open={isFilterOpen}
-            onClose={() => setIsFilterOpen(false)}
-          />
-
-          <div
-            onClick={() => setIsFilterOpen(true)}
-            className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer  shrink-0"
-          >
-            <FilterListIcon sx={{ color: "#305487" }} /> Filters
-          </div>
-
-          <div
-            onClick={() => setStatus("forSale")}
-            className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-              status === "forSale"
-                ? "bg-primary text-white border-primary"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            For Sale
-          </div>
-
-          <div
-            onClick={() => setStatus("sold")}
-            className={`flex items-center gap-1 border rounded-[10px] px-4 py-2.5 bg-background  text-sm font-normal cursor-pointer shrink-0 transition-all ${
-              status === "sold"
-                ? "bg-primary text-white border-primary"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Sold
-          </div>
-
-          <div
-            onClick={() => setStatus("expired")}
-            className={`flex items-center gap-1 border rounded-[10px] px-4 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-              status === "expired"
-                ? "bg-primary text-white border-primary"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Expired
-          </div>
-
-          <div className="relative" ref={priceAreaRef}>
-            <div
-              onClick={() => setIsPriceAreaOpen(!isPriceAreaOpen)}
-              className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all  ${
-                isPriceAreaOpen
-                  ? "border-primary bg-primary text-white"
-                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              Price & Area{" "}
-              <FiChevronDown
-                className={`text-gray-400 ml-1 transition-transform ${isPriceAreaOpen ? "rotate-180 text-white" : ""}`}
-              />
-            </div>
-
-            {isPriceAreaOpen && (
-              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[450px] animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95 max-h-[80vh] overflow-y-auto no-scrollbar">
-                {/* Price Section */}
-                <div className="md:mb-8 mb-5">
-                  <div className="flex items-center justify-between md:mb-3">
-                    <h3 className="font-bold text-gray-800 text-lg">
-                      Price Range
-                    </h3>
-
-                    <button
-                      onClick={() => setPrice([1000, 20000000])}
-                      className="text-xs font-bold text-primary hover:underline cursor-pointer"
-                    >
-                      Reset Price
-                    </button>
-                  </div>
-                  <div className="relative px-2">
-                    <PriceSlider
-                      value={[price[0] ?? 1000, price[1] ?? 20000000]}
-                      min={1000}
-                      max={20000000}
-                      step={20000}
-                      onChange={(_, v) => setPrice(v as [number, number])}
-                      disableSwap
-                      valueLabelDisplay="auto"
-                    />
-                  </div>
-
-                  <div className="flex flex-row items-center mt-5 justify-between gap-4 w-full">
-                    <div className="flex flex-col flex-1">
-                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                        Min Price
-                      </p>
-                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                        <span className="text-secondary">$</span>
-                        <span>{price[0].toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col flex-1">
-                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                        Max Price
-                      </p>
-                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                        {price[1] === 20000000 ? (
-                          <span>Max</span>
-                        ) : (
-                          <>
-                            <span className="text-secondary">$</span>
-                            <span>{price[1].toLocaleString()}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <LineGradient />
-
-                {/* Area Section */}
-                <div className="md:mb-2 mb-2 mt-2">
-                  <div className="flex items-center justify-between md:mb-3">
-                    <h3 className="font-bold text-gray-800 text-lg">
-                      Area Range
-                    </h3>
-                    <button
-                      onClick={() => setSqft([100, 15000])}
-                      className="text-xs font-bold text-primary hover:underline cursor-pointer"
-                    >
-                      Reset Area
-                    </button>
-                  </div>
-                  <div className="relative px-2">
-                    <PriceSlider
-                      value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
-                      min={100}
-                      max={15000}
-                      step={100}
-                      onChange={(_, v) => setSqft(v as [number, number])}
-                      disableSwap
-                      valueLabelDisplay="auto"
-                    />
-                  </div>
-
-                  <div className="flex flex-row items-center mt-5 justify-between gap-4 w-full">
-                    <div className="flex flex-col flex-1">
-                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                        Min Sqft
-                      </p>
-                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                        <span>{sqft[0]}</span>
-                        <span className="text-secondary text-[10px]">sqft</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col flex-1">
-                      <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                        Max Sqft
-                      </p>
-                      <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                        {sqft[1] === 15000 ? (
-                          <span>Max</span>
-                        ) : (
-                          <>
-                            <span>{sqft[1]}</span>
-                            <span className="text-secondary text-[10px]">
-                              sqft
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="relative" ref={bedsRef}>
-            <div
-              onClick={() => setIsBedsOpen(!isBedsOpen)}
-              className={`flex items-center gap-1 border rounded-[10px] px-7 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
-                isBedsOpen
-                  ? "border-primary bg-primary text-white shadow-md"
-                  : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
-              }`}
-            >
-              Beds & Baths{" "}
-              <FiChevronDown
-                className={`ml-1.5 transition-transform duration-300 ${isBedsOpen ? "rotate-180" : "text-gray-400"}`}
-              />
-            </div>
-
-            {isBedsOpen && (
-              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[380px] animate-in fade-in slide-in-from-top-3 duration-300">
-                <div className="mb-7">
-                  <h3 className="font-bold text-gray-800 text-lg mb-4">
-                    Bedrooms
-                  </h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["any", "1", "2", "3", "4+"].map((val) => (
-                      <button
-                        key={val}
-                        onClick={() => setActiveBedRoom(val)}
-                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
-                          activeBedRoom === val
-                            ? "bg-primary border-primary text-white shadow-sm"
-                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                        }`}
-                      >
-                        {val === "any" ? "Any" : val}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <LineGradient />
-
-                <div className="mb-2 mt-4">
-                  <h3 className="font-bold text-gray-800 text-lg mb-4">
-                    Bathrooms
-                  </h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["any", "1", "2", "3", "4+"].map((val) => (
-                      <button
-                        key={val}
-                        onClick={() => setActiveBathRoom(val)}
-                        className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
-                          activeBathRoom === val
-                            ? "bg-primary border-primary text-white shadow-sm"
-                            : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                        }`}
-                      >
-                        {val === "any" ? "Any" : val}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="relative min-w-50 shrink-0">
-            <FilterPillSelect
-              label="Property Type"
-              value={activeProperty}
-              onChange={setActiveProperty}
-              pillBase={pillBase}
-              pillActive={pillActive}
-              pillInactive={pillInactive}
-              options={
-                status === "sold" || status === "expired"
-                  ? [
-                      { label: "Any", value: "any" },
-                      { label: "Apartment/Condo", value: "Apartment/Condo" },
-                      {
-                        label: "Single Family Residence",
-                        value: "Single Family Residence",
-                      },
-                      { label: "Townhouse", value: "Townhouse" },
-                      { label: "Half Duplex", value: "Half Duplex" },
-                      {
-                        label: "Row House (Non-Strata)",
-                        value: "Row House (Non-Strata)",
-                      },
-                    ]
-                  : [
-                      { label: "Any", value: "any" },
-                      { label: "Single-Family", value: "Single-Family" },
-                      { label: "Multi-Family", value: "Multi-Family" },
-                      { label: "Office", value: "Office" },
-                      { label: "Business", value: "Business" },
-                      { label: "Agriculture", value: "Agriculture" },
-                      { label: "Vacant Land", value: "Vacant Land" },
-                    ]
-              }
-            />
-          </div>
-
-          <div className="relative" ref={locationRef}>
-            <div
-              onClick={() => setIsLocationOpen(!isLocationOpen)}
-              className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-                isLocationOpen
-                  ? "border-primary bg-primary text-white"
-                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {location || "Location"}{" "}
-              <FiChevronDown
-                className={`text-gray-400 ml-1 transition-transform ${isLocationOpen ? "rotate-180 text-white" : ""}`}
-              />
-            </div>
-
-            {isLocationOpen && (
-              <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[9999] p-5 w-[92vw] md:w-60 animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95">
-                <div className="max-h-80 overflow-y-auto no-scrollbar p-2">
-                  {[
-                    "British Columbia",
-                    "Vancouver",
-                    "Burnaby",
-                    "Surrey",
-                    "Richmond",
-                    "Victoria",
-                    "Kelowna",
-                    "Abbotsford",
-                    "White Rock",
-                    "Nanaimo",
-                    "Coquitlam",
-                    "New Westminster",
-                    "North Vancouver",
-                    "West Vancouver",
-                    "Langley",
-                    "Delta",
-                    "Maple Ridge",
-                    "Chilliwack",
-                  ].map((loc) => (
-                    <div
-                      key={loc}
-                      onClick={() => {
-                        setLocation(loc === "British Columbia" ? "" : loc);
-                        setIsLocationOpen(false);
-                      }}
-                      className={`px-4 py-2.5 text-sm cursor-pointer rounded-lg transition-colors ${location === loc || (loc === "British Columbia" && !location) ? "bg-primary/10 text-primary font-bold" : "text-gray-600 hover:bg-gray-50"}`}
-                    >
-                      {loc}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <MapTopFilterBar
+          status={status}
+          setStatus={setStatus}
+          price={price as [number, number]}
+          setPrice={setPrice}
+          sqft={sqft as [number, number]}
+          setSqft={setSqft}
+          activeBedRoom={activeBedRoom}
+          setActiveBedRoom={setActiveBedRoom}
+          activeBathRoom={activeBathRoom}
+          setActiveBathRoom={setActiveBathRoom}
+          activeProperty={activeProperty}
+          setActiveProperty={setActiveProperty}
+          location={location}
+          setLocation={setLocation}
+          pillBase={pillBase}
+          pillActive={pillActive}
+          pillInactive={pillInactive}
+        />
 
         {/* ACTIVE FILTER PILLS ROW */}
-        {hasActiveFilters && (
-          <div className="relative z-[999] bg-[#f8faff] border-b border-gray-100 px-4 py-2 flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide shrink-0 mr-1">
-              Active:
-            </span>
-
-            {activeFilterPills.map((pill, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-1.5 bg-primary/10 border border-primary/25 text-primary text-xs font-semibold px-3 py-1.5 rounded-full animate-in fade-in duration-200"
-              >
-                <span>{pill.label}</span>
-                <button
-                  onClick={pill.onRemove}
-                  className="ml-0.5 hover:bg-primary/20 rounded-full p-0.5 transition-colors cursor-pointer"
-                  aria-label="Remove filter"
-                >
-                  <FiX size={11} />
-                </button>
-              </div>
-            ))}
-
-            <button
-              onClick={resetAllFilters}
-              className="ml-auto flex items-center gap-1.5 bg-primary text-white text-xs font-bold px-4 py-2.5 rounded-[10px] transition-all duration-200 shrink-0 cursor-pointer"
-            >
-              <FiX size={12} />
-              Reset All
-            </button>
-          </div>
-        )}
+        <MapActiveFilters
+          hasActiveFilters={hasActiveFilters}
+          activeFilterPills={activeFilterPills}
+          resetAllFilters={resetAllFilters}
+        />
 
         {/* MAIN CONTENT */}
         <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative">
           {/* 2. SIDEBAR - LEFT (Mobile: Full width, Desktop: 110 width) */}
-          <div className="w-full md:w-110 flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
-            <div className="p-4 flex justify-between items-center text-sm font-semibold border-b border-gray-50">
-              <div className="text-gray-500 ">
-                Results:{" "}
-                <span className="text-black ">
-                  {isLoading
-                    ? "..."
-                    : `${visibleProperties.length}/${properties.length}`}
-                </span>
-              </div>
-
-              {/* <div className="flex items-center gap-2" ref={sortRef}>
-                <span className="text-gray-400 text-[15px] font-bold hidden sm:inline">
-                  Sort by:
-                </span>
-                <div className="relative min-w-40">
-                  <div
-                    onClick={() => setIsSortOpen(!isSortOpen)}
-                    className={`flex items-center justify-between px-3 py-2 bg-white border rounded-lg cursor-pointer transition-all duration-200 ${isSortOpen ? "border-primary shadow-md" : "border-gray-200 hover:border-gray-300 shadow-sm"}`}
-                  >
-                    <span className="text-gray-800 text-sm font-bold">
-                      {currentSortLabel}
-                    </span>
-                    <FiChevronDown
-                      className={`text-gray-400 transition-transform duration-300 ${isSortOpen ? "rotate-180 text-primary" : ""}`}
-                      size={16}
-                    />
-                  </div>
-
-                  {isSortOpen && (
-                    <div className="absolute right-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-999 overflow-hidden">
-                      <div className="py-1">
-                        {sortOptions.map((opt) => (
-                          <div
-                            key={opt.value}
-                            onClick={() => {
-                              setSortBy(opt.value);
-                              setIsSortOpen(false);
-                            }}
-                            className={`flex items-center justify-between px-4 py-3 text-sm cursor-pointer transition-colors ${sortBy === opt.value ? "bg-primary/5 text-primary font-bold" : "text-gray-600 hover:bg-gray-50"}`}
-                          >
-                            {opt.label}
-                            {sortBy === opt.value && (
-                              <FiCheck className="text-primary" size={14} />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div> */}
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar bg-[#f8f9fa]">
-              {isLoading ? (
-                <div className="flex flex-col items-center justify-center h-64 space-y-3">
-                  <FiLoader className="w-8 h-8 text-primary animate-spin" />
-                  <p className="text-gray-500 text-sm font-medium">
-                    Fetching properties...
-                  </p>
-                </div>
-              ) : visibleProperties.length > 0 ? (
-                visibleProperties.map((p) => (
-                  <div key={p.id} className="">
-                    <PropertiesCard
-                      {...p}
-                      isLogin={isLoggedIn || status === "forSale"}
-                      isSold={status === "sold"}
-                      isExpired={status === "expired"}
-                      isDdf={p.isDdf}
-                    />
-                  </div>
-                ))
-              ) : (
-                <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
-                  No properties found in this area.
-                </div>
-              )}
-            </div>
-          </div>
+          <MapSidebar
+            isLoading={isLoading}
+            visibleProperties={visibleProperties}
+            properties={properties}
+            isLoggedIn={isLoggedIn}
+            status={status}
+          />
 
           {/* 3. MAP AREA - RIGHT (Hidden on Mobile) */}
           <div className="hidden md:block flex-1 relative z-10">

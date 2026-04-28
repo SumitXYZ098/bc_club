@@ -42,7 +42,7 @@ export default function PropertiesListingPage() {
   const activeBedRoom = filters.activeBedRoom || "any";
   const activeProperty = filters.activeProperty || "any";
   const page = filters.page || 1;
-  const pageSize = 20;
+  const pageSize = 30;
 
   const minPrice = filters.minPrice;
   const maxPrice = filters.maxPrice;
@@ -83,27 +83,30 @@ export default function PropertiesListingPage() {
   const isForSale = !status || status === "forSale";
 
   const params: any = {
-    "pagination[page]": page,
-    "pagination[pageSize]": pageSize,
+    page: page,
+    pageSize: pageSize,
   };
 
   if (!isForSale) {
-    // These filters are only for standard properties
-    params["filters[property_status][$notIn]"] = ["Expired", "Terminated", "Cancelled"];
     params["filters[property_sub_type][$notNull]"] = true;
-    params["filters[raw_data][BCRES_SoldDate][$null]"] = true;
+    if (status === "sold") {
+      params["filters[property_status][$eq]"] = "Closed";
+    } else if (status === "expired") {
+      params["filters[property_status][$eq]"] = "Expired";
+    }
   }
 
   // sorting
   if (activePrice && activePrice !== "any") {
     if (isForSale) {
-      if (activePrice === 'newest') params.sort = 'date:desc';
-      else if (activePrice === 'oldest') params.sort = 'date:asc';
-      else if (activePrice === 'asc') params.sort = 'price:asc';
-      else if (activePrice === 'desc') params.sort = 'price:desc';
+      if (activePrice === "newest") params.sort = "ModificationTimestamp:desc";
+      else if (activePrice === "oldest")
+        params.sort = "ModificationTimestamp:asc";
+      else if (activePrice === "asc") params.sort = "price:asc";
+      else if (activePrice === "desc") params.sort = "price:desc";
     } else {
-      if (activePrice === 'newest') params.sort = 'createdAt:desc';
-      else if (activePrice === 'oldest') params.sort = 'createdAt:asc';
+      if (activePrice === "newest") params.sort = "createdAt:desc";
+      else if (activePrice === "oldest") params.sort = "createdAt:asc";
       else params.sort = `price:${activePrice}`;
     }
   }
@@ -144,52 +147,66 @@ export default function PropertiesListingPage() {
     params.location = location;
   }
 
-  console.log("FINAL PROPERTY PARAMS:", params);
-
   const select = (res: any) => {
     const listings = res?.data || [];
     const pagination = res?.meta?.pagination || {
       pageCount: res?.count ? Math.ceil(res.count / pageSize) : 1,
     };
 
-    let properties: PropertyCardProps[] = listings.map((listing: any) => ({
-      id: listing.documentId,
-      image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
-      title: listing?.property_sub_type,
-      price: listing?.price,
-      daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-      address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
-      sqft: listing?.area ?? listing?.lot_size_area ?? 0,
-      beds: listing?.bedrooms ?? 0,
-      baths: listing?.bathrooms ?? 0,
-      priceDrop:
-        listing.PreviousListPrice > listing.ListPrice
+    let properties: PropertyCardProps[] = listings
+      .map((listing: any) => ({
+        id: listing.doucumentId || listing.id?.toString(),
+        image:
+          typeof listing?.media?.[0] === "string"
+            ? listing.media[0]
+            : listing?.media?.[0]?.MediaURL,
+        title: listing?.property_sub_type,
+        price: listing?.price,
+        daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+        address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
+        sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+        beds: listing?.bedrooms ?? 0,
+        baths: listing?.bathrooms ?? 0,
+        priceDrop:
+          listing.PreviousListPrice > listing.ListPrice
+            ? Number(
+                (
+                  (listing.PreviousListPrice - listing.ListPrice) /
+                  listing.ListPrice
+                ).toFixed(1),
+              )
+            : undefined,
+        assessedDiff: listing.ListPrice
           ? Number(
               (
-                (listing.PreviousListPrice - listing.ListPrice) /
+                (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
                 listing.ListPrice
               ).toFixed(1),
             )
-          : undefined,
-      assessedDiff: listing.ListPrice
-        ? Number(
-            (
-              (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-              listing.ListPrice
-            ).toFixed(1),
-          )
-        : 0,
-      mls: listing?.mls_number ?? listing?.listing_id,
-      realtor: getOfficeName(listing),
-      isFavourite: listing?.is_favorite || isWishlistPage,
-      isDdf: isForSale,
-    })).filter((p: any) => Number(p.price) > 0);
+          : 0,
+        mls:
+          listing?.mls_number ??
+          listing?.listing_id ??
+          listing?.raw_data?.ListingID ??
+          listing?.raw_data?.MLS ??
+          listing?.MlsNumber ??
+          listing?.raw_data?.MlsNumber ??
+          "N/A",
+        realtor: getOfficeName(listing),
+        isFavourite: listing?.is_favorite || isWishlistPage,
+        isDdf: isForSale,
+      }))
+      .filter((p: any) => Number(p.price) > 0);
 
     // Explicit client-side sort to guarantee order regardless of API behavior
     if (activePrice === "asc") {
-      properties.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+      properties.sort(
+        (a, b) => (Number(a.price) || 0) - (Number(b.price) || 0),
+      );
     } else if (activePrice === "desc") {
-      properties.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+      properties.sort(
+        (a, b) => (Number(b.price) || 0) - (Number(a.price) || 0),
+      );
     } else if (activePrice === "newest") {
       properties.sort((a, b) => {
         const dateA = a.daysAgo ? new Date(a.daysAgo).getTime() : 0;
@@ -216,7 +233,7 @@ export default function PropertiesListingPage() {
   );
 
   const { data: queryDataActive, isLoading: isLoadingActive } =
-    useGetActiveListings( params,{
+    useGetActiveListings(params, {
       select,
       enabled: !isWishlistPage && isForSale,
     });
@@ -229,7 +246,7 @@ export default function PropertiesListingPage() {
     isLoading: wishlistLoading,
     refetch: refetchWishlist,
   } = useGetWishlistProperties({
-    select: (res) => select(res),
+    select,
     enabled: isWishlistPage && isLoggedIn,
   });
 
@@ -239,12 +256,16 @@ export default function PropertiesListingPage() {
     refetch: refetchDdfWishlist,
   } = useGetMyDdfFavorites({
     select: (res) => {
-        // Force isDdf to true for this response
-        const listings = res?.data || [];
-        const properties = listings.map((listing: any) => ({
+      // Force isDdf to true for this response
+      const listings = res?.data || [];
+      const properties = listings
+        .map((listing: any) => ({
           ...listing,
-          id: listing.documentId,
-          image: typeof listing?.media?.[0] === "string" ? listing.media[0] : (listing?.media?.[0]?.MediaURL || listing?.media_url?.[0]),
+          id: listing.doucumentId,
+          image:
+            typeof listing?.media?.[0] === "string"
+              ? listing.media[0]
+              : listing?.media?.[0]?.MediaURL || listing?.media_url?.[0],
           title: listing?.property_sub_type,
           price: listing?.price,
           daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
@@ -255,14 +276,22 @@ export default function PropertiesListingPage() {
           sqft: listing?.area ?? listing?.lot_size_area ?? 0,
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
-          mls: listing?.mls_number ?? listing?.listing_id,
+          mls:
+            listing?.mls_number ??
+            listing?.listing_id ??
+            listing?.raw_data?.ListingID ??
+            listing?.raw_data?.MLS ??
+            listing?.MlsNumber ??
+            listing?.raw_data?.MlsNumber ??
+            "N/A",
           realtor: getOfficeName(listing),
           assessedDiff: listing?.assessed_diff || 0,
           isLogin: true,
           isFavourite: true,
           isDdf: true,
-        })).filter((p: any) => Number(p.price) > 0);
-        return { properties };
+        }))
+        .filter((p: any) => Number(p.price) > 0);
+      return { properties };
     },
     enabled: isWishlistPage && isLoggedIn,
   });
@@ -275,18 +304,26 @@ export default function PropertiesListingPage() {
   }, [isWishlistPage, isLoggedIn, refetchWishlist, refetchDdfWishlist]);
 
   const data = isWishlistPage
-    ? [...(wishlistData?.properties || []), ...(ddfWishlistData?.properties || [])]
+    ? [
+        ...(wishlistData?.properties || []),
+        ...(ddfWishlistData?.properties || []),
+      ]
     : queryData?.properties || [];
 
   const listingData = isWishlistPage
-    ? [...(wishlistData?.listings || []), ...(ddfWishlistData?.properties || [])]
+    ? [
+        ...(wishlistData?.listings || []),
+        ...(ddfWishlistData?.properties || []),
+      ]
     : queryData?.listings || [];
 
   const pageCount = isWishlistPage
     ? wishlistData?.pagination?.pageCount || 1
     : queryData?.pagination?.pageCount || 1;
-    
-  const isLoading = isWishlistPage ? (wishlistLoading || ddfWishlistLoading) : loading;
+
+  const isLoading = isWishlistPage
+    ? wishlistLoading || ddfWishlistLoading
+    : loading;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // 🚀 Scroll to top of the container on filter change
@@ -418,7 +455,10 @@ export default function PropertiesListingPage() {
                       <button
                         onClick={() => {
                           clearInstanceFilters("list");
-                          scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                          scrollRef.current?.scrollTo({
+                            top: 0,
+                            behavior: "smooth",
+                          });
                         }}
                         className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
                           activePrice !== "any" ||
@@ -508,7 +548,10 @@ export default function PropertiesListingPage() {
                           status === "sold" || status === "expired"
                             ? [
                                 { label: "All", value: "any" },
-                                { label: "Apartment/Condo", value: "Apartment/Condo" },
+                                {
+                                  label: "Apartment/Condo",
+                                  value: "Apartment/Condo",
+                                },
                                 {
                                   label: "Single Family Residence",
                                   value: "Single Family Residence",
@@ -522,8 +565,14 @@ export default function PropertiesListingPage() {
                               ]
                             : [
                                 { label: "All", value: "any" },
-                                { label: "Single-Family", value: "Single-Family" },
-                                { label: "Multi-Family", value: "Multi-Family" },
+                                {
+                                  label: "Single-Family",
+                                  value: "Single-Family",
+                                },
+                                {
+                                  label: "Multi-Family",
+                                  value: "Multi-Family",
+                                },
                                 { label: "Office", value: "Office" },
                                 { label: "Business", value: "Business" },
                                 { label: "Agriculture", value: "Agriculture" },
@@ -535,7 +584,10 @@ export default function PropertiesListingPage() {
                     <button
                       onClick={() => {
                         clearInstanceFilters("list");
-                        scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                        scrollRef.current?.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
                       }}
                       className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
                         activePrice !== "any" ||

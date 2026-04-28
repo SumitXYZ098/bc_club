@@ -1,12 +1,8 @@
-import MapSearch from '@/src/mainComponents/maps/MapSearch'
-import React from 'react'
+import MapSearch from "@/src/mainComponents/maps/MapSearch";
+import React from "react";
 
 const page = () => {
-  return (
+  return <MapSearch />;
+};
 
-        <MapSearch />
-  
-  )
-}
-
-export default page
+export default page;

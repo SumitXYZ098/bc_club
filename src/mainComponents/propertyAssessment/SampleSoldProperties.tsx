@@ -18,8 +18,7 @@ const SampleSoldProperties = () => {
   const { isLoggedIn } = useAuthContext();
 
   const soldParams: any = {
-    "filters[property_status][$notIn]": ["Rented", "Expired"],
-    "filters[raw_data][BCRES_SoldDate][$notNull]": true,
+    "filters[property_status][$eq]": "Closed",
     "filters[property_sub_type][$notNull]": true,
   };
 
