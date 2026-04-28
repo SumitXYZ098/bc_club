@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
         hostname: "dvvjkgh94f2v6.cloudfront.net",
         pathname: "**",
       },
-        {
+      {
         protocol: "https",
         hostname: "ddfcdn.realtor.ca",
         pathname: "**",
@@ -28,6 +28,16 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "nationwiderealty.ca",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "maps.googleapis.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "propimages.bcassessment.ca",
         pathname: "**",
       },
     ],
