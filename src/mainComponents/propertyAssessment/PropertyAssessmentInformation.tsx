@@ -69,6 +69,12 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
             type={IDescriptionTypes.dec1614}
             content={data?.legal?.[0]?.description}
           />
+            <Description
+            type={IDescriptionTypes.dec18}
+            content={`PID : ${data?.legal?.[0]?.pid}`}
+            customClasses="font-sm"
+          />
+         
         </div>
         <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
           <Description
@@ -78,7 +84,7 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
           />
           <Description
             type={IDescriptionTypes.dec1614}
-            content="No sales hsitory for the last 3 full calendar years"
+            content={data?.salesHistory}
           />
         </div>
         <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
@@ -89,18 +95,18 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
           />
           <div className="w-full flex flex-row flex-nowrap justify-between items-center">
             <Description type={IDescriptionTypes.dec1614} content="Width" />
-            <Description type={IDescriptionTypes.dec1614} content="12 Ft" />
+            <Description type={IDescriptionTypes.dec1614} content={data?.manufacturedHome["width"] || "N/A"} />
           </div>
           <div className="w-full flex flex-row flex-nowrap justify-between items-center">
             <Description type={IDescriptionTypes.dec1614} content="Length" />
-            <Description type={IDescriptionTypes.dec1614} content="44 Ft" />
+            <Description type={IDescriptionTypes.dec1614} content={data?.manufacturedHome["length"] || "N/A"} />
           </div>
           <div className="w-full flex flex-row flex-nowrap justify-between items-center">
             <Description
               type={IDescriptionTypes.dec1614}
               content="Total area"
             />
-            <Description type={IDescriptionTypes.dec1614} content="528 sqFt" />
+            <Description type={IDescriptionTypes.dec1614} content={data?.manufacturedHome["totalArea"] || "N/A"} />
           </div>
         </div>
       </div>
