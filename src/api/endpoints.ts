@@ -16,7 +16,8 @@ export const Endpoints = {
   getActiveListingById: (id: string) => `${BASE_URL}/api/ddf-listings/${id}`,
   addDdfFavorite: (id: string) => `${BASE_URL}/api/ddf-listings/add-favorite/${id}`,
   removeDdfFavorite: (id: string) => `${BASE_URL}/api/ddf-listings/remove-favorite/${id}`,
-  getMyDdfFavorites: `${BASE_URL}/api/ddf-listings/my-favorites`, 
+  getMyDdfFavorites: `${BASE_URL}/api/ddf-listings/my-favorites`,
+
 
   
 };

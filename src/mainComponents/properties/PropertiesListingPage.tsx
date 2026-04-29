@@ -145,7 +145,7 @@ export default function PropertiesListingPage() {
 
   if (location && location !== "") {
     params.location = location;
-  }
+  } 
 
   const select = (res: any) => {
     const listings = res?.data || [];
@@ -155,7 +155,7 @@ export default function PropertiesListingPage() {
 
     let properties: PropertyCardProps[] = listings
       .map((listing: any) => ({
-        id: listing.doucumentId || listing.id?.toString(),
+        id: listing?.documentId  ,
         image:
           typeof listing?.media?.[0] === "string"
             ? listing.media[0]
@@ -167,6 +167,7 @@ export default function PropertiesListingPage() {
         sqft: listing?.area ?? listing?.lot_size_area ?? 0,
         beds: listing?.bedrooms ?? 0,
         baths: listing?.bathrooms ?? 0,
+        likesCount: listing?.likesCount ?? 0,
         priceDrop:
           listing.PreviousListPrice > listing.ListPrice
             ? Number(
@@ -219,6 +220,11 @@ export default function PropertiesListingPage() {
         const dateB = b.daysAgo ? new Date(b.daysAgo).getTime() : 0;
         return dateA - dateB;
       });
+    } else if (activePrice === "popular") {
+     
+      properties.sort(
+        (a, b) => (Number(b.likesCount) || 0) - (Number(a.likesCount) || 0),
+      );
     }
 
     return { properties, listings, pagination };
@@ -261,7 +267,7 @@ export default function PropertiesListingPage() {
       const properties = listings
         .map((listing: any) => ({
           ...listing,
-          id: listing.doucumentId,
+          id: listing.documentId,
           image:
             typeof listing?.media?.[0] === "string"
               ? listing.media[0]
@@ -276,6 +282,7 @@ export default function PropertiesListingPage() {
           sqft: listing?.area ?? listing?.lot_size_area ?? 0,
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
+          likesCount: listing?.likesCount ?? 0,
           mls:
             listing?.mls_number ??
             listing?.listing_id ??
@@ -498,6 +505,7 @@ export default function PropertiesListingPage() {
                           { label: "Oldest First", value: "oldest" },
                           { label: "Low to High", value: "asc" },
                           { label: "High to Low", value: "desc" },
+                          { label: "Popular First", value: "popular" },
                         ]}
                       />
 
@@ -660,15 +668,24 @@ export default function PropertiesListingPage() {
                           className="bg-gray-100 text-sm capitalize"
                         />
                       )}
-                      {filters.location && (
-                        <Chip
-                          label={filters.location}
-                          onDelete={() => {
-                            updateInstanceFilter("list", "location", "");
-                          }}
-                          className="bg-gray-100 text-sm"
-                        />
-                      )}
+                      {filters.location &&
+                        filters.location
+                          .split(",")
+                          .filter(Boolean)
+                          .map((loc: string) => (
+                            <Chip
+                              key={loc}
+                              label={loc}
+                              onDelete={() => {
+                                const remaining = (filters.location || "")
+                                  .split(",")
+                                  .filter((l: string) => l !== loc)
+                                  .join(",");
+                                updateInstanceFilter("list", "location", remaining);
+                              }}
+                              className="bg-gray-100 text-sm"
+                            />
+                          ))}
                     </div>
                   </div>
                 )}

@@ -36,7 +36,7 @@ const swiperConfig = {
     pauseOnMouseEnter: true,
   },
   modules: [Pagination, Navigation, Autoplay],
-  loop: true,
+  loop: false,
   pagination: {
     clickable: true,
     dynamicBullets: true,
@@ -84,6 +84,7 @@ const OurProperty = () => {
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
+    likesCount: listing?.likesCount ?? 0,
     priceDrop:
       listing.PreviousListPrice > listing.ListPrice
         ? Number(
@@ -109,15 +110,19 @@ const OurProperty = () => {
   });
 
   const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
-    {},
+    { location: city },
     {
       select: (res: any) => {
         console.log("📦 API Response:", res);
-        // console.log("🏙️ Current City Filter:", city);
-
+        const nonResidentialTypes = ["office", "business", "agriculture", "vacant land", "industrial", "retail"];
+        
         return (
           res?.data
             ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+            .filter((l: any) => {
+              const type = (l?.property_sub_type || "").toLowerCase();
+              return !nonResidentialTypes.some(nonRes => type.includes(nonRes));
+            })
             .map((l: any) => mapProperty(l, true)) || []
         );
       },
@@ -127,12 +132,21 @@ const OurProperty = () => {
   const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
     {
       "filters[property_status][$eq]": "Closed",
+      location: city,
     },
     {
-      select: (res: any) =>
-        res?.data
-          ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-          .map((l: any) => mapProperty(l, false)) || [],
+      select: (res: any) => {
+        const nonResidentialTypes = ["office", "business", "agriculture", "vacant land", "industrial", "retail"];
+        return (
+          res?.data
+            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+            .filter((l: any) => {
+              const type = (l?.property_sub_type || "").toLowerCase();
+              return !nonResidentialTypes.some(nonRes => type.includes(nonRes));
+            })
+            .map((l: any) => mapProperty(l, false)) || []
+        );
+      },
     },
   );
 
@@ -140,12 +154,21 @@ const OurProperty = () => {
     useGetListings(
       {
         "filters[property_status][$eq]": ["Expired"],
+        location: city,
       },
       {
-        select: (res: any) =>
-          res?.data
-            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-            .map((l: any) => mapProperty(l, false)) || [],
+        select: (res: any) => {
+          const nonResidentialTypes = ["office", "business", "agriculture", "vacant land", "industrial", "retail"];
+          return (
+            res?.data
+              ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+              .filter((l: any) => {
+                const type = (l?.property_sub_type || "").toLowerCase();
+                return !nonResidentialTypes.some(nonRes => type.includes(nonRes));
+              })
+              .map((l: any) => mapProperty(l, false)) || []
+          );
+        },
       },
     );
 
