@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 // import { dummyListings } from "../dummyData";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
@@ -73,11 +73,28 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
   if (!data) return <div>Loading...</div>;
   const classes = useStyles();
   // const address = dummyListings.find((list) => list.id === Number(data));
-  const years = ["2025", "2024", "2023", "2022", "2021", "2020", "2019"];
-  const [val, setVal] = useState(years[0]);
+  const years: string[] = Array.isArray(data?.valueHistory)
+  ? data.valueHistory.map((item: any) => item.year.toString())
+  : [];
+ const [val, setVal] = useState(
+  data?.valueHistory?.[0]?.year?.toString() || ""
+);
+
+useEffect(() => {
+  if (data?.valueHistory?.length) {
+    setVal(data.valueHistory[0].year.toString());
+  }
+}, [data]);
+
   const handleChange = (event: any) => {
     setVal(event.target.value);
   };
+
+  const selectedYearData = data?.valueHistory?.find(
+  (item: any) => item.year.toString() === val
+);
+
+const selectedValue = selectedYearData?.value || data?.totalValue;
   return (
     <div className="flex flex-col w-full">
       <div className="w-full flex justify-between items-center-safe md:py-1">
@@ -116,7 +133,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
               />
               <div className="flex flex-col md:flex-row gap-1.5 md:items-end">
                 <span className="md:text-[32px] md:leading-10 text-2xl text-primary font-bold">
-                  {data?.totalValue}
+                  {selectedValue}
                 </span>
                 <span className="md:text-sm text-xs">{`(2025 assessment as of July 1,2024)`}</span>
               </div>
@@ -175,15 +192,15 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
           <LineGradient />
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Previous Year Value</span>
-            <span className="text-primary">{data?.previousYearValue}</span>
+            <span className="text-primary">{data?.previousTotalValue}</span>
           </div>
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Land</span>
-            <span className="text-primary">{data?.landValue}</span>
+            <span className="text-primary">{data?.previousLandValue}</span>
           </div>
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Buildings</span>
-            <span className="text-primary">{data?.buildingValue}</span>
+            <span className="text-primary">{data?.previousBuildingValue}</span>
           </div>
         </div>
       </div>
