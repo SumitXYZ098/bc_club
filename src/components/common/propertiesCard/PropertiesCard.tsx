@@ -38,6 +38,7 @@ export interface PropertyCardProps {
   isSold?: boolean;
   isFavourite?: boolean;
   isDdf?: boolean;
+  likesCount?: number;
 }
 
 const PropertiesCard: React.FC<PropertyCardProps> = ({
@@ -59,6 +60,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   isFavourite: isFavouriteProp,
   isLogin: isLoginProp,
   isDdf,
+  likesCount
 }) => {
   const pathname = usePathname();
   const { data: me } = useGetMe();
@@ -71,6 +73,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   const removeFromWishlist = isDdf ? ddfRemove : normalRemove;
 
   const [localIsFavourite, setLocalIsFavourite] = React.useState(false);
+  const [localLikesCount, setLocalLikesCount] = React.useState(likesCount || 0);
 
   const isFavourite =
     me?.favorites?.some(
@@ -86,6 +89,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   React.useEffect(() => {
     setLocalIsFavourite(isFavourite);
   }, [isFavourite]);
+
+  React.useEffect(() => {
+    setLocalLikesCount(likesCount || 0);
+  }, [likesCount, id]);
 
   const { setOpenLogin, isLoggedIn } = useAuthContext();
   const isLogin = isLoginProp ?? isLoggedIn;
@@ -104,6 +111,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     }
 
     setLocalIsFavourite(true);
+    setLocalLikesCount((prev) => prev + 1);
     toggleWishlist.mutate(id);
   };
 
@@ -119,9 +127,12 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     }
 
     setLocalIsFavourite(false);
+    setLocalLikesCount((prev) => Math.max(0, prev - 1));
     removeFromWishlist.mutate(id);
   };
-  const displayPrice = isLogin ? `$${Number(price || 0).toLocaleString()}` : "$*,***,***";
+  const displayPrice = isLogin
+    ? `$${Number(price || 0).toLocaleString()}`
+    : "$*,***,***";
   const displayAddress = isLogin ? address : "Sign in to view address";
   const displayTitle = isLogin ? title : "Property Details Restricted";
   const displaySqft = isLogin ? `${sqft} sqft` : "---- sqft";
@@ -132,10 +143,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     ? `Courtesy of: ${realtor}`
     : "Courtesy of: **********";
 
-
   const img = image ? image : Images.apartment;
-
- 
 
   return (
     <Link
@@ -148,7 +156,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
         }`}
       >
         <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-full justify-between">
-          <div className="relative">
+          <div className="relative flex items-center">
             <div className="w-full h-56 overflow-clip rounded-lg">
               {img ? (
                 <Image
@@ -170,16 +178,20 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             {!isExpired && !isSold && (
               <button
                 onClick={
-                  localIsFavourite ? handleRemoveFromWishlist : handleToggleWishlist
+                  localIsFavourite
+                    ? handleRemoveFromWishlist
+                    : handleToggleWishlist
                 }
-                className="absolute top-3 left-3 bg-background p-2 rounded-full shadow z-20 cursor-pointer"
+                className="flex items-center absolute top-3 left-3 bg-background p-2 rounded-[18px] shadow z-20 cursor-pointer gap-0.5"
               >
                 <Heart
                   className="w-5 h-5"
                   color={localIsFavourite ? "var(--red)" : "var(--primary)"}
                   fill={localIsFavourite ? "var(--red)" : "none"}
                 />
-              </button>
+                <span className="text-xs font-bold ml-1 text-black">
+                  {localLikesCount}
+                </span></button>
             )}
 
             {/* Days Ago */}
@@ -188,6 +200,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 {getTime(daysAgo)}
               </span>
             )}
+
+
 
             {/* Price Drop Banner */}
             {priceDrop !== undefined && priceDrop > 0 && (
@@ -331,23 +345,23 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               </div>
             </div>
             <LineGradient />
-         <div className="w-full flex flex-row flex-wrap items-center justify-between gap-2">
-  <div className="min-w-0 flex-1">
-    <Description
-      content={displayRealtor}
-      type={IDescriptionTypes.dec12}
-      customClasses="text-lightWhite truncate"
-    />
-  </div>
+            <div className="w-full flex flex-row flex-wrap items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <Description
+                  content={displayRealtor}
+                  type={IDescriptionTypes.dec12}
+                  customClasses="text-lightWhite truncate"
+                />
+              </div>
 
-  <div className="min-w-0 shrink-0">
-    <Description
-      content={displayMls}
-      type={IDescriptionTypes.dec12}
-      customClasses="text-lightWhite"
-    />
-  </div>
-</div>
+              <div className="min-w-0 shrink-0">
+                <Description
+                  content={displayMls}
+                  type={IDescriptionTypes.dec12}
+                  customClasses="text-lightWhite"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

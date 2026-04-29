@@ -167,6 +167,7 @@ export default function PropertiesListingPage() {
         sqft: listing?.area ?? listing?.lot_size_area ?? 0,
         beds: listing?.bedrooms ?? 0,
         baths: listing?.bathrooms ?? 0,
+        likesCount: listing?.likesCount ?? 0,
         priceDrop:
           listing.PreviousListPrice > listing.ListPrice
             ? Number(
@@ -219,6 +220,11 @@ export default function PropertiesListingPage() {
         const dateB = b.daysAgo ? new Date(b.daysAgo).getTime() : 0;
         return dateA - dateB;
       });
+    } else if (activePrice === "popular") {
+     
+      properties.sort(
+        (a, b) => (Number(b.likesCount) || 0) - (Number(a.likesCount) || 0),
+      );
     }
 
     return { properties, listings, pagination };
@@ -276,6 +282,7 @@ export default function PropertiesListingPage() {
           sqft: listing?.area ?? listing?.lot_size_area ?? 0,
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
+          likesCount: listing?.likesCount ?? 0,
           mls:
             listing?.mls_number ??
             listing?.listing_id ??
@@ -498,6 +505,7 @@ export default function PropertiesListingPage() {
                           { label: "Oldest First", value: "oldest" },
                           { label: "Low to High", value: "asc" },
                           { label: "High to Low", value: "desc" },
+                          { label: "Popular First", value: "popular" },
                         ]}
                       />
 
