@@ -98,7 +98,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
     if (toggleWishlist.isPending) return;
 
-    if (!isLogin) {
+    if (!isLoggedIn) {
       setOpenLogin(true);
       return;
     }
@@ -112,6 +112,11 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     e.stopPropagation();
 
     if (removeFromWishlist.isPending) return;
+
+    if (!isLoggedIn) {
+      setOpenLogin(true);
+      return;
+    }
 
     setLocalIsFavourite(false);
     removeFromWishlist.mutate(id);
@@ -162,7 +167,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             </div>
 
             {/* Favorite Icon */}
-            {!isExpired && !isSold && isLoggedIn && (
+            {!isExpired && !isSold && (
               <button
                 onClick={
                   localIsFavourite ? handleRemoveFromWishlist : handleToggleWishlist

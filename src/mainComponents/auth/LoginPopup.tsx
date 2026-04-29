@@ -163,7 +163,7 @@ const LoginPopup = ({
             onClick={onOpenForgot}
             className="text-[#22558B] text-sm hover:underline"
           >
-            Forget password
+            Forgot password
           </button>
         </div>
 

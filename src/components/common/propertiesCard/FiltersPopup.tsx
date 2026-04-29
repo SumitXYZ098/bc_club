@@ -141,10 +141,20 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
       : null,
   );
   const [status, setStatus] = useState<string>(filters.status ?? "");
-  const [location, setLocation] = useState<string>(filters.location ?? "");
+  const [selectedLocations, setSelectedLocations] = useState<string[]>(
+    filters.location ? filters.location.split(",").filter(Boolean) : []
+  );
   
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
   const [expandedCityGroup, setExpandedCityGroup] = useState<'all' | 'popular' | null>('popular');
+
+  const handleToggleLocation = (city: string) => {
+    if (selectedLocations.includes(city)) {
+      setSelectedLocations(selectedLocations.filter((c) => c !== city));
+    } else {
+      setSelectedLocations([...selectedLocations, city]);
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -162,7 +172,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
           : null,
       );
       setStatus(currentFilters.status ?? "");
-      setLocation(currentFilters.location ?? "");
+      setSelectedLocations(currentFilters.location ? currentFilters.location.split(",").filter(Boolean) : []);
     }
   }, [open, id, getInstanceFilters]);
 
@@ -173,7 +183,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
     setBedrooms(null);
     setBathrooms(null);
     setStatus("");
-    setLocation("");
+    setSelectedLocations([]);
     onClose();
   };
 
@@ -191,7 +201,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
       bathrooms ? (bathrooms >= 4 ? "4+" : bathrooms.toString()) : "any",
     );
     updateInstanceFilter(id, "status", status);
-    updateInstanceFilter(id, "location", location);
+    updateInstanceFilter(id, "location", selectedLocations.join(","));
     onClose();
   };
 
@@ -255,10 +265,10 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
           <div className="relative w-full">
             <div
               onClick={() => setLocationDropdownOpen(!locationDropdownOpen)}
-              className="w-full border border-[#33333333] rounded-xl px-3 py-2 cursor-pointer text-sm flex justify-between items-center bg-white"
+              className="w-full border border-[#33333333] rounded-xl px-3 py-3 cursor-pointer text-sm flex justify-between items-center bg-white"
             >
-              <span className={location ? "text-black" : "text-gray-500"}>
-                {location || "All Locations"}
+              <span className={selectedLocations.length > 0 ? "text-black" : "text-gray-500"}>
+                {selectedLocations.length > 0 ? selectedLocations.join(", ") : "All Locations"}
               </span>
               <span className="text-gray-400">
                 {locationDropdownOpen ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
@@ -292,15 +302,18 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                       {POPULAR_CITIES.map((city) => (
                         <div
                           key={`pop-${city}`}
-                          className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 ${
-                            location === city ? "bg-gray-100 font-medium" : ""
+                          className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center gap-3 ${
+                            selectedLocations.includes(city) ? "bg-gray-100 font-medium" : ""
                           }`}
-                          onClick={() => {
-                            setLocation(city);
-                            setLocationDropdownOpen(false);
-                          }}
+                          onClick={() => handleToggleLocation(city)}
                         >
-                          {city}
+                          <input
+                            type="checkbox"
+                            checked={selectedLocations.includes(city)}
+                            onChange={() => {}}
+                            className="cursor-pointer rounded border-gray-300 text-primary focus:ring-primary checkbox checkbox-sm checkbox-"
+                          />
+                          <span>{city}</span>
                         </div>
                       ))}
                     </div>
@@ -321,27 +334,21 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                   </div>
                   {expandedCityGroup === "all" && (
                     <div className="py-1 flex flex-col">
-                      {/* <div
-                        className="px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 text-gray-500"
-                        onClick={() => {
-                          setLocation("");
-                          setLocationDropdownOpen(false);
-                        }}
-                      >
-                        All Locations
-                      </div> */}
                       {ALL_CITIES.map((city) => (
                         <div
                           key={`all-${city}`}
-                          className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 ${
-                            location === city ? "bg-gray-100 font-medium" : ""
+                          className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center gap-3 ${
+                            selectedLocations.includes(city) ? "bg-gray-100 font-medium" : ""
                           }`}
-                          onClick={() => {
-                            setLocation(city);
-                            setLocationDropdownOpen(false);
-                          }}
+                          onClick={() => handleToggleLocation(city)}
                         >
-                          {city}
+                          <input
+                            type="checkbox"
+                            checked={selectedLocations.includes(city)}
+                            onChange={() => {}}
+                            className="cursor-pointer rounded border-gray-300 text-primary focus:ring-primary checkbox checkbox-sm checkbox"
+                          />
+                          <span>{city}</span>
                         </div>
                       ))}
                     </div>

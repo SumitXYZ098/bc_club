@@ -145,7 +145,7 @@ export default function PropertiesListingPage() {
 
   if (location && location !== "") {
     params.location = location;
-  }
+  } 
 
   const select = (res: any) => {
     const listings = res?.data || [];
@@ -660,15 +660,24 @@ export default function PropertiesListingPage() {
                           className="bg-gray-100 text-sm capitalize"
                         />
                       )}
-                      {filters.location && (
-                        <Chip
-                          label={filters.location}
-                          onDelete={() => {
-                            updateInstanceFilter("list", "location", "");
-                          }}
-                          className="bg-gray-100 text-sm"
-                        />
-                      )}
+                      {filters.location &&
+                        filters.location
+                          .split(",")
+                          .filter(Boolean)
+                          .map((loc: string) => (
+                            <Chip
+                              key={loc}
+                              label={loc}
+                              onDelete={() => {
+                                const remaining = (filters.location || "")
+                                  .split(",")
+                                  .filter((l: string) => l !== loc)
+                                  .join(",");
+                                updateInstanceFilter("list", "location", remaining);
+                              }}
+                              className="bg-gray-100 text-sm"
+                            />
+                          ))}
                     </div>
                   </div>
                 )}
