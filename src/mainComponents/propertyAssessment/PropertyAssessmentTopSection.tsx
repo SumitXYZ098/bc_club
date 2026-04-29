@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
-import { dummyListings } from "../dummyData";
+// import { dummyListings } from "../dummyData";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
@@ -70,8 +70,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
+  if (!data) return <div>Loading...</div>;
   const classes = useStyles();
-  const address = dummyListings.find((list) => list.id === Number(data));
+  // const address = dummyListings.find((list) => list.id === Number(data));
   const years = ["2025", "2024", "2023", "2022", "2021", "2020", "2019"];
   const [val, setVal] = useState(years[0]);
   const handleChange = (event: any) => {
@@ -84,11 +85,11 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
           <Heading
             tagType="h1"
             type={IHeadingTypes.heading24}
-            content={address?.address}
+            content={data?.address}
           />
           <Description
             type={IDescriptionTypes.dec1614}
-            content="Area-Jurisdiction-Roll: 22-205-00991.000"
+            content={data?.roll}
           />
         </div>
         <div className="md:flex gap-x-2.5 hidden">
@@ -98,8 +99,8 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
         </div>
       </div>
       <Image
-        alt={address?.address || "property image"}
-        src={Images.assessment}
+        alt={data?.address || "property image"}
+        src={data?.image }
         width={1020}
         height={400}
         className="w-full xl:h-134 md:h-81 h-50.5 object-cover md:rounded-3xl rounded-2xl xl:mt-4 md:mb-8 mt-6 mb-4"
@@ -115,7 +116,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
               />
               <div className="flex flex-col md:flex-row gap-1.5 md:items-end">
                 <span className="md:text-[32px] md:leading-10 text-2xl text-primary font-bold">
-                  $327,000
+                  {data?.totalValue}
                 </span>
                 <span className="md:text-sm text-xs">{`(2025 assessment as of July 1,2024)`}</span>
               </div>
@@ -165,24 +166,24 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
         <div className="xl:w-[43%] w-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 rounded-2xl flex flex-col gap-y-4">
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Land</span>
-            <span className="text-primary">$103,000</span>
+            <span className="text-primary">{data?.landValue}</span>
           </div>
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Buildings</span>
-            <span className="text-primary">$224,000</span>
+            <span className="text-primary">{data?.buildingValue}</span>
           </div>
           <LineGradient />
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Previous Year Value</span>
-            <span className="text-primary">$287,100</span>
+            <span className="text-primary">{data?.previousYearValue}</span>
           </div>
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Land</span>
-            <span className="text-primary">$89,100</span>
+            <span className="text-primary">{data?.landValue}</span>
           </div>
           <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
             <span>Buildings</span>
-            <span className="text-primary">$198,000</span>
+            <span className="text-primary">{data?.buildingValue}</span>
           </div>
         </div>
       </div>

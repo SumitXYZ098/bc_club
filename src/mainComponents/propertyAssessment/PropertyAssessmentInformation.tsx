@@ -3,9 +3,31 @@ import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
 import React from "react";
-import { propertyDetails } from "../dummyData";
 
-const PropertyAssessmentInformation = () => {
+interface Props {
+  data: any;
+}
+
+const PropertyAssessmentInformation = ({ data }: Props) => {
+  if (!data) return <div>Loading...</div>;
+  
+   const propertyDetails = {
+  land: { label: "Land", value: data?.landValue||"N/A"},
+  description: { label: "Description", value: data?.propertyInfo["Description"] || "N/A" },
+  bedrooms: { label: "Bedrooms", value: data?.propertyInfo["Bedrooms"] || "N/A" },
+  baths: { label: "Baths", value: data?.propertyInfo["Baths"] || "N/A" },
+  carports: { label: "Carports", value: data?.propertyInfo["Carports"] || "N/A" },
+  garages: { label: "Garages", value: data?.propertyInfo["Garages"] || "N/A" },
+  landSize: { label: "Land Size", value: data?.propertyInfo["Land size"] || "N/A"  },
+  firstFloorArea: { label: "First Floor Area", value: data?.propertyInfo["First floor area"] || "N/A" },
+  secondFloorArea: { label: "Second Floor Area", value: data?.propertyInfo["Second floor area"] || "N/A" },
+  basementFinishArea: { label: "Basement Finish Area", value: data?.propertyInfo["Basement finish area"] || "N/A" },
+  buildingStoreys: { label: "Building Storeys", value: data?.propertyInfo["Building storeys"] || "N/A" },
+  grossLeasableArea: { label: "Gross Leasable Area", value: data?.propertyInfo["Gross leasable area"] || "N/A" },
+  netLeasableArea: { label: "Net Leasable Area", value: data?.propertyInfo["Net leasable area"] || "N/A" },
+  numberOfApartmentUnits: { label: "No. of Apartment Units", value: data?.propertyInfo["No. of apartment units"] || "N/A" },
+};
+
   return (
     <div className="flex xl:flex-row xl:flex-nowrap flex-col gap-x-6 md:gap-y-5 gap-y-6 justify-between bg-gray md:p-6 p-4 rounded-xl w-full min-h-4 h-full">
       {/* Property Information */}
@@ -21,7 +43,7 @@ const PropertyAssessmentInformation = () => {
                 />
                 <Description
                   type={IDescriptionTypes.dec1614}
-                  content={`$${item.value.toLocaleString()}`}
+                  content={`${item.value.toLocaleString()}`}
                   customClasses="text-primary"
                 />
               </div>
@@ -45,7 +67,7 @@ const PropertyAssessmentInformation = () => {
           />
           <Description
             type={IDescriptionTypes.dec1614}
-            content="LOT B, PLAN NEP4210, DISTRICT LOT 4596, KOOTENAY LAND DISTRICT, MANUFACTRED HOME REG.# 190009"
+            content={data?.legal?.[0]?.description}
           />
         </div>
         <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
