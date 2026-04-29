@@ -155,7 +155,7 @@ export default function PropertiesListingPage() {
 
     let properties: PropertyCardProps[] = listings
       .map((listing: any) => ({
-        id: listing.doucumentId || listing.id?.toString(),
+        id: listing?.documentId  ,
         image:
           typeof listing?.media?.[0] === "string"
             ? listing.media[0]
@@ -261,7 +261,7 @@ export default function PropertiesListingPage() {
       const properties = listings
         .map((listing: any) => ({
           ...listing,
-          id: listing.doucumentId,
+          id: listing.documentId,
           image:
             typeof listing?.media?.[0] === "string"
               ? listing.media[0]
