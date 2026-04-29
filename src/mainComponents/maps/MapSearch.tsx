@@ -309,17 +309,6 @@ export default function MapSearch() {
     params.propertyType = status;
     delete params["filters[property_status][$eq]"];
     delete params["filters[property_sub_type][$notNull]"];
-
-    // if (status === "sold") {
-    //   params["filters[property_status][$eq]"] = "Closed";
-    //   params["filters[property_sub_type][$notNull]"] = true;
-    // } else if (status === "expired") {
-    //   params["filters[property_status][$eq]"] = "Expired";
-    //   params["filters[property_sub_type][$notNull]"] = true;
-    // } else if (status === "forSale") {
-    //   params["filters[property_status][$eq]"] = "Active";
-    //   params["filters[property_sub_type][$notNull]"] = true;
-    // }
   }
 
   if (location && location !== "" && location !== "British Columbia")

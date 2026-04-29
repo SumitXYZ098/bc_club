@@ -102,8 +102,10 @@ body::-webkit-scrollbar {
 }
 
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE/Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 [class*="raphael-group-"][class*="-background"] rect {
@@ -117,14 +119,17 @@ body::-webkit-scrollbar {
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE & Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE & Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -135,6 +140,7 @@ body::-webkit-scrollbar {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -150,23 +156,23 @@ body::-webkit-scrollbar {
 }
 
 .filter-secondary {
-  filter: invert(71%) sepia(85%) saturate(3025%) hue-rotate(6deg) brightness(101%)
-    contrast(101%);
+  filter: invert(71%) sepia(85%) saturate(3025%) hue-rotate(6deg) brightness(101%) contrast(101%);
 }
 
 .price-marker {
   background: #fff;
-    padding: 6px 12px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    color: #222;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-    border: 1px solid #e5e5e5;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #222;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  border: 1px solid #e5e5e5;
 }
 
-.price-marker, .price-marker-carrot {
+.price-marker,
+.price-marker-carrot {
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out !important;
 }
 
@@ -184,7 +190,7 @@ body::-webkit-scrollbar {
 .mapboxgl-popup-content {
   padding: 10px !important;
   overflow: hidden;
-  border-radius: 12px !important ;
+  border-radius: 12px !important;
 
   .property-card {
     width: 100%;
@@ -221,6 +227,7 @@ body::-webkit-scrollbar {
     margin: 2px 0;
     color: var(--black70);
   }
+
   .property-content .combine {
     margin: 2px 0;
     font-size: 12px;
@@ -236,6 +243,7 @@ body::-webkit-scrollbar {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
