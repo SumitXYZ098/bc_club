@@ -84,6 +84,7 @@ const OurProperty = () => {
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
+    likesCount: listing?.likesCount ?? 0,
     priceDrop:
       listing.PreviousListPrice > listing.ListPrice
         ? Number(
