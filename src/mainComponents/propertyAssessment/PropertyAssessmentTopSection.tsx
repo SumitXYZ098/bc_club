@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState } from "react";
-// import { dummyListings } from "../dummyData";
+import React, { useState,useEffect } from "react";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
@@ -70,14 +69,65 @@ const useStyles = makeStyles(() => ({
 }));
 
 const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
-  if (!data) return <div>Loading...</div>;
+
+  if (!data) {
+  return (
+    <div className="w-full flex flex-col xl:flex-row gap-6 mt-6 animate-pulse">
+
+      
+      <div className="xl:w-[56%] w-full">
+        <div className="w-full xl:h-134 md:h-81 h-50.5 bg-gray-200 rounded-3xl" />
+      </div>
+
+      <div className="xl:w-[43%] w-full p-6 rounded-2xl bg-white shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex flex-col gap-y-5">
+
+        <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-2">
+            <div className="h-4 w-24 bg-gray-200 rounded" />
+            <div className="h-8 w-40 bg-gray-200 rounded" />
+          </div>
+          <div className="h-10 w-24 bg-gray-200 rounded-full" />
+        </div>
+
+        <div className="h-[1px] w-full bg-gray-200" />
+
+        {[1, 2, 3, 4, 5].map((_, i) => (
+          <div key={i} className="flex justify-between">
+            <div className="h-4 w-24 bg-gray-200 rounded" />
+            <div className="h-4 w-20 bg-gray-200 rounded" />
+          </div>
+        ))}
+
+      </div>
+    </div>
+  );
+}
+  
   const classes = useStyles();
-  // const address = dummyListings.find((list) => list.id === Number(data));
-  const years = ["2025", "2024", "2023", "2022", "2021", "2020", "2019"];
-  const [val, setVal] = useState(years[0]);
+  
+  const years: string[] = Array.isArray(data?.valueHistory)
+  ? data.valueHistory.map((item: any) => item.year.toString())
+  : [];
+ const [val, setVal] = useState(
+  data?.valueHistory?.[0]?.year?.toString() || ""
+);
+
+useEffect(() => {
+  if (data?.valueHistory?.length) {
+    setVal(data.valueHistory[0].year.toString());
+  }
+}, [data]);
+
   const handleChange = (event: any) => {
     setVal(event.target.value);
   };
+
+  const selectedYearData = data?.valueHistory?.find(
+  (item: any) => item.year.toString() === val
+);
+
+const selectedValue = selectedYearData?.value || data?.totalValue;
+
   return (
     <div className="flex flex-col w-full">
       <div className="w-full flex justify-between items-center-safe md:py-1">
@@ -98,95 +148,110 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
           <DocumentPrintFilled className="text-primary bg-primary/10 w-10.5 h-10.5 p-2.25 rounded-lg" />
         </div>
       </div>
-      <Image
-        alt={data?.address || "property image"}
-        src={data?.image }
-        width={1020}
-        height={400}
-        className="w-full xl:h-134 md:h-81 h-50.5 object-cover md:rounded-3xl rounded-2xl xl:mt-4 md:mb-8 mt-6 mb-4"
-      />
-      <div className="flex w-full flex-row flex-wrap items-start justify-between gap-y-5">
-        <div className="xl:w-[56%] w-full flex flex-col gap-y-4">
-          <div className="flex items-center justify-between flex-nowrap w-full">
-            <div className="flex flex-col gap-y-1.5">
-              <Description
-                type={IDescriptionTypes.dec16}
-                content="Total Value"
-                customClasses=""
-              />
-              <div className="flex flex-col md:flex-row gap-1.5 md:items-end">
-                <span className="md:text-[32px] md:leading-10 text-2xl text-primary font-bold">
-                  {data?.totalValue}
-                </span>
-                <span className="md:text-sm text-xs">{`(2025 assessment as of July 1,2024)`}</span>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span>Year</span>
-              <FormControl className={classes.formControl}>
-                <Select
-                  value={val}
-                  onChange={handleChange}
-                  IconComponent={ExpandMoreRounded}
-                  MenuProps={{
-                    classes: {
-                      list: classes.list,
-                      paper: classes.paper,
-                    },
-                    anchorOrigin: {
-                      vertical: "bottom",
-                      horizontal: "center",
-                    },
-                    transformOrigin: {
-                      vertical: "top",
-                      horizontal: "center",
-                    },
-                  }}
-                  classes={{
-                    select: classes.select,
-                    icon: classes.selectIcon,
-                  }}
-                >
-                  {years.map((year, idx) => (
-                    <MenuItem key={idx} value={year}>
-                      {year}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
-          </div>
 
-          <Description
-            type={IDescriptionTypes.dec16}
-            customClasses="text-black70 opacity-80"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc placerat odio enim, eu pellentesque libero tempus ac. Praesent tempor, tellus sed ullamcorper interdum, orci metus luctus enim, in laoreet ipsum ipsum ac eros. Pellentesque a risus sapien. Morbi nisi justo, semper auctor auctor eu, pharetra non velit. Quisque eu tincidunt dolor. Phasellus tempor, lorem ut pharetra porttitor, est augue convallis tortor, a pellentesque sem leo aliquam tellus. In at sapien id dolor iaculis scelerisque nec nec felis."
-          />
-        </div>
-        <div className="xl:w-[43%] w-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 rounded-2xl flex flex-col gap-y-4">
-          <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
-            <span>Land</span>
-            <span className="text-primary">{data?.landValue}</span>
-          </div>
-          <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
-            <span>Buildings</span>
-            <span className="text-primary">{data?.buildingValue}</span>
-          </div>
-          <LineGradient />
-          <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
-            <span>Previous Year Value</span>
-            <span className="text-primary">{data?.previousYearValue}</span>
-          </div>
-          <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
-            <span>Land</span>
-            <span className="text-primary">{data?.landValue}</span>
-          </div>
-          <div className="w-full flex justify-between items-start md:text-lg text-base font-medium">
-            <span>Buildings</span>
-            <span className="text-primary">{data?.buildingValue}</span>
-          </div>
+      <div className="w-full flex flex-col xl:flex-row gap-6 mt-6">
+
+  {/* ================= LEFT - IMAGE ================= */}
+  <div className="xl:w-[56%] w-full">
+    <Image
+      alt={data?.address || "property image"}
+      src={data?.image}
+      width={1020}
+      height={400}
+      className="w-full xl:h-134 md:h-81 h-50.5 object-cover md:rounded-3xl rounded-2xl"
+    />
+  </div>
+
+  {/* ================= RIGHT ================= */}
+  <div className="xl:w-[43%] w-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 rounded-2xl flex flex-col gap-y-5">
+
+    <div className="flex items-center justify-between w-full">
+
+      {/* TOTAL VALUE */}
+      <div className="flex flex-col gap-y-1.5">
+        <Description
+          type={IDescriptionTypes.dec16}
+          content="Total Value"
+        />
+
+        <div className="flex flex-col md:flex-row gap-1.5 md:items-end">
+          <span className="md:text-[32px] md:leading-10 text-2xl text-primary font-bold">
+            {selectedValue}
+          </span>
         </div>
       </div>
+
+      {/* YEAR */}
+      <div className="flex flex-col">
+        <span>Year</span>
+
+        <FormControl className={classes.formControl}>
+          <Select
+            value={val}
+            onChange={handleChange}
+            IconComponent={ExpandMoreRounded}
+            MenuProps={{
+              classes: {
+                list: classes.list,
+                paper: classes.paper,
+              },
+              anchorOrigin: {
+                vertical: "bottom",
+                horizontal: "center",
+              },
+              transformOrigin: {
+                vertical: "top",
+                horizontal: "center",
+              },
+            }}
+            classes={{
+              select: classes.select,
+              icon: classes.selectIcon,
+            }}
+          >
+            {years.map((year, idx) => (
+              <MenuItem key={idx} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+    </div>
+
+    {/* CURRENT VALUES */}
+    <div className="w-full flex justify-between md:text-lg text-base font-medium">
+      <span>Land</span>
+      <span className="text-primary">{data?.landValue}</span>
+    </div>
+
+    <div className="w-full flex justify-between md:text-lg text-base font-medium">
+      <span>Buildings</span>
+      <span className="text-primary">{data?.buildingValue}</span>
+    </div>
+
+    <LineGradient />
+
+    {/* PREVIOUS VALUES */}
+    <div className="w-full flex justify-between md:text-lg text-base font-medium">
+      <span>Previous Year Value</span>
+      <span className="text-primary">{data?.previousTotalValue}</span>
+    </div>
+
+    <div className="w-full flex justify-between md:text-lg text-base font-medium">
+      <span>Land</span>
+      <span className="text-primary">{data?.previousLandValue}</span>
+    </div>
+
+    <div className="w-full flex justify-between md:text-lg text-base font-medium">
+      <span>Buildings</span>
+      <span className="text-primary">{data?.previousBuildingValue}</span>
+    </div>
+
+  </div>
+
+</div>
+   
     </div>
   );
 };

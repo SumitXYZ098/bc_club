@@ -9,7 +9,43 @@ interface Props {
 }
 
 const PropertyAssessmentInformation = ({ data }: Props) => {
-  if (!data) return <div>Loading...</div>;
+  
+  if (!data) {
+  return (
+    <div className="flex xl:flex-row xl:flex-nowrap flex-col gap-x-6 md:gap-y-5 gap-y-6 justify-between bg-gray md:p-6 p-4 rounded-xl w-full animate-pulse">
+
+      <div className="xl:w-3/5 w-full flex flex-col md:gap-y-6 gap-y-4">
+        <div className="h-6 w-48 bg-gray-200 rounded" />
+
+        <div className="flex flex-col gap-y-4 w-full">
+          {[1,2,3,4,5,6,7].map((_, i) => (
+            <div key={i}>
+              <div className="flex justify-between">
+                <div className="h-4 w-32 bg-gray-200 rounded" />
+                <div className="h-4 w-24 bg-gray-200 rounded" />
+              </div>
+              <div className="h-[1px] bg-gray-200 mt-2" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="hidden xl:block w-[1px] bg-gray-200" />
+
+      <div className="xl:w-[40%] w-full flex flex-col gap-y-6">
+
+        {[1,2,3].map((_, i) => (
+          <div key={i} className="bg-white p-6 rounded-xl flex flex-col gap-y-4">
+            <div className="h-5 w-48 bg-gray-200 rounded" />
+            <div className="h-4 w-full bg-gray-200 rounded" />
+            <div className="h-4 w-32 bg-gray-200 rounded" />
+          </div>
+        ))}
+
+      </div>
+    </div>
+  );
+}
   
    const propertyDetails = {
   land: { label: "Land", value: data?.landValue||"N/A"},
@@ -69,6 +105,12 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
             type={IDescriptionTypes.dec1614}
             content={data?.legal?.[0]?.description}
           />
+            <Description
+            type={IDescriptionTypes.dec18}
+            content={`PID : ${data?.legal?.[0]?.pid}`}
+            customClasses="font-sm"
+          />
+         
         </div>
         <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
           <Description
@@ -78,7 +120,7 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
           />
           <Description
             type={IDescriptionTypes.dec1614}
-            content="No sales hsitory for the last 3 full calendar years"
+            content={data?.salesHistory}
           />
         </div>
         <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
@@ -89,18 +131,18 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
           />
           <div className="w-full flex flex-row flex-nowrap justify-between items-center">
             <Description type={IDescriptionTypes.dec1614} content="Width" />
-            <Description type={IDescriptionTypes.dec1614} content="12 Ft" />
+            <Description type={IDescriptionTypes.dec1614} content={data?.manufacturedHome?.width || "N/A"} />
           </div>
           <div className="w-full flex flex-row flex-nowrap justify-between items-center">
             <Description type={IDescriptionTypes.dec1614} content="Length" />
-            <Description type={IDescriptionTypes.dec1614} content="44 Ft" />
+            <Description type={IDescriptionTypes.dec1614} content={data?.manufacturedHome?.length || "N/A"} />
           </div>
           <div className="w-full flex flex-row flex-nowrap justify-between items-center">
             <Description
               type={IDescriptionTypes.dec1614}
               content="Total area"
             />
-            <Description type={IDescriptionTypes.dec1614} content="528 sqFt" />
+            <Description type={IDescriptionTypes.dec1614} content={data?.manufacturedHome?.totalArea || "N/A"} />
           </div>
         </div>
       </div>
