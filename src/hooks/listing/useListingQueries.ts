@@ -234,11 +234,7 @@ export function useRemoveFromWishlist() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: listingKeys.wishlist() });
     },
-    onSuccess: (resp) => {
-      if (resp) {
-        toast.success(resp.message || "Removed from wishlist");
-      }
-    },
+    onSuccess: () => {},
   });
 }
 
@@ -290,11 +286,7 @@ export function useToggleDdfWishlist() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [...listingKeys.wishlist(), "ddf"] });
     },
-    onSuccess: (resp) => {
-      if (resp) {
-        toast.success("Added to favorites");
-      }
-    },
+    onSuccess: () => {},
   });
 }
 
@@ -336,10 +328,6 @@ export function useRemoveDdfWishlist() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [...listingKeys.wishlist(), "ddf"] });
     },
-    onSuccess: (resp) => {
-      if (resp) {
-        toast.success("Removed from favorites");
-      }
-    },
+    onSuccess: () => {},
   });
 }
