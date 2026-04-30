@@ -45,6 +45,8 @@ const options = {
   streetViewControl: false,
   mapTypeControl: false,
   fullscreenControl: false,
+  minZoom: 6,
+  maxZoom: 20,
 };
 
 export default function GoogleMapSearch() {
@@ -63,6 +65,13 @@ export default function GoogleMapSearch() {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const superclusterRef = useRef<Supercluster | null>(null);
   const { data: me } = useGetMe();
+  const idleTimeout = useRef<any>(null);
+  const hasInitialized = useRef(false);
+  const [showSearchButton, setShowSearchButton] = useState(false);
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
+    null,
+  );
+  const lastFetchedBounds = useRef<string>("");
 
   const [mapBounds, setMapBounds] = useState<{
     north: number;
@@ -243,7 +252,7 @@ export default function GoogleMapSearch() {
       p.south = mapBounds.south;
       p.east = mapBounds.east;
       p.west = mapBounds.west;
-      // if (mapZoomVal !== null) p.zoom = mapZoomVal;
+      if (mapZoomVal !== null) p.zoom = mapZoomVal;
     }
     return p;
   }, [
@@ -309,6 +318,24 @@ export default function GoogleMapSearch() {
             (user: any) => user.documentId === me?.documentId,
           ),
           isDdf: false,
+          priceDrop:
+            listing.PreviousListPrice &&
+            listing.PreviousListPrice > listing.ListPrice
+              ? Number(
+                  (
+                    (listing.PreviousListPrice - listing.ListPrice) /
+                    listing.ListPrice
+                  ).toFixed(1),
+                )
+              : undefined,
+          assessedDiff: listing.ListPrice
+            ? Number(
+                (
+                  (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                  listing.ListPrice
+                ).toFixed(1),
+              )
+            : 0,
         }))
         .filter(
           (l: any) =>
@@ -328,7 +355,7 @@ export default function GoogleMapSearch() {
     select: (res: any) =>
       (res?.data || [])
         .map((listing: any) => ({
-          id: listing.doucumentId,
+          id: listing.documentId,
           image:
             typeof listing?.media_url === "string"
               ? listing.media_url
@@ -351,6 +378,24 @@ export default function GoogleMapSearch() {
           ),
           likesCount: listing?.likesCount,
           isDdf: true,
+          priceDrop:
+            listing.PreviousListPrice &&
+            listing.PreviousListPrice > listing.ListPrice
+              ? Number(
+                  (
+                    (listing.PreviousListPrice - listing.ListPrice) /
+                    listing.ListPrice
+                  ).toFixed(1),
+                )
+              : undefined,
+          assessedDiff: listing.ListPrice
+            ? Number(
+                (
+                  (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+                  listing.ListPrice
+                ).toFixed(1),
+              )
+            : 0,
         }))
         .filter(
           (l: any) =>
@@ -359,7 +404,7 @@ export default function GoogleMapSearch() {
             l.longitude !== 0 &&
             Number(l.price) > 0,
         ),
-    enabled: isForSale && !!mapBounds,
+    enabled: isForSale && !!mapBounds, // 🔥 KEY FIX
     staleTime: 1000 * 60 * 5,
   });
 
@@ -367,7 +412,7 @@ export default function GoogleMapSearch() {
   const isFetching = isForSale ? isFetchingActive : isFetchingNormal;
   const isLoadingData = isForSale ? isLoadingActive : isLoadingNormal;
 
-  const isLoading = isLoadingData || isFetching || isMoving;
+  const isLoading = isLoadingData || isFetching;
 
   const properties = useMemo(() => queryData || [], [queryData]);
 
@@ -376,50 +421,64 @@ export default function GoogleMapSearch() {
     setMapLoaded(true);
   }, []);
 
+  const triggerSearch = useCallback(() => {
+    if (!map) return;
+    const bounds = map.getBounds();
+    if (!bounds) return;
+
+    const zoom = map.getZoom() || 8;
+    if (zoom < 8) return;
+
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+
+    const newBounds = {
+      north: ne.lat(),
+      south: sw.lat(),
+      east: ne.lng(),
+      west: sw.lng(),
+      zoom,
+    };
+
+    const boundsKey = JSON.stringify(newBounds);
+    if (lastFetchedBounds.current === boundsKey) return;
+
+    setMapBounds(newBounds);
+    setMapZoomVal(Math.round(zoom));
+    lastFetchedBounds.current = boundsKey;
+    setShowSearchButton(false);
+  }, [map]);
+
   const onMapIdle = useCallback(() => {
     setIsMoving(false);
     if (!map) return;
-    const bounds = map.getBounds();
-    if (bounds) {
-      const ne = bounds.getNorthEast();
-      const sw = bounds.getSouthWest();
-      const newBounds = {
-        north: ne.lat(),
-        south: sw.lat(),
-        east: ne.lng(),
-        west: sw.lng(),
-        zoom: map.getZoom() || 6,
-      };
-
-      setMapBounds((prev) => {
-        if (
-          prev &&
-          prev.north === newBounds.north &&
-          prev.south === newBounds.south &&
-          prev.east === newBounds.east &&
-          prev.west === newBounds.west &&
-          prev.zoom === newBounds.zoom
-        ) {
-          return prev;
-        }
-        return newBounds;
-      });
-      const newZoom = Math.round(map.getZoom() || 6);
-      setMapZoomVal((prev) => (prev === newZoom ? prev : newZoom));
-    }
-  }, [map]);
-
-  useEffect(() => {
-    if (!map || !mapLoaded) return;
     const zoom = map.getZoom() || 6;
-    if (zoom >= 17 && !isSatellite) {
-      map.setMapTypeId("satellite");
-      setIsSatellite(true);
-    } else if (zoom < 17 && isSatellite) {
-      map.setMapTypeId("roadmap");
-      setIsSatellite(false);
+
+    // 🚫 STOP API CALL if zoom is too low
+    if (zoom < 8) {
+      return;
     }
-  }, [map, mapLoaded, isSatellite]);
+
+    // ⛔ Skip first unwanted trigger (important)
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      const bounds = map.getBounds();
+      if (bounds) {
+        triggerSearch();
+      }
+      return;
+    }
+
+    if (idleTimeout.current) {
+      clearTimeout(idleTimeout.current);
+    }
+
+    idleTimeout.current = setTimeout(() => {
+      // Instead of auto-fetching, we can check if we want auto-fetch or manual
+      // For now, let's keep auto-fetch but with a longer debounce and show button if it's a significant move
+      triggerSearch();
+    }, 400); // ⏱ debounce increased to 400ms
+  }, [map, triggerSearch]);
 
   const toggleMapStyle = () => {
     if (!map) return;
@@ -482,136 +541,63 @@ export default function GoogleMapSearch() {
     }
   }, [properties, mapLoaded, map, fitBoundsDone]);
 
-  // // Supercluster logic for Google Maps
-  // useEffect(() => {
-  //   if (!properties || properties.length === 0) {
-  //     setClusters((prev) => (prev.length === 0 ? prev : []));
-  //     setVisibleProperties((prev) => (prev.length === 0 ? prev : []));
-  //     return;
-  //   }
-
-  //   const points = properties.map((p: any) => ({
-  //     type: "Feature",
-  //     properties: { cluster: false, propertyId: p.id, propertyData: p },
-  //     geometry: { type: "Point", coordinates: [p.longitude, p.latitude] },
-  //   }));
-
-  //   superclusterRef.current = new Supercluster({ radius: 60, maxZoom: 15 });
-  //   superclusterRef.current.load(points as any);
-
-  //   if (map) {
-  //     const zoom = map.getZoom() || 6;
-  //     const bounds = map.getBounds();
-  //     if (bounds) {
-  //       const sw = bounds.getSouthWest();
-  //       const ne = bounds.getNorthEast();
-  //       const bbox: [number, number, number, number] = [
-  //         sw.lng(),
-  //         sw.lat(),
-  //         ne.lng(),
-  //         ne.lat(),
-  //       ];
-  //       const clustersData = superclusterRef.current.getClusters(
-  //         bbox,
-  //         Math.floor(zoom),
-  //       );
-
-  //       setClusters((prev) => {
-  //         if (JSON.stringify(prev) === JSON.stringify(clustersData))
-  //           return prev;
-  //         return clustersData;
-  //       });
-
-  //       let visible = properties.filter((p: any) =>
-  //         bounds.contains({ lat: p.latitude, lng: p.longitude }),
-  //       );
-  //       if (sortBy === "priceLow")
-  //         visible.sort((a: any, b: any) => a.price - b.price);
-  //       else if (sortBy === "priceHigh")
-  //         visible.sort((a: any, b: any) => b.price - a.price);
-  //       else if (sortBy === "newest")
-  //         visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
-
-  //       setVisibleProperties((prev) => {
-  //         if (JSON.stringify(prev) === JSON.stringify(visible)) return prev;
-  //         return visible;
-  //       });
-  //     }
-  //   }
-  // }, [properties, map, mapZoomVal, sortBy]);
-
+  // Supercluster logic for Google Maps
   useEffect(() => {
-    if (!properties.length) return;
+    if (!properties || properties.length === 0) {
+      setClusters((prev) => (prev.length === 0 ? prev : []));
+      setVisibleProperties((prev) => (prev.length === 0 ? prev : []));
+      return;
+    }
 
     const points = properties.map((p: any) => ({
       type: "Feature",
-      properties: {
-        cluster: false,
-        propertyData: p,
-      },
-      geometry: {
-        type: "Point",
-        coordinates: [p.longitude, p.latitude],
-      },
+      properties: { cluster: false, propertyId: p.id, propertyData: p },
+      geometry: { type: "Point", coordinates: [p.longitude, p.latitude] },
     }));
 
-    const cluster = new Supercluster({
-      radius: 60,
-      maxZoom: 15,
-    });
+    superclusterRef.current = new Supercluster({ radius: 60, maxZoom: 20 });
+    superclusterRef.current.load(points as any);
 
-    cluster.load(points as any);
-    superclusterRef.current = cluster;
-  }, [properties]);
-
-  useEffect(() => {
-    if (!map || !superclusterRef.current) return;
-
-    const clusterInstance = superclusterRef.current;
-
-    const updateClusters = () => {
-      const bounds = map.getBounds();
+    if (map) {
       const zoom = map.getZoom() || 6;
+      const bounds = map.getBounds();
+      if (bounds) {
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+        const bbox: [number, number, number, number] = [
+          sw.lng(),
+          sw.lat(),
+          ne.lng(),
+          ne.lat(),
+        ];
+        const clustersData = superclusterRef.current.getClusters(
+          bbox,
+          Math.floor(zoom),
+        );
 
-      if (!bounds) return;
+        setClusters((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(clustersData))
+            return prev;
+          return clustersData;
+        });
 
-      const sw = bounds.getSouthWest();
-      const ne = bounds.getNorthEast();
+        let visible = properties.filter((p: any) =>
+          bounds.contains({ lat: p.latitude, lng: p.longitude }),
+        );
+        if (sortBy === "priceLow")
+          visible.sort((a: any, b: any) => a.price - b.price);
+        else if (sortBy === "priceHigh")
+          visible.sort((a: any, b: any) => b.price - a.price);
+        else if (sortBy === "newest")
+          visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
 
-      const bbox: [number, number, number, number] = [
-        sw.lng(),
-        sw.lat(),
-        ne.lng(),
-        ne.lat(),
-      ];
-
-      const clustersData = clusterInstance.getClusters(bbox, Math.floor(zoom));
-
-      setClusters(clustersData);
-
-      let visible = properties.filter((p: any) =>
-        bounds.contains({ lat: p.latitude, lng: p.longitude }),
-      );
-
-      if (sortBy === "priceLow") {
-        visible.sort((a: any, b: any) => a.price - b.price);
-      } else if (sortBy === "priceHigh") {
-        visible.sort((a: any, b: any) => b.price - a.price);
-      } else {
-        visible.sort((a: any, b: any) => b.daysAgo - a.daysAgo);
+        setVisibleProperties((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(visible)) return prev;
+          return visible;
+        });
       }
-
-      setVisibleProperties(visible);
-    };
-
-    updateClusters();
-
-    const listener = map.addListener("idle", updateClusters);
-
-    return () => {
-      if (listener) listener.remove();
-    };
-  }, [map, properties, sortBy]);
+    }
+  }, [properties, map, mapZoomVal, sortBy]);
 
   if (!isLoaded)
     return (
@@ -625,7 +611,7 @@ export default function GoogleMapSearch() {
 
   return (
     <>
-      <div className="w-full h-screen flex flex-col bg-white overflow-hidden mt-20">
+      <div className="w-full h-[90svh] flex flex-col overflow-hidden mt-20">
         <MapTopFilterBar
           status={status}
           setStatus={setStatus}
@@ -659,19 +645,46 @@ export default function GoogleMapSearch() {
             properties={properties}
             isLoggedIn={isLoggedIn}
             status={status}
+            setHoveredPropertyId={setHoveredPropertyId}
           />
 
           <div className="hidden md:block flex-1 relative z-10">
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
+              zoom={11}
               center={center}
-              zoom={6}
               onLoad={onMapLoad}
               onIdle={onMapIdle}
-              onDragStart={() => setIsMoving(true)}
-              onZoomChanged={() => setIsMoving(true)}
+              onDragStart={() => {
+                setIsMoving(true);
+                setShowSearchButton(true);
+              }}
+              onZoomChanged={() => {
+                setIsMoving(true);
+                setShowSearchButton(true);
+              }}
               options={options}
             >
+              {/* Search This Area Button */}
+              {showSearchButton && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      triggerSearch();
+                    }}
+                    className="flex items-center gap-2 bg-white text-primary px-6 py-2.5 rounded-full shadow-2xl border border-primary/20 font-bold hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <FiLoader className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <FiNavigation className="w-4 h-4" />
+                    )}
+                    {isLoading ? "Searching..." : "Search This Area"}
+                  </button>
+                </div>
+              )}
               {clusters.map((cluster, index) => {
                 const [longitude, latitude] = cluster.geometry.coordinates;
                 const { cluster: isCluster, point_count: pointCount } =
@@ -711,9 +724,17 @@ export default function GoogleMapSearch() {
                 }
 
                 const property = cluster.properties.propertyData;
-                const zoom = map?.getZoom() || 6;
+                const zoom = map?.getZoom() || 8;
 
-                if (zoom >= 10) {
+                const isHovered = hoveredPropertyId === property.id;
+                const statusColor =
+                  status === "sold"
+                    ? "#ef4444"
+                    : status === "expired"
+                      ? "#3b82f6"
+                      : "#22c55e"; // Green for Active
+
+                if (zoom >= 13) {
                   return (
                     <OverlayView
                       key={`property-${property.id}`}
@@ -725,9 +746,41 @@ export default function GoogleMapSearch() {
                     >
                       <div
                         onClick={() => setSelectedProperty(property)}
-                        className="w-fit bg-white px-2 py-1 rounded-full shadow-md text-primary font-bold text-xs cursor-pointer hover:bg-primary hover:text-white transition-all"
+                        onMouseEnter={() => setHoveredPropertyId(property.id)}
+                        onMouseLeave={() => setHoveredPropertyId(null)}
+                        className={`group w-fit relative -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 ${isHovered ? "scale-110 z-30" : "z-20"}`}
                       >
-                        {formatPriceAbbreviated(property.price)}
+                        <div
+                          style={{
+                            borderColor: isHovered
+                              ? statusColor
+                              : "transparent",
+                          }}
+                          className={`bg-white px-3 py-1.5 rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.15)] font-bold text-sm whitespace-nowrap border-2 transition-all duration-200 ${isHovered ? "text-white" : "text-gray-800"}`}
+                        >
+                          <div
+                            style={{
+                              backgroundColor: isHovered
+                                ? statusColor
+                                : "white",
+                            }}
+                            className="absolute inset-0 rounded-lg -z-10"
+                          ></div>
+                          <span
+                            style={{ color: isHovered ? "white" : statusColor }}
+                          >
+                            {formatPriceAbbreviated(property.price)}
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            backgroundColor: isHovered ? statusColor : "white",
+                            borderColor: isHovered
+                              ? statusColor
+                              : "transparent",
+                          }}
+                          className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 rotate-45 border-r border-b transition-all duration-200 shadow-[2px_2px_2px_rgba(0,0,0,0.05)]"
+                        ></div>
                       </div>
                     </OverlayView>
                   );
@@ -744,22 +797,25 @@ export default function GoogleMapSearch() {
                   >
                     <div
                       onClick={() => {
-                        map?.setZoom(12);
+                        map?.setZoom(15);
                         map?.panTo({
                           lat: property.latitude,
                           lng: property.longitude,
                         });
                       }}
-                      className="cursor-pointer"
-                      style={{
-                        width: 30,
-                        height: 30,
-                        transform: "translate(-50%, -50%)",
-                      }}
+                      onMouseEnter={() => setHoveredPropertyId(property.id)}
+                      onMouseLeave={() => setHoveredPropertyId(null)}
+                      className={`group -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 ${isHovered ? "scale-150 z-30" : "z-20"}`}
                     >
-                      <div className="flex items-center justify-center bg-primary text-white font-bold text-sm rounded-full shadow-lg border-2 border-white w-full h-full transition-transform hover:scale-110">
-                        1
-                      </div>
+                      <div
+                        style={{
+                          backgroundColor: statusColor,
+                          boxShadow: isHovered
+                            ? `0 0 10px ${statusColor}`
+                            : "0 2px 5px rgba(0,0,0,0.2)",
+                        }}
+                        className="flex items-center justify-center w-3.5 h-3.5 rounded-full border-2 border-white transition-all"
+                      ></div>
                     </div>
                   </OverlayView>
                 );
@@ -867,9 +923,9 @@ export default function GoogleMapSearch() {
 
             {isLoading && (
               <div className="absolute top-4 left-4  z-20 pointer-events-none flex items-center justify-center">
-                <div className="bg-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-gray-100 animate-in fade-in zoom-in duration-300">
-                  <FiLoader className="animate-spin text-primary w-5 h-5" />
-                  <span className="text-sm font-bold text-gray-700 tracking-tight">
+                <div className="bg-white px-4 py-2 rounded-lg shadow-2xl flex items-center gap-2 border border-gray-100 animate-in fade-in zoom-in duration-300">
+                  <FiLoader className="animate-spin text-primary w-4 h-4" />
+                  <span className="text-xs font-bold text-gray-700 tracking-tight">
                     Loading...
                   </span>
                 </div>

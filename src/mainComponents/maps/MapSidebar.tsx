@@ -8,6 +8,7 @@ interface MapSidebarProps {
   properties: any[];
   isLoggedIn: boolean;
   status: string;
+  setHoveredPropertyId?: (id: string | null) => void;
 }
 
 export default function MapSidebar({
@@ -16,11 +17,12 @@ export default function MapSidebar({
   properties,
   isLoggedIn,
   status,
+  setHoveredPropertyId,
 }: MapSidebarProps) {
   return (
     <div className="w-full md:w-110 flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
       <div className="p-4 flex justify-between items-center text-sm font-semibold border-b border-gray-50">
-        <div className="text-gray-500 ">                       
+        <div className="text-gray-500 ">
           Results:{" "}
           <span className="text-black ">
             {isLoading
@@ -39,8 +41,12 @@ export default function MapSidebar({
             </p>
           </div>
         ) : visibleProperties.length > 0 ? (
-          visibleProperties.map((p) => (
-            <div key={p.id} className="">
+          visibleProperties.map((p, idx) => (
+            <div
+              key={idx}
+              onMouseEnter={() => setHoveredPropertyId?.(p.id)}
+              onMouseLeave={() => setHoveredPropertyId?.(null)}
+            >
               <PropertiesCard
                 {...p}
                 isLogin={isLoggedIn || status === "forSale"}
