@@ -53,7 +53,7 @@ const HomeEstimationTop = () => {
 
   return (
     <section className="xl:max-w-screen-2xl mx-auto w-full relative xl:pt-53.5 xl:pb-31 md:pt-38.75 md:pb-29 pt-26.5 pb-17 px-6 flex flex-col items-center-safe">
-      <h1 className="xl:text-6xl xl:leading-17 md:text-5xl md:leading-14 text-[40px] leading-12 font-bold text-center">
+      <h1 className="xl:text-5xl xl:leading-17 md:text-5xl md:leading-14 text-[40px] leading-12 font-bold text-center">
         Get Your Free <span className="text-primary">Home Evaluation</span>
       </h1>
       <Description
