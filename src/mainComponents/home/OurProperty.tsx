@@ -280,16 +280,63 @@ const OurProperty = () => {
 
     return (
       <div className="relative group/slider">
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-10 flex justify-between pointer-events-none px-2 md:-mx-4">
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-10 flex justify-between pointer-events-none px-1 md:-mx-5">
+          {/* Prev */}
           <button
-            className={`${navId}-prev pointer-events-auto bg-background/80 backdrop-blur-sm border border-borderColor p-3 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-all duration-300 opacity-0 group-hover/slider:opacity-100 disabled:opacity-0`}
+            className={[
+              `${navId}-prev`,
+              "pointer-events-auto",
+              "relative overflow-hidden",
+              "w-16 h-16 rounded-full",
+              "flex items-center justify-center",
+              "bg-white",
+              // clean shadow edge — no CSS border
+              "shadow-[0_2px_12px_rgba(0,0,0,0.12),inset_0_0_0_1px_rgba(0,0,0,0.06)]",
+              "text-primary",
+              // hover: blue glow, no border
+              "hover:shadow-[0_0_0_4px_rgba(34,85,139,0.12),0_4px_20px_rgba(34,85,139,0.22)]",
+              "group/btn",
+              "-translate-x-3 opacity-0",
+              "group-hover/slider:translate-x-0 group-hover/slider:opacity-100",
+              "transition-all duration-300 ease-out",
+              "disabled:opacity-0 disabled:pointer-events-none",
+            ].join(" ")}
           >
-            <ChevronLeft size={24} />
+            <span className="absolute inset-0 rounded-full bg-primary scale-0 group-hover/btn:scale-100 transition-transform duration-300 ease-out origin-center" />
+            <ChevronLeft
+              size={22}
+              strokeWidth={2.5}
+              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:-translate-x-0.5"
+            />
           </button>
+
+          {/* Next */}
           <button
-            className={`${navId}-next pointer-events-auto bg-background/80 backdrop-blur-sm border border-borderColor p-3 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-all duration-300 opacity-0 group-hover/slider:opacity-100 disabled:opacity-0`}
+            className={[
+              `${navId}-next`,
+              "pointer-events-auto",
+              "relative overflow-hidden",
+              "w-16 h-16 rounded-full",
+              "flex items-center justify-center",
+              "bg-white",
+              // clean shadow edge — no CSS border
+              "shadow-[0_2px_12px_rgba(0,0,0,0.12),inset_0_0_0_1px_rgba(0,0,0,0.06)]",
+              "text-primary",
+              // hover: blue glow, no border
+              "hover:shadow-[0_0_0_4px_rgba(34,85,139,0.12),0_4px_20px_rgba(34,85,139,0.22)]",
+              "group/btn",
+              "translate-x-3 opacity-0",
+              "group-hover/slider:translate-x-0 group-hover/slider:opacity-100",
+              "transition-all duration-300 ease-out",
+              "disabled:opacity-0 disabled:pointer-events-none",
+            ].join(" ")}
           >
-            <ChevronRight size={24} />
+            <span className="absolute inset-0 rounded-full bg-primary scale-0 group-hover/btn:scale-100 transition-transform duration-300 ease-out origin-center" />
+            <ChevronRight
+              size={22}
+              strokeWidth={2.5}
+              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:translate-x-0.5"
+            />
           </button>
         </div>
         <Swiper

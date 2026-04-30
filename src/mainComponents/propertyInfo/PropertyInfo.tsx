@@ -5,6 +5,7 @@ import PropertyInformation from "./propertyInformation/PropertyInformation";
 import GetInTouch from "../getInTouch/GetInTouch";
 import { propertyImages } from "@/src/mainComponents/dummyData";
 import { useGetUnifiedListingById } from "@/src/hooks/listing/useListingQueries";
+import PropertyInfoSkeleton from "./PropertyInfoSkeleton";
 
 const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const {
@@ -15,12 +16,7 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
     select: (res: any) => res?.data || res,
   });
 
-  if (loading)
-    return (
-      <div className="xl:max-w-screen-2xl mx-auto w-full h-[70svh] p-10 flex justify-center items-center">
-        Loading property...
-      </div>
-    );
+  if (loading) return <PropertyInfoSkeleton />;
   if (error)
     return (
       <div className="p-10 text-red-500 xl:max-w-screen-2xl mx-auto w-full h-[50svh] flex justify-center items-center">
