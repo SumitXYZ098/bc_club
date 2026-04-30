@@ -3,11 +3,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import mapboxgl, { Map as MapboxMap } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Supercluster from "supercluster";
-import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCard";
 import {
   useGetListings,
-  useGetActiveListings,
   useGetMapZoomListings,
+  useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
 import { Images } from "@/src/app/exports";
 import { useListingStore } from "@/src/store/useListingStore";
@@ -25,11 +24,10 @@ import MapTopFilterBar from "./MapTopFilterBar";
 import MapActiveFilters from "./MapActiveFilters";
 import MapSidebar from "./MapSidebar";
 import { createPriceMarker } from "./mapUtils";
-import CustomButton from "@/src/components/button/CustomButton";
-import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 
 export default function MapSearch() {
+  const { data: me } = useGetMe();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapboxMap | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -38,8 +36,6 @@ export default function MapSearch() {
   const [visibleProperties, setVisibleProperties] = useState<any[]>([]);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const superclusterRef = useRef<Supercluster | null>(null);
-  const pathName = usePathname();
-  const isWishlistPage = pathName === "/wishlist";
 
   const [mapBounds, setMapBounds] = useState<{
     north: number;
@@ -371,7 +367,10 @@ export default function MapSearch() {
           mls: listing?.mls_number,
           realtor: getOfficeName(listing),
           isLogin: false,
-          isFavourite: listing?.is_favorite || isWishlistPage,
+          likesCount: listing?.likesCount,
+          isFavourite: listing?.users?.some(
+            (user: any) => user.documentId === me?.documentId,
+          ),
           isDdf: false,
         }))
         .filter(
@@ -394,7 +393,7 @@ export default function MapSearch() {
       const listings = res?.data || [];
       return listings
         .map((listing: any) => ({
-          id: listing.doucumentId,
+          id: listing.documentId,
           image:
             typeof listing?.media_url === "string"
               ? listing.media_url
@@ -405,7 +404,7 @@ export default function MapSearch() {
           price: Number(listing?.price) || 0,
           daysAgo: listing?.originalEntryTimestamp ?? 0,
           address: listing?.address || `${listing?.city || ""}`,
-          sqft: listing?.area ?? listing?.Living_area ?? 0, 
+          sqft: listing?.area ?? listing?.Living_area ?? 0,
           beds: listing?.bedrooms ?? 0,
           baths: listing?.bathrooms ?? 0,
           priceDrop: undefined,
@@ -414,7 +413,10 @@ export default function MapSearch() {
           latitude: Number(listing?.latitude),
           mls: listing?.mls_number ?? listing?.listing_id,
           realtor: listing?.office_name ?? getOfficeName(listing),
-          isFavourite: listing?.is_favorite || isWishlistPage,
+          isFavourite: listing?.users?.some(
+            (user: any) => user.documentId === me?.documentId,
+          ),
+          likesCount: listing?.likesCount,
           isDdf: true,
         }))
         .filter(

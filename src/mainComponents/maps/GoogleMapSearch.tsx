@@ -16,6 +16,7 @@ import Supercluster from "supercluster";
 import {
   useGetListings,
   useGetMapZoomListings,
+  useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
 import { Images } from "@/src/app/exports";
 import { useListingStore } from "@/src/store/useListingStore";
@@ -26,7 +27,6 @@ import MapTopFilterBar from "./MapTopFilterBar";
 import MapActiveFilters from "./MapActiveFilters";
 import MapSidebar from "./MapSidebar";
 import { formatPriceAbbreviated } from "./mapUtils";
-import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 
 const mapContainerStyle = {
@@ -62,8 +62,7 @@ export default function GoogleMapSearch() {
   const [clusters, setClusters] = useState<any[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const superclusterRef = useRef<Supercluster | null>(null);
-  const pathName = usePathname();
-  const isWishlistPage = pathName === "/wishlist";
+  const { data: me } = useGetMe();
 
   const [mapBounds, setMapBounds] = useState<{
     north: number;
@@ -305,7 +304,10 @@ export default function GoogleMapSearch() {
           mls: listing?.mls_number,
           realtor: getOfficeName(listing),
           isLogin: false,
-          isFavourite: listing?.is_favorite || isWishlistPage,
+          likesCount: listing?.likesCount,
+          isFavourite: listing?.users?.some(
+            (user: any) => user.documentId === me?.documentId,
+          ),
           isDdf: false,
         }))
         .filter(
@@ -344,7 +346,10 @@ export default function GoogleMapSearch() {
           latitude: Number(listing?.latitude),
           mls: listing?.mls_number ?? listing?.listing_id,
           realtor: listing?.office_name ?? getOfficeName(listing),
-          isFavourite: listing?.is_favorite || isWishlistPage,
+          isFavourite: listing?.users?.some(
+            (user: any) => user.documentId === me?.documentId,
+          ),
+          likesCount: listing?.likesCount,
           isDdf: true,
         }))
         .filter(
