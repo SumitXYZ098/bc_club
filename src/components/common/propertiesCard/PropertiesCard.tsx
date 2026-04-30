@@ -60,7 +60,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   isFavourite: isFavouriteProp,
   isLogin: isLoginProp,
   isDdf,
-  likesCount
+  likesCount,
 }) => {
   const pathname = usePathname();
   const { data: me } = useGetMe();
@@ -193,7 +193,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                   <span className="text-xs font-bold ml-1 text-black">
                     {localLikesCount}
                   </span>
-                )}</button>
+                )}
+              </button>
             )}
 
             {/* Days Ago */}
@@ -202,8 +203,6 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 {getTime(daysAgo)}
               </span>
             )}
-
-
 
             {/* Price Drop Banner */}
             {priceDrop !== undefined && priceDrop > 0 && (
@@ -242,13 +241,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
           <div className="space-y-3 mt-1">
             <h3 className="font-bold text-xl">{displayTitle}</h3>
-            <div
-              className={`flex justify-between ${
-                pathname === "/properties"
-                  ? "xl:flex-col gap-y-1 xl:items-start items-end-safe"
-                  : "items-end-safe"
-              }`}
-            >
+            <div className={`flex justify-between  gap-y-1 items-end-safe`}>
               <div className="flex flex-col">
                 <span className="text-xs text-lightWhite">List Price Now</span>
                 <p className="text-2xl font-bold text-primary">

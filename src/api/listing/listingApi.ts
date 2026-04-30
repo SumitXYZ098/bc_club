@@ -134,10 +134,11 @@ export async function removeFromFavourite(id: string): Promise<any> {
 }
 
 // Get my favourite properties
-export async function getFavouriteProperties(): Promise<any> {
+export async function getFavouriteProperties(params?: any): Promise<any> {
   const token = Cookies.get("token");
   try {
     const res = await axios.get(Endpoints.getFavouriteProperties, {
+      params,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -226,14 +227,16 @@ export async function removeDdfFavorite(id: string): Promise<any> {
   }
 }
 
-export async function getMyDdfFavorites(): Promise<any> {
+export async function getMyDdfFavorites(params?: any): Promise<any> {
   const token = Cookies.get("token");
   try {
     const res = await axios.get(Endpoints.getMyDdfFavorites, {
+      params,
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

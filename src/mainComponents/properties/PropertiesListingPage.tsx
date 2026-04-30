@@ -5,7 +5,6 @@ import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import { Box, Chip, Pagination } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import PropertiesMap from "./PropertiesMap";
 import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
@@ -15,20 +14,13 @@ import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect
 import { useListingStore } from "@/src/store/useListingStore";
 import {
   useGetListings,
-  useGetWishlistProperties,
   useGetActiveListings,
-  useGetMyDdfFavorites,
+  useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
-import { usePathname } from "next/navigation";
-import { useAuthContext } from "../auth/AuthContext";
-import CustomButton from "../../components/button/CustomButton";
-import Link from "next/link";
 import { getOfficeName } from "@/src/utilities/utilities";
 
 export default function PropertiesListingPage() {
-  const pathName = usePathname();
-  const isWishlistPage = pathName === "/wishlist";
-  const { isLoggedIn, setOpenLogin } = useAuthContext();
+  const { data: me } = useGetMe();
   const [openFilters, setOpenFilters] = useState(false);
 
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
@@ -145,7 +137,7 @@ export default function PropertiesListingPage() {
 
   if (location && location !== "") {
     params.location = location;
-  } 
+  }
 
   const select = (res: any) => {
     const listings = res?.data || [];
@@ -155,7 +147,7 @@ export default function PropertiesListingPage() {
 
     let properties: PropertyCardProps[] = listings
       .map((listing: any) => ({
-        id: listing?.documentId  ,
+        id: listing?.documentId,
         image:
           typeof listing?.media?.[0] === "string"
             ? listing.media[0]
@@ -194,7 +186,9 @@ export default function PropertiesListingPage() {
           listing?.raw_data?.MlsNumber ??
           "N/A",
         realtor: getOfficeName(listing),
-        isFavourite: listing?.is_favorite || isWishlistPage,
+        isFavourite: listing?.users_permissions_users?.some(
+          (user: any) => user?.documentId === me?.documentId,
+        ),
         isDdf: isForSale,
       }))
       .filter((p: any) => Number(p.price) > 0);
@@ -221,7 +215,6 @@ export default function PropertiesListingPage() {
         return dateA - dateB;
       });
     } else if (activePrice === "popular") {
-     
       properties.sort(
         (a, b) => (Number(b.likesCount) || 0) - (Number(a.likesCount) || 0),
       );
@@ -234,103 +227,24 @@ export default function PropertiesListingPage() {
     params,
     {
       select,
-      enabled: !isWishlistPage && !isForSale,
+      enabled: !isForSale,
     },
   );
 
   const { data: queryDataActive, isLoading: isLoadingActive } =
     useGetActiveListings(params, {
       select,
-      enabled: !isWishlistPage && isForSale,
+      enabled: isForSale,
     });
 
   const queryData = isForSale ? queryDataActive : queryDataNormal;
   const loading = isForSale ? isLoadingActive : isLoadingNormal;
 
-  const {
-    data: wishlistData,
-    isLoading: wishlistLoading,
-    refetch: refetchWishlist,
-  } = useGetWishlistProperties({
-    select,
-    enabled: isWishlistPage && isLoggedIn,
-  });
+  const data = queryData?.properties || [];
 
-  const {
-    data: ddfWishlistData,
-    isLoading: ddfWishlistLoading,
-    refetch: refetchDdfWishlist,
-  } = useGetMyDdfFavorites({
-    select: (res) => {
-      // Force isDdf to true for this response
-      const listings = res?.data || [];
-      const properties = listings
-        .map((listing: any) => ({
-          ...listing,
-          id: listing.documentId,
-          image:
-            typeof listing?.media?.[0] === "string"
-              ? listing.media[0]
-              : listing?.media?.[0]?.MediaURL || listing?.media_url?.[0],
-          title: listing?.property_sub_type,
-          price: listing?.price,
-          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
-          address: listing?.address,
-          city: listing?.city,
-          province: listing?.state,
-          area: listing?.area,
-          sqft: listing?.area ?? listing?.lot_size_area ?? 0,
-          beds: listing?.bedrooms ?? 0,
-          baths: listing?.bathrooms ?? 0,
-          likesCount: listing?.likesCount ?? 0,
-          mls:
-            listing?.mls_number ??
-            listing?.listing_id ??
-            listing?.raw_data?.ListingID ??
-            listing?.raw_data?.MLS ??
-            listing?.MlsNumber ??
-            listing?.raw_data?.MlsNumber ??
-            "N/A",
-          realtor: getOfficeName(listing),
-          assessedDiff: listing?.assessed_diff || 0,
-          isLogin: true,
-          isFavourite: true,
-          isDdf: true,
-        }))
-        .filter((p: any) => Number(p.price) > 0);
-      return { properties };
-    },
-    enabled: isWishlistPage && isLoggedIn,
-  });
+  const pageCount = queryData?.pagination?.pageCount || 1;
 
-  useEffect(() => {
-    if (isWishlistPage && isLoggedIn) {
-      refetchWishlist();
-      refetchDdfWishlist();
-    }
-  }, [isWishlistPage, isLoggedIn, refetchWishlist, refetchDdfWishlist]);
-
-  const data = isWishlistPage
-    ? [
-        ...(wishlistData?.properties || []),
-        ...(ddfWishlistData?.properties || []),
-      ]
-    : queryData?.properties || [];
-
-  const listingData = isWishlistPage
-    ? [
-        ...(wishlistData?.listings || []),
-        ...(ddfWishlistData?.properties || []),
-      ]
-    : queryData?.listings || [];
-
-  const pageCount = isWishlistPage
-    ? wishlistData?.pagination?.pageCount || 1
-    : queryData?.pagination?.pageCount || 1;
-
-  const isLoading = isWishlistPage
-    ? wishlistLoading || ddfWishlistLoading
-    : loading;
+  const isLoading = loading;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // 🚀 Scroll to top of the container on filter change
@@ -361,396 +275,337 @@ export default function PropertiesListingPage() {
   return (
     <div className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
       <div className="h-full mt-24">
-        {(isWishlistPage ||
-          (status && (status === "sold" || status === "expired"))) &&
-          !isLoggedIn && (
-            <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <h2 className="text-3xl font-bold text-center capitalize">
-                {isWishlistPage ? "Wishlist" : `${status} Properties`}
-              </h2>
-              <p className="text-gray-600">
-                Please login to view your {isWishlistPage ? "wishlist" : status}{" "}
-                properties
-              </p>
-              <CustomButton
-                label="Login Now"
-                buttonType="primary"
-                onClick={() => setOpenLogin(true)}
-                customClasses="px-10"
+        {/* Top Filters Row */}
+        <div className="flex items-center gap-4 flex-wrap mb-6 justify-between">
+          {/* 🔍 CHIP SEARCH BAR (DESIGN SAME) */}
+          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] border border-gray-200 w-full max-w-md">
+            {isChip ? (
+              <Chip
+                label={search}
+                onDelete={() => {
+                  setSearch("");
+                  setIsChip(false);
+                }}
+                className="bg-gray-100 text-sm"
               />
-            </div>
-          )}
-
-        {(isLoggedIn ||
-          (!isWishlistPage && status !== "sold" && status !== "expired")) && (
-          <>
-            {isWishlistPage && !isLoading && data.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4 w-full">
-                <h2 className="text-3xl font-bold">No Wishlist Yet</h2>
-                <p className="text-gray-600 text-center max-w-md">
-                  You haven't saved any properties yet. Explore our listings and
-                  click the heart icon to save your wishlist!
-                </p>
-                <Link href="/properties">
-                  <CustomButton
-                    label="Explore Properties"
-                    buttonType="primary"
-                    customClasses="px-10"
-                  />
-                </Link>
-              </div>
             ) : (
-              <>
-                {/* Top Filters Row */}
-                <div className="flex items-center gap-4 flex-wrap mb-6 justify-between">
-                  {/* 🔍 CHIP SEARCH BAR (DESIGN SAME) */}
-                  <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] border border-gray-200 w-full max-w-md">
-                    {isChip ? (
-                      <Chip
-                        label={search}
-                        onDelete={() => {
-                          setSearch("");
-                          setIsChip(false);
-                        }}
-                        className="bg-gray-100 text-sm"
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search city..."
-                        className="flex-1 text-sm outline-none bg-transparent"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && search.trim()) {
-                            setIsChip(true);
-                          }
-                        }}
-                      />
-                    )}
-
-                    <button
-                      className="ml-auto bg-[#E6A500] p-2.5 rounded-lg flex items-center justify-center"
-                      onClick={() => {
-                        if (search.trim()) setIsChip(true);
-                      }}
-                    >
-                      <FiSearch size={18} className="text-white" />
-                    </button>
-                  </div>
-
-                  <button className="px-4 py-4 bg-gray rounded-xl shadow items-center gap-2 hidden">
-                    <BookmarkIcon sx={{ color: "#33333333" }} />
-                    Save Search
-                  </button>
-                </div>
-
-                {/* Filters */}
-                {pathName === "/properties" && (
-                  <div className="flex flex-wrap justify-between items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full">
-                    <div className="flex flex-row justify-between items-center gap-4 w-full xl:w-auto">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenFilters(true);
-                        }}
-                        className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer w-full xl:w-fit"
-                      >
-                        <FilterListIcon sx={{ color: "#305487" }} />
-                        <span className="font-medium">Filters</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          clearInstanceFilters("list");
-                          scrollRef.current?.scrollTo({
-                            top: 0,
-                            behavior: "smooth",
-                          });
-                        }}
-                        className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
-                          activePrice !== "any" ||
-                          activeBedRoom !== "any" ||
-                          activeBathRoom !== "any" ||
-                          activeProperty !== "any" ||
-                          filters.status ||
-                          (filters.minPrice !== undefined &&
-                            filters.minPrice > 1000) ||
-                          (filters.maxPrice !== undefined &&
-                            filters.maxPrice < 20000000) ||
-                          (filters.minSqft !== undefined &&
-                            filters.minSqft > 100) ||
-                          (filters.maxSqft !== undefined &&
-                            filters.maxSqft < 15000) ||
-                          filters.location
-                            ? "bg-primary text-white"
-                            : "bg-white"
-                        }`}
-                      >
-                        <FiX size={16} />
-                        <span className="font-medium">Reset Filters</span>
-                      </button>
-                    </div>
-
-                    {/* Price */}
-                    <div className="w-full flex flex-row xs:flex-nowrap flex-wrap justify-between items-center gap-4">
-                      <FilterPillSelect
-                        label="Sort By"
-                        value={activePrice}
-                        onChange={setActivePrice}
-                        pillBase={pillBase}
-                        pillActive={pillActive}
-                        pillInactive={pillInactive}
-                        options={[
-                          { label: "Newest First", value: "newest" },
-                          { label: "Oldest First", value: "oldest" },
-                          { label: "Low to High", value: "asc" },
-                          { label: "High to Low", value: "desc" },
-                          { label: "Popular First", value: "popular" },
-                        ]}
-                      />
-
-                      {/* BedRoom */}
-                      <FilterPillSelect
-                        label="BedRoom"
-                        value={activeBedRoom}
-                        onChange={setActiveBedRoom}
-                        pillBase={pillBase}
-                        pillActive={pillActive}
-                        pillInactive={pillInactive}
-                        options={[
-                          { label: "All", value: "any" },
-                          { label: "1", value: "1" },
-                          { label: "2", value: "2" },
-                          { label: "3", value: "3" },
-                          { label: "4+", value: "4" },
-                        ]}
-                      />
-                    </div>
-                    <div className="w-full flex flex-row sm:flex-nowrap flex-wrap justify-between items-center gap-4">
-                      {/* BathRoom */}
-                      <FilterPillSelect
-                        label="BathRoom"
-                        value={activeBathRoom}
-                        onChange={setActiveBathRoom}
-                        pillBase={pillBase}
-                        pillActive={pillActive}
-                        pillInactive={pillInactive}
-                        options={[
-                          { label: "All", value: "any" },
-                          { label: "1", value: "1" },
-                          { label: "2", value: "2" },
-                          { label: "3", value: "3" },
-                          { label: "4+", value: "4" },
-                        ]}
-                      />
-
-                      {/* Property Type */}
-                      <FilterPillSelect
-                        label="Property Type"
-                        value={activeProperty}
-                        onChange={setActiveProperty}
-                        pillBase={pillBase}
-                        pillActive={pillActive}
-                        pillInactive={pillInactive}
-                        options={
-                          status === "sold" || status === "expired"
-                            ? [
-                                { label: "All", value: "any" },
-                                {
-                                  label: "Apartment/Condo",
-                                  value: "Apartment/Condo",
-                                },
-                                {
-                                  label: "Single Family Residence",
-                                  value: "Single Family Residence",
-                                },
-                                { label: "Townhouse", value: "Townhouse" },
-                                { label: "Half Duplex", value: "Half Duplex" },
-                                {
-                                  label: "Row House (Non-Strata)",
-                                  value: "Row House (Non-Strata)",
-                                },
-                              ]
-                            : [
-                                { label: "All", value: "any" },
-                                {
-                                  label: "Single-Family",
-                                  value: "Single-Family",
-                                },
-                                {
-                                  label: "Multi-Family",
-                                  value: "Multi-Family",
-                                },
-                                { label: "Office", value: "Office" },
-                                { label: "Business", value: "Business" },
-                                { label: "Agriculture", value: "Agriculture" },
-                                { label: "Vacant Land", value: "Vacant Land" },
-                              ]
-                        }
-                      />
-                    </div>
-                    <button
-                      onClick={() => {
-                        clearInstanceFilters("list");
-                        scrollRef.current?.scrollTo({
-                          top: 0,
-                          behavior: "smooth",
-                        });
-                      }}
-                      className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
-                        activePrice !== "any" ||
-                        activeBedRoom !== "any" ||
-                        activeBathRoom !== "any" ||
-                        activeProperty !== "any" ||
-                        filters.status ||
-                        (filters.minPrice !== undefined &&
-                          filters.minPrice > 1000) ||
-                        (filters.maxPrice !== undefined &&
-                          filters.maxPrice < 20000000) ||
-                        (filters.minSqft !== undefined &&
-                          filters.minSqft > 100) ||
-                        (filters.maxSqft !== undefined &&
-                          filters.maxSqft < 15000) ||
-                        filters.location
-                          ? "bg-primary text-white"
-                          : "bg-white"
-                      }`}
-                    >
-                      <FiX size={16} />
-                      <span className="font-medium">Reset Filters</span>
-                    </button>
-                  </div>
-                )}
-                {((filters.status && filters.status !== "forSale") ||
-                  (filters.minPrice !== undefined && filters.minPrice > 1000) ||
-                  (filters.maxPrice !== undefined &&
-                    filters.maxPrice < 20000000) ||
-                  (filters.minSqft !== undefined && filters.minSqft > 100) ||
-                  (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
-                  filters.location) && (
-                  <div className="w-full flex flex-row justify-between items-center mb-4">
-                    <span className="font-medium text-sm">
-                      Selected Filters:
-                    </span>
-                    <div className="flex flex-row gap-2">
-                      {(filters.minPrice !== undefined &&
-                        filters.minPrice > 1000) ||
-                      (filters.maxPrice !== undefined &&
-                        filters.maxPrice < 20000000) ? (
-                        <Chip
-                          label={`$${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
-                          onDelete={() => {
-                            updateInstanceFilter("list", "minPrice", 0);
-                            updateInstanceFilter("list", "maxPrice", 20000000);
-                          }}
-                          className="bg-gray-100 text-sm"
-                        />
-                      ) : null}
-                      {(filters.minSqft !== undefined &&
-                        filters.minSqft > 100) ||
-                      (filters.maxSqft !== undefined &&
-                        filters.maxSqft < 15000) ? (
-                        <Chip
-                          label={`${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
-                          onDelete={() => {
-                            updateInstanceFilter("list", "minSqft", 0);
-                            updateInstanceFilter("list", "maxSqft", 15000);
-                          }}
-                          className="bg-gray-100 text-sm"
-                        />
-                      ) : null}
-                      {filters.status && filters.status !== "forSale" && (
-                        <Chip
-                          label={filters.status}
-                          onDelete={() => {
-                            updateInstanceFilter("list", "status", "forSale");
-                          }}
-                          className="bg-gray-100 text-sm capitalize"
-                        />
-                      )}
-                      {filters.location &&
-                        filters.location
-                          .split(",")
-                          .filter(Boolean)
-                          .map((loc: string) => (
-                            <Chip
-                              key={loc}
-                              label={loc}
-                              onDelete={() => {
-                                const remaining = (filters.location || "")
-                                  .split(",")
-                                  .filter((l: string) => l !== loc)
-                                  .join(",");
-                                updateInstanceFilter("list", "location", remaining);
-                              }}
-                              className="bg-gray-100 text-sm"
-                            />
-                          ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Property Grid */}
-                {isLoading ? (
-                  <div className="flex justify-between items-start mb-10 w-full">
-                    <div className="w-full flex flex-col h-full">
-                      <div
-                        ref={scrollRef}
-                        className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3"
-                      >
-                        {Array.from({ length: 6 }).map((_, i) => (
-                          <PropertyCardSkeleton key={i} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : data.length === 0 ? (
-                  <div className="w-full xl:h-[65svh] h-full flex justify-center items-center">
-                    <h3 className="text-2xl font-medium">
-                      No Properties Found
-                    </h3>
-                  </div>
-                ) : (
-                  <div className="flex justify-between items-start mb-10 w-full">
-                    <div className="w-full flex flex-col h-full">
-                      <div
-                        ref={scrollRef}
-                        className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3"
-                      >
-                        {data.map((property: any) => (
-                          <PropertiesCard
-                            key={property.id}
-                            {...property}
-                            isLogin
-                            isSold={status === "sold"}
-                            isExpired={status === "expired"}
-                            isDdf={property.isDdf}
-                          />
-                        ))}
-                      </div>
-                      {data?.length !== 0 && pageCount !== 0 && (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            mt: 4,
-                          }}
-                        >
-                          <Pagination
-                            count={pageCount}
-                            page={page}
-                            onChange={handlePageChange}
-                            color="primary"
-                            size="large"
-                          />
-                        </Box>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search city..."
+                className="flex-1 text-sm outline-none bg-transparent"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && search.trim()) {
+                    setIsChip(true);
+                  }
+                }}
+              />
             )}
-          </>
+
+            <button
+              className="ml-auto bg-[#E6A500] p-2.5 rounded-lg flex items-center justify-center"
+              onClick={() => {
+                if (search.trim()) setIsChip(true);
+              }}
+            >
+              <FiSearch size={18} className="text-white" />
+            </button>
+          </div>
+
+          <button className="px-4 py-4 bg-gray rounded-xl shadow items-center gap-2 hidden">
+            <BookmarkIcon sx={{ color: "#33333333" }} />
+            Save Search
+          </button>
+        </div>
+
+        {/* Filters */}
+
+        <div className="flex flex-wrap justify-between items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full">
+          <div className="flex flex-row justify-between items-center gap-4 w-full xl:w-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setOpenFilters(true);
+              }}
+              className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer w-full xl:w-fit"
+            >
+              <FilterListIcon sx={{ color: "#305487" }} />
+              <span className="font-medium">Filters</span>
+            </button>
+            <button
+              onClick={() => {
+                clearInstanceFilters("list");
+                scrollRef.current?.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }}
+              className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
+                activePrice !== "any" ||
+                activeBedRoom !== "any" ||
+                activeBathRoom !== "any" ||
+                activeProperty !== "any" ||
+                filters.status ||
+                (filters.minPrice !== undefined && filters.minPrice > 1000) ||
+                (filters.maxPrice !== undefined &&
+                  filters.maxPrice < 20000000) ||
+                (filters.minSqft !== undefined && filters.minSqft > 100) ||
+                (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+                filters.location
+                  ? "bg-primary text-white"
+                  : "bg-white"
+              }`}
+            >
+              <FiX size={16} />
+              <span className="font-medium">Reset Filters</span>
+            </button>
+          </div>
+
+          {/* Price */}
+          <div className="w-full flex flex-row xs:flex-nowrap flex-wrap justify-between items-center gap-4">
+            <FilterPillSelect
+              label="Sort By"
+              value={activePrice}
+              onChange={setActivePrice}
+              pillBase={pillBase}
+              pillActive={pillActive}
+              pillInactive={pillInactive}
+              options={[
+                { label: "Newest First", value: "newest" },
+                { label: "Oldest First", value: "oldest" },
+                { label: "Low to High", value: "asc" },
+                { label: "High to Low", value: "desc" },
+                { label: "Popular First", value: "popular" },
+              ]}
+            />
+
+            {/* BedRoom */}
+            <FilterPillSelect
+              label="BedRoom"
+              value={activeBedRoom}
+              onChange={setActiveBedRoom}
+              pillBase={pillBase}
+              pillActive={pillActive}
+              pillInactive={pillInactive}
+              options={[
+                { label: "All", value: "any" },
+                { label: "1", value: "1" },
+                { label: "2", value: "2" },
+                { label: "3", value: "3" },
+                { label: "4+", value: "4" },
+              ]}
+            />
+          </div>
+          <div className="w-full flex flex-row sm:flex-nowrap flex-wrap justify-between items-center gap-4">
+            {/* BathRoom */}
+            <FilterPillSelect
+              label="BathRoom"
+              value={activeBathRoom}
+              onChange={setActiveBathRoom}
+              pillBase={pillBase}
+              pillActive={pillActive}
+              pillInactive={pillInactive}
+              options={[
+                { label: "All", value: "any" },
+                { label: "1", value: "1" },
+                { label: "2", value: "2" },
+                { label: "3", value: "3" },
+                { label: "4+", value: "4" },
+              ]}
+            />
+
+            {/* Property Type */}
+            <FilterPillSelect
+              label="Property Type"
+              value={activeProperty}
+              onChange={setActiveProperty}
+              pillBase={pillBase}
+              pillActive={pillActive}
+              pillInactive={pillInactive}
+              options={
+                status === "sold" || status === "expired"
+                  ? [
+                      { label: "All", value: "any" },
+                      {
+                        label: "Apartment/Condo",
+                        value: "Apartment/Condo",
+                      },
+                      {
+                        label: "Single Family Residence",
+                        value: "Single Family Residence",
+                      },
+                      { label: "Townhouse", value: "Townhouse" },
+                      { label: "Half Duplex", value: "Half Duplex" },
+                      {
+                        label: "Row House (Non-Strata)",
+                        value: "Row House (Non-Strata)",
+                      },
+                    ]
+                  : [
+                      { label: "All", value: "any" },
+                      {
+                        label: "Single-Family",
+                        value: "Single-Family",
+                      },
+                      {
+                        label: "Multi-Family",
+                        value: "Multi-Family",
+                      },
+                      { label: "Office", value: "Office" },
+                      { label: "Business", value: "Business" },
+                      { label: "Agriculture", value: "Agriculture" },
+                      { label: "Vacant Land", value: "Vacant Land" },
+                    ]
+              }
+            />
+          </div>
+          <button
+            onClick={() => {
+              clearInstanceFilters("list");
+              scrollRef.current?.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }}
+            className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
+              activePrice !== "any" ||
+              activeBedRoom !== "any" ||
+              activeBathRoom !== "any" ||
+              activeProperty !== "any" ||
+              filters.status ||
+              (filters.minPrice !== undefined && filters.minPrice > 1000) ||
+              (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
+              (filters.minSqft !== undefined && filters.minSqft > 100) ||
+              (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+              filters.location
+                ? "bg-primary text-white"
+                : "bg-white"
+            }`}
+          >
+            <FiX size={16} />
+            <span className="font-medium">Reset Filters</span>
+          </button>
+        </div>
+
+        {((filters.status && filters.status !== "forSale") ||
+          (filters.minPrice !== undefined && filters.minPrice > 1000) ||
+          (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
+          (filters.minSqft !== undefined && filters.minSqft > 100) ||
+          (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+          filters.location) && (
+          <div className="w-full flex flex-row justify-between items-center mb-4">
+            <span className="font-medium text-sm">Selected Filters:</span>
+            <div className="flex flex-row gap-2">
+              {(filters.minPrice !== undefined && filters.minPrice > 1000) ||
+              (filters.maxPrice !== undefined &&
+                filters.maxPrice < 20000000) ? (
+                <Chip
+                  label={`$${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minPrice", 0);
+                    updateInstanceFilter("list", "maxPrice", 20000000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {(filters.minSqft !== undefined && filters.minSqft > 100) ||
+              (filters.maxSqft !== undefined && filters.maxSqft < 15000) ? (
+                <Chip
+                  label={`${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minSqft", 0);
+                    updateInstanceFilter("list", "maxSqft", 15000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {filters.status && filters.status !== "forSale" && (
+                <Chip
+                  label={filters.status}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "status", "forSale");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.location &&
+                filters.location
+                  .split(",")
+                  .filter(Boolean)
+                  .map((loc: string) => (
+                    <Chip
+                      key={loc}
+                      label={loc}
+                      onDelete={() => {
+                        const remaining = (filters.location || "")
+                          .split(",")
+                          .filter((l: string) => l !== loc)
+                          .join(",");
+                        updateInstanceFilter("list", "location", remaining);
+                      }}
+                      className="bg-gray-100 text-sm"
+                    />
+                  ))}
+            </div>
+          </div>
+        )}
+
+        {/* Property Grid */}
+        {isLoading ? (
+          <div className="flex justify-between items-start mb-10 w-full">
+            <div className="w-full flex flex-col h-full">
+              <div
+                ref={scrollRef}
+                className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3"
+              >
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <PropertyCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="w-full xl:h-[65svh] h-full flex justify-center items-center">
+            <h3 className="text-2xl font-medium">No Properties Found</h3>
+          </div>
+        ) : (
+          <div className="flex justify-between items-start mb-10 w-full">
+            <div className="w-full flex flex-col h-full">
+              <div
+                ref={scrollRef}
+                className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
+              >
+                {data.map((property: any) => (
+                  <PropertiesCard
+                    key={property.id}
+                    {...property}
+                    isLogin
+                    isSold={status === "sold"}
+                    isExpired={status === "expired"}
+                    isDdf={property.isDdf}
+                  />
+                ))}
+              </div>
+              {data?.length !== 0 && pageCount !== 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 4,
+                  }}
+                >
+                  <Pagination
+                    count={pageCount}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                    size="large"
+                  />
+                </Box>
+              )}
+            </div>
+          </div>
         )}
       </div>
 

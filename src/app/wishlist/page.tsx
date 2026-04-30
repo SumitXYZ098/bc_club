@@ -1,7 +1,7 @@
-import PropertiesListingPage from "@/src/mainComponents/properties/PropertiesListingPage";
+import WishlistingPage from "@/src/mainComponents/wishlist/WishlistingPage";
 
 const page = () => {
-  return <PropertiesListingPage />;
+  return <WishlistingPage />;
 };
 
 export default page;
