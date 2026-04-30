@@ -189,9 +189,11 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                   color={localIsFavourite ? "var(--red)" : "var(--primary)"}
                   fill={localIsFavourite ? "var(--red)" : "none"}
                 />
-                <span className="text-xs font-bold ml-1 text-black">
-                  {localLikesCount}
-                </span></button>
+                {localLikesCount > 0 && (
+                  <span className="text-xs font-bold ml-1 text-black">
+                    {localLikesCount}
+                  </span>
+                )}</button>
             )}
 
             {/* Days Ago */}
