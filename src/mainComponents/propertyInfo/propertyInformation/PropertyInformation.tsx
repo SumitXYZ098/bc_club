@@ -14,7 +14,7 @@ import {
   buildingComplexHeaders,
   buildingComplexRows,
   getPropertyDetailsRows,
-  getRoomRows,
+  getPropertyRoomRows,
   marketStatsHeaders,
   marketStatsRows,
   nearbySchoolsHeaders,
@@ -52,7 +52,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
     {
       icon: Icons.scale,
       label: "Area Size",
-      value: property?.lot_size_area || property?.area || "Na",
+      value: (property?.Living_area ?? property?.lot_size_area) || "Na",
     },
   ];
 
@@ -86,7 +86,11 @@ const PropertyInformation = ({ property }: { property: any }) => {
             <Description
               type={IDescriptionTypes.dec1614}
               customClasses="text-black70/50"
-              content={property?.public_remarks || property?.raw_data?.PublicRemarks || "No Description"}
+              content={
+                property?.public_remarks ||
+                property?.raw_data?.PublicRemarks ||
+                "No Description"
+              }
             />
           </div>
 
@@ -154,11 +158,13 @@ const PropertyInformation = ({ property }: { property: any }) => {
             rows={getPropertyDetailsRows(property)}
           />
           {/* Room Information */}
-          <DynamicTable
-            title="Room Information"
-            headers={roomHeaders}
-            rows={getRoomRows(property)}
-          />
+          {property?.rooms && property?.rooms?.length > 0 && (
+            <DynamicTable
+              title="Room Information"
+              headers={roomHeaders}
+              rows={getPropertyRoomRows(property)}
+            />
+          )}
 
           {/*  */}
           <div

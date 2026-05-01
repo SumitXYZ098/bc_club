@@ -264,7 +264,7 @@ export const getPropertyDetailsRows = (property: any) => [
       {
         data: {
           label: "Status",
-          value:  property?.standard_status || "-",
+          value: property?.standard_status || "-",
         },
       },
     ],
@@ -272,7 +272,10 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Floor Area",
-      value: property?.lot_size_area || property?.area ? `${property?.lot_size_area || property?.area} ${property?.lot_size_units || 'sqft'}` : "-",
+      value:
+        property?.lot_size_area || property?.area
+          ? `${property?.lot_size_area || property?.area} ${property?.lot_size_units || "sqft"}`
+          : "-",
     },
     subRows: [
       {
@@ -382,6 +385,25 @@ export const getRoomRows = (property: any) => {
       //   return `${feet}'${inches}`;
       // };
 
+      return {
+        data: {
+          room: room.RoomType,
+          level: room.RoomLevel,
+          dimensions: `${room.RoomWidth} × ${room.RoomLength}`,
+        },
+      };
+    });
+};
+
+export const getPropertyRoomRows = (property: any) => {
+  const rooms = property?.rooms || [];
+
+  return rooms
+    .filter(
+      (room: any) =>
+        room.RoomType && room.RoomLevel && room.RoomWidth && room.RoomLength,
+    )
+    .map((room: any) => {
       return {
         data: {
           room: room.RoomType,

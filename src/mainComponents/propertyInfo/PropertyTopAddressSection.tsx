@@ -36,7 +36,9 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
             {property?.city}, {property?.state}, Canada
           </span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
-          <span>MLS® {property?.listing_id || property?.mls_number || 'FPR345643E3'}</span>
+          <span>
+            MLS® {property?.listing_id || property?.mls_number || "FPR345643E3"}
+          </span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
           <span>Courtesy of: {getOfficeName(property)}</span>
         </div>
@@ -50,7 +52,9 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
         />
         <Description
           type={IDescriptionTypes.dec1614}
-          content={`${property?.lot_size_area || property?.area || '1470'} ${property?.lot_size_units || 'sqft'}`}
+          content={`${
+            property?.Living_area ?? property?.lot_size_area
+          } ${property?.living_area_units ?? property?.lot_size_units}`}
           customClasses="text-black70"
         />
       </div>
