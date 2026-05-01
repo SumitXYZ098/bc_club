@@ -28,6 +28,7 @@ import MapActiveFilters from "./MapActiveFilters";
 import MapSidebar from "./MapSidebar";
 import { formatPriceAbbreviated } from "./mapUtils";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
+import "./map.css";
 
 const mapContainerStyle = {
   width: "100%",
@@ -36,9 +37,8 @@ const mapContainerStyle = {
 
 const center = {
   lat: 49.2827,
-  lng: -123.1207,
+  lng: -123.1207, // Vancouver
 };
-
 const options = {
   disableDefaultUI: true,
   zoomControl: false,
@@ -599,6 +599,22 @@ export default function GoogleMapSearch() {
     }
   }, [properties, map, mapZoomVal, sortBy]);
 
+  const popupRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+        setSelectedProperty(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   if (!isLoaded)
     return (
       <div className="flex flex-col items-center justify-center h-screen space-y-3">
@@ -651,7 +667,7 @@ export default function GoogleMapSearch() {
           <div className="hidden md:block flex-1 relative z-10">
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
-              zoom={11}
+              zoom={13}
               center={center}
               onLoad={onMapLoad}
               onIdle={onMapIdle}
@@ -756,7 +772,7 @@ export default function GoogleMapSearch() {
                               ? statusColor
                               : "transparent",
                           }}
-                          className={`bg-white px-3 py-1.5 rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.15)] font-bold text-sm whitespace-nowrap border-2 transition-all duration-200 ${isHovered ? "text-white" : "text-gray-800"}`}
+                          className={`bg-white px-3 py-1.5 rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.15)] font-bold text-sm whitespace-nowrap border-2 transition-all duration-200 text-gray-800 `}
                         >
                           <div
                             style={{
@@ -766,9 +782,7 @@ export default function GoogleMapSearch() {
                             }}
                             className="absolute inset-0 rounded-lg -z-10"
                           ></div>
-                          <span
-                            style={{ color: isHovered ? "white" : statusColor }}
-                          >
+                          <span style={{ color: statusColor }}>
                             {formatPriceAbbreviated(property.price)}
                           </span>
                         </div>
@@ -779,7 +793,7 @@ export default function GoogleMapSearch() {
                               ? statusColor
                               : "transparent",
                           }}
-                          className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 rotate-45 border-r border-b transition-all duration-200 shadow-[2px_2px_2px_rgba(0,0,0,0.05)]"
+                          className="-z-10 absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 rotate-45 border-r border-b transition-all duration-200 shadow-[2px_2px_2px_rgba(0,0,0,0.05)]"
                         ></div>
                       </div>
                     </OverlayView>
@@ -830,13 +844,19 @@ export default function GoogleMapSearch() {
                   onCloseClick={() => setSelectedProperty(null)}
                 >
                   <div
-                    onClick={() =>
-                      (window.location.href = `/property-info/${selectedProperty.id}`)
-                    }
+                    ref={popupRef}
                     style={{
+                      width: 260,
+                      background: "white",
+                      borderRadius: 6,
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+                      fontFamily: "Plus Jakarta Display",
                       cursor: "pointer",
-                      width: 220,
-                      fontFamily: "'Inter', sans-serif",
+                      padding: 10,
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.location.href = `/property-info/${selectedProperty.id}`;
                     }}
                   >
                     <div style={{ overflow: "hidden" }}>
@@ -845,7 +865,7 @@ export default function GoogleMapSearch() {
                           width: "100%",
                           height: 130,
                           overflow: "hidden",
-                          borderRadius: 8,
+                          borderRadius: 3,
                           backgroundColor: "#f1f5f9",
                         }}
                       >
