@@ -3,9 +3,10 @@ import PropertyTopAddressSection from "./PropertyTopAddressSection";
 import PropertyGallery from "./PropertyGallery";
 import PropertyInformation from "./propertyInformation/PropertyInformation";
 import GetInTouch from "../getInTouch/GetInTouch";
-import { propertyImages } from "@/src/mainComponents/dummyData";
 import { useGetUnifiedListingById } from "@/src/hooks/listing/useListingQueries";
 import PropertyInfoSkeleton from "./PropertyInfoSkeleton";
+import Image from "next/image";
+import { Images } from "@/src/app/exports";
 
 const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const {
@@ -16,6 +17,7 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
     select: (res: any) => res?.data || res,
   });
 
+  console.log("🚀 ~ PropertyInfo ~ listing:", listing);
   if (loading) return <PropertyInfoSkeleton />;
   if (error)
     return (
@@ -32,9 +34,21 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
 
   return (
     <>
-      <section className="xl:max-w-screen-2xl mx-auto w-full bg-background flex flex-col xl:px-16 md:px-13 px-6 xl:pt-35.5 xl:pb-28.25 md:pt-28 md:pb-25 pt-21 pb-13">
+      <section className="xl:max-w-screen-2xl mx-auto w-full bg-background flex flex-col xl:px-16 md:px-13 px-6 xl:pt-35.5 xl:pb-28.25 md:pt-28 md:pb-25 pt-21 pb-13 items-center-safe">
         <PropertyTopAddressSection property={listing} />
-        <PropertyGallery images={listing?.media || propertyImages} />
+        {listing?.media_url.length > 0 ? (
+          <PropertyGallery images={listing?.media ?? listing?.media_url} />
+        ) : (
+          <div className="w-1/2 xl:h-134 md:h-76.5 h-56.5 relative cursor-pointer md:rounded-2xl rounded-xl">
+            <Image
+              className="w-full h-full object-cover rounded-xl"
+              src={Images.apartment}
+              alt="property image not found*"
+              width={1400}
+              height={1400}
+            />
+          </div>
+        )}
         <PropertyInformation property={listing} />
       </section>
 

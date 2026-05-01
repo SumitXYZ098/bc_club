@@ -15,7 +15,10 @@ import PropertiesCard, {
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 
-import { useGetActiveListings, useGetListings } from "@/src/hooks/listing/useListingQueries";
+import {
+  useGetActiveListings,
+  useGetListings,
+} from "@/src/hooks/listing/useListingQueries";
 import { getOfficeName } from "@/src/utilities/utilities";
 import { useAuthContext } from "../auth/AuthContext";
 
@@ -43,13 +46,12 @@ const swiperConfig = {
   },
   breakpoints: {
     640: { slidesPerView: 1.5, spaceBetween: 20 },
-    1024: { slidesPerView: 3, spaceBetween: 32 },
+    1024: { slidesPerView: 3.5, spaceBetween: 24 },
   },
-  speed: 800,
+  speed: 900,
 };
 
 const OurProperty = () => {
-
   const { isLoggedIn } = useAuthContext();
 
   const [tab, setTab] = useState(tabList[0]);
@@ -79,7 +81,7 @@ const OurProperty = () => {
     image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+    daysAgo: listing?.ModificationTimestamp ?? 0,
     address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
@@ -88,40 +90,48 @@ const OurProperty = () => {
     priceDrop:
       listing.PreviousListPrice > listing.ListPrice
         ? Number(
-          (
-            (listing.PreviousListPrice - listing.ListPrice) /
-            listing.ListPrice
-          ).toFixed(1),
-        )
+            (
+              (listing.PreviousListPrice - listing.ListPrice) /
+              listing.ListPrice
+            ).toFixed(1),
+          )
         : undefined,
     assessedDiff: listing.ListPrice
       ? Number(
-        (
-          (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-          listing.ListPrice
-        ).toFixed(1),
-      )
+          (
+            (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
+            listing.ListPrice
+          ).toFixed(1),
+        )
       : 0,
-    mls: listing?.mls_number ?? listing?.listing_id
-,
+    mls: listing?.mls_number ?? listing?.listing_id,
     realtor: getOfficeName(listing),
     isFavourite: listing?.is_favorite || false,
     isDdf: !!isDdf,
   });
 
   const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
-    { location: city },
+    { location: city, page: 1, pageSize: 30 },
     {
       select: (res: any) => {
         console.log("📦 API Response:", res);
-        const nonResidentialTypes = ["office", "business", "agriculture", "vacant land", "industrial", "retail"];
-        
+        const nonResidentialTypes = [
+          "office",
+          "business",
+          "agriculture",
+          "vacant land",
+          "industrial",
+          "retail",
+        ];
+
         return (
           res?.data
             ?.filter((l: any) => l?.address && Number(l?.price) > 0)
             .filter((l: any) => {
               const type = (l?.property_sub_type || "").toLowerCase();
-              return !nonResidentialTypes.some(nonRes => type.includes(nonRes));
+              return !nonResidentialTypes.some((nonRes) =>
+                type.includes(nonRes),
+              );
             })
             .map((l: any) => mapProperty(l, true)) || []
         );
@@ -136,13 +146,22 @@ const OurProperty = () => {
     },
     {
       select: (res: any) => {
-        const nonResidentialTypes = ["office", "business", "agriculture", "vacant land", "industrial", "retail"];
+        const nonResidentialTypes = [
+          "office",
+          "business",
+          "agriculture",
+          "vacant land",
+          "industrial",
+          "retail",
+        ];
         return (
           res?.data
             ?.filter((l: any) => l?.address && Number(l?.price) > 0)
             .filter((l: any) => {
               const type = (l?.property_sub_type || "").toLowerCase();
-              return !nonResidentialTypes.some(nonRes => type.includes(nonRes));
+              return !nonResidentialTypes.some((nonRes) =>
+                type.includes(nonRes),
+              );
             })
             .map((l: any) => mapProperty(l, false)) || []
         );
@@ -158,13 +177,22 @@ const OurProperty = () => {
       },
       {
         select: (res: any) => {
-          const nonResidentialTypes = ["office", "business", "agriculture", "vacant land", "industrial", "retail"];
+          const nonResidentialTypes = [
+            "office",
+            "business",
+            "agriculture",
+            "vacant land",
+            "industrial",
+            "retail",
+          ];
           return (
             res?.data
               ?.filter((l: any) => l?.address && Number(l?.price) > 0)
               .filter((l: any) => {
                 const type = (l?.property_sub_type || "").toLowerCase();
-                return !nonResidentialTypes.some(nonRes => type.includes(nonRes));
+                return !nonResidentialTypes.some((nonRes) =>
+                  type.includes(nonRes),
+                );
               })
               .map((l: any) => mapProperty(l, false)) || []
           );
@@ -180,7 +208,7 @@ const OurProperty = () => {
           const lng = pos.coords.longitude;
 
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
           );
 
           const data = await res.json();
@@ -194,7 +222,6 @@ const OurProperty = () => {
 
           // ✅ If API returns nothing → fallback
           setCity(detectedCity || "Vancouver");
-
         } catch (err) {
           // ✅ If API fails
           console.log("❌ Reverse geocode failed");
@@ -206,7 +233,7 @@ const OurProperty = () => {
       (error) => {
         console.log("❌ Location denied:", error.message);
         setCity("Vancouver");
-      }
+      },
     );
   };
 
@@ -229,17 +256,15 @@ const OurProperty = () => {
       return;
     }
 
-    navigator.permissions
-      .query({ name: "geolocation" })
-      .then((result) => {
-        // ❌ If already denied → DON'T call API again
-        if (result.state === "denied") {
-          console.log("🚫 Permission already denied → using Vancouver");
-          setCity("Vancouver");
-          return;
-        }
-        getUserLocation();
-      });
+    navigator.permissions.query({ name: "geolocation" }).then((result) => {
+      // ❌ If already denied → DON'T call API again
+      if (result.state === "denied") {
+        console.log("🚫 Permission already denied → using Vancouver");
+        setCity("Vancouver");
+        return;
+      }
+      getUserLocation();
+    });
   }, []);
 
   const renderSlider = (
@@ -363,7 +388,6 @@ const OurProperty = () => {
   };
 
   return (
-
     <section className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 py-16 overflow-clip">
       <Heading
         tagType="h2"
@@ -416,7 +440,14 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Newly Listed Properties"
           />
-          {renderSlider(newList, isLoadingNew, true, false, false, "newly-listed")}
+          {renderSlider(
+            newList,
+            isLoadingNew,
+            true,
+            false,
+            false,
+            "newly-listed",
+          )}
         </div>
 
         <div
@@ -428,7 +459,14 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Previously Listed Properties"
           />
-          {renderSlider(expiredList, isLoadingExpired, isLoggedIn, false, true, "expired")}
+          {renderSlider(
+            expiredList,
+            isLoadingExpired,
+            isLoggedIn,
+            false,
+            true,
+            "expired",
+          )}
         </div>
 
         <div ref={refs["Sold properties"]} className="flex flex-col gap-4">
@@ -437,11 +475,17 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Sold Properties"
           />
-          {renderSlider(soldList, isLoadingSold, isLoggedIn, true, false, "sold")}
+          {renderSlider(
+            soldList,
+            isLoadingSold,
+            isLoggedIn,
+            true,
+            false,
+            "sold",
+          )}
         </div>
       </div>
     </section>
-
   );
 };
 
