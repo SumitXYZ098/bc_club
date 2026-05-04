@@ -9,7 +9,7 @@ type TimeFormatMode = "short" | "long";
 
 export const getTime = (
   timestamp: string | number | Date,
-  mode: TimeFormatMode = "long"
+  mode: TimeFormatMode = "long",
 ): string => {
   const now = dayjs();
   const target = dayjs(timestamp);
@@ -42,36 +42,22 @@ export const getTime = (
   // ✅ LONG MODE
   if (seconds < 60) return "just now";
 
-  if (minutes < 60)
-    return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+  if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
 
-  if (hours < 24)
-    return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
 
   if (days === 1) return "yesterday";
 
-  if (days < 30)
-    return `${days} day${days !== 1 ? "s" : ""} ago`;
+  if (days < 30) return `${days} day${days !== 1 ? "s" : ""} ago`;
 
   const months = now.diff(target, "month");
-  if (months < 12)
-    return `${months} month${months !== 1 ? "s" : ""} ago`;
+  if (months < 12) return `${months} month${months !== 1 ? "s" : ""} ago`;
 
   const years = now.diff(target, "year");
   return `${years} year${years !== 1 ? "s" : ""} ago`;
 };
 
 export const getOfficeName = (listing: any): string => {
-  // console.log(" OFFICE FOR:", listing?.listing_id || listing?.id, {
-  //   office_name: listing?.office_name,
-  //   OFFICE_NAME: listing?.OFFICE_NAME,
-  //   office_data: listing?.office_data,
-  //   realtor_name: listing?.realtor_name,
-  //   raw_data_ListOfficeName: listing?.raw_data?.ListOfficeName,
-  //   raw_data_ListAOR: listing?.raw_data?.ListAOR,
-  //   raw_data_OriginatingSystemName: listing?.raw_data?.OriginatingSystemName,
-  // });
-
   const values = [
     listing?.office_name,
     listing?.OFFICE_NAME,
@@ -84,7 +70,7 @@ export const getOfficeName = (listing: any): string => {
     listing?.raw_data?.ListOfficeName,
     listing?.raw_data?.OfficeName,
   ];
-                 
+
   for (const val of values) {
     if (!val || typeof val !== "string") continue;
 
@@ -93,14 +79,9 @@ export const getOfficeName = (listing: any): string => {
 
     if (
       clean &&
-      ![
-        "pending office name",
-        "unknown office",
-        "unknown",
-        "",
-      ].includes(lower)
+      !["pending office name", "unknown office", "unknown", ""].includes(lower)
     ) {
-      return clean; 
+      return clean;
     }
   }
 
@@ -114,38 +95,60 @@ export function getDisplayPropertyType(listing: any): string {
   const isActive = status === "active" || status === "for sale";
 
   const rawType = (
-    listing?.property_sub_type || 
-    listing?.PropertySubType || 
-    listing?.raw_data?.PropertySubType || 
+    listing?.property_sub_type ||
+    listing?.PropertySubType ||
+    listing?.raw_data?.PropertySubType ||
     ""
-  ).trim().toLowerCase();
+  )
+    .trim()
+    .toLowerCase();
 
   if (!rawType) return "Property";
 
   if (isActive) {
-    if (rawType.includes("single family") || rawType.includes("single-family")) return "Single-Family";
-    if (rawType.includes("multi family") || rawType.includes("multi-family")) return "Multi-Family";
+    if (rawType.includes("single family") || rawType.includes("single-family"))
+      return "Single-Family";
+    if (rawType.includes("multi family") || rawType.includes("multi-family"))
+      return "Multi-Family";
     if (rawType.includes("office")) return "Office";
-    if (rawType.includes("business") || rawType.includes("commercial")) return "Business";
-    if (rawType.includes("agriculture") || rawType.includes("farm")) return "Agriculture";
-    if (rawType.includes("vacant land") || rawType.includes("land")) return "Vacant Land";
-    
+    if (rawType.includes("business") || rawType.includes("commercial"))
+      return "Business";
+    if (rawType.includes("agriculture") || rawType.includes("farm"))
+      return "Agriculture";
+    if (rawType.includes("vacant land") || rawType.includes("land"))
+      return "Vacant Land";
+
     return rawType
       .split(" ")
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   }
 
-  if (rawType.includes("condo") || rawType.includes("apartment")) return "Apartment/Condo";
-  if (rawType.includes("single family") || rawType.includes("house") || rawType.includes("single family residence")) return "Single Family Residence";
-  if (rawType.includes("half duplex") || rawType.includes("duplex")) return "Half Duplex";
-  if (rawType.includes("row house") || rawType.includes("row")) return "Row House (Non-Strata)";
-  if (rawType.includes("townhouse") || rawType.includes("townhome")) return "Townhouse";
+  if (rawType.includes("condo") || rawType.includes("apartment"))
+    return "Apartment/Condo";
+  if (
+    rawType.includes("single family") ||
+    rawType.includes("house") ||
+    rawType.includes("single family residence")
+  )
+    return "Single Family Residence";
+  if (rawType.includes("half duplex") || rawType.includes("duplex"))
+    return "Half Duplex";
+  if (rawType.includes("row house") || rawType.includes("row"))
+    return "Row House (Non-Strata)";
+  if (rawType.includes("townhouse") || rawType.includes("townhome"))
+    return "Townhouse";
 
   return "Property";
 }
 
-export function matchesPropertyFilter(listing: any, selectedType: string): boolean {
+export function matchesPropertyFilter(
+  listing: any,
+  selectedType: string,
+): boolean {
   if (!selectedType || selectedType.toLowerCase() === "any") return true;
-  return getDisplayPropertyType(listing).toLowerCase() === selectedType.trim().toLowerCase();
+  return (
+    getDisplayPropertyType(listing).toLowerCase() ===
+    selectedType.trim().toLowerCase()
+  );
 }

@@ -38,10 +38,16 @@ export default function Maps() {
         return listings
           .map((listing: any) => ({
             id: listing.documentId || Math.random().toString(),
-            image: typeof listing?.media?.[0] === "string" ? listing.media[0] : listing?.media?.[0]?.MediaURL,
+            image:
+              typeof listing?.media?.[0] === "string"
+                ? listing.media[0]
+                : listing?.media?.[0]?.MediaURL,
             title: listing?.property_sub_type || "Property",
             price: listing?.price || 0,
-            daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+            ddaysAgo:
+              listing?.ModificationTimestamp ??
+              listing?.raw_data?.BridgeModificationTimestamp ??
+              0,
             address: listing?.address
               ? `${listing?.address}, ${listing?.city || ""}, ${listing?.state || ""}`
               : `${listing?.city || ""}, ${listing?.state || ""}` || "",
@@ -73,7 +79,10 @@ export default function Maps() {
             longitude: Number(listing.longitude),
             latitude: Number(listing.latitude),
           }))
-          .filter((l: any) => !isNaN(l.longitude) && !isNaN(l.latitude) && Number(l.price) > 0);
+          .filter(
+            (l: any) =>
+              !isNaN(l.longitude) && !isNaN(l.latitude) && Number(l.price) > 0,
+          );
       },
     },
   );

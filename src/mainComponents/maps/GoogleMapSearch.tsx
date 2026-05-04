@@ -301,7 +301,10 @@ export default function GoogleMapSearch() {
               : listing?.media?.[0]?.MediaURL,
           title: listing?.property_sub_type || "Property",
           price: listing?.price || 0,
-          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+          daysAgo:
+            listing?.ModificationTimestamp ??
+            listing?.raw_data?.BridgeModificationTimestamp ??
+            0,
           address: listing?.address
             ? `${listing?.address}, ${listing?.city || ""}`
             : listing?.city || "",
@@ -364,7 +367,10 @@ export default function GoogleMapSearch() {
                 : listing?.media?.[0]?.MediaURL,
           title: listing?.property_sub_type || "Property",
           price: Number(listing?.price) || 0,
-          daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+          daysAgo:
+            listing?.ModificationTimestamp ??
+            listing?.raw_data?.BridgeModificationTimestamp ??
+            0,
           address: listing?.address || `${listing?.city || ""}`,
           sqft: listing?.area ?? listing?.Living_area ?? 0,
           beds: listing?.bedrooms ?? 0,

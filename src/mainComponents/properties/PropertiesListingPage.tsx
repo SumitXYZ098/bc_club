@@ -154,7 +154,10 @@ export default function PropertiesListingPage() {
             : listing?.media?.[0]?.MediaURL,
         title: listing?.property_sub_type,
         price: listing?.price,
-        daysAgo: listing?.raw_data?.OriginalEntryTimestamp ?? 0,
+        daysAgo:
+          listing?.ModificationTimestamp ??
+          listing?.raw_data?.BridgeModificationTimestamp ??
+          0,
         address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
         sqft: listing?.area ?? listing?.lot_size_area ?? 0,
         beds: listing?.bedrooms ?? 0,
