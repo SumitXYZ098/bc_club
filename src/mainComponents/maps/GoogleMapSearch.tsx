@@ -29,6 +29,8 @@ import MapSidebar from "./MapSidebar";
 import { formatPriceAbbreviated } from "./mapUtils";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import "./map.css";
+import { MapOptions } from "mapbox-gl";
+import { useRouter } from "next/navigation";
 
 const mapContainerStyle = {
   width: "100%",
@@ -40,6 +42,7 @@ const center = {
   lng: -123.1207, // Vancouver
 };
 const options = {
+  hash: false,
   disableDefaultUI: true,
   zoomControl: false,
   streetViewControl: false,
@@ -71,6 +74,13 @@ export default function GoogleMapSearch() {
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
     null,
   );
+  const [selectedClusterProperties, setSelectedClusterProperties] = useState<
+    any[]
+  >([]);
+  const [clusterPosition, setClusterPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const lastFetchedBounds = useRef<string>("");
 
   const [mapBounds, setMapBounds] = useState<{
@@ -428,6 +438,7 @@ export default function GoogleMapSearch() {
   }, []);
 
   const triggerSearch = useCallback(() => {
+    if (selectedClusterProperties.length > 0 || selectedProperty) return; // 🚫 block if any popup open
     if (!map) return;
     const bounds = map.getBounds();
     if (!bounds) return;
@@ -453,12 +464,15 @@ export default function GoogleMapSearch() {
     setMapZoomVal(Math.round(zoom));
     lastFetchedBounds.current = boundsKey;
     setShowSearchButton(false);
-  }, [map]);
+  }, [map, selectedClusterProperties]);
 
   const onMapIdle = useCallback(() => {
+    // 🚫 Do nothing if popup open
+    if (selectedClusterProperties.length > 0 || selectedProperty) return;
+
     setIsMoving(false);
     if (!map) return;
-    const zoom = map.getZoom() || 6;
+    const zoom = map.getZoom() || 14;
 
     // 🚫 STOP API CALL if zoom is too low
     if (zoom < 8) {
@@ -484,7 +498,7 @@ export default function GoogleMapSearch() {
       // For now, let's keep auto-fetch but with a longer debounce and show button if it's a significant move
       triggerSearch();
     }, 400); // ⏱ debounce increased to 400ms
-  }, [map, triggerSearch]);
+  }, [map, triggerSearch, selectedClusterProperties]);
 
   const toggleMapStyle = () => {
     if (!map) return;
@@ -496,6 +510,13 @@ export default function GoogleMapSearch() {
       setIsSatellite(true);
     }
   };
+
+  const stableClusterPosition = useMemo(
+    () => clusterPosition,
+    [clusterPosition?.lat, clusterPosition?.lng],
+  );
+
+  const router = useRouter();
 
   useEffect(() => {
     if (!mapLoaded || !map || !location) return;
@@ -512,10 +533,10 @@ export default function GoogleMapSearch() {
     const coords = cityCoords[location];
     if (coords) {
       map.panTo(coords);
-      map.setZoom(11);
+      map.setZoom(14);
     } else if (properties?.length > 0 && location !== "British Columbia") {
       map.panTo({ lat: properties[0].latitude, lng: properties[0].longitude });
-      map.setZoom(11);
+      map.setZoom(14);
     }
   }, [location, mapLoaded, map]);
 
@@ -525,7 +546,7 @@ export default function GoogleMapSearch() {
       (pos) => {
         const { latitude, longitude } = pos.coords;
         map.panTo({ lat: latitude, lng: longitude });
-        map.setZoom(15);
+        map.setZoom(17);
       },
       (err) => alert("Please enable location services to use this feature."),
     );
@@ -549,6 +570,9 @@ export default function GoogleMapSearch() {
 
   // Supercluster logic for Google Maps
   useEffect(() => {
+    // 🚫 STOP recalculation if cluster popup is open
+    if (selectedClusterProperties.length > 0) return;
+
     if (!properties || properties.length === 0) {
       setClusters((prev) => (prev.length === 0 ? prev : []));
       setVisibleProperties((prev) => (prev.length === 0 ? prev : []));
@@ -565,7 +589,7 @@ export default function GoogleMapSearch() {
     superclusterRef.current.load(points as any);
 
     if (map) {
-      const zoom = map.getZoom() || 6;
+      const zoom = map.getZoom() || 14;
       const bounds = map.getBounds();
       if (bounds) {
         const sw = bounds.getSouthWest();
@@ -603,7 +627,7 @@ export default function GoogleMapSearch() {
         });
       }
     }
-  }, [properties, map, mapZoomVal, sortBy]);
+  }, [properties, map, mapZoomVal, sortBy, selectedClusterProperties]);
 
   const popupRef = useRef<HTMLDivElement | null>(null);
 
@@ -673,7 +697,7 @@ export default function GoogleMapSearch() {
           <div className="hidden md:block flex-1 relative z-10">
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
-              zoom={13}
+              zoom={14}
               center={center}
               onLoad={onMapLoad}
               onIdle={onMapIdle}
@@ -686,6 +710,10 @@ export default function GoogleMapSearch() {
                 setShowSearchButton(true);
               }}
               options={options}
+              onClick={() => {
+                setSelectedClusterProperties([]);
+                setClusterPosition(null);
+              }}
             >
               {/* Search This Area Button */}
               {showSearchButton && (
@@ -722,11 +750,42 @@ export default function GoogleMapSearch() {
                       mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                     >
                       <div
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (selectedClusterProperties.length > 0) return;
+
+                          const currentZoom = map?.getZoom() || 0;
+
+                          // ❗ Close single property popup
+                          setSelectedProperty(null);
+
+                          // 🔥 If max zoom → show cluster properties in InfoWindow
+                          if (currentZoom >= 20) {
+                            const leaves =
+                              superclusterRef.current?.getLeaves(
+                                cluster.id,
+                                50, // limit for performance
+                              ) || [];
+
+                            const properties = leaves.map(
+                              (leaf: any) => leaf.properties.propertyData,
+                            );
+
+                            setSelectedClusterProperties(properties);
+                            setClusterPosition({
+                              lat: latitude,
+                              lng: longitude,
+                            });
+
+                            return;
+                          }
+
+                          // 👉 Normal zoom behavior
                           const expansionZoom =
                             superclusterRef.current?.getClusterExpansionZoom(
                               cluster.id as number,
                             ) || 10;
+
                           map?.setZoom(expansionZoom);
                           map?.panTo({ lat: latitude, lng: longitude });
                         }}
@@ -756,7 +815,7 @@ export default function GoogleMapSearch() {
                       ? "#3b82f6"
                       : "#22c55e"; // Green for Active
 
-                if (zoom >= 13) {
+                if (zoom >= 14) {
                   return (
                     <OverlayView
                       key={`property-${property.id}`}
@@ -767,7 +826,12 @@ export default function GoogleMapSearch() {
                       mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                     >
                       <div
-                        onClick={() => setSelectedProperty(property)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedClusterProperties([]);
+                          setClusterPosition(null);
+                          setSelectedProperty(property);
+                        }}
                         onMouseEnter={() => setHoveredPropertyId(property.id)}
                         onMouseLeave={() => setHoveredPropertyId(null)}
                         className={`group w-fit relative -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 ${isHovered ? "scale-110 z-30" : "z-20"}`}
@@ -816,7 +880,8 @@ export default function GoogleMapSearch() {
                     mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                   >
                     <div
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         map?.setZoom(15);
                         map?.panTo({
                           lat: property.latitude,
@@ -945,6 +1010,120 @@ export default function GoogleMapSearch() {
                   </div>
                 </InfoWindow>
               )}
+
+              {selectedClusterProperties.length > 0 &&
+                stableClusterPosition && (
+                  <InfoWindow
+                    position={stableClusterPosition}
+                    onCloseClick={() => {
+                      setSelectedClusterProperties([]);
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 300,
+                        maxHeight: 320,
+                        overflowY: "auto",
+                        padding: 10,
+                        fontFamily: "Plus Jakarta Display",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 700,
+                          marginBottom: 10,
+                        }}
+                      >
+                        Properties ({selectedClusterProperties.length})
+                      </h3>
+
+                      {selectedClusterProperties.map((p) => (
+                        <div
+                          key={p.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.href = `/property-info/${p.id}`;
+                          }}
+                          style={{
+                            display: "flex",
+                            gap: 10,
+                            marginBottom: 12,
+                            cursor: "pointer",
+                            borderBottom: "1px solid #eee",
+                            paddingBottom: 10,
+                          }}
+                        >
+                          <img
+                            src={p.image || Images.apartment}
+                            alt=""
+                            style={{
+                              width: 70,
+                              height: 55,
+                              objectFit: "cover",
+                              borderRadius: 6,
+                              background: "#f1f5f9",
+                            }}
+                          />
+
+                          <div style={{ flex: 1 }}>
+                            <div
+                              style={{
+                                fontWeight: 700,
+                                fontSize: 13,
+                                color: "#305487",
+                              }}
+                            >
+                              ${Number(p.price).toLocaleString()}
+                            </div>
+
+                            <div
+                              style={{
+                                fontSize: 12,
+                                color: "#444",
+                                fontWeight: 600,
+                                marginTop: 2,
+                              }}
+                            >
+                              {p.title}
+                            </div>
+
+                            <div
+                              style={{
+                                fontSize: 11,
+                                color: "#777",
+                                marginTop: 2,
+                              }}
+                            >
+                              {p.address}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* 👉 Optional CTA */}
+                      <button
+                        onClick={() => {
+                          setVisibleProperties(selectedClusterProperties);
+                          setSelectedClusterProperties([]);
+                          router.push("/properties");
+                        }}
+                        style={{
+                          width: "100%",
+                          marginTop: 8,
+                          padding: "8px",
+                          background: "#305487",
+                          color: "white",
+                          borderRadius: 6,
+                          fontWeight: 600,
+                          fontSize: 12,
+                        }}
+                      >
+                        View All
+                      </button>
+                    </div>
+                  </InfoWindow>
+                )}
             </GoogleMap>
 
             {isLoading && (

@@ -4,7 +4,7 @@ import { FiX, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import Image from "next/image";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import { Icons, Images } from "@/src/app/exports";
+import { Images } from "@/src/app/exports";
 import LineGradient from "../lineGradient/LineGradient";
 import CustomButton from "../../button/CustomButton";
 import { Dialog } from "@mui/material";
@@ -12,50 +12,118 @@ import { Dialog } from "@mui/material";
 // ================= Constants =================
 const ALL_CITIES = [
   // Core Metro Vancouver
-  'Vancouver', 'Burnaby', 'Richmond', 'Surrey', 'Coquitlam',
-  'Port Coquitlam', 'Port Moody', 'New Westminster',
-  'North Vancouver', 'West Vancouver',
+  "Vancouver",
+  "Burnaby",
+  "Richmond",
+  "Surrey",
+  "Coquitlam",
+  "Port Coquitlam",
+  "Port Moody",
+  "New Westminster",
+  "North Vancouver",
+  "West Vancouver",
 
   // Fraser Valley
-  'Abbotsford', 'Chilliwack', 'Mission', 'Agassiz', 'Hope',
-  'Langley', 'Maple Ridge', 'Pitt Meadows', 'Delta', 'White Rock',
-  'Tsawwassen', 'Ladner', 'Yarrow', 'Rosedale', 'Greendale',
+  "Abbotsford",
+  "Chilliwack",
+  "Mission",
+  "Agassiz",
+  "Hope",
+  "Langley",
+  "Maple Ridge",
+  "Pitt Meadows",
+  "Delta",
+  "White Rock",
+  "Tsawwassen",
+  "Ladner",
+  "Yarrow",
+  "Rosedale",
+  "Greendale",
 
   // Vancouver Island (important missing earlier)
-  'Victoria', 'Langford', 'Saanich', 'Nanaimo', 'Courtenay',
-  'Comox', 'Campbell River', 'Parksville', 'Duncan', 'Sidney',
+  "Victoria",
+  "Langford",
+  "Saanich",
+  "Nanaimo",
+  "Courtenay",
+  "Comox",
+  "Campbell River",
+  "Parksville",
+  "Duncan",
+  "Sidney",
 
   // Interior BC
-  'Kelowna', 'Kamloops', 'Prince George', 'Vernon',
-  'Penticton', 'Salmon Arm', 'Nelson', 'Castlegar', 'Trail',
+  "Kelowna",
+  "Kamloops",
+  "Prince George",
+  "Vernon",
+  "Penticton",
+  "Salmon Arm",
+  "Nelson",
+  "Castlegar",
+  "Trail",
 
   // Sea-to-Sky
-  'Squamish', 'Whistler', 'Pemberton', 'Britannia Beach', 'Lions Bay',
+  "Squamish",
+  "Whistler",
+  "Pemberton",
+  "Britannia Beach",
+  "Lions Bay",
 
   // Sunshine Coast
-  'Sechelt', 'Gibsons', 'Madeira Park', 'Roberts Creek', 'Egmont',
+  "Sechelt",
+  "Gibsons",
+  "Madeira Park",
+  "Roberts Creek",
+  "Egmont",
 
   // Islands
-  'Salt Spring Island', 'Pender Island', 'Mayne Island',
-  'Galiano Island', 'Saturna Island', 'Gabriola Island',
-  'Bowen Island', 'Gambier Island', 'Keats Island',
+  "Salt Spring Island",
+  "Pender Island",
+  "Mayne Island",
+  "Galiano Island",
+  "Saturna Island",
+  "Gabriola Island",
+  "Bowen Island",
+  "Gambier Island",
+  "Keats Island",
 
   // Small / Rural / Edge cases
-  'Anmore', 'Belcarra', "D'Arcy", 'Birken', 'Brackendale',
-  'Furry Creek', 'Halfmoon Bay', 'Garden Bay',
-  'Harrison Hot Springs', 'Harrison Mills',
-  'Cultus Lake', 'Lindell Beach', 'Sunshine Valley',
-  'Boston Bar', 'Lytton', 'Yale', 'Vanderhoof',
+  "Anmore",
+  "Belcarra",
+  "D'Arcy",
+  "Birken",
+  "Brackendale",
+  "Furry Creek",
+  "Halfmoon Bay",
+  "Garden Bay",
+  "Harrison Hot Springs",
+  "Harrison Mills",
+  "Cultus Lake",
+  "Lindell Beach",
+  "Sunshine Valley",
+  "Boston Bar",
+  "Lytton",
+  "Yale",
+  "Vanderhoof",
 
   // DDF-specific / MLS weird values (optional keep)
-  'Sardis', 'Sardis - Chwk River Valley', 'Sardis - Greendale',
-  'University Endowment Lands',
-  'Columbia Valley'
+  "Sardis",
+  "Sardis - Chwk River Valley",
+  "Sardis - Greendale",
+  "University Endowment Lands",
+  "Columbia Valley",
 ];
 
 const POPULAR_CITIES = [
-  'Vancouver', 'Surrey', 'Burnaby', 'Coquitlam', 
-  'Richmond', 'Langley', 'Abbotsford', 'Delta'
+  "Vancouver",
+  "Surrey",
+  "Burnaby",
+  "Coquitlam",
+  "Richmond",
+  "Langley",
+  "Abbotsford",
+  "Delta",
 ];
 import { useListingStore } from "@/src/store/useListingStore";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
@@ -115,9 +183,14 @@ interface FiltersDialogProps {
 }
 
 // ================= Component =================
-export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) {
+export default function FiltersPopup({
+  open,
+  onClose,
+  id,
+}: FiltersDialogProps) {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
-  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } = useListingStore();
+  const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
+    useListingStore();
 
   const filters = getInstanceFilters(id);
 
@@ -129,6 +202,10 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
   const [sqft, setSqft] = useState<[number | null, number | null]>([
     filters.minSqft ?? 0,
     filters.maxSqft ?? 15000,
+  ]);
+  const [lotSqft, setLotSqft] = useState<[number | null, number | null]>([
+    filters.minLotSizeArea ?? 0,
+    filters.maxLotSizeArea ?? 100000,
   ]);
   const [bedrooms, setBedrooms] = useState<number | null>(
     filters.activeBedRoom && filters.activeBedRoom !== "any"
@@ -142,11 +219,13 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
   );
   const [status, setStatus] = useState<string>(filters.status ?? "");
   const [selectedLocations, setSelectedLocations] = useState<string[]>(
-    filters.location ? filters.location.split(",").filter(Boolean) : []
+    filters.location ? filters.location.split(",").filter(Boolean) : [],
   );
-  
+
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
-  const [expandedCityGroup, setExpandedCityGroup] = useState<'all' | 'popular' | null>('popular');
+  const [expandedCityGroup, setExpandedCityGroup] = useState<
+    "all" | "popular" | null
+  >("popular");
 
   const handleToggleLocation = (city: string) => {
     if (selectedLocations.includes(city)) {
@@ -159,8 +238,15 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
   useEffect(() => {
     if (open) {
       const currentFilters = getInstanceFilters(id);
-      setPrice([currentFilters.minPrice ?? 0, currentFilters.maxPrice ?? 20000000]);
+      setPrice([
+        currentFilters.minPrice ?? 0,
+        currentFilters.maxPrice ?? 20000000,
+      ]);
       setSqft([currentFilters.minSqft ?? 0, currentFilters.maxSqft ?? 15000]);
+      setLotSqft([
+        currentFilters.minLotSizeArea ?? 0,
+        currentFilters.maxLotSizeArea ?? 100000,
+      ]);
       setBedrooms(
         currentFilters.activeBedRoom && currentFilters.activeBedRoom !== "any"
           ? Number(currentFilters.activeBedRoom.replace("+", ""))
@@ -172,7 +258,11 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
           : null,
       );
       setStatus(currentFilters.status ?? "");
-      setSelectedLocations(currentFilters.location ? currentFilters.location.split(",").filter(Boolean) : []);
+      setSelectedLocations(
+        currentFilters.location
+          ? currentFilters.location.split(",").filter(Boolean)
+          : [],
+      );
     }
   }, [open, id, getInstanceFilters]);
 
@@ -180,6 +270,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
     clearInstanceFilters(id);
     setPrice([0, 20000000]);
     setSqft([0, 15000]);
+    setLotSqft([0, 100000]);
     setBedrooms(null);
     setBathrooms(null);
     setStatus("");
@@ -192,11 +283,15 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
     updateInstanceFilter(id, "maxPrice", price[1]);
     updateInstanceFilter(id, "minSqft", sqft[0]);
     updateInstanceFilter(id, "maxSqft", sqft[1]);
-    updateInstanceFilter(id,
+    updateInstanceFilter(id, "minLotSizeArea", lotSqft[0]);
+    updateInstanceFilter(id, "maxLotSizeArea", lotSqft[1]);
+    updateInstanceFilter(
+      id,
       "activeBedRoom",
       bedrooms ? (bedrooms >= 4 ? "4+" : bedrooms.toString()) : "any",
     );
-    updateInstanceFilter(id,
+    updateInstanceFilter(
+      id,
       "activeBathRoom",
       bathrooms ? (bathrooms >= 4 ? "4+" : bathrooms.toString()) : "any",
     );
@@ -247,10 +342,11 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                 }
                 setStatus(s.k);
               }}
-              className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition ${status === s.k
+              className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition ${
+                status === s.k
                   ? "bg-[#7c7c7c33] border-[#0F0F0F33]"
                   : "border-[#0F0F0F33]"
-                }`}
+              }`}
             >
               <Image src={s.i} width={36} height={36} alt={s.l} />
               <span className="text-sm font-medium">{s.l}</span>
@@ -260,30 +356,39 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
         <LineGradient />
 
         {/* Location */}
-        <div className="mb-6 space-y-2 flex flex-col gap-y-1">
+        <div className="mb-6 space-y-2 flex flex-col gap-y-1 pt-5">
           <label className="font-medium">Location</label>
           <div className="relative w-full">
             <div
               onClick={() => setLocationDropdownOpen(!locationDropdownOpen)}
               className="w-full border border-[#33333333] rounded-xl px-3 py-3 cursor-pointer text-sm flex justify-between items-center bg-white"
             >
-              <span className={selectedLocations.length > 0 ? "text-black" : "text-gray-500"}>
-                {selectedLocations.length > 0 ? selectedLocations.join(", ") : "All Locations"}
+              <span
+                className={
+                  selectedLocations.length > 0 ? "text-black" : "text-gray-500"
+                }
+              >
+                {selectedLocations.length > 0
+                  ? selectedLocations.join(", ")
+                  : "All Locations"}
               </span>
               <span className="text-gray-400">
-                {locationDropdownOpen ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
+                {locationDropdownOpen ? (
+                  <FiChevronUp size={18} />
+                ) : (
+                  <FiChevronDown size={18} />
+                )}
               </span>
             </div>
 
             {locationDropdownOpen && (
               <div className="absolute top-full mt-1 w-full bg-white border border-[#33333333] shadow-lg rounded-xl z-50 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hide py-2">
-
-                  {/* Popular Group */}
+                {/* Popular Group */}
                 <div>
                   <div
                     onClick={() =>
                       setExpandedCityGroup(
-                        expandedCityGroup === "popular" ? null : "popular"
+                        expandedCityGroup === "popular" ? null : "popular",
                       )
                     }
                     className="px-4 py-2 bg-gray-50/80 font-medium text-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center"
@@ -303,7 +408,9 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                         <div
                           key={`pop-${city}`}
                           className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center gap-3 ${
-                            selectedLocations.includes(city) ? "bg-gray-100 font-medium" : ""
+                            selectedLocations.includes(city)
+                              ? "bg-gray-100 font-medium"
+                              : ""
                           }`}
                           onClick={() => handleToggleLocation(city)}
                         >
@@ -323,13 +430,19 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                 <div className="mb-1">
                   <div
                     onClick={() =>
-                      setExpandedCityGroup(expandedCityGroup === "all" ? null : "all")
+                      setExpandedCityGroup(
+                        expandedCityGroup === "all" ? null : "all",
+                      )
                     }
                     className="px-4 py-2 bg-gray-50/80 font-medium text-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center"
                   >
                     <span>All Cities</span>
                     <span className="text-gray-500">
-                      {expandedCityGroup === "all" ? <FiChevronUp /> : <FiChevronDown />}
+                      {expandedCityGroup === "all" ? (
+                        <FiChevronUp />
+                      ) : (
+                        <FiChevronDown />
+                      )}
                     </span>
                   </div>
                   {expandedCityGroup === "all" && (
@@ -338,7 +451,9 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                         <div
                           key={`all-${city}`}
                           className={`px-6 py-1.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center gap-3 ${
-                            selectedLocations.includes(city) ? "bg-gray-100 font-medium" : ""
+                            selectedLocations.includes(city)
+                              ? "bg-gray-100 font-medium"
+                              : ""
                           }`}
                           onClick={() => handleToggleLocation(city)}
                         >
@@ -346,7 +461,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                             type="checkbox"
                             checked={selectedLocations.includes(city)}
                             onChange={() => {}}
-                            className="cursor-pointer rounded border-gray-300 text-primary focus:ring-primary checkbox checkbox-sm checkbox"
+                            className="cursor-pointer rounded border-gray-300 text-primary focus:ring-primary checkbox-sm checkbox"
                           />
                           <span>{city}</span>
                         </div>
@@ -354,8 +469,6 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                     </div>
                   )}
                 </div>
-
-               
               </div>
             )}
           </div>
@@ -363,7 +476,7 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
         <LineGradient />
 
         {/* Price Range */}
-        <div className="md:mb-6 mb-3">
+        <div className="md:mb-6 mb-3 pt-5">
           <h3 className="font-medium md:mb-3">Price Range</h3>
           <div className="relative">
             <PriceSlider
@@ -415,8 +528,8 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
         </div>
         <LineGradient />
         {/* Area Range */}
-        <div className="md:mb-6 mb-3">
-          <h3 className="font-medium md:mb-3">Area Range</h3>
+        <div className="md:mb-6 mb-3 pt-5">
+          <h3 className="font-medium md:mb-3">Built Area</h3>
           <div className="relative">
             <PriceSlider
               value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
@@ -466,6 +579,58 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
           </div>
         </div>
         <LineGradient />
+        {/* Lot Size */}
+        <div className="md:mb-6 mb-3 pt-5">
+          <h3 className="font-medium md:mb-3">Lot Size</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[lotSqft[0] ?? 100, lotSqft[1] ?? 100000]}
+              min={100}
+              max={100000}
+              step={100}
+              onChange={(_, v) => setLotSqft(v as [number, number])}
+              disableSwap
+              valueLabelDisplay="auto"
+            />
+          </div>
+
+          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
+            {/* Min */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Min Sqft
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <span className="">{lotSqft[0]}</span>
+                <span className="text-secondary">sqft</span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <LineGradient
+              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+              vr
+            />
+
+            {/* Max */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Max Sqft
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                {lotSqft[1] === 100000 ? (
+                  <span className="">Max</span>
+                ) : (
+                  <>
+                    <span className="">{lotSqft[1]}</span>
+                    <span className="text-secondary">sqft</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        <LineGradient />
 
         {/* Property Info */}
         <div className="mb-6 border-[#33333333] pt-5">
@@ -488,7 +653,6 @@ export default function FiltersPopup({ open, onClose, id }: FiltersDialogProps) 
                         if (current === 1) setter(null);
                         else if (current > 1) setter(current - 1);
                       }}
-
                     >
                       −
                     </button>

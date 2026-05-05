@@ -159,7 +159,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
       }}
     >
       <div
-        className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-auto w-full ${
+        className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-fit w-full ${
           isLogin ? "group" : ""
         }`}
       >

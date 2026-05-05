@@ -40,6 +40,8 @@ export default function PropertiesListingPage() {
   const maxPrice = filters.maxPrice;
   const minSqft = filters.minSqft;
   const maxSqft = filters.maxSqft;
+  const minLotSizeArea = filters.minLotSizeArea;
+  const maxLotSizeArea = filters.maxLotSizeArea;
   const status = filters.status;
   const location = filters.location;
 
@@ -128,6 +130,10 @@ export default function PropertiesListingPage() {
   if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
+  if (minLotSizeArea !== undefined && minLotSizeArea > 100)
+    params.minLotSizeArea = minLotSizeArea;
+  if (maxLotSizeArea !== undefined && maxLotSizeArea < 15000)
+    params.maxLotSizeArea = maxLotSizeArea;
 
   if (status && status !== "any") {
     params.propertyType = status;
@@ -265,6 +271,8 @@ export default function PropertiesListingPage() {
     maxPrice,
     minSqft,
     maxSqft,
+    minLotSizeArea,
+    maxLotSizeArea,
     status,
     location,
     page,
@@ -577,7 +585,7 @@ export default function PropertiesListingPage() {
             <div className="w-full flex flex-col h-full">
               <div
                 ref={scrollRef}
-                className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
+                className="gap-7 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
               >
                 {data.map((property: any) => (
                   <PropertiesCard
