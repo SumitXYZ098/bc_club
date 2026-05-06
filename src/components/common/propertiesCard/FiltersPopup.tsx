@@ -207,6 +207,10 @@ export default function FiltersPopup({
     filters.minLotSizeArea ?? 0,
     filters.maxLotSizeArea ?? 100000,
   ]);
+  const [tax, setTax] = useState<[number | null, number | null]>([
+    filters.minTax ?? 0,
+    filters.maxTax ?? 50000,
+  ]);
   const [bedrooms, setBedrooms] = useState<number | null>(
     filters.activeBedRoom && filters.activeBedRoom !== "any"
       ? Number(filters.activeBedRoom.replace("+", ""))
@@ -218,11 +222,18 @@ export default function FiltersPopup({
       : null,
   );
   const [status, setStatus] = useState<string>(filters.status ?? "");
+  const [whenListed, setWhenListed] = useState<string>(filters.whenListed ?? "any");
   const [selectedLocations, setSelectedLocations] = useState<string[]>(
     filters.location ? filters.location.split(",").filter(Boolean) : [],
   );
+  const [selectedProperties, setSelectedProperties] = useState<string[]>(
+    filters.activeProperty && filters.activeProperty !== "any"
+      ? filters.activeProperty.split(",").filter(Boolean)
+      : [],
+  );
 
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
+  const [whenListedDropdownOpen, setWhenListedDropdownOpen] = useState(false);
   const [expandedCityGroup, setExpandedCityGroup] = useState<
     "all" | "popular" | null
   >("popular");
@@ -232,6 +243,34 @@ export default function FiltersPopup({
       setSelectedLocations(selectedLocations.filter((c) => c !== city));
     } else {
       setSelectedLocations([...selectedLocations, city]);
+    }
+  };
+
+  const handleToggleProperty = (prop: string, isSingleFamilyGroup: boolean) => {
+    const singleFamilyOptions = [
+      "Single-Family",
+      "Townhouse",
+      "Detached House",
+      "Duplex",
+      "Apartment/Condo",
+      "Single Family Residence",
+      "Half Duplex",
+      "Row House (Non-Strata)",
+    ];
+
+    if (isSingleFamilyGroup) {
+      // If it's a Single Family group option, clear any "Other" types
+      const currentSF = selectedProperties.filter((p) =>
+        singleFamilyOptions.includes(p),
+      );
+      if (currentSF.includes(prop)) {
+        setSelectedProperties(currentSF.filter((p) => p !== prop));
+      } else {
+        setSelectedProperties([...currentSF, prop]);
+      }
+    } else {
+      // If it's an "Other" type, it's single-select and clears everything else
+      setSelectedProperties([prop]);
     }
   };
 
@@ -247,6 +286,10 @@ export default function FiltersPopup({
         currentFilters.minLotSizeArea ?? 0,
         currentFilters.maxLotSizeArea ?? 100000,
       ]);
+      setTax([
+        currentFilters.minTax ?? 0,
+        currentFilters.maxTax ?? 50000,
+      ]);
       setBedrooms(
         currentFilters.activeBedRoom && currentFilters.activeBedRoom !== "any"
           ? Number(currentFilters.activeBedRoom.replace("+", ""))
@@ -258,9 +301,15 @@ export default function FiltersPopup({
           : null,
       );
       setStatus(currentFilters.status ?? "");
+      setWhenListed(currentFilters.whenListed ?? "any");
       setSelectedLocations(
         currentFilters.location
           ? currentFilters.location.split(",").filter(Boolean)
+          : [],
+      );
+      setSelectedProperties(
+        currentFilters.activeProperty && currentFilters.activeProperty !== "any"
+          ? currentFilters.activeProperty.split(",").filter(Boolean)
           : [],
       );
     }
@@ -271,10 +320,13 @@ export default function FiltersPopup({
     setPrice([0, 20000000]);
     setSqft([0, 15000]);
     setLotSqft([0, 100000]);
+    setTax([0, 50000]);
     setBedrooms(null);
     setBathrooms(null);
     setStatus("");
+    setWhenListed("any");
     setSelectedLocations([]);
+    setSelectedProperties([]);
     onClose();
   };
 
@@ -285,6 +337,8 @@ export default function FiltersPopup({
     updateInstanceFilter(id, "maxSqft", sqft[1]);
     updateInstanceFilter(id, "minLotSizeArea", lotSqft[0]);
     updateInstanceFilter(id, "maxLotSizeArea", lotSqft[1]);
+    updateInstanceFilter(id, "minTax", tax[0]);
+    updateInstanceFilter(id, "maxTax", tax[1]);
     updateInstanceFilter(
       id,
       "activeBedRoom",
@@ -296,7 +350,13 @@ export default function FiltersPopup({
       bathrooms ? (bathrooms >= 4 ? "4+" : bathrooms.toString()) : "any",
     );
     updateInstanceFilter(id, "status", status);
+    updateInstanceFilter(id, "whenListed", whenListed);
     updateInstanceFilter(id, "location", selectedLocations.join(","));
+    updateInstanceFilter(
+      id,
+      "activeProperty",
+      selectedProperties.length > 0 ? selectedProperties.join(",") : "any",
+    );
     onClose();
   };
 
@@ -475,6 +535,233 @@ export default function FiltersPopup({
         </div>
         <LineGradient />
 
+          {/* When Listed */}
+        <div className="mb-6 space-y-2 flex flex-col gap-y-1 pt-5">
+          <label className="font-medium">When Listed</label>
+          <div className="relative w-full">
+            <div
+              onClick={() => setWhenListedDropdownOpen(!whenListedDropdownOpen)}
+              className="w-full border border-[#33333333] rounded-xl px-3 py-3 cursor-pointer text-sm flex justify-between items-center bg-white"
+            >
+              <span className={whenListed !== "any" ? "text-black capitalize" : "text-gray-500"}>
+                {whenListed === "any" ? "Any time" : whenListed}
+              </span>
+              <span className="text-gray-400">
+                {whenListedDropdownOpen ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
+              </span>
+            </div>
+
+            {whenListedDropdownOpen && (
+              <div className="absolute top-full mt-1 w-full bg-white border border-[#33333333] shadow-lg rounded-xl z-50 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hide py-2">
+                {[
+                  { label: "Any time", value: "any" },
+                  { label: "Today", value: "today" },
+                  { label: "Yesterday", value: "yesterday" },
+                  { label: "Today and yesterday", value: "today and yesterday" },
+                  { label: "Last 7 days", value: "last 7 days" },
+                  { label: "Last 14 days", value: "last 14 days" },
+                  { label: "This month", value: "this month" },
+                  { label: "Last month", value: "last month" },
+                  { label: "This year", value: "this year" },
+                ].map((option) => (
+                  <div
+                    key={option.value}
+                    className={`px-6 py-2.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center transition ${
+                      whenListed === option.value ? "bg-gray-100 font-medium text-primary" : "text-gray-700"
+                    }`}
+                    onClick={() => {
+                      setWhenListed(option.value);
+                      setWhenListedDropdownOpen(false);
+                    }}
+                  >
+                    {option.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <LineGradient />
+
+        {/* Property Type */}
+        <div className="mb-6 space-y-3 pt-5">
+          <label className="font-medium">Property Type</label>
+          <div className="grid grid-cols-1 gap-8">
+            {status === "sold" || status === "expired" ? (
+              /* Sold/Expired Options */
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1 ">
+                {[
+                  { label: "Apartment/Condo", value: "Apartment/Condo" },
+                  {
+                    label: "Single Family Residence",
+                    value: "Single Family Residence",
+                  },
+                  { label: "Townhouse", value: "Townhouse" },
+                  { label: "Half Duplex", value: "Half Duplex" },
+                  {
+                    label: "Row House (Non-Strata)",
+                    value: "Row House (Non-Strata)",
+                  },
+                ].map((prop) => (
+                  <div
+                    key={prop.value}
+                    className="flex items-center gap-3 cursor-pointer group"
+                    onClick={() => handleToggleProperty(prop.value, false)}
+                  >
+                    <div
+                      className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
+                        selectedProperties.includes(prop.value)
+                          ? "bg-primary border-primary"
+                          : "border-gray-300 group-hover:border-primary"
+                      }`}
+                    >
+                      {selectedProperties.includes(prop.value) && (
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-sm text-gray-700 font-medium">
+                      {prop.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* For Sale Options */
+              <>
+                {/* Single Family Section */}
+                <div className="bg-gray-50/50 rounded-xl p-4 border border-[#33333311]">
+                  <div
+                    className="flex items-center gap-3 cursor-pointer group mb-3"
+                    onClick={() => handleToggleProperty("Single-Family", true)}
+                  >
+                    <div
+                      className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
+                        selectedProperties.includes("Single-Family")
+                          ? "bg-primary border-primary"
+                          : "border-gray-300 group-hover:border-primary"
+                      }`}
+                    >
+                      {selectedProperties.includes("Single-Family") && (
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="font-medium text-sm text-gray-700">
+                      Single Family
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-8">
+                    {[
+                      { label: "Townhouse", value: "Townhouse" },
+                      { label: "Detached House", value: "Detached House" },
+                      { label: "Duplex", value: "Duplex" },
+                      { label: "Apartment/Condo", value: "Apartment/Condo" },
+                    ].map((prop) => (
+                      <div
+                        key={prop.value}
+                        className="flex items-center gap-3 cursor-pointer group"
+                        onClick={() => handleToggleProperty(prop.value, true)}
+                      >
+                        <div
+                          className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
+                            selectedProperties.includes(prop.value)
+                              ? "bg-primary border-primary"
+                              : "border-gray-300 group-hover:border-primary"
+                          }`}
+                        >
+                          {selectedProperties.includes(prop.value) && (
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          )}
+                        </div>
+                        <span className="text-sm text-gray-700">
+                          {prop.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Other Types Section */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1">
+                  {[
+                    { label: "Multi-Family", value: "Multi-Family" },
+                    { label: "Office", value: "Office" },
+                    { label: "Business", value: "Business" },
+                    { label: "Agriculture", value: "Agriculture" },
+                    { label: "Vacant Land", value: "Vacant Land" },
+                  ].map((prop) => (
+                    <div
+                      key={prop.value}
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => handleToggleProperty(prop.value, false)}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
+                          selectedProperties.includes(prop.value)
+                            ? "bg-primary border-primary"
+                            : "border-gray-300 group-hover:border-primary"
+                        }`}
+                      >
+                        {selectedProperties.includes(prop.value) && (
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-sm text-gray-700 font-medium">
+                        {prop.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <LineGradient />
+
         {/* Price Range */}
         <div className="md:mb-6 mb-3 pt-5">
           <h3 className="font-medium md:mb-3">Price Range</h3>
@@ -631,6 +918,61 @@ export default function FiltersPopup({
           </div>
         </div>
         <LineGradient />
+
+        {/* Tax Range */}
+        <div className="md:mb-6 mb-3 pt-5">
+          <h3 className="font-medium md:mb-3">Tax Range</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[tax[0] ?? 0, tax[1] ?? 50000]}
+              min={0}
+              max={50000}
+              step={100}
+              onChange={(_, v) => setTax(v as [number, number])}
+              disableSwap
+              valueLabelDisplay="auto"
+            />
+          </div>
+
+          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
+            {/* Min */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Min Tax
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <span className="text-secondary">$</span>
+                <span className="">{tax[0]}</span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <LineGradient
+              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+              vr
+            />
+
+            {/* Max */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Max Tax
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                {tax[1] === 50000 ? (
+                  <span className="">Max</span>
+                ) : (
+                  <>
+                    <span className="text-secondary">$</span>
+                    <span className="">{tax[1]}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        <LineGradient />
+
+       
 
         {/* Property Info */}
         <div className="mb-6 border-[#33333333] pt-5">

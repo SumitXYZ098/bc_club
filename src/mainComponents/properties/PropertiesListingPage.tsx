@@ -42,8 +42,11 @@ export default function PropertiesListingPage() {
   const maxSqft = filters.maxSqft;
   const minLotSizeArea = filters.minLotSizeArea;
   const maxLotSizeArea = filters.maxLotSizeArea;
+  const minTax = filters.minTax;
+  const maxTax = filters.maxTax;
   const status = filters.status;
   const location = filters.location;
+  const whenListed = filters.whenListed;
 
   const setSearch = (val: string) =>
     updateInstanceFilter("list", "search", val);
@@ -120,7 +123,13 @@ export default function PropertiesListingPage() {
 
   // property type filter
   if (activeProperty && activeProperty !== "any") {
-    params.type = activeProperty;
+    if (activeProperty.includes(",")) {
+      activeProperty.split(",").forEach((type, index) => {
+        params[`filters[type][$in][${index}]`] = type;
+      });
+    } else {
+      params.type = activeProperty;
+    }
   }
 
   // search
@@ -370,6 +379,9 @@ export default function PropertiesListingPage() {
                   filters.minLotSizeArea > 100) ||
                 (filters.maxLotSizeArea !== undefined &&
                   filters.maxLotSizeArea < 100000) ||
+                (filters.minTax !== undefined && filters.minTax > 0) ||
+                (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+                (filters.whenListed && filters.whenListed !== "any") ||
                 filters.location
                   ? "bg-primary text-white"
                   : "bg-white"
@@ -502,6 +514,9 @@ export default function PropertiesListingPage() {
                 filters.minLotSizeArea > 100) ||
               (filters.maxLotSizeArea !== undefined &&
                 filters.maxLotSizeArea < 100000) ||
+              (filters.minTax !== undefined && filters.minTax > 0) ||
+              (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+              (filters.whenListed && filters.whenListed !== "any") ||
               filters.location
                 ? "bg-primary text-white"
                 : "bg-white"
@@ -521,6 +536,9 @@ export default function PropertiesListingPage() {
             filters.minLotSizeArea > 100) ||
           (filters.maxLotSizeArea !== undefined &&
             filters.maxLotSizeArea < 100000) ||
+          (filters.minTax !== undefined && filters.minTax > 0) ||
+          (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+          (filters.whenListed && filters.whenListed !== "any") ||
           filters.location) && (
           <div className="w-full flex flex-row justify-between items-center mb-4">
             <span className="font-medium text-sm">Selected Filters:</span>
@@ -561,6 +579,26 @@ export default function PropertiesListingPage() {
                   className="bg-gray-100 text-sm"
                 />
               ) : null}
+              {(filters.minTax !== undefined && filters.minTax > 0) ||
+              (filters.maxTax !== undefined && filters.maxTax < 50000) ? (
+                <Chip
+                  label={`$${filters.minTax} to ${filters.maxTax === 50000 ? "Max" : `$${filters.maxTax}`} (Tax)`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minTax", 0);
+                    updateInstanceFilter("list", "maxTax", 50000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {filters.whenListed && filters.whenListed !== "any" && (
+                <Chip
+                  label={`Listed: ${filters.whenListed}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "whenListed", "any");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
               {filters.status && filters.status !== "forSale" && (
                 <Chip
                   label={filters.status}
@@ -570,6 +608,25 @@ export default function PropertiesListingPage() {
                   className="bg-gray-100 text-sm capitalize"
                 />
               )}
+              {filters.activeProperty &&
+                filters.activeProperty !== "any" &&
+                filters.activeProperty.split(",").map((type: string) => (
+                  <Chip
+                    key={type}
+                    label={type.replace(/([A-Z])/g, " $1").trim()}
+                    onDelete={() => {
+                      const newProps = (filters.activeProperty || "")
+                        .split(",")
+                        .filter((p: string) => p !== type);
+                      updateInstanceFilter(
+                        "list",
+                        "activeProperty",
+                        newProps.length > 0 ? newProps.join(",") : "any",
+                      );
+                    }}
+                    className="bg-gray-100 text-sm capitalize"
+                  />
+                ))}
               {filters.location &&
                 filters.location
                   .split(",")
