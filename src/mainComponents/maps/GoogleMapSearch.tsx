@@ -107,6 +107,9 @@ export default function GoogleMapSearch() {
     maxSqft,
     minLotSizeArea,
     maxLotSizeArea,
+    minTax,
+    maxTax,
+    whenListed,
     activeBedRoom,
     activeBathRoom,
   } = filters;
@@ -137,6 +140,9 @@ export default function GoogleMapSearch() {
     maxSqft,
     minLotSizeArea,
     maxLotSizeArea,
+    minTax,
+    maxTax,
+    whenListed,
     activeBedRoom,
     activeBathRoom,
   ]);
@@ -224,6 +230,24 @@ export default function GoogleMapSearch() {
       onRemove: () => updateInstanceFilter("map", "maxLotSizeArea", 100000),
     });
   }
+  if (minTax !== undefined && minTax > 0) {
+    activeFilterPills.push({
+      label: `Min Tax: $${minTax}`,
+      onRemove: () => updateInstanceFilter("map", "minTax", 0),
+    });
+  }
+  if (maxTax !== undefined && maxTax < 50000) {
+    activeFilterPills.push({
+      label: `Max Tax: $${maxTax}`,
+      onRemove: () => updateInstanceFilter("map", "maxTax", 50000),
+    });
+  }
+  if (whenListed && whenListed !== "any") {
+    activeFilterPills.push({
+      label: `Listed: ${whenListed}`,
+      onRemove: () => updateInstanceFilter("map", "whenListed", "any"),
+    });
+  }
   if (activeBedRoom && activeBedRoom !== "any") {
     activeFilterPills.push({
       label: `Beds: ${activeBedRoom}`,
@@ -237,9 +261,20 @@ export default function GoogleMapSearch() {
     });
   }
   if (activeProperty && activeProperty !== "any") {
-    activeFilterPills.push({
-      label: `Type: ${activeProperty}`,
-      onRemove: () => updateInstanceFilter("map", "activeProperty", "any"),
+    activeProperty.split(",").forEach((type) => {
+      activeFilterPills.push({
+        label: `Type: ${type.replace(/([A-Z])/g, " $1").trim()}`,
+        onRemove: () => {
+          const newProps = activeProperty
+            .split(",")
+            .filter((p) => p !== type);
+          updateInstanceFilter(
+            "map",
+            "activeProperty",
+            newProps.length > 0 ? newProps.join(",") : "any",
+          );
+        },
+      });
     });
   }
   if (sortBy !== "newest") {
@@ -268,11 +303,22 @@ export default function GoogleMapSearch() {
     if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
     if (minLotSizeArea !== undefined && minLotSizeArea > 100) p["filters[lot_size_area][$gte]"] = minLotSizeArea;
     if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) p["filters[lot_size_area][$lte]"] = maxLotSizeArea;
+    if (minTax !== undefined && minTax > 0) p["filters[tax][$gte]"] = minTax;
+    if (maxTax !== undefined && maxTax < 50000) p["filters[tax][$lte]"] = maxTax;
+    if (whenListed && whenListed !== "any") p.whenListed = whenListed;
     if (activeBedRoom && activeBedRoom !== "any")
       p.beds = activeBedRoom.replace("+", "");
     if (activeBathRoom && activeBathRoom !== "any")
       p.baths = activeBathRoom.replace("+", "");
-    if (activeProperty && activeProperty !== "any") p.type = activeProperty;
+    if (activeProperty && activeProperty !== "any") {
+      if (activeProperty.includes(",")) {
+        activeProperty.split(",").forEach((type, index) => {
+          p[`filters[type][$in][${index}]`] = type;
+        });
+      } else {
+        p.type = activeProperty;
+      }
+    }
     if (status && status !== "forSale" && status !== "any")
       p.propertyType = status;
     if (mapBounds) {
@@ -294,6 +340,9 @@ export default function GoogleMapSearch() {
     maxSqft,
     minLotSizeArea,
     maxLotSizeArea,
+    minTax,
+    maxTax,
+    whenListed,
     activeBedRoom,
     activeBathRoom,
     activeProperty,
@@ -310,6 +359,18 @@ export default function GoogleMapSearch() {
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
   if (minLotSizeArea !== undefined && minLotSizeArea > 100) params["filters[lot_size_area][$gte]"] = minLotSizeArea;
   if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) params["filters[lot_size_area][$lte]"] = maxLotSizeArea;
+  if (minTax !== undefined && minTax > 0) params["filters[tax][$gte]"] = minTax;
+  if (maxTax !== undefined && maxTax < 50000) params["filters[tax][$lte]"] = maxTax;
+  if (whenListed && whenListed !== "any") params.whenListed = whenListed;
+  if (activeProperty && activeProperty !== "any") {
+    if (activeProperty.includes(",")) {
+      activeProperty.split(",").forEach((type, index) => {
+        params[`filters[type][$in][${index}]`] = type;
+      });
+    } else {
+      params.type = activeProperty;
+    }
+  }
   if (activeBedRoom && activeBedRoom !== "any")
     params.beds = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")

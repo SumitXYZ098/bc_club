@@ -8,9 +8,13 @@ interface FilterState {
   maxSqft?: number;
   minLotSizeArea?: number;
   maxLotSizeArea?: number;
+  minTax?: number;
+  maxTax?: number;
   activeBedRoom?: string;
   activeBathRoom?: string;
   status?: string;
+  whenListed?: string;
+  activeProperty?: string;
   [key: string]: any;
 }
 
@@ -36,9 +40,13 @@ const DEFAULT_FILTERS: FilterState = {
   maxSqft: 15000,
   minLotSizeArea: 0,
   maxLotSizeArea: 100000,
+  minTax: 0,
+  maxTax: 50000,
   activeBedRoom: "any",
   activeBathRoom: "any",
   status: "forSale",
+  whenListed: "any",
+  activeProperty: "any",
 };
 
 export const useListingStore = create<ListingState>((set, get) => ({
