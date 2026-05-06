@@ -26,11 +26,8 @@ export async function getListings(params: any): Promise<any> {
 
 export async function getActiveListings(params?: any): Promise<any> {
   try {
-    const enhancedParams = { ...params };
-    if (!enhancedParams.populate) enhancedParams.populate = "*";
-
     const res = await axios.get(Endpoints.getActivePropertyLists, {
-      params: enhancedParams,
+      params,
     });
     return res.data;
   } catch (error) {
@@ -247,7 +244,10 @@ export async function getMyDdfFavorites(params?: any): Promise<any> {
 }
 
 // Get import property list (address search)
-export async function getImportPropertyList(params?: { address?: string; [key: string]: any }): Promise<any> {
+export async function getImportPropertyList(params?: {
+  address?: string;
+  [key: string]: any;
+}): Promise<any> {
   try {
     const res = await axios.get(Endpoints.importPropertyList, { params });
     return res.data;

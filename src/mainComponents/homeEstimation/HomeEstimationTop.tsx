@@ -25,7 +25,7 @@ const HomeEstimationTop = () => {
     setIsFetching(true);
     try {
       const res = await fetch(
-        `${Endpoints.importPropertyList}?address=${encodeURIComponent(query)}`
+        `${Endpoints.importPropertyList}?address=${encodeURIComponent(query)}`,
       );
 
       const json = await res.json();
@@ -67,8 +67,11 @@ const HomeEstimationTop = () => {
       {/* Full-screen navigation loading overlay */}
       {navigating && (
         <div
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4"
-          style={{ backgroundColor: "rgba(255,255,255,0.75)", backdropFilter: "blur(2px)" }}
+          className="fixed inset-0 z-9999 flex flex-col items-center justify-center gap-4"
+          style={{
+            backgroundColor: "rgba(255,255,255,0.75)",
+            backdropFilter: "blur(2px)",
+          }}
         >
           {/* Spinning ring */}
           <div
@@ -79,7 +82,10 @@ const HomeEstimationTop = () => {
               animation: "spin 0.75s linear infinite",
             }}
           />
-          <p className="text-sm font-medium" style={{ color: "var(--lightWhite)" }}>
+          <p
+            className="text-sm font-medium"
+            style={{ color: "var(--lightWhite)" }}
+          >
             Loading property…
           </p>
         </div>
@@ -117,8 +123,10 @@ const HomeEstimationTop = () => {
                   : "rounded-xl"
               }`}
               style={{
-                borderBottomLeftRadius: showDropdown && filteredResults.length > 0 ? 0 : undefined,
-                borderBottomRightRadius: showDropdown && filteredResults.length > 0 ? 0 : undefined,
+                borderBottomLeftRadius:
+                  showDropdown && filteredResults.length > 0 ? 0 : undefined,
+                borderBottomRightRadius:
+                  showDropdown && filteredResults.length > 0 ? 0 : undefined,
               }}
             >
               <Search
@@ -140,7 +148,7 @@ const HomeEstimationTop = () => {
                 }}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
               />
-              
+
               {/* Fetching spinner inside input */}
               {isFetching && (
                 <div
@@ -172,12 +180,18 @@ const HomeEstimationTop = () => {
                   className="px-4 py-2.5 flex items-center justify-between"
                   style={{ borderBottom: "1px solid var(--borderColor)" }}
                 >
-                  <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--lightWhite)" }}>
+                  <span
+                    className="text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: "var(--lightWhite)" }}
+                  >
                     Properties
                   </span>
                   <span
                     className="text-xs font-bold px-2 py-0.5 rounded-full"
-                    style={{ background: "rgba(34,85,139,0.10)", color: "var(--primary)" }}
+                    style={{
+                      background: "rgba(34,85,139,0.10)",
+                      color: "var(--primary)",
+                    }}
                   >
                     {filteredResults.length}
                   </span>
@@ -206,7 +220,10 @@ const HomeEstimationTop = () => {
                         {item.address}
                       </span>
                       {item.city && (
-                        <span className="text-xs mt-0.5" style={{ color: "var(--lightWhite)" }}>
+                        <span
+                          className="text-xs mt-0.5"
+                          style={{ color: "var(--lightWhite)" }}
+                        >
                           {item.city}
                         </span>
                       )}

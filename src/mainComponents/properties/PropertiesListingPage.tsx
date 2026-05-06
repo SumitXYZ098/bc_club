@@ -133,16 +133,16 @@ export default function PropertiesListingPage() {
   if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
-  if (minLotSizeArea !== undefined && minLotSizeArea > 100)
-    params["filters[lot_size_area][$gte]"] = minLotSizeArea;
-  if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000)
-    params["filters[lot_size_area][$lte]"] = maxLotSizeArea;
-
-  if (status && status !== "any") {
-    params.propertyType = status;
-  } else if (isForSale) {
-    params.propertyType = "forSale";
+  if (minLotSizeArea !== undefined && minLotSizeArea > 100) {
+    params.minLotSizeArea = minLotSizeArea;
   }
+  if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) {
+    params.maxLotSizeArea = maxLotSizeArea;
+  }
+
+  // if (status && status !== "any") {
+  //   params.propertyType = status;
+  // }
 
   if (location && location !== "") {
     params.location = location;
@@ -366,8 +366,10 @@ export default function PropertiesListingPage() {
                   filters.maxPrice < 20000000) ||
                 (filters.minSqft !== undefined && filters.minSqft > 100) ||
                 (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
-                (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
-                (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ||
+                (filters.minLotSizeArea !== undefined &&
+                  filters.minLotSizeArea > 100) ||
+                (filters.maxLotSizeArea !== undefined &&
+                  filters.maxLotSizeArea < 100000) ||
                 filters.location
                   ? "bg-primary text-white"
                   : "bg-white"
@@ -395,7 +397,6 @@ export default function PropertiesListingPage() {
                 { label: "Popular First", value: "popular" },
                 { label: "Tax Asc", value: "tax-asc" },
                 { label: "Tax Desc", value: "tax-desc" },
-
               ]}
             />
 
@@ -497,8 +498,10 @@ export default function PropertiesListingPage() {
               (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
               (filters.minSqft !== undefined && filters.minSqft > 100) ||
               (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
-              (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
-              (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ||
+              (filters.minLotSizeArea !== undefined &&
+                filters.minLotSizeArea > 100) ||
+              (filters.maxLotSizeArea !== undefined &&
+                filters.maxLotSizeArea < 100000) ||
               filters.location
                 ? "bg-primary text-white"
                 : "bg-white"
@@ -514,8 +517,10 @@ export default function PropertiesListingPage() {
           (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
           (filters.minSqft !== undefined && filters.minSqft > 100) ||
           (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
-          (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
-          (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ||
+          (filters.minLotSizeArea !== undefined &&
+            filters.minLotSizeArea > 100) ||
+          (filters.maxLotSizeArea !== undefined &&
+            filters.maxLotSizeArea < 100000) ||
           filters.location) && (
           <div className="w-full flex flex-row justify-between items-center mb-4">
             <span className="font-medium text-sm">Selected Filters:</span>
@@ -543,8 +548,10 @@ export default function PropertiesListingPage() {
                   className="bg-gray-100 text-sm"
                 />
               ) : null}
-              {(filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
-              (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ? (
+              {(filters.minLotSizeArea !== undefined &&
+                filters.minLotSizeArea > 100) ||
+              (filters.maxLotSizeArea !== undefined &&
+                filters.maxLotSizeArea < 100000) ? (
                 <Chip
                   label={`${filters.minLotSizeArea}sqft to ${filters.maxLotSizeArea === 100000 ? "Max" : `${filters.maxLotSizeArea}sqft`} (Lot)`}
                   onDelete={() => {
