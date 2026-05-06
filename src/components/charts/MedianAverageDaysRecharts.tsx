@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import PoweredBy from "../common/poweredby/PoweredBy";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import ChartSignInOverlay from "../common/charts/ChartSignInOverlay";
+import { monthName } from "@/src/utilities/utilities";
 
 /* -------------------------------
    1️⃣ Data Generation Logic
@@ -91,7 +92,7 @@ const MedianAverageDaysRecharts = () => {
   const [range, setRange] = useState("1M");
 
   const isProtectedRange = useMemo(
-    () => !isLoggedIn && ["3M", "6M", "Custom"].includes(range),
+    () => !isLoggedIn && ["12D", "1M", "3M", "6M", "Custom"].includes(range),
     [isLoggedIn, range],
   );
 
@@ -140,7 +141,10 @@ const MedianAverageDaysRecharts = () => {
       {/* Chart Area */}
       <div className="w-full h-[400px] relative">
         {isProtectedRange ? (
-          <ChartSignInOverlay onSignIn={() => setOpenLogin(true)} />
+          <ChartSignInOverlay
+            monthContent={monthName(range)}
+            onSignIn={() => setOpenLogin(true)}
+          />
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart

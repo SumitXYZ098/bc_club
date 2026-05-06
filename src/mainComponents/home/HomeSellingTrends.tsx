@@ -9,9 +9,11 @@ import Description, {
 import SalesReportedRecharts from "@/src/components/charts/SalesReportedRecharts";
 import MedianAverageDaysRecharts from "@/src/components/charts/MedianAverageDaysRecharts";
 import MedianAveragePriceRecharts from "@/src/components/charts/MedianAveragePriceRecharts";
+import { useAuthContext } from "../auth/AuthContext";
 
 const HomeSellingTrends = () => {
   const [location, setLocation] = useState<string>("Surrey, BC");
+  const { isLoggedIn } = useAuthContext();
 
   const handleChange = (event: { target: { value: string } }) => {
     setLocation(event.target.value);
@@ -30,24 +32,27 @@ const HomeSellingTrends = () => {
             customClasses="font-bold "
           />
           {/* Location Selector */}
-          <Select
-            value={location}
-            onChange={handleChange}
-            sx={{
-              borderRadius: 10,
-              "& .MuiOutlinedInput-notchedOutline , & .Mui-focused.MuiOutlinedInput-notchedOutline":
-                {
-                  borderWidth: "0 !important",
-                },
-            }}
-            className="shadow-[0_0_20px_0_rgba(0,0,0,0.12)]"
-          >
-            {cities.map((city, idx) => (
-              <MenuItem key={idx} value={city}>
-                {city}
-              </MenuItem>
-            ))}
-          </Select>
+          {isLoggedIn && (
+            <Select
+              value={location}
+              onChange={handleChange}
+              sx={{
+                borderRadius: 3,
+                width: 180,
+                "& .MuiOutlinedInput-notchedOutline , & .Mui-focused.MuiOutlinedInput-notchedOutline":
+                  {
+                    borderWidth: "0 !important",
+                  },
+              }}
+              className="shadow-[0_0_20px_0_rgba(0,0,0,0.12)]"
+            >
+              {cities.map((city, idx) => (
+                <MenuItem key={idx} value={city}>
+                  {city}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
         </div>
       </div>
 

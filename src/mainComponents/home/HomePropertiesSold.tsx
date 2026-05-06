@@ -5,9 +5,12 @@ import { MenuItem, Select } from "@mui/material";
 import { cities, propertyDataByCity } from ".";
 import MarketDemandGauge from "@/src/components/charts/MarketDemandGauge";
 import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
+import { useAuthContext } from "../auth/AuthContext";
+import ChartSignInOverlay from "@/src/components/common/charts/ChartSignInOverlay";
 
 const HomePropertiesSold = () => {
   const [location, setLocation] = useState<string>("Surrey, BC");
+  const { isLoggedIn, setOpenLogin } = useAuthContext();
 
   const handleChange = (event: { target: { value: string } }) => {
     setLocation(event.target.value);
@@ -74,108 +77,118 @@ const HomePropertiesSold = () => {
           customClasses="font-bold md:text-start text-center"
         />
         {/* Location Selector */}
-        <Select
-          value={location}
-          onChange={handleChange}
-          sx={{
-            borderRadius: 3,
-            width: 180,
-            "& .MuiOutlinedInput-notchedOutline , & .Mui-focused.MuiOutlinedInput-notchedOutline":
-              {
-                borderWidth: "0 !important",
-              },
-          }}
-          className="shadow-[0_0_20px_0_rgba(0,0,0,0.12)]"
-        >
-          {cities.map((city, idx) => (
-            <MenuItem key={idx} value={city}>
-              {city}
-            </MenuItem>
-          ))}
-        </Select>
+        {isLoggedIn && (
+          <Select
+            value={location}
+            onChange={handleChange}
+            sx={{
+              borderRadius: 3,
+              width: 180,
+              "& .MuiOutlinedInput-notchedOutline , & .Mui-focused.MuiOutlinedInput-notchedOutline":
+                {
+                  borderWidth: "0 !important",
+                },
+            }}
+            className="shadow-[0_0_20px_0_rgba(0,0,0,0.12)]"
+          >
+            {cities.map((city, idx) => (
+              <MenuItem key={idx} value={city}>
+                {city}
+              </MenuItem>
+            ))}
+          </Select>
+        )}
       </div>
 
       {/* Property Cards */}
-      <div className="w-full flex flex-row flex-wrap justify-between gap-y-6">
-        {propertyData.map((property, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 flex flex-col gap-6 w-full md:w-[47%] xl:w-[32%]"
-          >
-            {/* Sales Statistics */}
-            <div className="flex flex-col items-center text-center">
-              <h3 className="text-lg font-bold text-foreground mb-3">
-                {property.type}
-              </h3>
-              <div className="text-5xl font-bold text-primary mb-2">
-                {property.sold}
-              </div>
-              <div className="flex items-center gap-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                >
-                  <rect
+
+      <div className="w-full min-h-[50vh] flex flex-row flex-wrap justify-between gap-y-6 relative">
+        {!isLoggedIn ? (
+          <ChartSignInOverlay
+            monthContent={"previous month"}
+            onSignIn={() => setOpenLogin(true)}
+            bg="bg-gray"
+          />
+        ) : (
+          propertyData.map((property, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 flex flex-col gap-6 w-full md:w-[47%] xl:w-[32%]"
+            >
+              {/* Sales Statistics */}
+              <div className="flex flex-col items-center text-center">
+                <h3 className="text-lg font-bold text-foreground mb-3">
+                  {property.type}
+                </h3>
+                <div className="text-5xl font-bold text-primary mb-2">
+                  {property.sold}
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
                     width="20"
                     height="20"
-                    rx="2"
-                    className={`${
-                      property.changePercent >= 0
-                        ? "fill-lightGreen"
-                        : "fill-lightRed"
-                    }`}
-                  />
-                  {property.changePercent >= 0 ? (
-                    <path
-                      d="M15 7.5L12.3535 10.1465C12.2597 10.2402 12.1326 10.2929 12 10.2929C11.8674 10.2929 11.7403 10.2402 11.6465 10.1465L10.8535 9.3535C10.7597 9.25976 10.6326 9.20711 10.5 9.20711C10.3674 9.20711 10.2403 9.25976 10.1465 9.3535L8 11.5"
-                      strokeLinecap="round"
-                      strokeWidth="1.5"
-                      strokeLinejoin="round"
-                      className="stroke-green"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                  >
+                    <rect
+                      width="20"
+                      height="20"
+                      rx="2"
+                      className={`${
+                        property.changePercent >= 0
+                          ? "fill-lightGreen"
+                          : "fill-lightRed"
+                      }`}
                     />
-                  ) : (
+                    {property.changePercent >= 0 ? (
+                      <path
+                        d="M15 7.5L12.3535 10.1465C12.2597 10.2402 12.1326 10.2929 12 10.2929C11.8674 10.2929 11.7403 10.2402 11.6465 10.1465L10.8535 9.3535C10.7597 9.25976 10.6326 9.20711 10.5 9.20711C10.3674 9.20711 10.2403 9.25976 10.1465 9.3535L8 11.5"
+                        strokeLinecap="round"
+                        strokeWidth="1.5"
+                        strokeLinejoin="round"
+                        className="stroke-green"
+                      />
+                    ) : (
+                      <path
+                        d="M15.8319 11.2963L12.4012 7.86562C12.2797 7.74411 12.1149 7.67585 11.943 7.67585C11.7711 7.67585 11.6063 7.74411 11.4848 7.86562L10.4568 8.89358C10.3352 9.01509 10.1704 9.08335 9.99855 9.08335C9.82669 9.08335 9.66186 9.01509 9.54031 8.89358L6.75781 6.11108"
+                        className="stroke-red"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    )}
                     <path
-                      d="M15.8319 11.2963L12.4012 7.86562C12.2797 7.74411 12.1149 7.67585 11.943 7.67585C11.7711 7.67585 11.6063 7.74411 11.4848 7.86562L10.4568 8.89358C10.3352 9.01509 10.1704 9.08335 9.99855 9.08335C9.82669 9.08335 9.66186 9.01509 9.54031 8.89358L6.75781 6.11108"
-                      className="stroke-red"
+                      d="M4.16406 4.16663V13.7592C4.16406 14.4851 4.16406 14.8481 4.30536 15.1255C4.42964 15.3694 4.62794 15.5677 4.87184 15.692C5.14925 15.8333 5.51221 15.8333 6.23814 15.8333H15.8307"
                       strokeWidth="1.5"
                       strokeLinecap="round"
-                      strokeLinejoin="round"
+                      className={`${
+                        property.changePercent >= 0
+                          ? "stroke-green"
+                          : "stroke-red"
+                      }`}
                     />
-                  )}
-                  <path
-                    d="M4.16406 4.16663V13.7592C4.16406 14.4851 4.16406 14.8481 4.30536 15.1255C4.42964 15.3694 4.62794 15.5677 4.87184 15.692C5.14925 15.8333 5.51221 15.8333 6.23814 15.8333H15.8307"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    className={`${
-                      property.changePercent >= 0
-                        ? "stroke-green"
-                        : "stroke-red"
+                  </svg>
+                  <span
+                    className={`text-sm font-medium ${
+                      property.changePercent > 0 ? "text-green" : "text-red"
                     }`}
-                  />
-                </svg>
-                <span
-                  className={`text-sm font-medium ${
-                    property.changePercent > 0 ? "text-green" : "text-red"
-                  }`}
-                >
-                  {Math.abs(property.changePercent)}%{" "}
-                  {property.changePercent > 0 ? "More than" : "Less than"}
-                </span>
-                <span className="text-sm text-lightWhite">March 2025</span>
+                  >
+                    {Math.abs(property.changePercent)}%{" "}
+                    {property.changePercent > 0 ? "More than" : "Less than"}
+                  </span>
+                  <span className="text-sm text-lightWhite">March 2025</span>
+                </div>
               </div>
+              {/* Market Demand Gauge */}
+              <GaugeChart
+                value={property.gaugeValue}
+                label={property.marketCondition}
+                tip={property.tip}
+              />
             </div>
-
-            {/* Market Demand Gauge */}
-            <GaugeChart
-              value={property.gaugeValue}
-              label={property.marketCondition}
-              tip={property.tip}
-            />
-          </div>
-        ))}
+          ))
+        )}
       </div>
       <PoweredBy className="mt-2" />
     </section>

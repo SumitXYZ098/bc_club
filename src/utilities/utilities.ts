@@ -152,3 +152,17 @@ export function matchesPropertyFilter(
     selectedType.trim().toLowerCase()
   );
 }
+
+export const monthName = (range: string) => {
+  return range === "12D"
+    ? "previous 12 days"
+    : range === "1M"
+      ? "previous month"
+      : range === "3M"
+        ? "previous 3 months"
+        : range === "6M"
+          ? "previous 6 months"
+          : range === "Custom"
+            ? ""
+            : "";
+};
