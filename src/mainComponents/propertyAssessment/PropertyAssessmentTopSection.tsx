@@ -111,6 +111,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
  const [val, setVal] = useState(
   data?.valueHistory?.[0]?.year?.toString() || ""
 );
+ const [isImageLoading, setIsImageLoading] = useState(true);
 
 useEffect(() => {
   if (data?.valueHistory?.length) {
@@ -152,13 +153,17 @@ const selectedValue = selectedYearData?.value || data?.totalValue;
       <div className="w-full flex flex-col xl:flex-row gap-6 mt-6">
 
   {/* ================= LEFT - IMAGE ================= */}
-  <div className="xl:w-[56%] w-full">
+  <div className="xl:w-[56%] w-full relative">
+    {isImageLoading && (
+      <div className="absolute inset-0 w-full xl:h-134 md:h-81 h-50.5 bg-gray-200 animate-pulse md:rounded-3xl rounded-2xl" />
+    )}
     <Image
       alt={data?.address || "property image"}
       src={data?.image}
       width={1020}
       height={400}
-      className="w-full xl:h-134 md:h-81 h-50.5 object-cover md:rounded-3xl rounded-2xl"
+      className={`w-full xl:h-134 md:h-81 h-50.5 object-cover md:rounded-3xl rounded-2xl transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
+      onLoad={() => setIsImageLoading(false)}
     />
   </div>
 

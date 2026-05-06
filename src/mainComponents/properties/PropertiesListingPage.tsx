@@ -98,6 +98,9 @@ export default function PropertiesListingPage() {
         params.sort = "ModificationTimestamp:asc";
       else if (activePrice === "asc") params.sort = "price:asc";
       else if (activePrice === "desc") params.sort = "price:desc";
+      else if (activePrice === "tax-asc") params.sort = "tax:asc";
+      else if (activePrice === "tax-desc") params.sort = "tax:desc";
+      else if (activePrice === "popular") params.sort = "popular";
     } else {
       if (activePrice === "newest") params.sort = "createdAt:desc";
       else if (activePrice === "oldest") params.sort = "createdAt:asc";
@@ -131,9 +134,9 @@ export default function PropertiesListingPage() {
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
   if (minLotSizeArea !== undefined && minLotSizeArea > 100)
-    params.minLotSizeArea = minLotSizeArea;
-  if (maxLotSizeArea !== undefined && maxLotSizeArea < 15000)
-    params.maxLotSizeArea = maxLotSizeArea;
+    params["filters[lot_size_area][$gte]"] = minLotSizeArea;
+  if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000)
+    params["filters[lot_size_area][$lte]"] = maxLotSizeArea;
 
   if (status && status !== "any") {
     params.propertyType = status;
@@ -363,6 +366,8 @@ export default function PropertiesListingPage() {
                   filters.maxPrice < 20000000) ||
                 (filters.minSqft !== undefined && filters.minSqft > 100) ||
                 (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+                (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
+                (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ||
                 filters.location
                   ? "bg-primary text-white"
                   : "bg-white"
@@ -388,6 +393,9 @@ export default function PropertiesListingPage() {
                 { label: "Low to High", value: "asc" },
                 { label: "High to Low", value: "desc" },
                 { label: "Popular First", value: "popular" },
+                { label: "Tax Asc", value: "tax-asc" },
+                { label: "Tax Desc", value: "tax-desc" },
+
               ]}
             />
 
@@ -489,6 +497,8 @@ export default function PropertiesListingPage() {
               (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
               (filters.minSqft !== undefined && filters.minSqft > 100) ||
               (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+              (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
+              (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ||
               filters.location
                 ? "bg-primary text-white"
                 : "bg-white"
@@ -504,6 +514,8 @@ export default function PropertiesListingPage() {
           (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
           (filters.minSqft !== undefined && filters.minSqft > 100) ||
           (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+          (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
+          (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ||
           filters.location) && (
           <div className="w-full flex flex-row justify-between items-center mb-4">
             <span className="font-medium text-sm">Selected Filters:</span>
@@ -527,6 +539,17 @@ export default function PropertiesListingPage() {
                   onDelete={() => {
                     updateInstanceFilter("list", "minSqft", 0);
                     updateInstanceFilter("list", "maxSqft", 15000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {(filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) ||
+              (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) ? (
+                <Chip
+                  label={`${filters.minLotSizeArea}sqft to ${filters.maxLotSizeArea === 100000 ? "Max" : `${filters.maxLotSizeArea}sqft`} (Lot)`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minLotSizeArea", 0);
+                    updateInstanceFilter("list", "maxLotSizeArea", 100000);
                   }}
                   className="bg-gray-100 text-sm"
                 />

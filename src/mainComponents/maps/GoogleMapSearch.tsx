@@ -105,6 +105,8 @@ export default function GoogleMapSearch() {
     maxPrice,
     minSqft,
     maxSqft,
+    minLotSizeArea,
+    maxLotSizeArea,
     activeBedRoom,
     activeBathRoom,
   } = filters;
@@ -133,6 +135,8 @@ export default function GoogleMapSearch() {
     maxPrice,
     minSqft,
     maxSqft,
+    minLotSizeArea,
+    maxLotSizeArea,
     activeBedRoom,
     activeBathRoom,
   ]);
@@ -208,6 +212,18 @@ export default function GoogleMapSearch() {
       onRemove: () => updateInstanceFilter("map", "maxSqft", 15000),
     });
   }
+  if (minLotSizeArea !== undefined && minLotSizeArea > 100) {
+    activeFilterPills.push({
+      label: `Min Lot Area: ${minLotSizeArea} sqft`,
+      onRemove: () => updateInstanceFilter("map", "minLotSizeArea", 0),
+    });
+  }
+  if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) {
+    activeFilterPills.push({
+      label: `Max Lot Area: ${maxLotSizeArea} sqft`,
+      onRemove: () => updateInstanceFilter("map", "maxLotSizeArea", 100000),
+    });
+  }
   if (activeBedRoom && activeBedRoom !== "any") {
     activeFilterPills.push({
       label: `Beds: ${activeBedRoom}`,
@@ -250,6 +266,8 @@ export default function GoogleMapSearch() {
     if (maxPrice !== undefined && maxPrice < 20000000) p.maxPrice = maxPrice;
     if (minSqft !== undefined && minSqft > 100) p.minSqft = minSqft;
     if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
+    if (minLotSizeArea !== undefined && minLotSizeArea > 100) p["filters[lot_size_area][$gte]"] = minLotSizeArea;
+    if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) p["filters[lot_size_area][$lte]"] = maxLotSizeArea;
     if (activeBedRoom && activeBedRoom !== "any")
       p.beds = activeBedRoom.replace("+", "");
     if (activeBathRoom && activeBathRoom !== "any")
@@ -274,6 +292,8 @@ export default function GoogleMapSearch() {
     maxPrice,
     minSqft,
     maxSqft,
+    minLotSizeArea,
+    maxLotSizeArea,
     activeBedRoom,
     activeBathRoom,
     activeProperty,
@@ -288,6 +308,8 @@ export default function GoogleMapSearch() {
   if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
+  if (minLotSizeArea !== undefined && minLotSizeArea > 100) params["filters[lot_size_area][$gte]"] = minLotSizeArea;
+  if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) params["filters[lot_size_area][$lte]"] = maxLotSizeArea;
   if (activeBedRoom && activeBedRoom !== "any")
     params.beds = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")

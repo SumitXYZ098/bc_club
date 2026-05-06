@@ -19,6 +19,7 @@ import {
   removeFromFavourite,
   getActiveListings,
   getMapZoomListings,
+  getImportPropertyList,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -361,5 +362,20 @@ export function useRemoveDdfWishlist() {
       });
     },
     onSuccess: () => {},
+  });
+}
+
+export function useGetImportPropertyList<TData = any>(
+  params?: { address?: string; [key: string]: any },
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["importPropertyList", params],
+    queryFn: () => getImportPropertyList(params),
+    enabled: !!params?.address && params.address.length > 1,
+    ...options,
   });
 }
