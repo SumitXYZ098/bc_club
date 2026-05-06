@@ -180,6 +180,27 @@ export default function MapSearch() {
     });
   }
 
+  if (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) {
+    activeFilterPills.push({
+      label: `Min Lot Area: ${filters.minLotSizeArea} sqft`,
+      onRemove: () => updateInstanceFilter("map", "minLotSizeArea", 100),
+    });
+  }
+
+  if (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) {
+    activeFilterPills.push({
+      label: `Max Lot Area: ${filters.maxLotSizeArea} sqft`,
+      onRemove: () => updateInstanceFilter("map", "maxLotSizeArea", 100000),
+    });
+  }
+
+  if (activeBedRoom && activeBedRoom !== "any") {
+    activeFilterPills.push({
+      label: `Beds: ${activeBedRoom}`,
+      onRemove: () => updateInstanceFilter("map", "activeBedRoom", "any"),
+    });
+  }
+
   if (activeBathRoom && activeBathRoom !== "any") {
     activeFilterPills.push({
       label: `Baths: ${activeBathRoom}`,
@@ -231,6 +252,10 @@ export default function MapSearch() {
   if (minSqft !== undefined) commonParams.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft !== 15000)
     commonParams.maxSqft = maxSqft;
+  if (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100)
+    commonParams["filters[lot_size_area][$gte]"] = filters.minLotSizeArea;
+  if (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000)
+    commonParams["filters[lot_size_area][$lte]"] = filters.maxLotSizeArea;
   if (activeBedRoom && activeBedRoom !== "any")
     commonParams.bedrooms = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")
@@ -249,6 +274,8 @@ export default function MapSearch() {
     if (maxPrice !== undefined && maxPrice < 20000000) p.maxPrice = maxPrice;
     if (minSqft !== undefined && minSqft > 100) p.minSqft = minSqft;
     if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
+    if (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) p["filters[lot_size_area][$gte]"] = filters.minLotSizeArea;
+    if (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) p["filters[lot_size_area][$lte]"] = filters.maxLotSizeArea;
 
     if (activeBedRoom && activeBedRoom !== "any") {
       p.beds = activeBedRoom.replace("+", "");
@@ -313,6 +340,8 @@ export default function MapSearch() {
   if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
+  if (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) params["filters[lot_size_area][$gte]"] = filters.minLotSizeArea;
+  if (filters.maxLotSizeArea !== undefined && filters.maxLotSizeArea < 100000) params["filters[lot_size_area][$lte]"] = filters.maxLotSizeArea;
   if (activeBedRoom && activeBedRoom !== "any")
     params.beds = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")
