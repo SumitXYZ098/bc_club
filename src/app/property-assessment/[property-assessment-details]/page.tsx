@@ -26,7 +26,7 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
       <section className="xl:max-w-screen-2xl mx-auto w-full flex flex-col xl:gap-y-13 md:gap-y-10 gap-y-7 xl:px-16 md:px-13 px-6 xl:pt-35.5 xl:pb-38 md:pt-28 md:pb-31 pt-21 pb-13 ">
         <PropertyAssessmentTopSection data={property} />
         <PropertyAssessmentInformation data={property} />
-        <RegisterWithBC />
+        {/* <RegisterWithBC /> */}
         <MapTapSection />
       </section>
     

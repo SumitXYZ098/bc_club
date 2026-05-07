@@ -316,7 +316,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 pathname === "/properties" ? "gap-x-1" : "gap-3"
               }`}
             >
-              <div className="flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm w-full">
+              <div className="flex flex-row items-center gap-x-1 justify-center py-2 px-3 rounded-md bg-gray text-lightWhite text-sm w-full whitespace-nowrap">
                 <Image
                   src={Icons.scale}
                   alt="sqft"

@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
+import { useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import { Box, Chip, Pagination } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
@@ -22,9 +24,19 @@ import { getOfficeName } from "@/src/utilities/utilities";
 export default function PropertiesListingPage() {
   const { data: me } = useGetMe();
   const [openFilters, setOpenFilters] = useState(false);
+  const searchParams = useSearchParams();
 
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
     useListingStore();
+
+  const urlLocation = searchParams.get("location");
+
+  useEffect(() => {
+    if (urlLocation) {
+      updateInstanceFilter("list", "location", urlLocation);
+      window.scrollTo({ top: 120, behavior: "smooth" });
+    }
+  }, [urlLocation, updateInstanceFilter]);
   const filters = getInstanceFilters("list");
 
   const search = filters.search || "";
@@ -313,7 +325,12 @@ export default function PropertiesListingPage() {
   };
 
   return (
-    <div className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 pt-5 w-full h-full"
+    >
       <div className="h-full mt-24">
         {/* Top Filters Row */}
         <div className="flex items-center gap-4 flex-wrap mb-6 justify-between">
@@ -570,7 +587,7 @@ export default function PropertiesListingPage() {
               (filters.maxPrice !== undefined &&
                 filters.maxPrice < 20000000) ? (
                 <Chip
-                  label={`$${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
+                  label={`Price: $${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
                   onDelete={() => {
                     updateInstanceFilter("list", "minPrice", 0);
                     updateInstanceFilter("list", "maxPrice", 20000000);
@@ -581,7 +598,7 @@ export default function PropertiesListingPage() {
               {(filters.minSqft !== undefined && filters.minSqft > 100) ||
               (filters.maxSqft !== undefined && filters.maxSqft < 15000) ? (
                 <Chip
-                  label={`${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
+                  label={`Area: ${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
                   onDelete={() => {
                     updateInstanceFilter("list", "minSqft", 0);
                     updateInstanceFilter("list", "maxSqft", 15000);
@@ -624,11 +641,29 @@ export default function PropertiesListingPage() {
               )}
               {filters.status && filters.status !== "forSale" && (
                 <Chip
-                  label={filters.status}
+                  label={`Status: ${filters.status}`}
                   onDelete={() => {
                     updateInstanceFilter("list", "status", "forSale");
                   }}
                   className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.activeBedRoom && filters.activeBedRoom !== "any" && (
+                <Chip
+                  label={`Beds: ${filters.activeBedRoom}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "activeBedRoom", "any");
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              )}
+              {filters.activeBathRoom && filters.activeBathRoom !== "any" && (
+                <Chip
+                  label={`Baths: ${filters.activeBathRoom}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "activeBathRoom", "any");
+                  }}
+                  className="bg-gray-100 text-sm"
                 />
               )}
               {filters.activeProperty &&
@@ -665,24 +700,15 @@ export default function PropertiesListingPage() {
                     className="bg-gray-100 text-sm capitalize"
                   />
                 )}
-              {filters.location &&
-                filters.location
-                  .split(",")
-                  .filter(Boolean)
-                  .map((loc: string) => (
-                    <Chip
-                      key={loc}
-                      label={loc}
-                      onDelete={() => {
-                        const remaining = (filters.location || "")
-                          .split(",")
-                          .filter((l: string) => l !== loc)
-                          .join(",");
-                        updateInstanceFilter("list", "location", remaining);
-                      }}
-                      className="bg-gray-100 text-sm"
-                    />
-                  ))}
+              {filters.location && filters.location.split(",").filter(Boolean).length > 0 && (
+                <Chip
+                  label={`Location: ${filters.location.split(",").filter(Boolean).join(", ")}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "location", "");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
             </div>
           </div>
         )}
@@ -750,6 +776,6 @@ export default function PropertiesListingPage() {
         open={openFilters}
         onClose={() => setOpenFilters(false)}
       />
-    </div>
+    </motion.div>
   );
 }

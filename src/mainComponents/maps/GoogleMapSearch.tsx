@@ -50,6 +50,7 @@ const options = {
   fullscreenControl: false,
   minZoom: 6,
   maxZoom: 20,
+ 
 };
 
 export default function GoogleMapSearch() {

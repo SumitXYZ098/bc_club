@@ -11,23 +11,23 @@ export const citiesWeCover: LinkListProps = {
   linkList: [
     {
       label: "Vancouver, BC",
-      href: "/vancouver-bc",
+      href: "/properties?location=Vancouver",
     },
     {
       label: "Surrey, BC",
-      href: "/surrey-bc",
+      href: "/properties?location=Surrey",
+    },
+    {
+      label: "Burnaby, BC",
+      href: "/properties?location=Burnaby",
+    },
+    {
+      label: "Richmond, BC",
+      href: "/properties?location=Richmond",
     },
     {
       label: "Victoria, BC",
-      href: "/victoria-bc",
-    },
-    {
-      label: "Kelowna, BC",
-      href: "/kelowna-bc",
-    },
-    {
-      label: "Prince George, BC",
-      href: "/prince-george-bc",
+      href: "/properties?location=Victoria",
     },
   ],
 };
@@ -80,7 +80,7 @@ export const marketTrends: LinkListProps = {
     {
       label: "Buyer vs Seller Market",
       href: "/market-trends",
-    }
+    },
   ],
 };
 
