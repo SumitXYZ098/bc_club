@@ -50,7 +50,7 @@ const options = {
   fullscreenControl: false,
   minZoom: 6,
   maxZoom: 20,
- 
+  gestureHandling: "greedy",
 };
 
 export default function GoogleMapSearch() {
@@ -632,7 +632,17 @@ export default function GoogleMapSearch() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!mapLoaded || !map || !location) return;
+    if (!mapLoaded || !map) return;
+
+    if (!location || location === "British Columbia") {
+      // 🗺️ Smoothly fly out to a broad overview of the region
+      const bcBounds = new google.maps.LatLngBounds();
+      bcBounds.extend({ lat: 48.0, lng: -125.5 });
+      bcBounds.extend({ lat: 50.5, lng: -121.0 });
+      map.fitBounds(bcBounds);
+      return;
+    }
+
     const cityCoords: { [key: string]: { lat: number; lng: number } } = {
       Vancouver: { lat: 49.2827, lng: -123.1207 },
       Burnaby: { lat: 49.2488, lng: -122.9805 },
@@ -642,14 +652,36 @@ export default function GoogleMapSearch() {
       Victoria: { lat: 48.4284, lng: -123.3656 },
       Kelowna: { lat: 49.888, lng: -119.496 },
       Abbotsford: { lat: 49.0504, lng: -122.3275 },
+      "White Rock": { lat: 49.025, lng: -122.8028 },
+      Nanaimo: { lat: 49.1659, lng: -123.9401 },
+      "New Westminster": { lat: 49.2057, lng: -122.911 },
+      "North Vancouver": { lat: 49.32, lng: -123.0724 },
+      "West Vancouver": { lat: 49.3667, lng: -123.1667 },
+      Langley: { lat: 49.1042, lng: -122.6578 },
+      Delta: { lat: 49.0847, lng: -123.0583 },
+      "Maple Ridge": { lat: 49.2194, lng: -122.6011 },
+      Chilliwack: { lat: 49.1573, lng: -121.9515 },
     };
-    const coords = cityCoords[location];
+
+    // Support multi-select by taking the first city
+    const firstCity = location.split(",")[0].trim();
+    const coords = cityCoords[firstCity];
+
     if (coords) {
-      map.panTo(coords);
-      map.setZoom(14);
-    } else if (properties?.length > 0 && location !== "British Columbia") {
-      map.panTo({ lat: properties[0].latitude, lng: properties[0].longitude });
-      map.setZoom(14);
+      // 🚀 Using fitBounds provides a smooth, coordinated pan + zoom animation (the 'Fly To' effect)
+      const bounds = new google.maps.LatLngBounds();
+      const offset = 0.05; // Balanced city-level view
+      bounds.extend({ lat: coords.lat - offset, lng: coords.lng - offset });
+      bounds.extend({ lat: coords.lat + offset, lng: coords.lng + offset });
+      map.fitBounds(bounds);
+    } else if (properties?.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      properties.slice(0, 5).forEach((p: any) => {
+        if (p.latitude && p.longitude) {
+          bounds.extend({ lat: p.latitude, lng: p.longitude });
+        }
+      });
+      map.fitBounds(bounds);
     }
   }, [location, mapLoaded, map]);
 

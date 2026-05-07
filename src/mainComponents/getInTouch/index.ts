@@ -113,9 +113,9 @@ export const realEstateBC: GetInTouchLinkListProps = {
       label: "Homes For Sale in Chilliwack",
       href: "/Homes For Sale in Chilliwack",
     },
-    {
-      label: "British Columbia Sitemap",
-      href: "/British Columbia Sitemap",
-    },
+    // {
+    //   label: "British Columbia Sitemap",
+    //   href: "/British Columbia Sitemap",
+    // },
   ],
 };
