@@ -29,8 +29,8 @@ import MapSidebar from "./MapSidebar";
 import { formatPriceAbbreviated } from "./mapUtils";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import "./map.css";
-import { MapOptions } from "mapbox-gl";
 import { useRouter } from "next/navigation";
+import GeoJsonLayer from "./GeoJsonLayer";
 
 const mapContainerStyle = {
   width: "100%",
@@ -41,6 +41,7 @@ const center = {
   lat: 49.2827,
   lng: -123.1207, // Vancouver
 };
+
 const options = {
   hash: false,
   disableDefaultUI: true,
@@ -51,6 +52,18 @@ const options = {
   minZoom: 6,
   maxZoom: 20,
   gestureHandling: "greedy",
+};
+
+const fitBoundsWithZoom = (
+  map: google.maps.Map,
+  bounds: google.maps.LatLngBounds,
+  zoom = 14,
+) => {
+  map.fitBounds(bounds);
+
+  google.maps.event.addListenerOnce(map, "idle", () => {
+    map.setZoom(zoom);
+  });
 };
 
 export default function GoogleMapSearch() {
@@ -70,8 +83,7 @@ export default function GoogleMapSearch() {
   const superclusterRef = useRef<Supercluster | null>(null);
   const { data: me } = useGetMe();
   const idleTimeout = useRef<any>(null);
-  const hasInitialized = useRef(false);
-  const [showSearchButton, setShowSearchButton] = useState(false);
+
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
     null,
   );
@@ -93,6 +105,7 @@ export default function GoogleMapSearch() {
   } | null>(null);
   const [mapZoomVal, setMapZoomVal] = useState<number | null>(null);
   const [fitBoundsDone, setFitBoundsDone] = useState(false);
+  const [parcelGeoJSON, setParcelGeoJSON] = useState<any>(null);
 
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
     useListingStore();
@@ -320,12 +333,11 @@ export default function GoogleMapSearch() {
     if (minSqft !== undefined && minSqft > 100) p.minSqft = minSqft;
     if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
     if (minLotSizeArea !== undefined && minLotSizeArea > 100)
-      p["filters[lot_size_area][$gte]"] = minLotSizeArea;
+      p.minLotSizeArea = minLotSizeArea;
     if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000)
-      p["filters[lot_size_area][$lte]"] = maxLotSizeArea;
-    if (minTax !== undefined && minTax > 0) p["filters[tax][$gte]"] = minTax;
-    if (maxTax !== undefined && maxTax < 50000)
-      p["filters[tax][$lte]"] = maxTax;
+      p.maxLotSizeArea = maxLotSizeArea;
+    if (minTax !== undefined && minTax > 0) p.minTax = minTax;
+    if (maxTax !== undefined && maxTax < 50000) p.maxTax = maxTax;
     if (whenListed && whenListed !== "any") p.whenListed = whenListed;
     if (activeBedRoom && activeBedRoom !== "any")
       p.beds = activeBedRoom.replace("+", "");
@@ -383,12 +395,11 @@ export default function GoogleMapSearch() {
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
   if (minLotSizeArea !== undefined && minLotSizeArea > 100)
-    params["filters[lot_size_area][$gte]"] = minLotSizeArea;
+    params.minLotSizeArea = minLotSizeArea;
   if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000)
-    params["filters[lot_size_area][$lte]"] = maxLotSizeArea;
-  if (minTax !== undefined && minTax > 0) params["filters[tax][$gte]"] = minTax;
-  if (maxTax !== undefined && maxTax < 50000)
-    params["filters[tax][$lte]"] = maxTax;
+    params.maxLotSizeArea = maxLotSizeArea;
+  if (minTax !== undefined && minTax > 0) params.minTax = minTax;
+  if (maxTax !== undefined && maxTax < 50000) params.maxTax = maxTax;
   if (whenListed && whenListed !== "any") params.whenListed = whenListed;
   if (activeProperty && activeProperty !== "any") {
     if (activeProperty.includes(",")) {
@@ -400,7 +411,8 @@ export default function GoogleMapSearch() {
     }
   }
   if (features && features !== "") params.features = features;
-  if (structureType && structureType !== "") params.structureType = structureType;
+  if (structureType && structureType !== "")
+    params.structureType = structureType;
   if (activeBedRoom && activeBedRoom !== "any")
     params.beds = activeBedRoom.replace("+", "");
   if (activeBathRoom && activeBathRoom !== "any")
@@ -533,7 +545,7 @@ export default function GoogleMapSearch() {
             l.longitude !== 0 &&
             Number(l.price) > 0,
         ),
-    enabled: isForSale && !!mapBounds, // 🔥 KEY FIX
+    enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -545,13 +557,59 @@ export default function GoogleMapSearch() {
 
   const properties = useMemo(() => queryData || [], [queryData]);
 
-  const onMapLoad = useCallback((map: google.maps.Map) => {
-    setMap(map);
+  // ✅ FIX 1: onMapLoad — capture initial bounds immediately so first fetch fires
+  const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
+    setMap(mapInstance);
     setMapLoaded(true);
+
+    // Small defer to let the map fully render and bounds to be available
+    setTimeout(() => {
+      const bounds = mapInstance.getBounds();
+      if (bounds) {
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
+        const zoom = mapInstance.getZoom() || 14;
+        const newBounds = {
+          north: ne.lat(),
+          south: sw.lat(),
+          east: ne.lng(),
+          west: sw.lng(),
+          zoom,
+        };
+        setMapBounds(newBounds);
+        setMapZoomVal(Math.round(zoom));
+        lastFetchedBounds.current = JSON.stringify(newBounds);
+      }
+    }, 300);
   }, []);
 
+  const fetchParcels = async (bounds: any) => {
+    try {
+      const params = new URLSearchParams({
+        north: bounds.north.toString(),
+        south: bounds.south.toString(),
+        east: bounds.east.toString(),
+        west: bounds.west.toString(),
+        zoom: bounds.zoom.toString(),
+      });
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/parcels/findGeoJSON?${params}`,
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch parcels");
+      }
+
+      const data = await res.json();
+      setParcelGeoJSON(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const triggerSearch = useCallback(() => {
-    if (selectedClusterProperties.length > 0 || selectedProperty) return; // 🚫 block if any popup open
+    if (selectedClusterProperties.length > 0 || selectedProperty) return;
     if (!map) return;
     const bounds = map.getBounds();
     if (!bounds) return;
@@ -574,44 +632,29 @@ export default function GoogleMapSearch() {
     if (lastFetchedBounds.current === boundsKey) return;
 
     setMapBounds(newBounds);
+    fetchParcels(newBounds);
     setMapZoomVal(Math.round(zoom));
     lastFetchedBounds.current = boundsKey;
-    setShowSearchButton(false);
-  }, [map, selectedClusterProperties]);
+  }, [map, selectedClusterProperties, selectedProperty]);
 
+  // ✅ FIX 2: onMapIdle — removed broken hasInitialized guard, simplified logic
   const onMapIdle = useCallback(() => {
-    // 🚫 Do nothing if popup open
     if (selectedClusterProperties.length > 0 || selectedProperty) return;
 
     setIsMoving(false);
     if (!map) return;
+
     const zoom = map.getZoom() || 14;
-
-    // 🚫 STOP API CALL if zoom is too low
-    if (zoom < 8) {
-      return;
-    }
-
-    // ⛔ Skip first unwanted trigger (important)
-    if (!hasInitialized.current) {
-      hasInitialized.current = true;
-      const bounds = map.getBounds();
-      if (bounds) {
-        triggerSearch();
-      }
-      return;
-    }
+    if (zoom < 8) return;
 
     if (idleTimeout.current) {
       clearTimeout(idleTimeout.current);
     }
 
     idleTimeout.current = setTimeout(() => {
-      // Instead of auto-fetching, we can check if we want auto-fetch or manual
-      // For now, let's keep auto-fetch but with a longer debounce and show button if it's a significant move
       triggerSearch();
-    }, 400); // ⏱ debounce increased to 400ms
-  }, [map, triggerSearch, selectedClusterProperties]);
+    }, 400);
+  }, [map, triggerSearch, selectedClusterProperties, selectedProperty]);
 
   const toggleMapStyle = () => {
     if (!map) return;
@@ -635,11 +678,10 @@ export default function GoogleMapSearch() {
     if (!mapLoaded || !map) return;
 
     if (!location || location === "British Columbia") {
-      // 🗺️ Smoothly fly out to a broad overview of the region
       const bcBounds = new google.maps.LatLngBounds();
       bcBounds.extend({ lat: 48.0, lng: -125.5 });
       bcBounds.extend({ lat: 50.5, lng: -121.0 });
-      map.fitBounds(bcBounds);
+      fitBoundsWithZoom(map, bcBounds, 12);
       return;
     }
 
@@ -663,17 +705,15 @@ export default function GoogleMapSearch() {
       Chilliwack: { lat: 49.1573, lng: -121.9515 },
     };
 
-    // Support multi-select by taking the first city
     const firstCity = location.split(",")[0].trim();
     const coords = cityCoords[firstCity];
 
     if (coords) {
-      // 🚀 Using fitBounds provides a smooth, coordinated pan + zoom animation (the 'Fly To' effect)
       const bounds = new google.maps.LatLngBounds();
-      const offset = 0.05; // Balanced city-level view
+      const offset = 0.05;
       bounds.extend({ lat: coords.lat - offset, lng: coords.lng - offset });
       bounds.extend({ lat: coords.lat + offset, lng: coords.lng + offset });
-      map.fitBounds(bounds);
+      fitBoundsWithZoom(map, bounds, 12);
     } else if (properties?.length > 0) {
       const bounds = new google.maps.LatLngBounds();
       properties.slice(0, 5).forEach((p: any) => {
@@ -681,7 +721,7 @@ export default function GoogleMapSearch() {
           bounds.extend({ lat: p.latitude, lng: p.longitude });
         }
       });
-      map.fitBounds(bounds);
+      fitBoundsWithZoom(map, bounds, 12);
     }
   }, [location, mapLoaded, map]);
 
@@ -693,12 +733,16 @@ export default function GoogleMapSearch() {
         map.panTo({ lat: latitude, lng: longitude });
         map.setZoom(17);
       },
-      (err) => alert("Please enable location services to use this feature."),
+      () => alert("Please enable location services to use this feature."),
     );
   };
 
+  // ✅ FIX 3: fitBounds from properties — guard against fighting the location effect
   useEffect(() => {
     if (!mapLoaded || !map || properties?.length === 0 || fitBoundsDone) return;
+    // Don't override the location-based fitBounds
+    if (location && location !== "British Columbia") return;
+
     const bounds = new google.maps.LatLngBounds();
     let hasValidPoints = false;
     properties.forEach((p: any) => {
@@ -708,14 +752,13 @@ export default function GoogleMapSearch() {
       }
     });
     if (hasValidPoints) {
-      map.fitBounds(bounds);
+      fitBoundsWithZoom(map, bounds, 12);
       setFitBoundsDone(true);
     }
-  }, [properties, mapLoaded, map, fitBoundsDone]);
+  }, [properties, mapLoaded, map, fitBoundsDone, location]);
 
   // Supercluster logic for Google Maps
   useEffect(() => {
-    // 🚫 STOP recalculation if cluster popup is open
     if (selectedClusterProperties.length > 0) return;
 
     if (!properties || properties.length === 0) {
@@ -782,9 +825,7 @@ export default function GoogleMapSearch() {
         setSelectedProperty(null);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -846,40 +887,18 @@ export default function GoogleMapSearch() {
               center={center}
               onLoad={onMapLoad}
               onIdle={onMapIdle}
-              onDragStart={() => {
-                setIsMoving(true);
-                setShowSearchButton(true);
-              }}
-              onZoomChanged={() => {
-                setIsMoving(true);
-                setShowSearchButton(true);
-              }}
+              onDragStart={() => setIsMoving(true)}
+              onZoomChanged={() => setIsMoving(true)}
               options={options}
               onClick={() => {
                 setSelectedClusterProperties([]);
                 setClusterPosition(null);
               }}
             >
-              {/* Search This Area Button */}
-              {showSearchButton && (
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      triggerSearch();
-                    }}
-                    className="flex items-center gap-2 bg-white text-primary px-6 py-2.5 rounded-full shadow-2xl border border-primary/20 font-bold hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <FiLoader className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <FiNavigation className="w-4 h-4" />
-                    )}
-                    {isLoading ? "Searching..." : "Search This Area"}
-                  </button>
-                </div>
-              )}
+              {/* PARCEL LAYER */}
+              {parcelGeoJSON && <GeoJsonLayer data={parcelGeoJSON} map={map} />}
+
+              {/* PROPERTY CLUSTERS */}
               {clusters.map((cluster, index) => {
                 const [longitude, latitude] = cluster.geometry.coordinates;
                 const { cluster: isCluster, point_count: pointCount } =
@@ -900,37 +919,29 @@ export default function GoogleMapSearch() {
                           if (selectedClusterProperties.length > 0) return;
 
                           const currentZoom = map?.getZoom() || 0;
-
-                          // ❗ Close single property popup
                           setSelectedProperty(null);
 
-                          // 🔥 If max zoom → show cluster properties in InfoWindow
                           if (currentZoom >= 20) {
                             const leaves =
                               superclusterRef.current?.getLeaves(
                                 cluster.id,
-                                50, // limit for performance
+                                50,
                               ) || [];
-
-                            const properties = leaves.map(
+                            const props = leaves.map(
                               (leaf: any) => leaf.properties.propertyData,
                             );
-
-                            setSelectedClusterProperties(properties);
+                            setSelectedClusterProperties(props);
                             setClusterPosition({
                               lat: latitude,
                               lng: longitude,
                             });
-
                             return;
                           }
 
-                          // 👉 Normal zoom behavior
                           const expansionZoom =
                             superclusterRef.current?.getClusterExpansionZoom(
                               cluster.id as number,
                             ) || 10;
-
                           map?.setZoom(expansionZoom);
                           map?.panTo({ lat: latitude, lng: longitude });
                         }}
@@ -951,14 +962,13 @@ export default function GoogleMapSearch() {
 
                 const property = cluster.properties.propertyData;
                 const zoom = map?.getZoom() || 8;
-
                 const isHovered = hoveredPropertyId === property.id;
                 const statusColor =
                   status === "sold"
                     ? "#ef4444"
                     : status === "expired"
                       ? "#3b82f6"
-                      : "#22c55e"; // Green for Active
+                      : "#22c55e";
 
                 if (zoom >= 14) {
                   return (
@@ -987,7 +997,7 @@ export default function GoogleMapSearch() {
                               ? statusColor
                               : "transparent",
                           }}
-                          className={`bg-white px-3 py-1.5 rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.15)] font-bold text-sm whitespace-nowrap border-2 transition-all duration-200 text-gray-800 `}
+                          className="bg-white px-3 py-1.5 rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.15)] font-bold text-sm whitespace-nowrap border-2 transition-all duration-200 text-gray-800"
                         >
                           <div
                             style={{
@@ -1160,9 +1170,7 @@ export default function GoogleMapSearch() {
                 stableClusterPosition && (
                   <InfoWindow
                     position={stableClusterPosition}
-                    onCloseClick={() => {
-                      setSelectedClusterProperties([]);
-                    }}
+                    onCloseClick={() => setSelectedClusterProperties([])}
                   >
                     <div
                       style={{
@@ -1210,7 +1218,6 @@ export default function GoogleMapSearch() {
                               background: "#f1f5f9",
                             }}
                           />
-
                           <div style={{ flex: 1 }}>
                             <div
                               style={{
@@ -1221,7 +1228,6 @@ export default function GoogleMapSearch() {
                             >
                               ${Number(p.price).toLocaleString()}
                             </div>
-
                             <div
                               style={{
                                 fontSize: 12,
@@ -1232,7 +1238,6 @@ export default function GoogleMapSearch() {
                             >
                               {p.title}
                             </div>
-
                             <div
                               style={{
                                 fontSize: 11,
@@ -1246,7 +1251,6 @@ export default function GoogleMapSearch() {
                         </div>
                       ))}
 
-                      {/* 👉 Optional CTA */}
                       <button
                         onClick={() => {
                           setVisibleProperties(selectedClusterProperties);
@@ -1272,7 +1276,7 @@ export default function GoogleMapSearch() {
             </GoogleMap>
 
             {isLoading && (
-              <div className="absolute top-4 left-4  z-20 pointer-events-none flex items-center justify-center">
+              <div className="absolute top-4 left-4 z-20 pointer-events-none flex items-center justify-center">
                 <div className="bg-white px-4 py-2 rounded-lg shadow-2xl flex items-center gap-2 border border-gray-100 animate-in fade-in zoom-in duration-300">
                   <FiLoader className="animate-spin text-primary w-4 h-4" />
                   <span className="text-xs font-bold text-gray-700 tracking-tight">

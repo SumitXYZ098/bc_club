@@ -10,6 +10,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: "BC Club",
@@ -34,6 +35,7 @@ export default function RootLayout({
         className={`plusJakartaDisplay antialiased bg-background`}
         suppressHydrationWarning
       >
+        <NextTopLoader color="#22558b" height={4} showSpinner={false} />
         <QueryProvider>
           <GoogleOAuthProvider clientId="265527084086-pd2igue5ksbto4srj2du15nj6b7re5ov.apps.googleusercontent.com">
             <AuthProvider>

@@ -103,10 +103,10 @@ export const contactUs: LinkListProps = {
     //   label: "Live Chat",
     //   href: "/Live Chat",
     // },
-    // {
-    //   label: "Renovation",
-    //   href: "/renovation",
-    // },
+    {
+      label: "Renovation",
+      href: "/renovation",
+    },
     // {
     //   label: "FAQs",
     //   href: "/faqs",

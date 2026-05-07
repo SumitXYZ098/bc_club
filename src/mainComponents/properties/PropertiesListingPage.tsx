@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
-import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import { Box, Chip, Pagination } from "@mui/material";
@@ -20,23 +19,30 @@ import {
   useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
 import { getOfficeName } from "@/src/utilities/utilities";
+import { useSearchParams } from "next/navigation";
 
 export default function PropertiesListingPage() {
   const { data: me } = useGetMe();
   const [openFilters, setOpenFilters] = useState(false);
-  const searchParams = useSearchParams();
 
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
     useListingStore();
 
-  const urlLocation = searchParams.get("location");
+  const searchParams = useSearchParams();
 
   useEffect(() => {
+    const urlLocation = searchParams.get("location");
+
     if (urlLocation) {
       updateInstanceFilter("list", "location", urlLocation);
-      window.scrollTo({ top: 120, behavior: "smooth" });
+
+      window.scrollTo({
+        top: 120,
+        behavior: "smooth",
+      });
     }
-  }, [urlLocation, updateInstanceFilter]);
+  }, [searchParams, updateInstanceFilter]);
+
   const filters = getInstanceFilters("list");
 
   const search = filters.search || "";
@@ -162,6 +168,8 @@ export default function PropertiesListingPage() {
   if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) {
     params.maxLotSizeArea = maxLotSizeArea;
   }
+  if (minTax !== undefined && minTax > 0) params.minTax = minTax;
+  if (maxTax !== undefined && maxTax < 50000) params.maxTax = maxTax;
 
   // if (status && status !== "any") {
   //   params.propertyType = status;
@@ -174,11 +182,11 @@ export default function PropertiesListingPage() {
   if (whenListed && whenListed !== "any") {
     params.whenListed = whenListed;
   }
-  
+
   if (features && features !== "") {
     params.features = features;
   }
-  
+
   if (structureType && structureType !== "") {
     params.structureType = structureType;
   }
@@ -311,6 +319,8 @@ export default function PropertiesListingPage() {
     maxSqft,
     minLotSizeArea,
     maxLotSizeArea,
+    minTax,
+    maxTax,
     status,
     location,
     whenListed,
@@ -325,7 +335,7 @@ export default function PropertiesListingPage() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -666,49 +676,51 @@ export default function PropertiesListingPage() {
                   className="bg-gray-100 text-sm"
                 />
               )}
-              {filters.activeProperty &&
-                filters.activeProperty !== "any" && (
-                  <Chip
-                    label={`Property: ${filters.activeProperty
-                      .split(",")
-                      .map((t: string) => t.replace(/([A-Z])/g, " $1").trim())
-                      .join(", ")}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "activeProperty", "any");
-                    }}
-                    className="bg-gray-100 text-sm capitalize"
-                  />
-                )}
-              {filters.features && (
-                  <Chip
-                    label={`Feature: ${filters.features
-                      .split(",")
-                      .map((feat: string) => feat.replace(/([A-Z])/g, " $1").trim())
-                      .join(", ")}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "features", "");
-                    }}
-                    className="bg-gray-100 text-sm capitalize"
-                  />
-                )}
-              {filters.structureType && (
-                  <Chip
-                    label={`Type: ${filters.structureType.split(",").join(", ")}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "structureType", "");
-                    }}
-                    className="bg-gray-100 text-sm capitalize"
-                  />
-                )}
-              {filters.location && filters.location.split(",").filter(Boolean).length > 0 && (
+              {filters.activeProperty && filters.activeProperty !== "any" && (
                 <Chip
-                  label={`Location: ${filters.location.split(",").filter(Boolean).join(", ")}`}
+                  label={`Property: ${filters.activeProperty
+                    .split(",")
+                    .map((t: string) => t.replace(/([A-Z])/g, " $1").trim())
+                    .join(", ")}`}
                   onDelete={() => {
-                    updateInstanceFilter("list", "location", "");
+                    updateInstanceFilter("list", "activeProperty", "any");
                   }}
                   className="bg-gray-100 text-sm capitalize"
                 />
               )}
+              {filters.features && (
+                <Chip
+                  label={`Feature: ${filters.features
+                    .split(",")
+                    .map((feat: string) =>
+                      feat.replace(/([A-Z])/g, " $1").trim(),
+                    )
+                    .join(", ")}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "features", "");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.structureType && (
+                <Chip
+                  label={`Type: ${filters.structureType.split(",").join(", ")}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "structureType", "");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.location &&
+                filters.location.split(",").filter(Boolean).length > 0 && (
+                  <Chip
+                    label={`Location: ${filters.location.split(",").filter(Boolean).join(", ")}`}
+                    onDelete={() => {
+                      updateInstanceFilter("list", "location", "");
+                    }}
+                    className="bg-gray-100 text-sm capitalize"
+                  />
+                )}
             </div>
           </div>
         )}
