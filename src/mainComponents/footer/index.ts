@@ -37,20 +37,20 @@ export const buyAndSell: LinkListProps = {
   linkList: [
     {
       label: "Search Properties",
-      href: "/search-properties",
+      href: "/properties",
     },
     {
       label: "List Your Property",
-      href: "/list-your-property",
+      href: "/wishlist",
     },
     {
       label: "Home Estimation",
       href: "/home-estimation",
     },
-    {
-      label: "Neighborhood Insights",
-      href: "/neighborhood-insights",
-    },
+    // {
+    //   label: "Neighborhood Insights",
+    //   href: "/neighborhood-insights",
+    // },
     {
       label: "Compare Market Trends",
       href: "/market-trends",
@@ -63,28 +63,24 @@ export const marketTrends: LinkListProps = {
   linkList: [
     {
       label: "Detached Homes Statistics",
-      href: "/Detached Homes Statistics",
+      href: "/market-trends",
     },
     {
       label: "Townhouse Statistics",
-      href: "/Townhouse Statistics",
+      href: "/market-trends",
     },
     {
       label: "Condo / Apartment Statistics",
-      href: "/Condo Apartment Statistics",
+      href: "/market-trends",
     },
     {
       label: "Monthly Sales Report",
-      href: "/Monthly Sales Report",
+      href: "/market-trends",
     },
     {
       label: "Buyer vs Seller Market",
-      href: "/Buyer vs Seller Market",
-    },
-    {
-      label: "Map",
-      href: "/maps",
-    },
+      href: "/market-trends",
+    }
   ],
 };
 
@@ -93,7 +89,7 @@ export const contactUs: LinkListProps = {
   linkList: [
     {
       label: "Contact Form",
-      href: "/contact",
+      href: "/contact-us",
     },
     {
       label: "info@bcclub.com",
@@ -101,38 +97,38 @@ export const contactUs: LinkListProps = {
     },
     {
       label: "Support / Help Center",
-      href: "/Support Help Center",
+      href: "/contact-us",
     },
-    {
-      label: "Live Chat",
-      href: "/Live Chat",
-    },
-    {
-      label: "Renovation",
-      href: "/renovation",
-    },
-    {
-      label: "FAQs",
-      href: "/faqs",
-    },
+    // {
+    //   label: "Live Chat",
+    //   href: "/Live Chat",
+    // },
+    // {
+    //   label: "Renovation",
+    //   href: "/renovation",
+    // },
+    // {
+    //   label: "FAQs",
+    //   href: "/faqs",
+    // },
   ],
 };
 
 export const company: LinkListProps = {
   title: "Company",
   linkList: [
-    {
-      label: "About BCClub",
-      href: "/about",
-    },
+    // {
+    //   label: "About BCClub",
+    //   href: "/about",
+    // },
     {
       label: "Our Story",
       href: "/blogs",
     },
-    {
-      label: "News & Articles",
-      href: "/news-and-articles",
-    },
+    // {
+    //   label: "News & Articles",
+    //   href: "/news-and-articles",
+    // },
     {
       label: "Privacy Policy",
       href: "/privacy-policy",
