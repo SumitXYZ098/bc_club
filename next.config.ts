@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
         hostname: "propimages.bcassessment.ca",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "iframe.videodelivery.net",
+        pathname: "**",
+      },
     ],
   },
   turbopack: {

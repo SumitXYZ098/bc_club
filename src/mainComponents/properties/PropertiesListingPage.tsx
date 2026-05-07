@@ -47,6 +47,8 @@ export default function PropertiesListingPage() {
   const status = filters.status;
   const location = filters.location;
   const whenListed = filters.whenListed;
+  const features = filters.features;
+  const structureType = filters.structureType;
 
   const setSearch = (val: string) =>
     updateInstanceFilter("list", "search", val);
@@ -155,6 +157,18 @@ export default function PropertiesListingPage() {
 
   if (location && location !== "") {
     params.location = location;
+  }
+
+  if (whenListed && whenListed !== "any") {
+    params.whenListed = whenListed;
+  }
+  
+  if (features && features !== "") {
+    params.features = features;
+  }
+  
+  if (structureType && structureType !== "") {
+    params.structureType = structureType;
   }
 
   const select = (res: any) => {
@@ -287,6 +301,9 @@ export default function PropertiesListingPage() {
     maxLotSizeArea,
     status,
     location,
+    whenListed,
+    features,
+    structureType,
     page,
   ]);
 
@@ -382,7 +399,9 @@ export default function PropertiesListingPage() {
                 (filters.minTax !== undefined && filters.minTax > 0) ||
                 (filters.maxTax !== undefined && filters.maxTax < 50000) ||
                 (filters.whenListed && filters.whenListed !== "any") ||
-                filters.location
+                filters.location ||
+                filters.features ||
+                filters.structureType
                   ? "bg-primary text-white"
                   : "bg-white"
               }`}
@@ -517,7 +536,9 @@ export default function PropertiesListingPage() {
               (filters.minTax !== undefined && filters.minTax > 0) ||
               (filters.maxTax !== undefined && filters.maxTax < 50000) ||
               (filters.whenListed && filters.whenListed !== "any") ||
-              filters.location
+              filters.location ||
+              filters.features ||
+              filters.structureType
                 ? "bg-primary text-white"
                 : "bg-white"
             }`}
@@ -539,7 +560,9 @@ export default function PropertiesListingPage() {
           (filters.minTax !== undefined && filters.minTax > 0) ||
           (filters.maxTax !== undefined && filters.maxTax < 50000) ||
           (filters.whenListed && filters.whenListed !== "any") ||
-          filters.location) && (
+          filters.location ||
+          filters.features ||
+          filters.structureType) && (
           <div className="w-full flex flex-row justify-between items-center mb-4">
             <span className="font-medium text-sm">Selected Filters:</span>
             <div className="flex flex-row gap-2">
@@ -609,24 +632,39 @@ export default function PropertiesListingPage() {
                 />
               )}
               {filters.activeProperty &&
-                filters.activeProperty !== "any" &&
-                filters.activeProperty.split(",").map((type: string) => (
+                filters.activeProperty !== "any" && (
                   <Chip
-                    key={type}
-                    label={type.replace(/([A-Z])/g, " $1").trim()}
+                    label={`Property: ${filters.activeProperty
+                      .split(",")
+                      .map((t: string) => t.replace(/([A-Z])/g, " $1").trim())
+                      .join(", ")}`}
                     onDelete={() => {
-                      const newProps = (filters.activeProperty || "")
-                        .split(",")
-                        .filter((p: string) => p !== type);
-                      updateInstanceFilter(
-                        "list",
-                        "activeProperty",
-                        newProps.length > 0 ? newProps.join(",") : "any",
-                      );
+                      updateInstanceFilter("list", "activeProperty", "any");
                     }}
                     className="bg-gray-100 text-sm capitalize"
                   />
-                ))}
+                )}
+              {filters.features && (
+                  <Chip
+                    label={`Feature: ${filters.features
+                      .split(",")
+                      .map((feat: string) => feat.replace(/([A-Z])/g, " $1").trim())
+                      .join(", ")}`}
+                    onDelete={() => {
+                      updateInstanceFilter("list", "features", "");
+                    }}
+                    className="bg-gray-100 text-sm capitalize"
+                  />
+                )}
+              {filters.structureType && (
+                  <Chip
+                    label={`Type: ${filters.structureType.split(",").join(", ")}`}
+                    onDelete={() => {
+                      updateInstanceFilter("list", "structureType", "");
+                    }}
+                    className="bg-gray-100 text-sm capitalize"
+                  />
+                )}
               {filters.location &&
                 filters.location
                   .split(",")

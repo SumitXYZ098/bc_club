@@ -231,6 +231,13 @@ export default function FiltersPopup({
       ? filters.activeProperty.split(",").filter(Boolean)
       : [],
   );
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
+    filters.features ? filters.features.split(",").filter(Boolean) : []
+  );
+
+  const [selectedStructureTypes, setSelectedStructureTypes] = useState<string[]>(
+    filters.structureType ? filters.structureType.split(",").filter(Boolean) : []
+  );
 
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
   const [whenListedDropdownOpen, setWhenListedDropdownOpen] = useState(false);
@@ -251,8 +258,10 @@ export default function FiltersPopup({
       "Single-Family",
       "Townhouse",
       "Detached House",
+      "Detached Home",
       "Duplex",
       "Apartment/Condo",
+      "Apartment",
       "Single Family Residence",
       "Half Duplex",
       "Row House (Non-Strata)",
@@ -269,10 +278,45 @@ export default function FiltersPopup({
         setSelectedProperties([...currentSF, prop]);
       }
     } else {
-      // If it's an "Other" type, it's single-select and clears everything else
+      // If it's an "Other" type, it's single-select and clears everything elsew
       setSelectedProperties([prop]);
+      setSelectedStructureTypes([]);
     }
   };
+
+  const handleToggleStructureType = (type: string) => {
+    const singleFamilyOptions = [
+      "Single-Family",
+      "Townhouse",
+      "Detached House",
+      "Detached Home",
+      "Duplex",
+      "Apartment/Condo",
+      "Apartment",
+      "Single Family Residence",
+      "Half Duplex",
+      "Row House (Non-Strata)",
+    ];
+    const currentSF = selectedProperties.filter((p) => singleFamilyOptions.includes(p));
+    if (currentSF.length !== selectedProperties.length) {
+      setSelectedProperties(currentSF);
+    }
+
+    if (selectedStructureTypes.includes(type)) {
+      setSelectedStructureTypes(selectedStructureTypes.filter((t) => t !== type));
+    } else {
+      setSelectedStructureTypes([...selectedStructureTypes, type]);
+    }
+  };
+
+  const handleToggleFeature = (feat: string) => {
+    if (selectedFeatures.includes(feat)) {
+      setSelectedFeatures(selectedFeatures.filter((f) => f !== feat));
+    } else {
+      setSelectedFeatures([...selectedFeatures, feat]);
+    }
+  };
+
 
   useEffect(() => {
     if (open) {
@@ -312,6 +356,12 @@ export default function FiltersPopup({
           ? currentFilters.activeProperty.split(",").filter(Boolean)
           : [],
       );
+      setSelectedFeatures(
+        currentFilters.features ? currentFilters.features.split(",").filter(Boolean) : []
+      );
+      setSelectedStructureTypes(
+        currentFilters.structureType ? currentFilters.structureType.split(",").filter(Boolean) : []
+      );
     }
   }, [open, id, getInstanceFilters]);
 
@@ -327,6 +377,8 @@ export default function FiltersPopup({
     setWhenListed("any");
     setSelectedLocations([]);
     setSelectedProperties([]);
+    setSelectedFeatures([]);
+    setSelectedStructureTypes([]);
     onClose();
   };
 
@@ -357,6 +409,8 @@ export default function FiltersPopup({
       "activeProperty",
       selectedProperties.length > 0 ? selectedProperties.join(",") : "any",
     );
+    updateInstanceFilter(id, "features", selectedFeatures.join(","));
+    updateInstanceFilter(id, "structureType", selectedStructureTypes.join(","));
     onClose();
   };
 
@@ -675,23 +729,23 @@ export default function FiltersPopup({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-8">
                     {[
                       { label: "Townhouse", value: "Townhouse" },
-                      { label: "Detached House", value: "Detached House" },
+                      { label: "Detached Home", value: "Detached Home" },
                       { label: "Duplex", value: "Duplex" },
-                      { label: "Apartment/Condo", value: "Apartment/Condo" },
+                      { label: "Apartment", value: "Apartment" },
                     ].map((prop) => (
                       <div
                         key={prop.value}
                         className="flex items-center gap-3 cursor-pointer group"
-                        onClick={() => handleToggleProperty(prop.value, true)}
+                        onClick={() => handleToggleStructureType(prop.value)}
                       >
                         <div
                           className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                            selectedProperties.includes(prop.value)
+                            selectedStructureTypes.includes(prop.value)
                               ? "bg-primary border-primary"
                               : "border-gray-300 group-hover:border-primary"
                           }`}
                         >
-                          {selectedProperties.includes(prop.value) && (
+                          {selectedStructureTypes.includes(prop.value) && (
                             <svg
                               width="12"
                               height="12"
@@ -1023,27 +1077,34 @@ export default function FiltersPopup({
         <LineGradient />
 
         {/* Features */}
-        {/* <div className="mb-6  border-[#33333333] pt-5">
+         <div className="mb-6  border-[#33333333] pt-5">
             <h3 className="font-bold mb-5">Features</h3>
             <div className="grid grid-cols-3 gap-4">
               {[
-                "Water front",
-                "View",
-                "Fireplace",
-                "Pool",
-                "Workshop",
-                "Suite",
+                // { label: "Parking", value: "parking" },
+                { label: "View", value: "view" },
+                { label: "Fireplace", value: "firePlace" },
+                { label: "Suite", value: "suite" },
+                // { label: "Security", value: "security" },
+                { label: "Waterfront", value: "waterfront" },
+                { label: "Pool", value: "pool" },
+                { label: "Workshop", value: "workshop" },
               ].map((f) => (
                 <div
-                  key={f}
-                  className="text-center py-3 rounded-xl border border-[#0F0F0F1F] text-gray-400 text-sm"
+                  key={f.value}
+                  onClick={() => handleToggleFeature(f.value)}
+                  className={`text-center py-3 rounded-xl border cursor-pointer text-sm transition-all ${
+                    selectedFeatures.includes(f.value)
+                      ? "bg-primary border-primary text-white"
+                      : "border-[#0F0F0F1F] text-gray-400 hover:border-primary hover:text-primary"
+                  }`}
                 >
-                  {f}
+                  {f.label}
                 </div>
               ))}
             </div>
           </div>
-          <LineGradient /> */}
+          <LineGradient /> 
 
         {/* Extra Features */}
         {/* <div className="border-[#33333333] pt-2">
@@ -1073,8 +1134,8 @@ export default function FiltersPopup({
                 <span>Must Be on Favorites list</span>
               </div>
             </div>
-          </div> */}
-        {/* <LineGradient /> */}
+          </div> 
+        {/* <LineGradient /> 
 
         {/* Bottom Buttons */}
         <div className="md:py-6 py-4 mt-2 border-[#0F0F0F1F] flex gap-4 sticky bottom-0 bg-background w-full">
