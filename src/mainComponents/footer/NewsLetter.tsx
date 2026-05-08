@@ -4,6 +4,7 @@ import { newsletterApi } from "@/src/api/newsletter/newsletterApi";
 import { AxiosError } from "axios";
 import Image from "next/image";
 import React, { useState } from "react";
+import RippleButton from "@/src/components/button/RippleButton";
 
 const NewsLetter = () => {
   const [email, setEmail] = useState("");
@@ -71,19 +72,21 @@ const NewsLetter = () => {
               onChange={onChangeEmail}
             />
           </div>
-          <button
+          <RippleButton
             onClick={handleSubscribe}
-            className="bg-background text-primary font-bold text-base py-3.5 px-8.5 rounded-lg md:flex hidden"
-          >
-            Submit
-          </button>
+            title="Submit"
+            buttonType="quaternary"
+            customClassName="py-3.5 px-8.5 !rounded-lg md:flex hidden"
+            textClassName="!font-bold !text-base"
+          />
         </div>
-        <button
+        <RippleButton
           onClick={handleSubscribe}
-          className="bg-background text-primary font-bold text-base py-3.5 px-8.5 rounded-lg my-5 md:hidden block w-fit "
-        >
-          Submit
-        </button>
+          title="Submit"
+          buttonType="quaternary"
+          customClassName="py-3.5 px-8.5 !rounded-lg my-5 md:hidden block w-fit"
+          textClassName="!font-bold !text-base"
+        />
         {error && (
           <p className="text-red-500 absolute md:-bottom-4.5 -bottom-2 mt-3 text-sm">
             {error}

@@ -67,7 +67,7 @@ export async function getActiveListingById(id: string): Promise<any> {
 export async function getListingById(id: string): Promise<any> {
   try {
     const res = await axios.get(Endpoints.getListingById(id));
-    console.log("Listing API Response:", res.data);
+    // console.log("Listing API Response:", res.data);
     return res.data;
   } catch (error) {
     console.error("Error fetching listing:", error);

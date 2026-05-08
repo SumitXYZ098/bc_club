@@ -16,6 +16,7 @@ import { useAuthContext } from "../auth/AuthContext";
 import { usePathname } from "next/navigation";
 import { Heart, LogOut } from "lucide-react";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
+import RippleButton from "@/src/components/button/RippleButton";
 
 export const menulist = [
   { title: "Evaluation", href: "/home-estimation" },
@@ -86,7 +87,7 @@ const Header = () => {
         initial="hidden"
         animate={isVisible ? "visible" : "exit"}
         variants={navVariants as any}
-        className={`xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 xl:py-6 md:py-4 py-3 flex items-center justify-between w-full fixed top-0 left-0 right-0 z-999   ${
+        className={`xl:max-w-screen-2xl mx-auto xl:px-16 md:px-13 px-6 xl:py-4 md:py-4 py-3 flex items-center justify-between w-full fixed top-0 left-0 right-0 z-999   ${
           isLaptop
             ? isScrolled
               ? "bg-background shadow"
@@ -181,18 +182,18 @@ const Header = () => {
             </div>
           ) : (
             <div className="flex items-center gap-x-3">
-              <CustomButton
-                label="Login"
+              <RippleButton
+                title="Login"
                 buttonType="primary"
                 onClick={() => setOpenLogin(true)}
-                customClasses="w-[132px]"
+                customClassName="w-[132px]"
               />
 
-              <CustomButton
-                label="Sign up"
-                buttonType="secondary-outlined"
+              <RippleButton
+                title="Sign up"
+                buttonType="secondary"
                 onClick={() => setOpenSignup(true)}
-                customClasses="w-[132px]"
+                customClassName="w-[132px]"
               />
             </div>
           )}

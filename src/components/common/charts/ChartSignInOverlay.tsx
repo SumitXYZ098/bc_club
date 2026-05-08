@@ -1,4 +1,5 @@
 import React from "react";
+import RippleButton from "@/src/components/button/RippleButton";
 
 interface ChartSignInOverlayProps {
   onSignIn: () => void;
@@ -41,12 +42,13 @@ const ChartSignInOverlay: React.FC<ChartSignInOverlayProps> = ({
               `Please login in to view historical data beyond ${monthContent || "1 month"}.`}
           </p>
         </div>
-        <button
+        <RippleButton
+          title="Log In"
+          buttonType="tertiary"
           onClick={onSignIn}
-          className="w-full py-3 bg-[#FFA500] hover:bg-[#e69500] text-white rounded-xl font-bold transition-colors shadow-sm"
-        >
-          Log In
-        </button>
+          customClassName="w-full !py-3 !rounded-xl font-bold shadow-sm"
+          textClassName="!text-white !font-bold"
+        />
       </div>
     </div>
   );

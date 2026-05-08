@@ -1,6 +1,7 @@
 "use client";
 import { contactApi } from "@/src/api/contact/contactApi";
 import { useForm } from "react-hook-form";
+import RippleButton from "@/src/components/button/RippleButton";
 
 type FormValues = {
   firstName: string;
@@ -131,12 +132,12 @@ export default function GetInTouchForm() {
       </div>
 
       {/* Submit */}
-      <button
+      <RippleButton
         type="submit"
-        className=" bg-primary text-background py-3 rounded-xl mt-4 text-lg font-medium w-1/2"
-      >
-        Submit
-      </button>
+        title="Submit"
+        buttonType="primary"
+        customClassName="!py-3 !rounded-xl mt-4 !text-lg font-medium w-full md:w-1/2"
+      />
     </form>
   );
 }

@@ -239,12 +239,137 @@ body::-webkit-scrollbar {
   }
 }
 
-@keyframes shimmer {
+@keyframes ripple {
   0% {
-    background-position: -200% 0;
+    width: 0;
+    height: 0;
+    opacity: 1;
   }
-
   100% {
-    background-position: 200% 0;
+    width: 600px;
+    height: 600px;
+    opacity: 1;
   }
+}
+
+@keyframes ripple-reverse {
+  0% {
+    width: 600px;
+    height: 600px;
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes ripple-text {
+  0% {
+    color: white;
+  }
+  100% {
+    color: var(--secondary);
+  }
+}
+
+@keyframes ripple-text-reverse {
+  0% {
+    color: var(--secondary);
+  }
+  100% {
+    color: white;
+  }
+}
+
+@keyframes ripple-text-secondary {
+  0% {
+    color: var(--secondary);
+  }
+  100% {
+    color: white;
+  }
+}
+
+@keyframes ripple-text-tertiary {
+  0% {
+    color: var(--primary);
+  }
+  100% {
+    color: white;
+  }
+}
+
+@keyframes ripple-text-tertiary-reverse {
+  0% {
+    color: white;
+  }
+  100% {
+    color: var(--primary);
+  }
+}
+
+@keyframes ripple-text-secondary-reverse {
+  0% {
+    color: white;
+  }
+  100% {
+    color: var(--secondary);
+  }
+}
+
+.animate-ripple {
+  animation: ripple 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-ripple-reverse {
+  animation: ripple-reverse 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-ripple-text {
+  animation: ripple-text 1.2s ease-out forwards;
+}
+
+.animate-ripple-text-reverse {
+  animation: ripple-text-reverse 1s ease-out forwards;
+}
+
+.animate-ripple-text-secondary {
+  animation: ripple-text-secondary 1s ease-out forwards;
+}
+
+.animate-ripple-text-secondary-reverse {
+  animation: ripple-text-secondary-reverse 1s ease-out forwards;
+}
+
+.animate-ripple-text-tertiary {
+  animation: ripple-text-tertiary 1.2s ease-out forwards;
+}
+
+.animate-ripple-text-tertiary-reverse {
+  animation: ripple-text-tertiary-reverse 1s ease-out forwards;
+}
+
+@keyframes border-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes text-glow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(34, 85, 139, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(238, 165, 0, 0.8);
+  }
+}
+
+.animate-border-rotate {
+  animation: border-rotate 4s linear infinite;
+}
+
+.animate-text-glow:hover {
+  animation: text-glow 2s ease-in-out infinite;
 }
