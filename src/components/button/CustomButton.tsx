@@ -31,7 +31,7 @@ const getButtonStyle = (
     case "secondary":
       return `bg-secondary text-background`;
     case "disabled":
-      return `bg-gray text-lightWhite`;
+      return `bg-gray text-lightWhite hover:bg-gray-200 transition-all duration-300`;
     case "secondary-outlined":
       return `bg-transparent text-secondary border border-secondary`;
     case "white-primary":

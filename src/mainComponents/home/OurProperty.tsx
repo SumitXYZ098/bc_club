@@ -20,6 +20,8 @@ import {
   useGetListings,
 } from "@/src/hooks/listing/useListingQueries";
 import { getOfficeName } from "@/src/utilities/utilities";
+import { useRouter } from "next/navigation";
+import RippleButton from "@/src/components/button/RippleButton";
 import { useAuthContext } from "../auth/AuthContext";
 
 const tabList = [
@@ -52,6 +54,7 @@ const swiperConfig = {
 };
 
 const OurProperty = () => {
+  const router = useRouter();
   const { isLoggedIn } = useAuthContext();
 
   const [tab, setTab] = useState(tabList[0]);
@@ -114,7 +117,7 @@ const OurProperty = () => {
     { location: city, page: 1, pageSize: 30 },
     {
       select: (res: any) => {
-        console.log("📦 API Response:", res);
+        // console.log("📦 API Response:", res);
         const nonResidentialTypes = [
           "office",
           "business",
@@ -395,24 +398,27 @@ const OurProperty = () => {
             />
           ))}
         </div>
-        <Link
-          href={"/properties"}
-          className="flex flex-row items-center bg-secondary text-background font-black md:text-base text-sm md:py-4.5 xl:px-13.5 py-2.5 px-7 rounded-lg"
-        >
-          View All
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <path
-              d="M8.7842 17.7042C8.87716 17.7979 8.98777 17.8723 9.10962 17.9231C9.23148 17.9739 9.36219 18 9.4942 18C9.62621 18 9.75692 17.9739 9.87878 17.9231C10.0006 17.8723 10.1112 17.7979 10.2042 17.7042L15.2042 12.7042C15.2979 12.6112 15.3723 12.5006 15.4231 12.3788C15.4739 12.2569 15.5 12.1262 15.5 11.9942C15.5 11.8622 15.4739 11.7315 15.4231 11.6096C15.3723 11.4878 15.2979 11.3772 15.2042 11.2842L10.2042 6.2842C10.1112 6.19047 10.0006 6.11608 9.87878 6.06531C9.75692 6.01454 9.62621 5.9884 9.4942 5.9884C9.36219 5.9884 9.23148 6.01454 9.10962 6.06531C8.98777 6.11608 8.87716 6.19047 8.7842 6.2842C8.69047 6.37717 8.61608 6.48777 8.56531 6.60962C8.51454 6.73148 8.4884 6.86219 8.4884 6.9942C8.4884 7.12621 8.51454 7.25692 8.56531 7.37878C8.61608 7.50064 8.69047 7.61124 8.7842 7.7042L13.0842 11.9942L8.7842 16.2842C8.69047 16.3772 8.61608 16.4878 8.56531 16.6096C8.51454 16.7315 8.4884 16.8622 8.4884 16.9942C8.4884 17.1262 8.51454 17.2569 8.56531 17.3788C8.61608 17.5006 8.69047 17.6112 8.7842 17.7042Z"
-              fill="white"
-            />
-          </svg>
-        </Link>
+        <RippleButton
+          title="View All"
+          buttonType="tertiary"
+          onClick={() => router.push("/properties")}
+          icon={
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M8.7842 17.7042C8.87716 17.7979 8.98777 17.8723 9.10962 17.9231C9.23148 17.9739 9.36219 18 9.4942 18C9.62621 18 9.75692 17.9739 9.87878 17.9231C10.0006 17.8723 10.1112 17.7979 10.2042 17.7042L15.2042 12.7042C15.2979 12.6112 15.3723 12.5006 15.4231 12.3788C15.4739 12.2569 15.5 12.1262 15.5 11.9942C15.5 11.8622 15.4739 11.7315 15.4231 11.6096C15.3723 11.4878 15.2979 11.3772 15.2042 11.2842L10.2042 6.2842C10.1112 6.19047 10.0006 6.11608 9.87878 6.06531C9.75692 6.01454 9.62621 5.9884 9.4942 5.9884C9.36219 5.9884 9.23148 6.01454 9.10962 6.06531C8.98777 6.11608 8.87716 6.19047 8.7842 6.2842C8.69047 6.37717 8.61608 6.48777 8.56531 6.60962C8.51454 6.73148 8.4884 6.86219 8.4884 6.9942C8.4884 7.12621 8.51454 7.25692 8.56531 7.37878C8.61608 7.50064 8.69047 7.61124 8.7842 7.7042L13.0842 11.9942L8.7842 16.2842C8.69047 16.3772 8.61608 16.4878 8.56531 16.6096C8.51454 16.7315 8.4884 16.8622 8.4884 16.9942C8.4884 17.1262 8.51454 17.2569 8.56531 17.3788C8.61608 17.5006 8.69047 17.6112 8.7842 17.7042Z"
+                fill="currentColor"
+              />
+            </svg>
+          }
+          customClassName="font-black md:py-3 xl:px-5 py-2.5 px-7 rounded-lg"
+          textClassName="!font-black !text-xs md:!text-sm"
+        />
       </div>
 
       {/* Sections */}

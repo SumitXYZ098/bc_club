@@ -32,10 +32,17 @@ export default function PropertiesListingPage() {
 
   useEffect(() => {
     const urlLocation = searchParams.get("location");
+    const urlSearch = searchParams.get("search");
 
     if (urlLocation) {
       updateInstanceFilter("list", "location", urlLocation);
+    }
 
+    if (urlSearch) {
+      updateInstanceFilter("list", "search", urlSearch);
+    }
+
+    if (urlLocation || urlSearch) {
       window.scrollTo({
         top: 120,
         behavior: "smooth",
@@ -346,34 +353,18 @@ export default function PropertiesListingPage() {
         <div className="flex items-center gap-4 flex-wrap mb-6 justify-between">
           {/* 🔍 CHIP SEARCH BAR (DESIGN SAME) */}
           <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] border border-gray-200 w-full max-w-md">
-            {isChip ? (
-              <Chip
-                label={search}
-                onDelete={() => {
-                  setSearch("");
-                  setIsChip(false);
-                }}
-                className="bg-gray-100 text-sm"
-              />
-            ) : (
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search city..."
-                className="flex-1 text-sm outline-none bg-transparent"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && search.trim()) {
-                    setIsChip(true);
-                  }
-                }}
-              />
-            )}
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search city, neighborhood, or address..."
+              className="flex-1 text-sm outline-none bg-transparent"
+            />
 
             <button
               className="ml-auto bg-[#E6A500] p-2.5 rounded-lg flex items-center justify-center"
               onClick={() => {
-                if (search.trim()) setIsChip(true);
+                // Search is live, but we can keep the button for UX
               }}
             >
               <FiSearch size={18} className="text-white" />
