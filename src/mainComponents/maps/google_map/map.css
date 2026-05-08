@@ -3,6 +3,7 @@
     border-radius: 4;
 }
 
-.gm-style-iw-chr {
-    display: none;
+.gm-style-iw-chr,
+.gmnoprint {
+    display: none !important;
 }

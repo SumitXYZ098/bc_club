@@ -288,20 +288,6 @@ const OurProperty = () => {
     if (!list.length) {
       return <p className="text-center py-10">No properties found</p>;
     }
-    // if (list.length <= 3) {
-    //   return (
-    //     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    //       {list.map((item) => (
-    //         <PropertiesCard
-    //           {...item}
-    //           isLogin={isLoginOverride ?? isLoggedIn}
-    //           isSold={isSold}
-    //           isExpired={isExpired}
-    //         />
-    //       ))}
-    //     </div>
-    //   );
-    // }
 
     return (
       <div className="relative group/slider">

@@ -1,5 +1,4 @@
-import GoogleMapSearch from "@/src/mainComponents/maps/GoogleMapSearch";
-import React from "react";
+import GoogleMapSearch from "@/src/mainComponents/maps/google_map/GoogleMapSearch";
 
 const page = () => {
   return <GoogleMapSearch />;
