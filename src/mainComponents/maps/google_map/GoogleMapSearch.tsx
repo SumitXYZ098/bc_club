@@ -294,7 +294,7 @@ export default function GoogleMapSearch() {
 
       const ne = bounds.getNorthEast();
       const sw = bounds.getSouthWest();
-      const zoom = mapInstance.getZoom() || 14;
+      const zoom = mapInstance.getZoom() || 13;
 
       const newBounds = {
         north: ne.lat(),
@@ -365,7 +365,7 @@ export default function GoogleMapSearch() {
     if (selectedClusterProperties.length > 0 || selectedProperty) return;
     if (!map) return;
 
-    const zoom = map.getZoom() || 14;
+    const zoom = map.getZoom() || 13;
     if (zoom < 8) return;
 
     if (idleTimeout.current) clearTimeout(idleTimeout.current);
@@ -394,7 +394,7 @@ export default function GoogleMapSearch() {
 
     if (!location) {
       map.panTo(defaultCenter);
-      map.setZoom(12);
+      map.setZoom(13);
       return;
     }
 
@@ -404,7 +404,7 @@ export default function GoogleMapSearch() {
     if (coords) {
       map.panTo(coords);
       setTimeout(() => {
-        map.setZoom(14);
+        map.setZoom(13);
         triggerSearch();
       }, 300);
       return;
@@ -416,7 +416,7 @@ export default function GoogleMapSearch() {
         if (hasValidCoordinates(p))
           bounds.extend({ lat: p.latitude, lng: p.longitude });
       });
-      fitBoundsWithZoom(map, bounds, 14);
+      fitBoundsWithZoom(map, bounds, 13);
     }
   }, [location, mapLoaded, map]);
 
@@ -448,7 +448,7 @@ export default function GoogleMapSearch() {
     });
 
     if (hasValidPoints) {
-      fitBoundsWithZoom(map, bounds, 12);
+      fitBoundsWithZoom(map, bounds, 13);
       setFitBoundsDone(true);
     }
   }, [properties, mapLoaded, map, fitBoundsDone, location]);
@@ -471,12 +471,27 @@ export default function GoogleMapSearch() {
       },
     }));
 
-    superclusterRef.current = new Supercluster({ radius: 60, maxZoom: 20 });
+    const currentZoom = map?.getZoom() || 8;
+
+    const getClusterRadius = (zoom: number) => {
+      if (zoom >= 16) return 100;
+      if (zoom >= 14) return 255;
+      if (zoom >= 12) return 270;
+      if (zoom >= 10) return 300;
+
+      return 340;
+    };
+
+    superclusterRef.current = new Supercluster({
+      radius: getClusterRadius(currentZoom),
+      maxZoom: 20,
+    });
+
     superclusterRef.current.load(points as any);
 
     if (!map) return;
 
-    const zoom = map.getZoom() || 14;
+    const zoom = map.getZoom() || 13;
     const bounds = map.getBounds();
     if (!bounds) return;
 
@@ -534,8 +549,8 @@ export default function GoogleMapSearch() {
           setActiveBedRoom={setActiveBedRoom}
           activeBathRoom={activeBathRoom}
           setActiveBathRoom={setActiveBathRoom}
-          activeProperty={activeProperty}
-          setActiveProperty={setActiveProperty}
+          // activeProperty={activeProperty}
+          // setActiveProperty={setActiveProperty}
           location={location}
           setLocation={setLocation}
           pillBase={pillBase}
@@ -562,7 +577,7 @@ export default function GoogleMapSearch() {
           <div className="hidden md:block flex-1 relative z-10">
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
-              zoom={14}
+              zoom={13}
               center={defaultCenter}
               onLoad={onMapLoad}
               onIdle={onMapIdle}
@@ -574,7 +589,7 @@ export default function GoogleMapSearch() {
                 setClusterPosition(null);
               }}
             >
-              {parcelGeoJSON && (
+              {parcelGeoJSON && mapZoomVal && mapZoomVal >= 17 && (
                 <GeoJsonLayer
                   data={parcelGeoJSON}
                   map={map}

@@ -6,6 +6,7 @@
   --foreground: #0f0f0f;
   --primary: #22558b;
   --secondary: #eea500;
+  --primary2: #305487;
   --gray: #f0f0f0;
   --black70: #333333;
   --lightWhite: #848484;
@@ -22,6 +23,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary2: var(--primary2);
   --color-secondary: var(--secondary);
   --color-gray: var(--gray);
   --color-black70: var(--black70);
@@ -39,6 +41,7 @@
     --foreground: #0f0f0f;
     --primary: #22558b;
     --secondary: #eea500;
+    --primary2: #305487;
     --gray: #f0f0f0;
     --black70: #333333;
     --lightWhite: #848484;
@@ -56,6 +59,7 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1260px;
+  --breakpoint-2xl: 1940px;
   --font-weight-medium: 550;
 }
 
@@ -173,7 +177,10 @@ body::-webkit-scrollbar {
 
 .price-marker,
 .price-marker-carrot {
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out !important;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out !important;
 }
 
 .price-marker:hover {
@@ -245,6 +252,7 @@ body::-webkit-scrollbar {
     height: 0;
     opacity: 1;
   }
+
   100% {
     width: 600px;
     height: 600px;
@@ -258,6 +266,7 @@ body::-webkit-scrollbar {
     height: 600px;
     opacity: 1;
   }
+
   100% {
     width: 0;
     height: 0;
@@ -269,6 +278,7 @@ body::-webkit-scrollbar {
   0% {
     color: white;
   }
+
   100% {
     color: var(--secondary);
   }
@@ -278,6 +288,7 @@ body::-webkit-scrollbar {
   0% {
     color: var(--secondary);
   }
+
   100% {
     color: white;
   }
@@ -287,6 +298,7 @@ body::-webkit-scrollbar {
   0% {
     color: var(--secondary);
   }
+
   100% {
     color: white;
   }
@@ -296,6 +308,7 @@ body::-webkit-scrollbar {
   0% {
     color: var(--primary);
   }
+
   100% {
     color: white;
   }
@@ -305,6 +318,7 @@ body::-webkit-scrollbar {
   0% {
     color: white;
   }
+
   100% {
     color: var(--primary);
   }
@@ -314,6 +328,7 @@ body::-webkit-scrollbar {
   0% {
     color: white;
   }
+
   100% {
     color: var(--secondary);
   }
@@ -358,9 +373,12 @@ body::-webkit-scrollbar {
 }
 
 @keyframes text-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     text-shadow: 0 0 10px rgba(34, 85, 139, 0.5);
   }
+
   50% {
     text-shadow: 0 0 20px rgba(238, 165, 0, 0.8);
   }

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { FiChevronDown } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
+// import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 import { PriceSlider } from "./mapUtils";
 
@@ -17,8 +17,8 @@ interface MapTopFilterBarProps {
   setActiveBedRoom: (val: string) => void;
   activeBathRoom: string | undefined;
   setActiveBathRoom: (val: string) => void;
-  activeProperty: string;
-  setActiveProperty: (val: string) => void;
+  // activeProperty: string;
+  // setActiveProperty: (val: string) => void;
   location: string;
   setLocation: (val: string) => void;
   pillBase: string;
@@ -37,8 +37,8 @@ export default function MapTopFilterBar({
   setActiveBedRoom,
   activeBathRoom,
   setActiveBathRoom,
-  activeProperty,
-  setActiveProperty,
+  // activeProperty,
+  // setActiveProperty,
   location,
   setLocation,
   pillBase,
@@ -311,7 +311,7 @@ export default function MapTopFilterBar({
         )}
       </div>
 
-      <div className="relative min-w-50 shrink-0">
+      {/* <div className="relative min-w-50 shrink-0">
         <FilterPillSelect
           label="Property Type"
           value={activeProperty}
@@ -346,7 +346,7 @@ export default function MapTopFilterBar({
                 ]
           }
         />
-      </div>
+      </div> */}
 
       <div className="relative" ref={locationRef}>
         <div

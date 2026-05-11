@@ -37,6 +37,10 @@ const Icons = {
   grahp: "../grahp.svg",
   upArrow: "../upArrow.svg",
   downArrow: "../downArrow.svg",
+  lotSize: "../lotSize.svg",
+  bed: "../bedroomN.svg",
+  bath: "../bathtubN.svg",
+  square: "../scaleN.svg",
 };
 
 const Images = {

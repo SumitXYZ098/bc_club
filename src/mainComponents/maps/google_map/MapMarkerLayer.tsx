@@ -95,7 +95,7 @@ export default function MapMarkerLayer({
               ? "#3b82f6"
               : "#22c55e";
 
-        if (zoom >= 14) {
+        if (zoom >= 17) {
           return (
             <OverlayView
               key={`property-${property.id}`}
@@ -144,36 +144,37 @@ export default function MapMarkerLayer({
           );
         }
 
-        return (
-          <OverlayView
-            key={`marker-${property.id}`}
-            position={{ lat: property.latitude, lng: property.longitude }}
-            mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-          >
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                map?.setZoom(15);
-                map?.panTo({ lat: property.latitude, lng: property.longitude });
-              }}
-              onMouseEnter={() => setHoveredPropertyId(property.id)}
-              onMouseLeave={() => setHoveredPropertyId(null)}
-              className={`group -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 ${
-                isHovered ? "scale-150 z-30" : "z-20"
-              }`}
-            >
-              <div
-                style={{
-                  backgroundColor: statusColor,
-                  boxShadow: isHovered
-                    ? `0 0 10px ${statusColor}`
-                    : "0 2px 5px rgba(0,0,0,0.2)",
-                }}
-                className="flex items-center justify-center w-3.5 h-3.5 rounded-full border-2 border-white transition-all"
-              />
-            </div>
-          </OverlayView>
-        );
+        return null;
+        // (
+        //   <OverlayView
+        //     key={`marker-${property.id}`}
+        //     position={{ lat: property.latitude, lng: property.longitude }}
+        //     mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+        //   >
+        //     <div
+        //       onClick={(e) => {
+        //         e.stopPropagation();
+        //         map?.setZoom(15);
+        //         map?.panTo({ lat: property.latitude, lng: property.longitude });
+        //       }}
+        //       onMouseEnter={() => setHoveredPropertyId(property.id)}
+        //       onMouseLeave={() => setHoveredPropertyId(null)}
+        //       className={`group -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 ${
+        //         isHovered ? "scale-150 z-30" : "z-20"
+        //       }`}
+        //     >
+        //       <div
+        //         style={{
+        //           backgroundColor: statusColor,
+        //           boxShadow: isHovered
+        //             ? `0 0 10px ${statusColor}`
+        //             : "0 2px 5px rgba(0,0,0,0.2)",
+        //         }}
+        //         className="flex items-center justify-center w-3.5 h-3.5 rounded-full border-2 border-white transition-all"
+        //       />
+        //     </div>
+        //   </OverlayView>
+        // );
       })}
     </>
   );

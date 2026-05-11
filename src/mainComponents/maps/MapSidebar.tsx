@@ -32,7 +32,7 @@ export default function MapSidebar({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar bg-[#f8f9fa]">
+      <div className="flex-1 overflow-y-auto p-3 space-y-8 no-scrollbar bg-[#f8f9fa]">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-64 space-y-3">
             <FiLoader className="w-8 h-8 text-primary animate-spin" />

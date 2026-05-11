@@ -29,6 +29,7 @@ export interface PropertyCardProps {
   sqft: string | number;
   beds: number;
   baths: number;
+  lotSize?: number;
   priceDrop?: number;
   assessedDiff: number;
   mls: string;
@@ -39,6 +40,7 @@ export interface PropertyCardProps {
   isFavourite?: boolean;
   isDdf?: boolean;
   likesCount?: number;
+  structureType?: string;
 }
 
 const PropertiesCard: React.FC<PropertyCardProps> = ({
@@ -51,6 +53,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   sqft,
   beds,
   baths,
+  lotSize,
   priceDrop,
   assessedDiff,
   mls,
@@ -61,6 +64,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   isLogin: isLoginProp,
   isDdf,
   likesCount,
+  structureType,
 }) => {
   const pathname = usePathname();
   const { data: me } = useGetMe();
@@ -130,14 +134,27 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     setLocalLikesCount((prev) => Math.max(0, prev - 1));
     removeFromWishlist.mutate(id);
   };
+
+  const sqftToAcresFormatted = (sqft: number, decimals = 2): string => {
+    if (!sqft || isNaN(sqft)) return "0";
+
+    return (sqft / 43560).toFixed(decimals);
+  };
+
   const displayPrice = isLogin
     ? `$${Number(price || 0).toLocaleString()}`
     : "$*,***,***";
   const displayAddress = isLogin ? address : "Sign in to view address";
   const displayTitle = isLogin ? title : "Property Details Restricted";
+  const displayStructure = isLogin ? structureType : "----";
   const displaySqft = isLogin ? `${sqft} sqft` : "---- sqft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
+  const displayLotSize = isLogin
+    ? lotSize
+      ? `${sqftToAcresFormatted(lotSize)} ac`
+      : "--- ac"
+    : "---- ac";
   const displayMls = isLogin ? `MLS® ${mls}` : "MLS® *******";
   const displayRealtor = isLogin
     ? `Courtesy of: ${realtor}`
@@ -159,18 +176,18 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
       }}
     >
       <div
-        className={`relative rounded-xl flex overflow-hidden border border-borderColor hover:border-none hover:shadow-[0_0_20px_0_rgba(0,0,0,0.12)] transition h-fit w-full ${
+        className={`relative rounded-2xl flex overflow-hidden shadow-[0_0_5px_0_rgba(21,21,21,0.19)] transition h-fit w-full ${
           isLogin ? "group" : ""
         }`}
       >
-        <div className="flex flex-col gap-y-3 xl:p-5 p-4 w-full h-full justify-between">
+        <div className="flex flex-col w-full h-full justify-between">
           <div className="relative flex items-center">
-            <div className="w-full h-56 overflow-clip rounded-lg">
+            <div className="w-full h-[268px] overflow-clip rounded-t-2xl">
               {img ? (
                 <Image
                   src={img}
                   alt={displayTitle}
-                  className={`w-full h-56 object-cover rounded-lg transition duration-300 ease-in-out ${
+                  className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
                     isLogin ? "group-hover:scale-125" : "blur-sm"
                   }`}
                   width={700}
@@ -247,15 +264,14 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             )}
           </div>
 
-          <div className="space-y-3 mt-1">
-            <h3 className="font-bold text-xl">{displayTitle}</h3>
-            <div className={`flex justify-between  gap-y-1 items-end-safe`}>
-              <div className="flex flex-col">
-                <span className="text-xs text-lightWhite">List Price Now</span>
-                <p className="text-2xl font-bold text-primary">
-                  {displayPrice}
-                </p>
-              </div>
+          <div className="space-y-2.5 mt-2.5 px-5 pb-5">
+            <div className={`flex justify-between items-center`}>
+              {/* <div className="flex flex-col"> */}
+              {/* <span className="text-xs text-lightWhite">List Price Now</span> */}
+              <p className="text-[32px] leading-10 font-bold text-primary">
+                {displayPrice}
+              </p>
+              {/* </div> */}
               {/* Assessed Diff */}
               <p
                 className={`text-[10px] leading-4 inline-flex items-center gap-1 p-1 rounded-md ${
@@ -306,19 +322,26 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               </p>
             </div>
 
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-foreground text-sm">
+                {displayTitle}
+              </h3>
+              {structureType && (
+                <h3 className="text-black70 text-sm opacity-60">
+                  {displayStructure}
+                </h3>
+              )}
+            </div>
+
             <p className="text-lightWhite text-sm line-clamp-1">
               {displayAddress}
             </p>
 
             {/* Specs */}
-            <div
-              className={`flex items-center justify-between ${
-                pathname === "/properties" ? "gap-x-1" : "gap-3"
-              }`}
-            >
-              <div className="flex flex-row items-center gap-x-1 justify-center py-2 px-3 rounded-md bg-gray text-lightWhite text-sm w-full whitespace-nowrap">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
-                  src={Icons.scale}
+                  src={Icons.square}
                   alt="sqft"
                   width={100}
                   height={100}
@@ -326,9 +349,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 />
                 <span>{displaySqft}</span>
               </div>
-              <div className="flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm w-full">
+              <LineGradient vr />
+              <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
-                  src={Icons.bedroom}
+                  src={Icons.bed}
                   alt="bedroom"
                   width={100}
                   height={100}
@@ -336,9 +360,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 />
                 <span>{displayBeds}</span>
               </div>
-              <div className="flex flex-row items-center gap-x-1 justify-center py-2 rounded-md bg-gray text-lightWhite text-sm w-full">
+              <LineGradient vr={true} />
+              <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
-                  src={Icons.bathtub}
+                  src={Icons.bath}
                   alt="bathtub"
                   width={100}
                   height={100}
@@ -346,6 +371,21 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 />
                 <span>{displayBaths}</span>
               </div>
+              {lotSize && Number(lotSize) > 100 && (
+                <>
+                  <LineGradient vr={true} />
+                  <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
+                    <Image
+                      src={Icons.lotSize}
+                      alt="lotSize"
+                      width={100}
+                      height={100}
+                      className="w-5 h-5 object-contain"
+                    />
+                    <span>{displayLotSize}</span>
+                  </div>
+                </>
+              )}
             </div>
             <LineGradient />
             <div className="w-full flex flex-row flex-wrap items-center justify-between gap-2">

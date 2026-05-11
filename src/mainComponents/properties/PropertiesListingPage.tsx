@@ -218,10 +218,12 @@ export default function PropertiesListingPage() {
           listing?.raw_data?.BridgeModificationTimestamp ??
           0,
         address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
-        sqft: listing?.area ?? listing?.lot_size_area ?? 0,
+        sqft: listing?.Living_area ?? listing?.area ?? 0,
         beds: listing?.bedrooms ?? 0,
         baths: listing?.bathrooms ?? 0,
         likesCount: listing?.likesCount ?? 0,
+        lotSize: listing?.lot_size_area ?? "",
+        structureType: listing?.structure_type ?? "",
         priceDrop:
           listing.PreviousListPrice > listing.ListPrice
             ? Number(
@@ -231,11 +233,11 @@ export default function PropertiesListingPage() {
                 ).toFixed(1),
               )
             : undefined,
-        assessedDiff: listing.ListPrice
+        assessedDiff: listing.price
           ? Number(
               (
-                (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                listing.ListPrice
+                (listing.price - (listing.annual_tax ?? 0)) /
+                listing.price
               ).toFixed(1),
             )
           : 0,
@@ -303,6 +305,7 @@ export default function PropertiesListingPage() {
   const loading = isForSale ? isLoadingActive : isLoadingNormal;
 
   const data = queryData?.properties || [];
+  console.log("DATA", data[0]);
 
   const pageCount = queryData?.pagination?.pageCount || 1;
 
@@ -465,8 +468,8 @@ export default function PropertiesListingPage() {
                 { label: "4+", value: "4" },
               ]}
             />
-          </div>
-          <div className="w-full flex flex-row sm:flex-nowrap flex-wrap justify-between items-center gap-4">
+            {/* </div> */}
+            {/* <div className="w-auto flex flex-row sm:flex-nowrap flex-wrap justify-between items-center gap-4"> */}
             {/* BathRoom */}
             <FilterPillSelect
               label="BathRoom"
@@ -485,7 +488,7 @@ export default function PropertiesListingPage() {
             />
 
             {/* Property Type */}
-            <FilterPillSelect
+            {/* <FilterPillSelect
               label="Property Type"
               value={activeProperty}
               onChange={setActiveProperty}
@@ -527,7 +530,7 @@ export default function PropertiesListingPage() {
                       { label: "Vacant Land", value: "Vacant Land" },
                     ]
               }
-            />
+            /> */}
           </div>
           <button
             onClick={() => {
@@ -722,9 +725,9 @@ export default function PropertiesListingPage() {
             <div className="w-full flex flex-col h-full">
               <div
                 ref={scrollRef}
-                className="gap-7 grid grid-cols-1 md:grid-cols-3 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3"
+                className="gap-7 grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 justify-between overflow-y-scroll xl:h-[65svh] no-scrollbar w-full xl:p-3"
               >
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: 12 }).map((_, i) => (
                   <PropertyCardSkeleton key={i} />
                 ))}
               </div>
@@ -739,7 +742,7 @@ export default function PropertiesListingPage() {
             <div className="w-full flex flex-col h-full">
               <div
                 ref={scrollRef}
-                className="gap-7 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
+                className="gap-7 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 2xl:grid-cols-4 justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
               >
                 {data.map((property: any) => (
                   <PropertiesCard

@@ -109,6 +109,7 @@ export const propertyData: PropertyCardProps[] = [
     mls: "R3059142",
   },
 ];
+
 export const dummyListings = [
   {
     id: 1,
