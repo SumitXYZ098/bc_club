@@ -48,20 +48,20 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
 }
   
    const propertyDetails = {
-  land: { label: "Land", value: data?.landValue||"N/A"},
+  land: { label: "Land Price", value: data?.landValue||"N/A"},
   description: { label: "Description", value: data?.propertyInfo["Description"] || "N/A" },
   bedrooms: { label: "Bedrooms", value: data?.propertyInfo["Bedrooms"] || "N/A" },
   baths: { label: "Baths", value: data?.propertyInfo["Baths"] || "N/A" },
-  carports: { label: "Carports", value: data?.propertyInfo["Carports"] || "N/A" },
-  garages: { label: "Garages", value: data?.propertyInfo["Garages"] || "N/A" },
-  landSize: { label: "Land Size", value: data?.propertyInfo["Land size"] || "N/A"  },
-  firstFloorArea: { label: "First Floor Area", value: data?.propertyInfo["First floor area"] || "N/A" },
-  secondFloorArea: { label: "Second Floor Area", value: data?.propertyInfo["Second floor area"] || "N/A" },
-  basementFinishArea: { label: "Basement Finish Area", value: data?.propertyInfo["Basement finish area"] || "N/A" },
-  buildingStoreys: { label: "Building Storeys", value: data?.propertyInfo["Building storeys"] || "N/A" },
-  grossLeasableArea: { label: "Gross Leasable Area", value: data?.propertyInfo["Gross leasable area"] || "N/A" },
-  netLeasableArea: { label: "Net Leasable Area", value: data?.propertyInfo["Net leasable area"] || "N/A" },
-  numberOfApartmentUnits: { label: "No. of Apartment Units", value: data?.propertyInfo["No. of apartment units"] || "N/A" },
+  // carports: { label: "Carports", value: data?.propertyInfo["Carports"] || "N/A" },
+  // garages: { label: "Garages", value: data?.propertyInfo["Garages"] || "N/A" },
+  // landSize: { label: "Land Size", value: data?.propertyInfo["Land size"] || "N/A"  },
+  // firstFloorArea: { label: "First Floor Area", value: data?.propertyInfo["First floor area"] || "N/A" },
+  // secondFloorArea: { label: "Second Floor Area", value: data?.propertyInfo["Second floor area"] || "N/A" },
+  // basementFinishArea: { label: "Basement Finish Area", value: data?.propertyInfo["Basement finish area"] || "N/A" },
+  // buildingStoreys: { label: "Building Storeys", value: data?.propertyInfo["Building storeys"] || "N/A" },
+  // grossLeasableArea: { label: "Gross Leasable Area", value: data?.propertyInfo["Gross leasable area"] || "N/A" },
+  // netLeasableArea: { label: "Net Leasable Area", value: data?.propertyInfo["Net leasable area"] || "N/A" },
+  // numberOfApartmentUnits: { label: "No. of Apartment Units", value: data?.propertyInfo["No. of apartment units"] || "N/A" },
 };
 
   return (

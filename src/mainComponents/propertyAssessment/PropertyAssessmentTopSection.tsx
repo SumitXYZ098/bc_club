@@ -179,11 +179,11 @@
             <Heading tagType="h1" type={IHeadingTypes.heading24} content={data?.address} />
             <Description type={IDescriptionTypes.dec1614} content={data?.roll} />
           </div>
-          <div className="md:flex gap-x-2.5 hidden">
+          {/* <div className="md:flex gap-x-2.5 hidden">
             <Heart className="text-primary bg-primary/10 w-10.5 h-10.5 p-2.25 rounded-lg cursor-pointer" />
             <GitCompareArrows className="text-primary bg-primary/10 w-10.5 h-10.5 p-2.25 rounded-lg cursor-pointer" />
             <DocumentPrintFilled className="text-primary bg-primary/10 w-10.5 h-10.5 p-2.25 rounded-lg cursor-pointer" />
-          </div>
+          </div> */}
         </div>
 
         <div className="w-full flex flex-col xl:flex-row gap-6 mt-6">
