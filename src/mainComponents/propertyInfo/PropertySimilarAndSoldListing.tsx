@@ -1,0 +1,295 @@
+import PropertiesCard, {
+  PropertyCardProps,
+} from "@/src/components/common/propertiesCard/PropertiesCard";
+import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+import { getOfficeName } from "@/src/utilities/utilities";
+import React from "react";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { useAuthContext } from "../auth/AuthContext";
+import {
+  useGetActiveListings,
+  useGetListings,
+} from "@/src/hooks/listing/useListingQueries";
+import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const swiperConfig = {
+  spaceBetween: 12,
+  slidesPerView: 1,
+  autoplay: {
+    delay: 4000,
+    disableOnInteraction: false,
+    pauseOnMouseEnter: true,
+  },
+  modules: [Pagination, Navigation, Autoplay],
+  loop: false,
+  pagination: {
+    clickable: true,
+    dynamicBullets: true,
+  },
+  breakpoints: {
+    640: { slidesPerView: 1.5, spaceBetween: 20 },
+    1024: { slidesPerView: 3.2, spaceBetween: 20 },
+    1600: {
+      slidesPerView: 4.1,
+      spaceBetween: 24,
+    },
+  },
+  speed: 900,
+};
+
+const PropertySimilarAndSoldListing = ({
+  city,
+  bedsVariance,
+  lotSizeAreaVariance,
+}: {
+  city: string;
+  bedsVariance: number;
+  lotSizeAreaVariance: number;
+}) => {
+  console.log(bedsVariance, "bedsVariance");
+  console.log(lotSizeAreaVariance, "lotSizeAreaVariance");
+  const { isLoggedIn } = useAuthContext();
+
+  // 🔹 Mapping Function
+  const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
+    id: listing.documentId,
+    image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
+    title: listing?.property_sub_type,
+    price: listing?.price,
+    daysAgo: listing?.ModificationTimestamp ?? 0,
+    address: listing?.address,
+    sqft: listing?.area ?? listing?.Living_area ?? 0,
+    beds: listing?.bedrooms ?? 0,
+    baths: listing?.bathrooms ?? 0,
+    likesCount: listing?.likesCount ?? 0,
+    lotSize: listing?.lot_size_area ?? "",
+    structureType: listing?.structure_type ?? "",
+    priceDrop:
+      listing.PreviousListPrice > listing.ListPrice
+        ? Number(
+            (
+              (listing.PreviousListPrice - listing.ListPrice) /
+              listing.ListPrice
+            ).toFixed(1),
+          )
+        : undefined,
+    assessedDiff: listing.ListPrice
+      ? Number(
+          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+            1,
+          ),
+        )
+      : 0,
+    mls: listing?.mls_number ?? listing?.listing_id,
+    realtor: getOfficeName(listing),
+    isFavourite: listing?.is_favorite || false,
+    isDdf: !!isDdf,
+  });
+
+  // Similar Properties
+  const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
+    {
+      location: city,
+      ...(lotSizeAreaVariance ? { lotSizeAreaVariance } : { bedsVariance }),
+      page: 1,
+      pageSize: 30,
+    },
+    {
+      select: (res: any) => {
+        // console.log("📦 API Response:", res);
+        const nonResidentialTypes = [
+          "office",
+          "business",
+          "agriculture",
+          "vacant land",
+          "industrial",
+          "retail",
+        ];
+
+        return (
+          res?.data
+            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+            .filter((l: any) => {
+              const type = (l?.property_sub_type || "").toLowerCase();
+              return !nonResidentialTypes.some((nonRes) =>
+                type.includes(nonRes),
+              );
+            })
+            .map((l: any) => mapProperty(l, true)) || []
+        );
+      },
+    },
+  );
+
+  // Sold Listings
+  const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
+    {
+      "filters[property_status][$eq]": "Closed",
+      location: city,
+      bedsVariance,
+      "pagination[page]": 1,
+      "pagination[pageSize]": 30,
+    },
+    {
+      select: (res: any) => {
+        const nonResidentialTypes = [
+          "office",
+          "business",
+          "agriculture",
+          "vacant land",
+          "industrial",
+          "retail",
+        ];
+        return (
+          res?.data
+            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+            .filter((l: any) => {
+              const type = (l?.property_sub_type || "").toLowerCase();
+              return !nonResidentialTypes.some((nonRes) =>
+                type.includes(nonRes),
+              );
+            })
+            .map((l: any) => mapProperty(l, false)) || []
+        );
+      },
+    },
+  );
+
+  const renderSlider = (
+    list: PropertyCardProps[],
+    isLoading: boolean,
+    isLoginOverride?: boolean,
+    isSold?: boolean,
+    isExpired?: boolean,
+    navId?: string,
+  ) => {
+    if (isLoading) {
+      return (
+        <div className="flex gap-6 justify-center-safe">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <PropertyCardSkeleton key={i} />
+          ))}
+        </div>
+      );
+    }
+
+    if (!list.length) {
+      return <p className="text-center py-10">No properties found</p>;
+    }
+
+    return (
+      <div className="relative group/slider ">
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-10 flex justify-between pointer-events-none px-1 md:-mx-5">
+          {/* Prev */}
+          <button
+            className={[
+              `${navId}-prev`,
+              "pointer-events-auto",
+              "relative overflow-hidden",
+              "w-16 h-16 rounded-full",
+              "flex items-center justify-center",
+              "bg-white",
+              // clean shadow edge — no CSS border
+              "shadow-[0_2px_12px_rgba(0,0,0,0.12),inset_0_0_0_1px_rgba(0,0,0,0.06)]",
+              "text-primary",
+              // hover: blue glow, no border
+              "hover:shadow-[0_0_0_4px_rgba(34,85,139,0.12),0_4px_20px_rgba(34,85,139,0.22)]",
+              "group/btn",
+              "-translate-x-3 opacity-0",
+              "group-hover/slider:translate-x-0 group-hover/slider:opacity-100",
+              "transition-all duration-300 ease-out",
+              "disabled:opacity-0 disabled:pointer-events-none",
+            ].join(" ")}
+          >
+            <span className="absolute inset-0 rounded-full bg-primary scale-0 group-hover/btn:scale-100 transition-transform duration-300 ease-out origin-center" />
+            <ChevronLeft
+              size={22}
+              strokeWidth={2.5}
+              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:-translate-x-0.5"
+            />
+          </button>
+
+          {/* Next */}
+          <button
+            className={[
+              `${navId}-next`,
+              "pointer-events-auto",
+              "relative overflow-hidden",
+              "w-16 h-16 rounded-full",
+              "flex items-center justify-center",
+              "bg-white",
+              // clean shadow edge — no CSS border
+              "shadow-[0_2px_12px_rgba(0,0,0,0.12),inset_0_0_0_1px_rgba(0,0,0,0.06)]",
+              "text-primary",
+              // hover: blue glow, no border
+              "hover:shadow-[0_0_0_4px_rgba(34,85,139,0.12),0_4px_20px_rgba(34,85,139,0.22)]",
+              "group/btn",
+              "translate-x-3 opacity-0",
+              "group-hover/slider:translate-x-0 group-hover/slider:opacity-100",
+              "transition-all duration-300 ease-out",
+              "disabled:opacity-0 disabled:pointer-events-none",
+            ].join(" ")}
+          >
+            <span className="absolute inset-0 rounded-full bg-primary scale-0 group-hover/btn:scale-100 transition-transform duration-300 ease-out origin-center" />
+            <ChevronRight
+              size={22}
+              strokeWidth={2.5}
+              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:translate-x-0.5"
+            />
+          </button>
+        </div>
+        <Swiper
+          {...swiperConfig}
+          navigation={{
+            prevEl: `.${navId}-prev`,
+            nextEl: `.${navId}-next`,
+          }}
+          className="pt-3! pb-9! mySwiper w-full h-full grid!"
+        >
+          {list.map((item) => (
+            <SwiperSlide key={item.id}>
+              <PropertiesCard
+                {...item}
+                isLogin={isLoginOverride ?? isLoggedIn}
+                isSold={isSold}
+                isExpired={isExpired}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    );
+  };
+  return (
+    <div className="space-y-10 mb-20 h-auto xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6">
+      <div className="flex flex-col gap-4 h-full">
+        <Heading
+          tagType="h3"
+          type={IHeadingTypes.heading20}
+          content="Similar Properties"
+        />
+        {renderSlider(
+          newList,
+          isLoadingNew,
+          true,
+          false,
+          false,
+          "newly-listed",
+        )}
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <Heading
+          tagType="h3"
+          type={IHeadingTypes.heading20}
+          content="Sold Properties"
+        />
+        {renderSlider(soldList, isLoadingSold, isLoggedIn, true, false, "sold")}
+      </div>
+    </div>
+  );
+};
+
+export default PropertySimilarAndSoldListing;

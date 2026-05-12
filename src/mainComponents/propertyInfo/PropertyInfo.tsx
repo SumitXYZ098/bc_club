@@ -7,6 +7,7 @@ import { useGetUnifiedListingById } from "@/src/hooks/listing/useListingQueries"
 import PropertyInfoSkeleton from "./PropertyInfoSkeleton";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
+import PropertySimilarAndSoldListing from "./PropertySimilarAndSoldListing";
 
 const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const {
@@ -51,6 +52,13 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
         )}
         <PropertyInformation property={listing} />
       </section>
+
+      {/* Sections */}
+      <PropertySimilarAndSoldListing
+        city={listing?.city}
+        bedsVariance={listing.bedrooms}
+        lotSizeAreaVariance={listing.lot_size_area}
+      />
 
       <GetInTouch />
     </>

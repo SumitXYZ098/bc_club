@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
@@ -48,7 +47,7 @@ const swiperConfig = {
   },
   breakpoints: {
     640: { slidesPerView: 1.5, spaceBetween: 20 },
-    1024: { slidesPerView: 3.5, spaceBetween: 24 },
+    1024: { slidesPerView: 3.2, spaceBetween: 16 },
   },
   speed: 900,
 };
@@ -85,11 +84,13 @@ const OurProperty = () => {
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.ModificationTimestamp ?? 0,
-    address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
+    address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
     likesCount: listing?.likesCount ?? 0,
+    lotSize: listing?.lot_size_area ?? "",
+    structureType: listing?.structure_type ?? "",
     priceDrop:
       listing.PreviousListPrice > listing.ListPrice
         ? Number(
@@ -101,10 +102,9 @@ const OurProperty = () => {
         : undefined,
     assessedDiff: listing.ListPrice
       ? Number(
-          (
-            (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-            listing.ListPrice
-          ).toFixed(1),
+          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+            1,
+          ),
         )
       : 0,
     mls: listing?.mls_number ?? listing?.listing_id,
@@ -280,8 +280,8 @@ const OurProperty = () => {
   ) => {
     if (isLoading) {
       return (
-        <div className="flex gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="flex gap-6 justify-center-safe">
+          {Array.from({ length: 3 }).map((_, i) => (
             <PropertyCardSkeleton key={i} />
           ))}
         </div>
