@@ -1,6 +1,7 @@
 import { Images } from "../app/exports";
 import { TableHeader } from "../components/common/dynamicTable/DynamicTable";
 import { PropertyCardProps } from "../components/common/propertiesCard/PropertiesCard";
+import { getTime } from "../utilities/utilities";
 
 export const propertyData: PropertyCardProps[] = [
   {
@@ -179,39 +180,25 @@ export const propertyDetails = {
 };
 
 export const propertyImages = [
-  // Existing
   Images.apartment,
   Images.apartment,
   Images.apartment,
   Images.apartment,
   Images.apartment,
   Images.apartment,
-  // "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9",
-  // "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d",
-  // "https://images.unsplash.com/photo-1600585154526-990dced4db0d",
-  // "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea",
-  // "https://images.unsplash.com/photo-1600585154154-0b0a3d06d3c4",
-  // "https://images.unsplash.com/photo-1572120360610-d971b9d7767c",
-  // "https://images.unsplash.com/photo-1564013799919-ab600027ffc6",
-  // "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde",
-  // "https://images.unsplash.com/photo-1598928506311-c55ded91a20c",
-  // "https://images.unsplash.com/photo-1600047509358-9dc75507daeb",
-  // "https://images.unsplash.com/photo-1576941089067-2de3c901e126",
-  // "https://images.unsplash.com/photo-1580587771525-78b9dba3b914",
-  // "https://images.unsplash.com/photo-1599423300746-b62533397364",
-  // "https://images.unsplash.com/photo-1600585152915-d208bec867a1",
-  // "https://images.unsplash.com/photo-1600585154084-4e5fe7c39198",
-  // "https://images.unsplash.com/photo-1593696140826-c58b021acf8b",
-  // "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f1",
-  // "https://images.unsplash.com/photo-1600047509782-20b8f98a2f63",
-  // "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
-  // "https://images.unsplash.com/photo-1600585153780-ec9b8c8d3cde",
 ];
 
 export const propertyDetailsHeaders: TableHeader[] = [
   { key: "label", label: "" },
   { key: "value", label: "", align: "right" },
 ];
+
+export const calculatePropertyAge = (yearBuilt: number | string) => {
+  if (!yearBuilt) return null;
+
+  const currentYear = new Date().getFullYear();
+  return currentYear - Number(yearBuilt);
+};
 
 export const getPropertyDetailsRows = (property: any) => [
   {
@@ -251,15 +238,17 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Listing Date",
-      value: property?.raw_data?.ListingContractDate
-        ? new Date(property.raw_data.ListingContractDate).toLocaleDateString()
+      value: property?.ModificationTimestamp
+        ? new Date(property.ModificationTimestamp).toLocaleDateString()
         : "-",
     },
     subRows: [
       {
         data: {
           label: "Days On Market",
-          value: property?.DaysOnMarket ? `${property.DaysOnMarket} days` : "-",
+          value: property?.ModificationTimestamp
+            ? `${getTime(property.ModificationTimestamp)}`
+            : "-",
         },
       },
       {
@@ -274,8 +263,8 @@ export const getPropertyDetailsRows = (property: any) => [
     data: {
       label: "Floor Area",
       value:
-        property?.lot_size_area || property?.area
-          ? `${property?.lot_size_area || property?.area} ${property?.lot_size_units || "sqft"}`
+        property?.Living_area || property?.area
+          ? `${property?.Living_area || property?.area} sqft`
           : "-",
     },
     subRows: [
@@ -299,23 +288,21 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Age",
-      value: property?.raw_data?.BCRES_Age
-        ? `${property.raw_data.BCRES_Age} years`
+      value: property?.raw_data?.YearBuilt
+        ? `${calculatePropertyAge(property.raw_data.YearBuilt)} Years Old`
         : "-",
     },
   },
   {
     data: {
       label: "Property Taxes",
-      value: property?.raw_data?.TaxAnnualAmount
-        ? `$${property.raw_data.TaxAnnualAmount}`
-        : "-",
+      value: property?.annual_tax ? `$${property.annual_tax}` : "-",
     },
   },
   {
     data: {
       label: "Ownership",
-      value: property?.raw_data?.Ownership || "-",
+      value: property?.raw_data?.CommonInterest || "-",
     },
   },
   {
@@ -327,7 +314,7 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Address",
-      value: `${property?.address}, ${property?.city}, ${property?.state}`,
+      value: `${property?.address}`,
     },
   },
   {
@@ -380,12 +367,6 @@ export const getRoomRows = (property: any) => {
         room.RoomType && room.RoomLevel && room.RoomWidth && room.RoomLength,
     )
     .map((room: any) => {
-      // const formatFeetInches = (num: number) => {
-      //   const feet = Math.floor(num);
-      //   const inches = Math.round((num - feet) * 12);
-      //   return `${feet}'${inches}`;
-      // };
-
       return {
         data: {
           room: room.RoomType,

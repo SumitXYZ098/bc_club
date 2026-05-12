@@ -217,7 +217,7 @@ export default function PropertiesListingPage() {
           listing?.ModificationTimestamp ??
           listing?.raw_data?.BridgeModificationTimestamp ??
           0,
-        address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
+        address: listing?.address,
         sqft: listing?.Living_area ?? listing?.area ?? 0,
         beds: listing?.bedrooms ?? 0,
         baths: listing?.bathrooms ?? 0,

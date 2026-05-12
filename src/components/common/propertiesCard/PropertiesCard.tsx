@@ -135,26 +135,29 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     removeFromWishlist.mutate(id);
   };
 
-  const sqftToAcresFormatted = (sqft: number, decimals = 2): string => {
-    if (!sqft || isNaN(sqft)) return "0";
+  // const sqftToAcresFormatted = (sqft: number, decimals = 2): string => {
+  //   if (!sqft || isNaN(sqft)) return "0";
 
-    return (sqft / 43560).toFixed(decimals);
-  };
+  //   return (sqft / 43560).toFixed(decimals);
+  // };
 
   const displayPrice = isLogin
     ? `$${Number(price || 0).toLocaleString()}`
     : "$*,***,***";
   const displayAddress = isLogin ? address : "Sign in to view address";
-  const displayTitle = isLogin ? title : "Property Details Restricted";
-  const displayStructure = isLogin ? structureType : "----";
+  const displayTitle = isLogin
+    ? title === "Single Family"
+      ? structureType
+      : title
+    : "Property Details Restricted";
   const displaySqft = isLogin ? `${sqft} sqft` : "---- sqft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
   const displayLotSize = isLogin
     ? lotSize
-      ? `${sqftToAcresFormatted(lotSize)} ac`
-      : "--- ac"
-    : "---- ac";
+      ? `${lotSize} sqft`
+      : "--- sqft"
+    : "---- sqft";
   const displayMls = isLogin ? `MLS® ${mls}` : "MLS® *******";
   const displayRealtor = isLogin
     ? `Courtesy of: ${realtor}`
@@ -186,7 +189,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               {img ? (
                 <Image
                   src={img}
-                  alt={displayTitle}
+                  alt={title}
                   className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
                     isLogin ? "group-hover:scale-125" : "blur-sm"
                   }`}
@@ -326,14 +329,12 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               <h3 className="font-bold text-foreground text-sm">
                 {displayTitle}
               </h3>
-              {structureType && (
-                <h3 className="text-black70 text-sm opacity-60">
-                  {displayStructure}
-                </h3>
-              )}
             </div>
 
-            <p className="text-lightWhite text-sm line-clamp-1">
+            <p
+              className="text-lightWhite text-sm line-clamp-1"
+              title={displayAddress}
+            >
               {displayAddress}
             </p>
 
@@ -389,7 +390,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             </div>
             <LineGradient />
             <div className="w-full flex flex-row flex-wrap items-center justify-between gap-2">
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1" title={displayRealtor}>
                 <Description
                   content={displayRealtor}
                   type={IDescriptionTypes.dec12}

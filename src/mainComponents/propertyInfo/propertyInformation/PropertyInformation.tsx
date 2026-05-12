@@ -52,8 +52,17 @@ const PropertyInformation = ({ property }: { property: any }) => {
     {
       icon: Icons.scale,
       label: "Area Size",
-      value: (property?.Living_area ?? property?.lot_size_area) || "Na",
+      value: `${property?.Living_area}`,
     },
+    ...(property?.lot_size_area != null && property?.lot_size_area !== ""
+      ? [
+          {
+            icon: Icons.lot,
+            label: "Lot Size",
+            value: `${property?.lot_size_area}`,
+          },
+        ]
+      : []),
   ];
 
   const formatCurrency = (num?: number) => {
@@ -115,9 +124,9 @@ const PropertyInformation = ({ property }: { property: any }) => {
                       alt={features.label}
                       width={40}
                       height={40}
-                      className="w-8 h-8 object-contain"
+                      className="w-5 md:w-7 h-5 md:h-7 lg:w-8 lg:h-8 object-contain"
                     />
-                    <span className="text-lg font-medium">
+                    <span className="text-base md:text-lg font-medium">
                       {features.value}
                     </span>
                   </div>
