@@ -112,7 +112,7 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
           />
          
         </div>
-        <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
+        {/* <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
           <Description
             type={IDescriptionTypes.dec18}
             content="Sale History (Last 3 full calendar years)"
@@ -122,8 +122,8 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
             type={IDescriptionTypes.dec1614}
             content={data?.salesHistory}
           />
-        </div>
-        <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
+        </div> */}
+        {/* <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
           <Description
             type={IDescriptionTypes.dec18}
             content="Manufactured home"
@@ -144,7 +144,7 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
             />
             <Description type={IDescriptionTypes.dec1614} content={data?.manufacturedHome?.totalArea || "N/A"} />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

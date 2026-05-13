@@ -92,7 +92,7 @@ const PropertySimilarAndSoldListing = ({
   const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
     {
       location: city,
-      ...(lotSizeAreaVariance ? { lotSizeAreaVariance } : { bedsVariance }),
+      lotSizeAreaVariance, bedsVariance ,
       page: 1,
       pageSize: 30,
     },
