@@ -93,9 +93,36 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
       </div>
       <LineGradient vr customClasses="h-auto xl:block hidden" />
       <LineGradient customClasses="w-full block xl:hidden" />
-      {/* Legal description */}
       <div className="flex flex-col xl:justify-between md:gap-y-6 gap-y-4 xl:w-[40%] w-full">
-        <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
+        {/* Value Details */}
+        <div className="bg-white p-6 rounded-xl flex flex-col gap-y-5 w-full shadow-sm">
+          <div className="flex justify-between md:text-lg text-base font-bold">
+            <span className="text-gray-800">Land</span>
+            <span className="text-[#22558b]">{data?.landValue}</span>
+          </div>
+          <div className="flex justify-between md:text-lg text-base font-bold">
+            <span className="text-gray-800">Buildings</span>
+            <span className="text-[#22558b]">{data?.buildingValue}</span>
+          </div>
+          <div className="h-[1px] w-full bg-gray-100 my-1"></div>
+          <div className="flex justify-between md:text-lg text-base font-bold">
+            <span className="text-gray-800">Previous Year Value</span>
+            <span className="text-[#22558b]">{data?.previousTotalValue}</span>
+          </div>
+          <div className="flex justify-between md:text-lg text-base font-bold">
+            <span className="text-gray-800">Land</span>
+            <span className="text-[#22558b]">{data?.previousLandValue}</span>
+          </div>
+          <div className="flex justify-between md:text-lg text-base font-bold">
+            <span className="text-gray-800">Buildings</span>
+            <span className="text-[#22558b]">
+              {data?.previousBuildingValue}
+            </span>
+          </div>
+        </div>
+
+        {/* Legal description */}
+        <div className="bg-white p-6 rounded-xl flex flex-col gap-y-4 w-full shadow-sm">
           <Description
             type={IDescriptionTypes.dec18}
             content="Legal description and parcel ID"

@@ -1,16 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState, useEffect } from "react";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
-import { GitCompareArrows, Heart } from "lucide-react";
-import { DocumentPrintFilled } from "@fluentui/react-icons";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
-import { FormControl, MenuItem, Select } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import {
   Area,
   XAxis,
@@ -20,6 +15,9 @@ import {
   ResponsiveContainer,
   ComposedChart,
   Bar,
+  BarChart,
+  Cell,
+  LabelList,
 } from "recharts";
 
 const useStyles = makeStyles(() => ({
@@ -128,6 +126,9 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
   // Background columns height set to match Y-Axis max
   const finalChartData = chartData.map((d: any) => ({ ...d, bg: 1000000 }));
 
+  // Calculate maxValue for the second chart
+  const maxValue = chartData.length > 0 ? Math.max(...chartData.map((d: any) => d.value)) : 0;
+
   const formatYAxis = (tickItem: number) =>
     tickItem === 0 ? "0" : `$${tickItem / 1000}K`;
 
@@ -157,8 +158,8 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
         <line
           x1={cx}
           y1={cy}
-          x2={cx + 1.1} // Tiny offset to give the line a bounding box for the gradient
-          y2={345} // Fixed height to stop near the X-axis
+          x2={cx + 1.1}
+          y2={345}
           stroke="url(#verticalLineGradient)"
           strokeWidth={2}
         />
@@ -175,6 +176,12 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
     );
   };
 
+  // Give 15% headroom for the bar track so the longest bar doesn't touch the very edge
+  const barMax = maxValue > 0 ? maxValue * 1.15 : 100000;
+
+  // Reverse data to show newest year first, as per design
+  const displayChartData = [...chartData].reverse();
+
   return (
     <div className="flex flex-col w-full">
       <div className="w-full flex justify-between items-center-safe md:py-1">
@@ -186,15 +193,18 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
           />
           <Description type={IDescriptionTypes.dec1614} content={data?.roll} />
         </div>
-        {/* <div className="md:flex gap-x-2.5 hidden">
-            <Heart className="text-primary bg-primary/10 w-10.5 h-10.5 p-2.25 rounded-lg cursor-pointer" />
-            <GitCompareArrows className="text-primary bg-primary/10 w-10.5 h-10.5 p-2.25 rounded-lg cursor-pointer" />
-            <DocumentPrintFilled className="text-primary bg-primary/10 w-10.5 h-10.5 p-2.25 rounded-lg cursor-pointer" />
-          </div> */}
+        <div className="flex flex-col text-right">
+          <span className="text-gray-500 font-medium text-sm mb-1">
+            Total Value Year {new Date().getFullYear()}
+          </span>
+          <span className="text-3xl font-bold text-[#22558b]">
+            {data?.totalValue}
+          </span>
+        </div>
       </div>
 
-      <div className="w-full flex flex-col xl:flex-row gap-6 mt-6">
-        {/* CHART SECTION */}
+      <div className="w-full  flex flex-col xl:flex-row gap-6 mt-6">
+        {/* CHART SECTION 1 (Recharts) */}
         <div className="xl:w-[56%] w-full relative bg-white shadow-[0_0_25px_0_rgba(0,0,0,0.08)] p-8 rounded-4xl flex flex-col border border-gray-50">
           <div className="mb-10">
             <h3 className="text-xl font-bold text-gray-900">
@@ -255,11 +265,10 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                   ticks={[0, 200000, 400000, 600000, 800000, 1000000]}
                 />
 
-                {/* Tooltip comes after Grid/Axis */}
                 <Tooltip
                   content={<CustomTooltip />}
                   cursor={false}
-                  offset={-100} // Negative offset in Recharts can often center/move tooltip above
+                  offset={-100}
                   wrapperStyle={{ zIndex: 100 }}
                 />
                 <Bar
@@ -271,7 +280,6 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                   opacity={0.4}
                 />
 
-                {/* 2. RENDER AREA LAST (Foreground Layer - line always on top) */}
                 <Area
                   type="monotone"
                   dataKey="value"
@@ -286,50 +294,105 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
           </div>
         </div>
 
-        {/* DETAILS SECTION */}
-        <div className="xl:w-[43%] w-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 rounded-2xl bg-white flex flex-col gap-y-5">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex flex-col gap-y-1">
-              <Description
-                type={IDescriptionTypes.dec16}
-                content="Total Value"
-              />
-              <span className="md:text-[32px] md:leading-10 text-2xl text-[#22558b] font-bold">
-                {data?.totalValue}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-md text-gray-400 mb-1">Year</span>
-              <span className="text-[16px] font-semibold text-[#22558b]">
-                {new Date().getFullYear()}
-              </span>
-            </div>
+        {/* SECOND CHART (Horizontal Bar) */}
+        <div className="xl:w-[48%] w-full relative bg-white shadow-[0_0_25px_0_rgba(0,0,0,0.08)] p-5 rounded-2xl flex flex-col border-1 border-[#ccc]">
+          <div className="mb-8">
+            <h3 className="text-xl font-medium text-gray-800">
+              Property value history
+            </h3>
           </div>
-
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between md:text-lg text-base font-medium">
-              <span className="text-gray-600">Land</span>
-              <span className="text-[#22558b]">{data?.landValue}</span>
-            </div>
-            <div className="flex justify-between md:text-lg text-base font-medium">
-              <span className="text-gray-600">Buildings</span>
-              <span className="text-[#22558b]">{data?.buildingValue}</span>
-            </div>
-            <LineGradient />
-            <div className="flex justify-between md:text-lg text-base font-medium">
-              <span className="text-gray-600">Previous Year Value</span>
-              <span className="text-[#22558b]">{data?.previousTotalValue}</span>
-            </div>
-            <div className="flex justify-between md:text-lg text-base font-medium">
-              <span className="text-gray-600">Land</span>
-              <span className="text-[#22558b]">{data?.previousLandValue}</span>
-            </div>
-            <div className="flex justify-between md:text-lg text-base font-medium">
-              <span className="text-gray-600">Buildings</span>
-              <span className="text-[#22558b]">
-                {data?.previousBuildingValue}
-              </span>
-            </div>
+          <div className="h-[400px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={displayChartData}
+                layout="vertical"
+                margin={{ top: 0, right: 0, left: 40, bottom: 0 }}
+                barCategoryGap={25}
+              >
+                <XAxis type="number" hide domain={[0, barMax]} />
+                <YAxis
+                  type="category"
+                  dataKey="year"
+                  axisLine={false}
+                  tickLine={false}
+                  width={100}
+                  tick={(props: any) => {
+                    const { x, y, payload } = props;
+                    return (
+                      <g transform={`translate(${x - 90},${y - 22})`}>
+                        <rect width="69" height="44" rx="8" fill="#f3f4f6" />
+                        <text
+                          x="34.5"
+                          y="27"
+                          textAnchor="middle"
+                          fill="#4b5563"
+                          style={{ fontSize: "14px", fontWeight: "500" }}
+                        >
+                          {payload.value}
+                        </text>
+                      </g>
+                    );
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={[8, 8, 8, 8]}
+                  barSize={45}
+                  background={{ fill: "#f3f4f6", radius: 8 }}
+                >
+                  {displayChartData.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill="#E1A22A" />
+                  ))}
+                  <LabelList
+                    dataKey="value"
+                    content={(props: any) => {
+                      const { x, y, width, value, index } = props;
+                      const entry = displayChartData[index];
+                      if (!entry) return null;
+                      return (
+                        <g>
+                          {/* Change Badge */}
+                          <rect
+                            x={x + 12}
+                            y={y + 10}
+                            width="55"
+                            height="25"
+                            rx="6"
+                            fill="rgba(255,255,255,0.25)"
+                          />
+                          <text
+                            x={x + 39.5}
+                            y={y + 27}
+                            textAnchor="middle"
+                            fill="white"
+                            style={{
+                              fontSize: "13px",
+                              fontWeight: "600",
+                            }}
+                          >
+                            {entry.change >= 0 ? "+" : ""}
+                            {entry.change}%
+                          </text>
+                          {/* Value Label */}
+                          <text
+                            x={x + width - 15}
+                            y={y + 28}
+                            textAnchor="end"
+                            fill="white"
+                            style={{
+                              fontSize: "16px",
+                              fontWeight: "700",
+                            }}
+                          >
+                            {entry.displayValue}
+                          </text>
+                        </g>
+                      );
+                    }}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
