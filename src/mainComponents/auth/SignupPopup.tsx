@@ -71,7 +71,6 @@ const SignupPopup = ({
       );
 
       const data = await res.json();
-      console.log(data);
 
       if (data.message && !data.token) {
         toast.info(data.message); // "Please verify your email"
@@ -186,9 +185,10 @@ const SignupPopup = ({
               if (idToken) handleGoogleLogin(idToken);
             }}
             onError={() => {
-              console.log("Login Failed");
               setErrorMsg("Google Login Failed");
             }}
+            text="signup_with"
+            shape="pill"
           />
         </div>
 

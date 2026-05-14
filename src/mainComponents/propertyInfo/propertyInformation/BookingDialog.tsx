@@ -80,7 +80,6 @@ const BookingDialog: React.FC<Props> = ({ open, onClose, property }) => {
   }, [isLoggedIn, name, email, setValue]);
 
   const onSubmit = (data: FormValues) => {
-    console.log("Form Data:", data);
     toast.success("Meeting Scheduled!");
     reset();
     onClose();

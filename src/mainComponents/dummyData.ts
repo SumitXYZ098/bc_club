@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { Images } from "../app/exports";
 import { TableHeader } from "../components/common/dynamicTable/DynamicTable";
 import { PropertyCardProps } from "../components/common/propertiesCard/PropertiesCard";
@@ -239,7 +240,7 @@ export const getPropertyDetailsRows = (property: any) => [
     data: {
       label: "Listing Date",
       value: property?.ModificationTimestamp
-        ? new Date(property.ModificationTimestamp).toLocaleDateString()
+        ? dayjs(property.ModificationTimestamp).format("DD MMM, YYYY")
         : "-",
     },
     subRows: [

@@ -10,7 +10,6 @@ import { Endpoints } from "@/src/api/endpoints";
 import { MapPin, Search } from "lucide-react";
 
 const SearchPropertyTab = () => {
-  const [search, setSearch] = useState<string>("");
   const tabList = ["Find Home", "Home Assessment", "Market Trends"];
   const [activeTab, setActiveTab] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -114,170 +113,52 @@ const SearchPropertyTab = () => {
       )}
 
       <div className="xl:w-183.75 w-full xl:absolute p-3 flex flex-col gap-y-4 justify-between shadow-[0_0_16px_0_rgba(0,0,0,0.12)] rounded-xl bg-background z-99">
-      <div className="flex flex-nowrap gap-2.5 w-full">
-        {tabList.map((item, idx) => (
-          <CustomButton
-            key={idx}
-            label={item}
-            buttonType={activeTab === idx ? "primary" : "disabled"}
-            customClasses="w-full"
-            onClick={() => {
-              if (idx !== 2) {
-                setActiveTab(idx);
-                setQuery(""); // Clear query when switching tabs
-                setShowDropdown(false);
-              } else {
-                router.push(`/market-trends`);
-              }
-            }}
-          />
-        ))}
-      </div>
-      {activeTab === 0 && (
-        <div
-          className={`border border-borderColor md:p-1.5 p-1 flex flex-row items-center justify-between relative  ${
-            showDropdown && filteredResults.length > 0
-              ? "rounded-t-xl rounded-b-0"
-              : "rounded-xl"
-          }`}
-        >
-          <input
-            className="outline-0 px-3 cursor-pointer w-full h-12 bg-transparent"
-            placeholder={`Enter an address, neighborhood, city, or ZIP code for Find Home`}
-            required
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => query.length > 1 && setShowDropdown(true)}
-            onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
-          />
-          <button
-            onClick={() => {
-              if (query.trim()) {
-                router.push(`/properties?search=${encodeURIComponent(query)}`);
-              }
-            }}
-            className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
-          >
-            <Image
-              src={Icons.searchLine}
-              alt="Search"
-              width={100}
-              height={100}
-              className="w-full h-full object-contain"
-            />
-          </button>
-          {showDropdown && filteredResults.length > 0 && (
-            <div
-              className="search-dropdown absolute left-0 w-full bg-background z-20 max-h-72 overflow-y-auto scrollbar-hide"
-              style={{
-                top: "100%",
-                border: "1px solid var(--borderColor)",
-                borderTop: "none",
-                borderBottomLeftRadius: "12px",
-                borderBottomRightRadius: "12px",
-                boxShadow: "0 12px 32px rgba(0,0,0,0.10)",
+        <div className="flex flex-nowrap gap-2.5 w-full">
+          {tabList.map((item, idx) => (
+            <CustomButton
+              key={idx}
+              label={item}
+              buttonType={activeTab === idx ? "primary" : "disabled"}
+              customClasses="w-full"
+              onClick={() => {
+                if (idx !== 2) {
+                  setActiveTab(idx);
+                  setQuery(""); // Clear query when switching tabs
+                  setShowDropdown(false);
+                } else {
+                  router.push(`/market-trends`);
+                }
               }}
-            >
-              <div
-                className="px-4 py-2.5 flex items-center justify-between"
-                style={{ borderBottom: "1px solid var(--borderColor)" }}
-              >
-                <span
-                  className="text-xs font-semibold uppercase tracking-widest"
-                  style={{ color: "var(--lightWhite)" }}
-                >
-                  Properties
-                </span>
-                <span
-                  className="text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{
-                    background: "rgba(34,85,139,0.10)",
-                    color: "var(--primary)",
-                  }}
-                >
-                  {filteredResults.length}
-                </span>
-              </div>
-              {filteredResults.map((item, index) => (
-                <div
-                  key={item.id}
-                  onMouseDown={() =>
-                    router.push(
-                      `/properties?search=${encodeURIComponent(item.address)}`,
-                    )
-                  }
-                  className="search-item cursor-pointer px-4 py-3 flex items-start gap-3"
-                  style={{
-                    borderBottom:
-                      index + 1 < filteredResults.length
-                        ? "1px solid var(--borderColor)"
-                        : "none",
-                  }}
-                >
-                  <MapPin
-                    size={16}
-                    className="mt-0.5 shrink-0"
-                    style={{ color: "var(--primary)" }}
-                  />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-semibold text-foreground truncate">
-                      {item.address}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {activeTab === 1 && (
-        <div
-          className={`border border-borderColor md:p-1.5 p-1 flex flex-row items-center justify-between relative  ${
-            showDropdown && assessmentResults.length > 0
-              ? "rounded-t-xl rounded-b-0"
-              : "rounded-xl"
-          }`}
-        >
-          <div className="flex items-center w-full">
-            <Search
-              className="ml-3 shrink-0"
-              size={18}
-              style={{ color: "var(--lightWhite)" }}
             />
+          ))}
+        </div>
+        {activeTab === 0 && (
+          <div
+            className={`border border-borderColor md:p-1.5 p-1 flex flex-row items-center justify-between relative  ${
+              showDropdown && filteredResults.length > 0
+                ? "rounded-t-xl rounded-b-0"
+                : "rounded-xl"
+            }`}
+          >
             <input
               className="outline-0 px-3 cursor-pointer w-full h-12 bg-transparent"
-              placeholder={`Enter address for Home Assessment`}
+              placeholder={`Enter an address, neighborhood, city, or ZIP code for Find Home`}
               required
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && query.length > 1) {
-                  fetchAssessmentProperties();
-                }
-              }}
-              onFocus={() => {
-                if (assessmentResults.length > 0) setShowDropdown(true);
-              }}
+              onFocus={() => query.length > 1 && setShowDropdown(true)}
               onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
             />
-          </div>
-
-          <button
-            onClick={() => {
-              console.log("Search", query);
-            }}
-            className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
-          >
-            {isFetching ? (
-              <div
-                className="w-5 h-5 rounded-full"
-                style={{
-                  border: "2px solid rgba(255,255,255,0.3)",
-                  borderTopColor: "#fff",
-                  animation: "spin 0.75s linear infinite",
-                }}
-              />
-            ) : (
+            <button
+              onClick={() => {
+                if (query.trim()) {
+                  router.push(
+                    `/properties?search=${encodeURIComponent(query)}`,
+                  );
+                }
+              }}
+              className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
+            >
               <Image
                 src={Icons.searchLine}
                 alt="Search"
@@ -285,80 +166,200 @@ const SearchPropertyTab = () => {
                 height={100}
                 className="w-full h-full object-contain"
               />
-            )}
-          </button>
-
-          {showDropdown && assessmentResults.length > 0 && (
-            <div
-              className="search-dropdown absolute left-0 w-full bg-background z-20 max-h-72 overflow-y-auto scrollbar-hide"
-              style={{
-                top: "100%",
-                border: "1px solid var(--borderColor)",
-                borderTop: "none",
-                borderBottomLeftRadius: "12px",
-                borderBottomRightRadius: "12px",
-                boxShadow: "0 12px 32px rgba(0,0,0,0.10)",
-              }}
-            >
-              {/* Header */}
+            </button>
+            {showDropdown && filteredResults.length > 0 && (
               <div
-                className="px-4 py-2.5 flex items-center justify-between"
-                style={{ borderBottom: "1px solid var(--borderColor)" }}
+                className="search-dropdown absolute left-0 w-full bg-background z-20 max-h-72 overflow-y-auto scrollbar-hide"
+                style={{
+                  top: "100%",
+                  border: "1px solid var(--borderColor)",
+                  borderTop: "none",
+                  borderBottomLeftRadius: "12px",
+                  borderBottomRightRadius: "12px",
+                  boxShadow: "0 12px 32px rgba(0,0,0,0.10)",
+                }}
               >
-                <span
-                  className="text-xs font-semibold uppercase tracking-widest"
-                  style={{ color: "var(--lightWhite)" }}
-                >
-                  Properties
-                </span>
-                <span
-                  className="text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{
-                    background: "rgba(34,85,139,0.10)",
-                    color: "var(--primary)",
-                  }}
-                >
-                  {assessmentResults.length}
-                </span>
-              </div>
-
-              {/* Items */}
-              {assessmentResults.map((item, index) => (
                 <div
-                  key={item.id}
-                  onMouseDown={() => handleSelectAssessment(item.documentId)}
-                  className="search-item cursor-pointer px-4 py-3 flex items-start gap-3"
-                  style={{
-                    borderBottom:
-                      index + 1 < assessmentResults.length
-                        ? "1px solid var(--borderColor)"
-                        : "none",
-                  }}
+                  className="px-4 py-2.5 flex items-center justify-between"
+                  style={{ borderBottom: "1px solid var(--borderColor)" }}
                 >
-                  <MapPin
-                    size={16}
-                    className="mt-0.5 shrink-0"
-                    style={{ color: "var(--primary)" }}
-                  />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-semibold text-foreground truncate">
-                      {item.address}
-                    </span>
-                    {item.city && (
-                      <span
-                        className="text-xs mt-0.5"
-                        style={{ color: "var(--lightWhite)" }}
-                      >
-                        {item.city}
-                      </span>
-                    )}
-                  </div>
+                  <span
+                    className="text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: "var(--lightWhite)" }}
+                  >
+                    Properties
+                  </span>
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                    style={{
+                      background: "rgba(34,85,139,0.10)",
+                      color: "var(--primary)",
+                    }}
+                  >
+                    {filteredResults.length}
+                  </span>
                 </div>
-              ))}
+                {filteredResults.map((item, index) => (
+                  <div
+                    key={item.id}
+                    onMouseDown={() =>
+                      router.push(
+                        `/properties?search=${encodeURIComponent(item.address)}`,
+                      )
+                    }
+                    className="search-item cursor-pointer px-4 py-3 flex items-start gap-3"
+                    style={{
+                      borderBottom:
+                        index + 1 < filteredResults.length
+                          ? "1px solid var(--borderColor)"
+                          : "none",
+                    }}
+                  >
+                    <MapPin
+                      size={16}
+                      className="mt-0.5 shrink-0"
+                      style={{ color: "var(--primary)" }}
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-semibold text-foreground truncate">
+                        {item.address}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {activeTab === 1 && (
+          <div
+            className={`border border-borderColor md:p-1.5 p-1 flex flex-row items-center justify-between relative  ${
+              showDropdown && assessmentResults.length > 0
+                ? "rounded-t-xl rounded-b-0"
+                : "rounded-xl"
+            }`}
+          >
+            <div className="flex items-center w-full">
+              <Search
+                className="ml-3 shrink-0"
+                size={18}
+                style={{ color: "var(--lightWhite)" }}
+              />
+              <input
+                className="outline-0 px-3 cursor-pointer w-full h-12 bg-transparent"
+                placeholder={`Enter address for Home Assessment`}
+                required
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && query.length > 1) {
+                    fetchAssessmentProperties();
+                  }
+                }}
+                onFocus={() => {
+                  if (assessmentResults.length > 0) setShowDropdown(true);
+                }}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
+              />
             </div>
-          )}
-        </div>
-      )}
+
+            <button
+              onClick={() => {
+                console.log("Search", query);
+              }}
+              className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
+            >
+              {isFetching ? (
+                <div
+                  className="w-5 h-5 rounded-full"
+                  style={{
+                    border: "2px solid rgba(255,255,255,0.3)",
+                    borderTopColor: "#fff",
+                    animation: "spin 0.75s linear infinite",
+                  }}
+                />
+              ) : (
+                <Image
+                  src={Icons.searchLine}
+                  alt="Search"
+                  width={100}
+                  height={100}
+                  className="w-full h-full object-contain"
+                />
+              )}
+            </button>
+
+            {showDropdown && assessmentResults.length > 0 && (
+              <div
+                className="search-dropdown absolute left-0 w-full bg-background z-20 max-h-72 overflow-y-auto scrollbar-hide"
+                style={{
+                  top: "100%",
+                  border: "1px solid var(--borderColor)",
+                  borderTop: "none",
+                  borderBottomLeftRadius: "12px",
+                  borderBottomRightRadius: "12px",
+                  boxShadow: "0 12px 32px rgba(0,0,0,0.10)",
+                }}
+              >
+                {/* Header */}
+                <div
+                  className="px-4 py-2.5 flex items-center justify-between"
+                  style={{ borderBottom: "1px solid var(--borderColor)" }}
+                >
+                  <span
+                    className="text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: "var(--lightWhite)" }}
+                  >
+                    Properties
+                  </span>
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                    style={{
+                      background: "rgba(34,85,139,0.10)",
+                      color: "var(--primary)",
+                    }}
+                  >
+                    {assessmentResults.length}
+                  </span>
+                </div>
+
+                {/* Items */}
+                {assessmentResults.map((item, index) => (
+                  <div
+                    key={item.id}
+                    onMouseDown={() => handleSelectAssessment(item.documentId)}
+                    className="search-item cursor-pointer px-4 py-3 flex items-start gap-3"
+                    style={{
+                      borderBottom:
+                        index + 1 < assessmentResults.length
+                          ? "1px solid var(--borderColor)"
+                          : "none",
+                    }}
+                  >
+                    <MapPin
+                      size={16}
+                      className="mt-0.5 shrink-0"
+                      style={{ color: "var(--primary)" }}
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-semibold text-foreground truncate">
+                        {item.address}
+                      </span>
+                      {item.city && (
+                        <span
+                          className="text-xs mt-0.5"
+                          style={{ color: "var(--lightWhite)" }}
+                        >
+                          {item.city}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

@@ -117,7 +117,6 @@ const OurProperty = () => {
     { location: city, page: 1, pageSize: 30 },
     {
       select: (res: any) => {
-        // console.log("📦 API Response:", res);
         const nonResidentialTypes = [
           "office",
           "business",
@@ -227,14 +226,12 @@ const OurProperty = () => {
           setCity(detectedCity || "Vancouver");
         } catch (err) {
           // ✅ If API fails
-          console.log("❌ Reverse geocode failed");
           setCity("Vancouver");
         }
       },
 
       // ✅ If user clicks DENY or any error
       (error) => {
-        console.log("❌ Location denied:", error.message);
         setCity("Vancouver");
       },
     );
@@ -246,9 +243,6 @@ const OurProperty = () => {
 
     // ✅ If no properties found for detected city → fallback
     if (newList.length === 0 && city !== "Vancouver") {
-      console.log("❌ No properties found for:", city);
-      console.log("➡️ Falling back to Vancouver");
-
       setCity("Vancouver");
     }
   }, [isLoadingNew, newList, city]);
@@ -262,7 +256,6 @@ const OurProperty = () => {
     navigator.permissions.query({ name: "geolocation" }).then((result) => {
       // ❌ If already denied → DON'T call API again
       if (result.state === "denied") {
-        console.log("🚫 Permission already denied → using Vancouver");
         setCity("Vancouver");
         return;
       }

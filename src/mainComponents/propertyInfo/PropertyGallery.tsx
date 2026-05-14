@@ -14,10 +14,12 @@ export default function PropertyGallery({ images }: Props) {
   const [index, setIndex] = useState(0);
 
   const visibleImages = images.slice(0, 5);
-  
+
   const getImageUrl = (img: any) => {
     if (typeof img === "string") return img;
-    return img?.MediaURL || "";
+    if (img?.MediaURL) return img?.MediaURL;
+    if (img?.VideoURL) return img?.VideoURL;
+    return "";
   };
 
   return (

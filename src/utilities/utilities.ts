@@ -4,28 +4,33 @@ export const getCurrentYear = () => {
 };
 
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type TimeFormatMode = "short" | "long";
+
+const BC_TIMEZONE = "America/Vancouver";
 
 export const getTime = (
   timestamp: string | number | Date,
   mode: TimeFormatMode = "long",
 ): string => {
-  const now = dayjs();
-  const target = dayjs(timestamp);
+  const now = dayjs().tz(BC_TIMEZONE);
+  const target = dayjs.utc(timestamp).tz(BC_TIMEZONE);
 
   if (!target.isValid()) return "";
 
   const seconds = now.diff(target, "second");
 
-  // future date
-  if (seconds < 0) return "just now";
+  if (seconds < 0) return mode === "short" ? "now" : "just now";
 
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(seconds / 3600);
-  const days = Math.floor(seconds / 86400);
+  const minutes = now.diff(target, "minute");
+  const hours = now.diff(target, "hour");
+  const days = now.diff(target, "day");
 
-  // ✅ SHORT MODE
   if (mode === "short") {
     if (seconds < 60) return "now";
     if (minutes < 60) return `${minutes}m`;
@@ -39,15 +44,10 @@ export const getTime = (
     return `${years}y`;
   }
 
-  // ✅ LONG MODE
   if (seconds < 60) return "just now";
-
   if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
-
   if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-
   if (days === 1) return "yesterday";
-
   if (days < 30) return `${days} day${days !== 1 ? "s" : ""} ago`;
 
   const months = now.diff(target, "month");

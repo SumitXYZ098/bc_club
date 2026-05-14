@@ -77,10 +77,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
-  console.log("Received data in TopSection:", data);
   const classes = useStyles();
 
-  if (!data) return null; 
+  if (!data) return null;
 
   // const years: string[] = Array.isArray(data?.valueHistory)
   //   ? data.valueHistory.map((item: any) => item.year.toString())
@@ -103,15 +102,17 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
 
   const chartData = (data?.valueHistory || [])
     .map((item: any, index: number, arr: any[]) => {
-      const numericVal = typeof item.value === "string"
-        ? parseInt(item.value.replace(/[^0-9]/g, ""))
-        : item.value;
+      const numericVal =
+        typeof item.value === "string"
+          ? parseInt(item.value.replace(/[^0-9]/g, ""))
+          : item.value;
 
       let change = 0;
       if (index > 0) {
-        const prevVal = typeof arr[index - 1].value === "string"
-          ? parseInt(arr[index - 1].value.replace(/[^0-9]/g, ""))
-          : arr[index - 1].value;
+        const prevVal =
+          typeof arr[index - 1].value === "string"
+            ? parseInt(arr[index - 1].value.replace(/[^0-9]/g, ""))
+            : arr[index - 1].value;
         if (prevVal > 0) change = ((numericVal - prevVal) / prevVal) * 100;
       }
 
@@ -127,7 +128,8 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
   // Background columns height set to match Y-Axis max
   const finalChartData = chartData.map((d: any) => ({ ...d, bg: 1000000 }));
 
-  const formatYAxis = (tickItem: number) => tickItem === 0 ? "0" : `$${tickItem / 1000}K`;
+  const formatYAxis = (tickItem: number) =>
+    tickItem === 0 ? "0" : `$${tickItem / 1000}K`;
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -138,7 +140,8 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
             {d.displayValue}
           </span>
           <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#e8eff6] text-[#22558b]">
-            {d.change >= 0 ? "+" : ""}{d.change}%
+            {d.change >= 0 ? "+" : ""}
+            {d.change}%
           </span>
         </div>
       );
@@ -176,7 +179,11 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
     <div className="flex flex-col w-full">
       <div className="w-full flex justify-between items-center-safe md:py-1">
         <div className="flex flex-col">
-          <Heading tagType="h1" type={IHeadingTypes.heading24} content={data?.address} />
+          <Heading
+            tagType="h1"
+            type={IHeadingTypes.heading24}
+            content={data?.address}
+          />
           <Description type={IDescriptionTypes.dec1614} content={data?.roll} />
         </div>
         {/* <div className="md:flex gap-x-2.5 hidden">
@@ -190,7 +197,9 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
         {/* CHART SECTION */}
         <div className="xl:w-[56%] w-full relative bg-white shadow-[0_0_25px_0_rgba(0,0,0,0.08)] p-8 rounded-4xl flex flex-col border border-gray-50">
           <div className="mb-10">
-            <h3 className="text-xl font-bold text-gray-900">Property Value history</h3>
+            <h3 className="text-xl font-bold text-gray-900">
+              Property Value history
+            </h3>
           </div>
           <div className="w-full xl:h-96 md:h-80 h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -206,13 +215,23 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                   </linearGradient>
                   <linearGradient id="barBg" x1="0" y1="1" x2="0" y2="0">
                     <stop offset="0%" stopColor="#c8d9ed" stopOpacity={0.7} />
-                    <stop offset="100%" stopColor="#f0f5fa" stopOpacity={0.05} />
+                    <stop
+                      offset="100%"
+                      stopColor="#f0f5fa"
+                      stopOpacity={0.05}
+                    />
                   </linearGradient>
                   <linearGradient id="lineStroke" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#22558b" stopOpacity={1} />
                     <stop offset="100%" stopColor="#7aaed6" stopOpacity={0.6} />
                   </linearGradient>
-                  <linearGradient id="verticalLineGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="verticalLineGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor="#22558b" stopOpacity={1} />
                     <stop offset="70%" stopColor="#22558b" stopOpacity={0.7} />
                     <stop offset="100%" stopColor="#22558b" stopOpacity={0} />
@@ -242,7 +261,8 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                   cursor={false}
                   offset={-100} // Negative offset in Recharts can often center/move tooltip above
                   wrapperStyle={{ zIndex: 100 }}
-                /><Bar
+                />
+                <Bar
                   dataKey="bg"
                   fill="url(#barBg)"
                   barSize={80}
@@ -270,7 +290,10 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
         <div className="xl:w-[43%] w-full shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 rounded-2xl bg-white flex flex-col gap-y-5">
           <div className="flex items-center justify-between w-full">
             <div className="flex flex-col gap-y-1">
-              <Description type={IDescriptionTypes.dec16} content="Total Value" />
+              <Description
+                type={IDescriptionTypes.dec16}
+                content="Total Value"
+              />
               <span className="md:text-[32px] md:leading-10 text-2xl text-[#22558b] font-bold">
                 {data?.totalValue}
               </span>
@@ -303,7 +326,9 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
             </div>
             <div className="flex justify-between md:text-lg text-base font-medium">
               <span className="text-gray-600">Buildings</span>
-              <span className="text-[#22558b]">{data?.previousBuildingValue}</span>
+              <span className="text-[#22558b]">
+                {data?.previousBuildingValue}
+              </span>
             </div>
           </div>
         </div>

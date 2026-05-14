@@ -105,8 +105,6 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("Toggle Wishlist Clicked:", { id, isDdf });
-
     if (toggleWishlist.isPending) return;
 
     if (!isLoggedIn) {

@@ -80,7 +80,6 @@ export default function PropertiesListingPage() {
   const setIsChip = (val: boolean) =>
     updateInstanceFilter("list", "isChip", val);
   const setActivePrice = (val: string) => {
-    console.log("Setting Active Price:", val);
     updateInstanceFilter("list", "activePrice", val);
   };
   const setActiveBathRoom = (val: string) =>
@@ -305,7 +304,6 @@ export default function PropertiesListingPage() {
   const loading = isForSale ? isLoadingActive : isLoadingNormal;
 
   const data = queryData?.properties || [];
-  console.log("DATA", data[0]);
 
   const pageCount = queryData?.pagination?.pageCount || 1;
 

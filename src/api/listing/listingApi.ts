@@ -67,7 +67,6 @@ export async function getActiveListingById(id: string): Promise<any> {
 export async function getListingById(id: string): Promise<any> {
   try {
     const res = await axios.get(Endpoints.getListingById(id));
-    // console.log("Listing API Response:", res.data);
     return res.data;
   } catch (error) {
     console.error("Error fetching listing:", error);
@@ -182,8 +181,6 @@ export async function addDdfFavorite(id: string): Promise<any> {
     }
   }
 
-  console.log("DDF Favorite Payload:", { DocumentID: id, userId: userId });
-
   try {
     const res = await axios.post(
       Endpoints.addDdfFavorite(id),
@@ -197,7 +194,6 @@ export async function addDdfFavorite(id: string): Promise<any> {
         },
       },
     );
-    console.log("DDF Favorite Response:", res.data);
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

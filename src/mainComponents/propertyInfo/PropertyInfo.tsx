@@ -18,7 +18,6 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
     select: (res: any) => res?.data || res,
   });
 
-  console.log("🚀 ~ PropertyInfo ~ listing:", listing);
   if (loading) return <PropertyInfoSkeleton />;
   if (error)
     return (

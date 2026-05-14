@@ -48,8 +48,6 @@ const PropertySimilarAndSoldListing = ({
   bedsVariance: number;
   lotSizeAreaVariance: number;
 }) => {
-  console.log(bedsVariance, "bedsVariance");
-  console.log(lotSizeAreaVariance, "lotSizeAreaVariance");
   const { isLoggedIn } = useAuthContext();
 
   // 🔹 Mapping Function
@@ -92,13 +90,13 @@ const PropertySimilarAndSoldListing = ({
   const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
     {
       location: city,
-      lotSizeAreaVariance, bedsVariance ,
+      lotSizeAreaVariance,
+      bedsVariance,
       page: 1,
       pageSize: 30,
     },
     {
       select: (res: any) => {
-        // console.log("📦 API Response:", res);
         const nonResidentialTypes = [
           "office",
           "business",

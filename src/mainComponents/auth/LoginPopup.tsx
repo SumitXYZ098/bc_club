@@ -78,7 +78,6 @@ const LoginPopup = ({
       );
 
       const data = await res.json();
-      console.log(data);
 
       if (data.message && !data.token) {
         toast.info(data.message); // "Please verify your email"
@@ -105,7 +104,6 @@ const LoginPopup = ({
       onClose={onClose}
       title="WelCome Back"
       description="Log in to continue your home search"
-      
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}
@@ -186,9 +184,10 @@ const LoginPopup = ({
               if (idToken) handleGoogleLogin(idToken);
             }}
             onError={() => {
-              console.log("Login Failed");
               setErrorMsg("Google Login Failed");
             }}
+            text="continue_with"
+            shape="pill"
           />
         </div>
 

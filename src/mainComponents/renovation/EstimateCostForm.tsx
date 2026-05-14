@@ -102,7 +102,6 @@ const EstimateCostForm = () => {
   const onSubmit = (data: FormValues) => {
     setData(data.renovations);
     setOpenDialog(true);
-    console.log("FORM SUBMITTED 👉", data);
   };
 
   return (

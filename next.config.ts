@@ -46,6 +46,11 @@ const nextConfig: NextConfig = {
         hostname: "iframe.videodelivery.net",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "keithhendersonphoto.view.property",
+        pathname: "**",
+      },
     ],
   },
   turbopack: {
