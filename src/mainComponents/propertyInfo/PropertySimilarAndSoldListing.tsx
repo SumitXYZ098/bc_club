@@ -1,10 +1,6 @@
-import PropertiesCard, {
-  PropertyCardProps,
-} from "@/src/components/common/propertiesCard/PropertiesCard";
-import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+"use client";
 import { getOfficeName } from "@/src/utilities/utilities";
-import React from "react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useAuthContext } from "../auth/AuthContext";
 import {
@@ -13,6 +9,8 @@ import {
 } from "@/src/hooks/listing/useListingQueries";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+ import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+import PropertiesCard, { PropertyCardProps } from "@/src/components/common/propertiesCard/PropertiesCard";
 
 const swiperConfig = {
   spaceBetween: 12,
@@ -44,9 +42,9 @@ const PropertySimilarAndSoldListing = ({
   bedsVariance,
   lotSizeAreaVariance,
 }: {
-  city: string;
+  city?: string;
   bedsVariance: number;
-  lotSizeAreaVariance: number;
+  lotSizeAreaVariance?: number;
 }) => {
   const { isLoggedIn } = useAuthContext();
 
@@ -261,7 +259,10 @@ const PropertySimilarAndSoldListing = ({
     );
   };
   return (
-    <div className="space-y-10 mb-20 h-auto xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6">
+    <div
+      className={`space-y-10 mb-20 h-auto xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6  
+      `}
+    >
       <div className="flex flex-col gap-4 h-full">
         <Heading
           tagType="h3"

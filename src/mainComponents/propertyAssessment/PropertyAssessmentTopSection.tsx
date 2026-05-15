@@ -123,11 +123,22 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
     })
     .sort((a: any, b: any) => Number(a.year) - Number(b.year));
 
-  // Background columns height set to match Y-Axis max
-  const finalChartData = chartData.map((d: any) => ({ ...d, bg: 1000000 }));
-
-  // Calculate maxValue for the second chart
+  // Calculate maxValue for both charts
   const maxValue = chartData.length > 0 ? Math.max(...chartData.map((d: any) => d.value)) : 0;
+
+  // Calculate dynamic Y-axis upper bound to ensure the chart line never goes above the highest tick
+  let step = 200000;
+  if (maxValue > 1000000) {
+    const rawStep = maxValue / 5;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+    step = Math.ceil(rawStep / magnitude) * magnitude;
+  }
+
+  const yAxisMax = step * 5;
+  const yTicks = [0, step, step * 2, step * 3, step * 4, yAxisMax];
+
+  // Background columns height set to match dynamic Y-Axis max
+  const finalChartData = chartData.map((d: any) => ({ ...d, bg: yAxisMax }));
 
   const formatYAxis = (tickItem: number) =>
     tickItem === 0 ? "0" : `$${tickItem / 1000}K`;
@@ -258,11 +269,11 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: "#111", fontWeight: 500 }}
+                  tick={{ fontSize: 12, fill: "#111", fontWeight: 500, dy: 4 }}
                   tickFormatter={formatYAxis}
                   width={60}
-                  domain={[0, 1000000]}
-                  ticks={[0, 200000, 400000, 600000, 800000, 1000000]}
+                  domain={[0, yAxisMax]}
+                  ticks={yTicks}
                 />
 
                 <Tooltip
@@ -274,7 +285,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                 <Bar
                   dataKey="bg"
                   fill="url(#barBg)"
-                  barSize={80}
+                  barSize={90}
                   isAnimationActive={false}
                   radius={[6, 6, 0, 0]}
                   opacity={0.4}

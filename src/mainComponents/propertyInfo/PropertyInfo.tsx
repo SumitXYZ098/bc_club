@@ -56,7 +56,7 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
       <PropertySimilarAndSoldListing
         city={listing?.city}
         bedsVariance={listing.bedrooms}
-        lotSizeAreaVariance={listing.lot_size_area}
+        lotSizeAreaVariance={listing?.lot_size_area}
       />
 
       <GetInTouch />

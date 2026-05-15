@@ -9,60 +9,68 @@ interface Props {
 }
 
 const PropertyAssessmentInformation = ({ data }: Props) => {
-  
   if (!data) {
-  return (
-    <div className="flex xl:flex-row xl:flex-nowrap flex-col gap-x-6 md:gap-y-5 gap-y-6 justify-between bg-gray md:p-6 p-4 rounded-xl w-full animate-pulse">
+    return (
+      <div className="flex xl:flex-row xl:flex-nowrap flex-col gap-x-6 md:gap-y-5 gap-y-6 justify-between bg-gray md:p-6 p-4 rounded-xl w-full animate-pulse">
+        <div className="xl:w-3/5 w-full flex flex-col md:gap-y-6 gap-y-4">
+          <div className="h-6 w-48 bg-gray-200 rounded" />
 
-      <div className="xl:w-3/5 w-full flex flex-col md:gap-y-6 gap-y-4">
-        <div className="h-6 w-48 bg-gray-200 rounded" />
-
-        <div className="flex flex-col gap-y-4 w-full">
-          {[1,2,3,4,5,6,7].map((_, i) => (
-            <div key={i}>
-              <div className="flex justify-between">
-                <div className="h-4 w-32 bg-gray-200 rounded" />
-                <div className="h-4 w-24 bg-gray-200 rounded" />
+          <div className="flex flex-col gap-y-4 w-full">
+            {[1, 2, 3, 4, 5, 6, 7].map((_, i) => (
+              <div key={i}>
+                <div className="flex justify-between">
+                  <div className="h-4 w-32 bg-gray-200 rounded" />
+                  <div className="h-4 w-24 bg-gray-200 rounded" />
+                </div>
+                <div className="h-[1px] bg-gray-200 mt-2" />
               </div>
-              <div className="h-[1px] bg-gray-200 mt-2" />
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden xl:block w-[1px] bg-gray-200" />
+
+        <div className="xl:w-[40%] w-full flex flex-col gap-y-6">
+          {[1, 2, 3].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white p-6 rounded-xl flex flex-col gap-y-4"
+            >
+              <div className="h-5 w-48 bg-gray-200 rounded" />
+              <div className="h-4 w-full bg-gray-200 rounded" />
+              <div className="h-4 w-32 bg-gray-200 rounded" />
             </div>
           ))}
         </div>
       </div>
+    );
+  }
 
-      <div className="hidden xl:block w-[1px] bg-gray-200" />
-
-      <div className="xl:w-[40%] w-full flex flex-col gap-y-6">
-
-        {[1,2,3].map((_, i) => (
-          <div key={i} className="bg-white p-6 rounded-xl flex flex-col gap-y-4">
-            <div className="h-5 w-48 bg-gray-200 rounded" />
-            <div className="h-4 w-full bg-gray-200 rounded" />
-            <div className="h-4 w-32 bg-gray-200 rounded" />
-          </div>
-        ))}
-
-      </div>
-    </div>
-  );
-}
-  
-   const propertyDetails = {
-  land: { label: "Land Price", value: data?.landValue||"N/A"},
-  description: { label: "Description", value: data?.propertyInfo["Description"] || "N/A" },
-  bedrooms: { label: "Bedrooms", value: data?.propertyInfo["Bedrooms"] || "N/A" },
-  baths: { label: "Baths", value: data?.propertyInfo["Baths"] || "N/A" },
-  // carports: { label: "Carports", value: data?.propertyInfo["Carports"] || "N/A" },
-  // garages: { label: "Garages", value: data?.propertyInfo["Garages"] || "N/A" },
-  // landSize: { label: "Land Size", value: data?.propertyInfo["Land size"] || "N/A"  },
-  // firstFloorArea: { label: "First Floor Area", value: data?.propertyInfo["First floor area"] || "N/A" },
-  // secondFloorArea: { label: "Second Floor Area", value: data?.propertyInfo["Second floor area"] || "N/A" },
-  // basementFinishArea: { label: "Basement Finish Area", value: data?.propertyInfo["Basement finish area"] || "N/A" },
-  // buildingStoreys: { label: "Building Storeys", value: data?.propertyInfo["Building storeys"] || "N/A" },
-  // grossLeasableArea: { label: "Gross Leasable Area", value: data?.propertyInfo["Gross leasable area"] || "N/A" },
-  // netLeasableArea: { label: "Net Leasable Area", value: data?.propertyInfo["Net leasable area"] || "N/A" },
-  // numberOfApartmentUnits: { label: "No. of Apartment Units", value: data?.propertyInfo["No. of apartment units"] || "N/A" },
-};
+  const propertyDetails = {
+    land: { label: "Land Price", value: data?.landValue || "N/A" },
+    description: {
+      label: "Description",
+      value: data?.propertyInfo["Description"] || "N/A",
+    },
+    bedrooms: {
+      label: "Bedrooms",
+      value: data?.propertyInfo["Bedrooms"] || "N/A",
+    },
+    baths: { label: "Baths", value: data?.propertyInfo["Baths"] || "N/A" },
+    landSize: {
+      label: "Land Area",
+      value: data?.propertyInfo["Land size"] || "N/A",
+    },
+    // carports: { label: "Carports", value: data?.propertyInfo["Carports"] || "N/A" },
+    // garages: { label: "Garages", value: data?.propertyInfo["Garages"] || "N/A" },
+    // firstFloorArea: { label: "First Floor Area", value: data?.propertyInfo["First floor area"] || "N/A" },
+    // secondFloorArea: { label: "Second Floor Area", value: data?.propertyInfo["Second floor area"] || "N/A" },
+    // basementFinishArea: { label: "Basement Finish Area", value: data?.propertyInfo["Basement finish area"] || "N/A" },
+    // buildingStoreys: { label: "Building Storeys", value: data?.propertyInfo["Building storeys"] || "N/A" },
+    // grossLeasableArea: { label: "Gross Leasable Area", value: data?.propertyInfo["Gross leasable area"] || "N/A" },
+    // netLeasableArea: { label: "Net Leasable Area", value: data?.propertyInfo["Net leasable area"] || "N/A" },
+    // numberOfApartmentUnits: { label: "No. of Apartment Units", value: data?.propertyInfo["No. of apartment units"] || "N/A" },
+  };
 
   return (
     <div className="flex xl:flex-row xl:flex-nowrap flex-col gap-x-6 md:gap-y-5 gap-y-6 justify-between bg-gray md:p-6 p-4 rounded-xl w-full min-h-4 h-full">
@@ -104,7 +112,7 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
             <span className="text-gray-800">Buildings</span>
             <span className="text-[#22558b]">{data?.buildingValue}</span>
           </div>
-          <div className="h-[1px] w-full bg-gray-100 my-1"></div>
+          <div className="h-px w-full bg-gray-100 my-1"></div>
           <div className="flex justify-between md:text-lg text-base font-bold">
             <span className="text-gray-800">Previous Year Value</span>
             <span className="text-[#22558b]">{data?.previousTotalValue}</span>
@@ -132,12 +140,11 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
             type={IDescriptionTypes.dec1614}
             content={data?.legal?.[0]?.description}
           />
-            <Description
+          <Description
             type={IDescriptionTypes.dec18}
             content={`PID : ${data?.legal?.[0]?.pid}`}
             customClasses="font-sm"
           />
-         
         </div>
         {/* <div className="bg-background p-6 rounded-xl flex flex-col gap-y-4 w-full ">
           <Description

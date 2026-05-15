@@ -1,11 +1,10 @@
 import GetInTouch from "@/src/mainComponents/getInTouch/GetInTouch";
-import MapTapSection from "@/src/mainComponents/propertyAssessment/MapTapSection";
 import PropertyAssessmentInformation from "@/src/mainComponents/propertyAssessment/PropertyAssessmentInformation";
 import PropertyAssessmentTopSection from "@/src/mainComponents/propertyAssessment/PropertyAssessmentTopSection";
-import RegisterWithBC from "@/src/mainComponents/propertyAssessment/RegisterWithBC";
-import { Endpoints } from "@/src/api/endpoints";
+import PropertySimilarAndSoldListing from "@/src/mainComponents/propertyInfo/PropertySimilarAndSoldListing";
+import axios from "axios";
 
- 
+
 interface Params {
   "property-assessment-details": string;
 }
@@ -14,11 +13,12 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
   const resolvedParams = await params;
   const assessmentId = resolvedParams["property-assessment-details"];
 
- const res = await fetch(
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/property-assignment-lists/${assessmentId}`,
-  { cache: "no-store" }
-);
-  const json = await res.json();
+  const res = await  axios.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/property-assignment-lists/${assessmentId}`,
+   
+  );
+  const json = await res.data
+  ;
   const property = json?.data;
 
   return (
@@ -27,9 +27,15 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
         <PropertyAssessmentTopSection data={property} />
         <PropertyAssessmentInformation data={property} />
         {/* <RegisterWithBC /> */}
-        <MapTapSection />
+        {/* <MapTapSection property={property}  /> */}
       </section>
-    
+      <PropertySimilarAndSoldListing
+        bedsVariance={property?.propertyInfo?.Bedrooms
+          ? Number(property?.propertyInfo?.Bedrooms)
+          : 3
+        }
+      />
+
       <GetInTouch />
     </>
   );
