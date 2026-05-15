@@ -296,18 +296,18 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
 
         {/* SECOND CHART (Horizontal Bar) */}
         <div className="xl:w-[48%] w-full relative bg-white p-5 rounded-[16px] flex flex-col border border-[#33333333]">
-          <div className="mb-15px]">
+          <div className="mb-[2px]">
             <h3 className="text-xl font-medium text-gray-800 mb-5">
               Property value history
             </h3>
           </div>
-          <div className="h-[400px] w-full">
+          <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={displayChartData}
                 layout="vertical"
                 margin={{ top: 0, right: 0, left: 10, bottom: 0 }}
-                barCategoryGap={24}
+                barCategoryGap={15}
               >
                 <XAxis type="number" hide domain={[0, barMax]} />
                 <YAxis
@@ -319,11 +319,11 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                   tick={(props: any) => {
                     const { x, y, payload } = props;
                     return (
-                      <g transform={`translate(${x - 75},${y - 22})`}>
-                        <rect width="69" height="44" rx="8" fill="#f3f4f6" />
+                      <g transform={`translate(${x - 75},${y - 19.5})`}>
+                        <rect width="69" height="39" rx="8" fill="#f3f4f6" />
                         <text
                           x="34.5"
-                          y="27"
+                          y="24"
                           textAnchor="middle"
                           fill="#4b5563"
                           style={{ fontSize: "14px", fontWeight: "500" }}
@@ -337,7 +337,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                 <Bar
                   dataKey="value"
                   radius={[8, 8, 8, 8]}
-                  barSize={51}
+                  barSize={39}
                   background={{ fill: "#f3f4f6", radius: 8 }}
                 >
                   {displayChartData.map((entry: any, index: number) => (
@@ -354,7 +354,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                           {/* Change Badge */}
                           <rect
                             x={x + 12}
-                            y={y + 13}
+                            y={y + 8}
                             width="55"
                             height="25"
                             rx="6"
@@ -362,7 +362,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                           />
                           <text
                             x={x + 39.5}
-                            y={y + 30}
+                            y={y + 25}
                             textAnchor="middle"
                             fill="white"
                             style={{
@@ -376,7 +376,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                           {/* Value Label */}
                           <text
                             x={x + width - 15}
-                            y={y + 31}
+                            y={y + 26}
                             textAnchor="end"
                             fill="white"
                             style={{
