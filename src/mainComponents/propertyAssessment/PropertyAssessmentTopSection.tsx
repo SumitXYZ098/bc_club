@@ -220,15 +220,15 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
               >
                 <defs>
                   <linearGradient id="colorValue" x1="0" y1="2" x2="0" y2="0">
-                    <stop offset="5%" stopColor="#22558b" stopOpacity={0.15} />
+                    <stop offset="5%" stopColor="#22558b" stopOpacity={0.25} />
                     <stop offset="95%" stopColor="#ffffff" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="barBg" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0%" stopColor="#c8d9ed" stopOpacity={0.7} />
+                    <stop offset="0%" stopColor="#22558b" stopOpacity={0.1} />
                     <stop
                       offset="100%"
-                      stopColor="#f0f5fa"
-                      stopOpacity={0.05}
+                      stopColor="#22558b"
+                      stopOpacity={0.02}
                     />
                   </linearGradient>
                   <linearGradient id="lineStroke" x1="0" y1="0" x2="0" y2="1">
@@ -283,7 +283,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="url(#lineStroke)"
+                  stroke="#22558b"
                   strokeWidth={4}
                   fill="url(#colorValue)"
                   fillOpacity={1}
@@ -295,9 +295,9 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
         </div>
 
         {/* SECOND CHART (Horizontal Bar) */}
-        <div className="xl:w-[48%] w-full relative bg-white shadow-[0_0_25px_0_rgba(0,0,0,0.08)] p-5 rounded-2xl flex flex-col border-1 border-[#ccc]">
-          <div className="mb-8">
-            <h3 className="text-xl font-medium text-gray-800">
+        <div className="xl:w-[48%] w-full relative bg-white p-5 rounded-[16px] flex flex-col border border-[#33333333]">
+          <div className="mb-15px]">
+            <h3 className="text-xl font-medium text-gray-800 mb-5">
               Property value history
             </h3>
           </div>
@@ -306,8 +306,8 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
               <BarChart
                 data={displayChartData}
                 layout="vertical"
-                margin={{ top: 0, right: 0, left: 40, bottom: 0 }}
-                barCategoryGap={25}
+                margin={{ top: 0, right: 0, left: 10, bottom: 0 }}
+                barCategoryGap={24}
               >
                 <XAxis type="number" hide domain={[0, barMax]} />
                 <YAxis
@@ -315,11 +315,11 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                   dataKey="year"
                   axisLine={false}
                   tickLine={false}
-                  width={100}
+                  width={75}
                   tick={(props: any) => {
                     const { x, y, payload } = props;
                     return (
-                      <g transform={`translate(${x - 90},${y - 22})`}>
+                      <g transform={`translate(${x - 75},${y - 22})`}>
                         <rect width="69" height="44" rx="8" fill="#f3f4f6" />
                         <text
                           x="34.5"
@@ -337,7 +337,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                 <Bar
                   dataKey="value"
                   radius={[8, 8, 8, 8]}
-                  barSize={45}
+                  barSize={51}
                   background={{ fill: "#f3f4f6", radius: 8 }}
                 >
                   {displayChartData.map((entry: any, index: number) => (
@@ -354,7 +354,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                           {/* Change Badge */}
                           <rect
                             x={x + 12}
-                            y={y + 10}
+                            y={y + 13}
                             width="55"
                             height="25"
                             rx="6"
@@ -362,7 +362,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                           />
                           <text
                             x={x + 39.5}
-                            y={y + 27}
+                            y={y + 30}
                             textAnchor="middle"
                             fill="white"
                             style={{
@@ -376,7 +376,7 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
                           {/* Value Label */}
                           <text
                             x={x + width - 15}
-                            y={y + 28}
+                            y={y + 31}
                             textAnchor="end"
                             fill="white"
                             style={{
