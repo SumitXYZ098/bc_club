@@ -88,11 +88,19 @@ export const transformNormalListing = (listing: any, me: any) => {
     priceDrop:
       listing.PreviousListPrice && listing.PreviousListPrice > listing.ListPrice
         ? Number(
-            ((listing.PreviousListPrice - listing.ListPrice) / listing.ListPrice).toFixed(1),
+            (
+              (listing.PreviousListPrice - listing.ListPrice) /
+              listing.ListPrice
+            ).toFixed(1),
           )
         : undefined,
     assessedDiff: listing.ListPrice
-      ? Number(((listing.ListPrice - (listing.TaxAssessedValue ?? 0)) / listing.ListPrice).toFixed(1))
+      ? Number(
+          (
+            (listing.ListPrice - (listing.annual_tax ?? 0)) /
+            listing.ListPrice
+          ).toFixed(1),
+        )
       : 0,
   };
 };
@@ -110,18 +118,15 @@ export const transformActiveListing = (listing: any, me: any) => {
           : listing?.media?.[0]?.MediaURL,
     title: listing?.property_sub_type || "Property",
     price: Number(listing?.price) || 0,
-    daysAgo:
-      listing?.ModificationTimestamp ??
-      listing?.raw_data?.BridgeModificationTimestamp ??
-      0,
-    address: listing?.address || `${listing?.city || ""}`,
-    city: listing?.city || "",
-    province: listing?.province || "BC",
-    sqft: listing?.area ?? listing?.Living_area ?? 0,
+    daysAgo: listing?.ModificationTimestamp ?? 0,
+    address: listing?.address,
+    sqft: listing?.Living_area ?? listing?.area ?? 0,
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
     longitude,
     latitude,
+    lotSize: listing?.lot_size_area ?? "",
+    structureType: listing?.structure_type ?? "",
     mls: listing?.mls_number ?? listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
     isFavourite: listing?.users?.some(
@@ -132,11 +137,18 @@ export const transformActiveListing = (listing: any, me: any) => {
     priceDrop:
       listing.PreviousListPrice && listing.PreviousListPrice > listing.ListPrice
         ? Number(
-            ((listing.PreviousListPrice - listing.ListPrice) / listing.ListPrice).toFixed(1),
+            (
+              (listing.PreviousListPrice - listing.ListPrice) /
+              listing.ListPrice
+            ).toFixed(1),
           )
         : undefined,
-    assessedDiff: listing.ListPrice
-      ? Number(((listing.ListPrice - (listing.TaxAssessedValue ?? 0)) / listing.ListPrice).toFixed(1))
+    assessedDiff: listing.price
+      ? Number(
+          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+            1,
+          ),
+        )
       : 0,
   };
 };

@@ -294,7 +294,7 @@ export default function GoogleMapSearch() {
 
       const ne = bounds.getNorthEast();
       const sw = bounds.getSouthWest();
-      const zoom = mapInstance.getZoom() || 13;
+      const zoom = mapInstance.getZoom() || 14;
 
       const newBounds = {
         north: ne.lat(),
@@ -365,7 +365,7 @@ export default function GoogleMapSearch() {
     if (selectedClusterProperties.length > 0 || selectedProperty) return;
     if (!map) return;
 
-    const zoom = map.getZoom() || 13;
+    const zoom = map.getZoom() || 14;
     if (zoom < 8) return;
 
     if (idleTimeout.current) clearTimeout(idleTimeout.current);
@@ -394,7 +394,7 @@ export default function GoogleMapSearch() {
 
     if (!location) {
       map.panTo(defaultCenter);
-      map.setZoom(13);
+      map.setZoom(14);
       return;
     }
 
@@ -404,7 +404,7 @@ export default function GoogleMapSearch() {
     if (coords) {
       map.panTo(coords);
       setTimeout(() => {
-        map.setZoom(13);
+        map.setZoom(14);
         triggerSearch();
       }, 300);
       return;
@@ -416,7 +416,7 @@ export default function GoogleMapSearch() {
         if (hasValidCoordinates(p))
           bounds.extend({ lat: p.latitude, lng: p.longitude });
       });
-      fitBoundsWithZoom(map, bounds, 13);
+      fitBoundsWithZoom(map, bounds, 14);
     }
   }, [location, mapLoaded, map]);
 
@@ -448,7 +448,7 @@ export default function GoogleMapSearch() {
     });
 
     if (hasValidPoints) {
-      fitBoundsWithZoom(map, bounds, 13);
+      fitBoundsWithZoom(map, bounds, 14);
       setFitBoundsDone(true);
     }
   }, [properties, mapLoaded, map, fitBoundsDone, location]);
@@ -491,7 +491,7 @@ export default function GoogleMapSearch() {
 
     if (!map) return;
 
-    const zoom = map.getZoom() || 13;
+    const zoom = map.getZoom() || 14;
     const bounds = map.getBounds();
     if (!bounds) return;
 
@@ -577,7 +577,7 @@ export default function GoogleMapSearch() {
           <div className="hidden md:block flex-1 relative z-10">
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
-              zoom={13}
+              zoom={14}
               center={defaultCenter}
               onLoad={onMapLoad}
               onIdle={onMapIdle}

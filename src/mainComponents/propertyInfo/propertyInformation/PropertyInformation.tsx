@@ -26,6 +26,8 @@ import {
 } from "../../dummyData";
 import AssessmentHistory from "./AssessmentHistory";
 import PropertyMap from "./PropertyMap";
+import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
+import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 
 const PropertyInformation = ({ property }: { property: any }) => {
   const featureslist = [
@@ -78,6 +80,9 @@ const PropertyInformation = ({ property }: { property: any }) => {
   const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`;
 
+  const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
+    useGetNearbyPlaces(property.documentId);
+  console.log("nearbyPlaces", nearbyPlaces);
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
       <div className="flex flex-col xl:w-[70%] w-full h-full  relative">
@@ -215,11 +220,50 @@ const PropertyInformation = ({ property }: { property: any }) => {
 
           {/* Nearby Schools */}
           <div id="neighbourhood" className="scroll-mt-40">
-            <DynamicTable
+            <div>
+              <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
+                Nearby Schools
+              </h2>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {nearbyPlacesLoading
+                  ? Array.from({ length: 6 }).map((_, index) => (
+                      <NearbyPlaceSkeleton key={index} />
+                    ))
+                  : nearbyPlaces?.data?.schools?.map((school: any) => (
+                      <NearbyPlaceCard
+                        key={school.place_id}
+                        place={school}
+                        type="school"
+                      />
+                    ))}
+              </div>
+            </div>
+
+            <div className="mt-12">
+              <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
+                Nearby Hospitals
+              </h2>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {nearbyPlacesLoading
+                  ? Array.from({ length: 6 }).map((_, index) => (
+                      <NearbyPlaceSkeleton key={index} />
+                    ))
+                  : nearbyPlaces?.data?.hospitals?.map((hospital: any) => (
+                      <NearbyPlaceCard
+                        key={hospital.place_id}
+                        place={hospital}
+                        type="hospital"
+                      />
+                    ))}
+              </div>
+            </div>
+            {/* <DynamicTable
               title={"Nearby Schools (Dummy Data)"}
               headers={nearbySchoolsHeaders}
               rows={nearbySchoolsRows}
-            />
+            /> */}
           </div>
 
           {/* Building Complex Information */}

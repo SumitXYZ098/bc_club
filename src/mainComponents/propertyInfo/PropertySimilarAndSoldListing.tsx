@@ -1,6 +1,6 @@
 "use client";
 import { getOfficeName } from "@/src/utilities/utilities";
- import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useAuthContext } from "../auth/AuthContext";
 import {
@@ -9,8 +9,10 @@ import {
 } from "@/src/hooks/listing/useListingQueries";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { ChevronLeft, ChevronRight } from "lucide-react";
- import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
-import PropertiesCard, { PropertyCardProps } from "@/src/components/common/propertiesCard/PropertiesCard";
+import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
+import PropertiesCard, {
+  PropertyCardProps,
+} from "@/src/components/common/propertiesCard/PropertiesCard";
 
 const swiperConfig = {
   spaceBetween: 12,
@@ -51,7 +53,7 @@ const PropertySimilarAndSoldListing = ({
   // 🔹 Mapping Function
   const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
     id: listing.documentId,
-    image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
+    image: listing?.media_url ?? listing?.media[0]?.MediaURL,
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.ModificationTimestamp ?? 0,

@@ -80,7 +80,7 @@ const OurProperty = () => {
   // 🔹 Mapping Function
   const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
     id: listing.documentId,
-    image: listing?.media_url?.[0] ?? listing?.media[0]?.MediaURL,
+    image: listing?.media_url ?? listing?.media[0]?.MediaURL,
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.ModificationTimestamp ?? 0,
@@ -108,7 +108,7 @@ const OurProperty = () => {
         )
       : 0,
     mls: listing?.mls_number ?? listing?.listing_id,
-    realtor: getOfficeName(listing),
+    realtor: listing?.office_name ?? getOfficeName(listing),
     isFavourite: listing?.is_favorite || false,
     isDdf: !!isDdf,
   });

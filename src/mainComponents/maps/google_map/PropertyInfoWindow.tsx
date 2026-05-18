@@ -11,10 +11,17 @@ export default function PropertyInfoWindow({
   onClose: () => void;
 }) {
   if (!selectedProperty) return null;
+  const displayTitle =
+    selectedProperty.title === "Single Family"
+      ? selectedProperty.structureType
+      : selectedProperty.title;
 
   return (
     <InfoWindow
-      position={{ lat: selectedProperty.latitude, lng: selectedProperty.longitude }}
+      position={{
+        lat: selectedProperty.latitude,
+        lng: selectedProperty.longitude,
+      }}
       onCloseClick={onClose}
     >
       <div
@@ -50,14 +57,46 @@ export default function PropertyInfoWindow({
             />
           </div>
 
-          <div style={{ padding: "12px 2px 4px 2px", display: "flex", flexDirection: "column", gap: 4 }}>
-            <h3 style={{ margin: 0, color: "#305487", fontSize: 18, fontWeight: 700 }}>
+          <div
+            style={{
+              padding: "12px 2px 4px 2px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+            }}
+          >
+            <h3
+              style={{
+                margin: 0,
+                color: "#305487",
+                fontSize: 18,
+                fontWeight: 700,
+              }}
+            >
               ${Number(selectedProperty.price).toLocaleString()}
             </h3>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {selectedProperty.title}
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: 700,
+                color: "#333",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {displayTitle}
             </p>
-            <p style={{ margin: 0, fontSize: 12, color: "#6e6e6e", lineHeight: 1.4, fontWeight: 500 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 12,
+                color: "#6e6e6e",
+                lineHeight: 1.4,
+                fontWeight: 500,
+              }}
+            >
               {selectedProperty.address}
             </p>
           </div>

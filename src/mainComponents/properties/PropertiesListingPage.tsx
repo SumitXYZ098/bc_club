@@ -207,8 +207,8 @@ export default function PropertiesListingPage() {
       .map((listing: any) => ({
         id: listing?.documentId,
         image:
-          typeof listing?.media?.[0] === "string"
-            ? listing.media[0]
+          typeof listing?.media_url === "string"
+            ? listing.media_url
             : listing?.media?.[0]?.MediaURL,
         title: listing?.property_sub_type,
         price: listing?.price,
@@ -248,7 +248,7 @@ export default function PropertiesListingPage() {
           listing?.MlsNumber ??
           listing?.raw_data?.MlsNumber ??
           "N/A",
-        realtor: getOfficeName(listing),
+        realtor: listing?.office_name ?? getOfficeName(listing),
         isFavourite: listing?.users_permissions_users?.some(
           (user: any) => user?.documentId === me?.documentId,
         ),

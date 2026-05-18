@@ -133,12 +133,6 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     removeFromWishlist.mutate(id);
   };
 
-  // const sqftToAcresFormatted = (sqft: number, decimals = 2): string => {
-  //   if (!sqft || isNaN(sqft)) return "0";
-
-  //   return (sqft / 43560).toFixed(decimals);
-  // };
-
   const displayPrice = isLogin
     ? `$${Number(price || 0).toLocaleString()}`
     : "$*,***,***";

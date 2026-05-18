@@ -14,10 +14,11 @@ export const Endpoints = {
   getActivePropertyLists: `${BASE_URL}/api/ddf-listings`,
   mapZoom: `${BASE_URL}/api/map-zoom`,
   getActiveListingById: (id: string) => `${BASE_URL}/api/ddf-listings/${id}`,
-  addDdfFavorite: (id: string) => `${BASE_URL}/api/ddf-listings/add-favorite/${id}`,
-  removeDdfFavorite: (id: string) => `${BASE_URL}/api/ddf-listings/remove-favorite/${id}`,
+  addDdfFavorite: (id: string) =>
+    `${BASE_URL}/api/ddf-listings/add-favorite/${id}`,
+  removeDdfFavorite: (id: string) =>
+    `${BASE_URL}/api/ddf-listings/remove-favorite/${id}`,
   getMyDdfFavorites: `${BASE_URL}/api/ddf-listings/my-favorites`,
-
-
-  
+  getNearbyPlaces: (id: string) =>
+    `${BASE_URL}/api/ddf-listings/${id}/neighbourhood?radius=16000&limit=4`,
 };

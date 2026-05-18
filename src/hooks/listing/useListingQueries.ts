@@ -20,6 +20,7 @@ import {
   getActiveListings,
   getMapZoomListings,
   getImportPropertyList,
+  getNearbyPlaces,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -376,6 +377,21 @@ export function useGetImportPropertyList<TData = any>(
     queryKey: ["importPropertyList", params],
     queryFn: () => getImportPropertyList(params),
     enabled: !!params?.address && params.address.length > 1,
+    ...options,
+  });
+}
+
+export function useGetNearbyPlaces<TData = any>(
+  id: string,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["nearbyPlaces", id],
+    queryFn: () => getNearbyPlaces(id),
+    enabled: !!id,
     ...options,
   });
 }
