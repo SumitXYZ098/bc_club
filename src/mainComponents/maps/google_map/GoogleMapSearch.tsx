@@ -76,6 +76,7 @@ export default function GoogleMapSearch() {
     location = "",
     status = "forSale",
     activeProperty = "any",
+    propertyType,
     minPrice,
     maxPrice,
     minSqft,

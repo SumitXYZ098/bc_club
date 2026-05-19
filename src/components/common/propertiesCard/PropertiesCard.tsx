@@ -39,6 +39,7 @@ export interface PropertyCardProps {
   isSold?: boolean;
   isFavourite?: boolean;
   isDdf?: boolean;
+  status?: string;
   likesCount?: number;
   structureType?: string;
 }

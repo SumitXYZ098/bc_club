@@ -169,14 +169,22 @@ export const buildActiveFilterPills = ({
 };
 
 export const buildListingParams = (filters: any) => {
+  const page =
+    filters.status === "sold" || filters.status === "expired"
+      ? "page"
+      : "pagination[page]";
+  const pageSize =
+    filters.status === "sold" || filters.status === "expired"
+      ? "pageSize"
+      : "pagination[pageSize]";
   const params: any = {
-    "pagination[page]": 1,
-    "pagination[pageSize]": 500,
+    [page]: 1,
+    [pageSize]: 500,
   };
 
   appendCommonParams(params, filters);
-  if (filters.status && filters.status !== "any") params.propertyType = filters.status;
-
+  if (filters.status && filters.status !== "any")
+    params.propertyType = filters.status;
   return params;
 };
 
@@ -193,7 +201,11 @@ export const buildMapZoomParams = ({
 
   appendCommonParams(p, filters);
 
-  if (filters.status && filters.status !== "forSale" && filters.status !== "any") {
+  if (
+    filters.status &&
+    filters.status !== "forSale" &&
+    filters.status !== "any"
+  ) {
     p.propertyType = filters.status;
   }
 
@@ -234,16 +246,20 @@ const appendCommonParams = (params: any, filters: any) => {
   if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
-  if (minLotSizeArea !== undefined && minLotSizeArea > 100) params.minLotSizeArea = minLotSizeArea;
-  if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000) params.maxLotSizeArea = maxLotSizeArea;
+  if (minLotSizeArea !== undefined && minLotSizeArea > 100)
+    params.minLotSizeArea = minLotSizeArea;
+  if (maxLotSizeArea !== undefined && maxLotSizeArea < 100000)
+    params.maxLotSizeArea = maxLotSizeArea;
   if (minTax !== undefined && minTax > 0) params.minTax = minTax;
   if (maxTax !== undefined && maxTax < 50000) params.maxTax = maxTax;
   if (whenListed && whenListed !== "any") params.whenListed = whenListed;
   if (features) params.features = features;
   if (structureType) params.structureType = structureType;
 
-  if (activeBedRoom && activeBedRoom !== "any") params.beds = activeBedRoom.replace("+", "");
-  if (activeBathRoom && activeBathRoom !== "any") params.baths = activeBathRoom.replace("+", "");
+  if (activeBedRoom && activeBedRoom !== "any")
+    params.beds = activeBedRoom.replace("+", "");
+  if (activeBathRoom && activeBathRoom !== "any")
+    params.baths = activeBathRoom.replace("+", "");
 
   if (activeProperty && activeProperty !== "any") {
     if (activeProperty.includes(",")) {

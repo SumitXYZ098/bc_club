@@ -100,15 +100,16 @@ const OurProperty = () => {
             ).toFixed(1),
           )
         : undefined,
-    assessedDiff: listing.ListPrice
+    assessedDiff: listing.price
       ? Number(
           ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
             1,
           ),
         )
       : 0,
-    mls: listing?.mls_number ?? listing?.listing_id,
+    mls: listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
+    status: listing?.status || "",
     isFavourite: listing?.is_favorite || false,
     isDdf: !!isDdf,
   });
@@ -143,7 +144,7 @@ const OurProperty = () => {
 
   const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
     {
-      "filters[property_status][$eq]": "Closed",
+      propertyType: "sold",
       location: city,
     },
     {
@@ -174,7 +175,7 @@ const OurProperty = () => {
   const { data: expiredList = [], isLoading: isLoadingExpired } =
     useGetListings(
       {
-        "filters[property_status][$eq]": ["Expired"],
+        propertyType: "expired",
         location: city,
       },
       {
@@ -267,8 +268,6 @@ const OurProperty = () => {
     list: PropertyCardProps[],
     isLoading: boolean,
     isLoginOverride?: boolean,
-    isSold?: boolean,
-    isExpired?: boolean,
     navId?: string,
   ) => {
     if (isLoading) {
@@ -359,8 +358,8 @@ const OurProperty = () => {
               <PropertiesCard
                 {...item}
                 isLogin={isLoginOverride ?? isLoggedIn}
-                isSold={isSold}
-                isExpired={isExpired}
+                isSold={item.status === "Closed" ? true : false}
+                isExpired={item.status === "Expired" ? true : false}
               />
             </SwiperSlide>
           ))}
@@ -425,14 +424,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Newly Listed Properties"
           />
-          {renderSlider(
-            newList,
-            isLoadingNew,
-            true,
-            false,
-            false,
-            "newly-listed",
-          )}
+          {renderSlider(newList, isLoadingNew, true, "newly-listed")}
         </div>
 
         <div
@@ -444,14 +436,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Previously Listed Properties"
           />
-          {renderSlider(
-            expiredList,
-            isLoadingExpired,
-            isLoggedIn,
-            false,
-            true,
-            "expired",
-          )}
+          {renderSlider(expiredList, isLoadingExpired, isLoggedIn, "expired")}
         </div>
 
         <div ref={refs["Sold properties"]} className="flex flex-col gap-4">
@@ -460,14 +445,7 @@ const OurProperty = () => {
             type={IHeadingTypes.heading20}
             content="Sold Properties"
           />
-          {renderSlider(
-            soldList,
-            isLoadingSold,
-            isLoggedIn,
-            true,
-            false,
-            "sold",
-          )}
+          {renderSlider(soldList, isLoadingSold, isLoggedIn, "sold")}
         </div>
       </div>
     </section>

@@ -12,6 +12,7 @@ interface FilterState {
   maxTax?: number;
   activeBedRoom?: string;
   activeBathRoom?: string;
+  propertyType?: string;
   status?: string;
   whenListed?: string;
   activeProperty?: string;
@@ -44,6 +45,7 @@ const DEFAULT_FILTERS: FilterState = {
   maxTax: 50000,
   activeBedRoom: "any",
   activeBathRoom: "any",
+  propertyType: "any",
   status: "forSale",
   whenListed: "any",
   activeProperty: "any",

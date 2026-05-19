@@ -4,13 +4,8 @@ import Cookies from "js-cookie";
 
 export async function getListings(params: any): Promise<any> {
   try {
-    // Explicitly request office_name along with existing populations
-    const enhancedParams = { ...params };
-    // Usually Strapi might need explicit fields if they are somehow excluded
-    if (!enhancedParams.populate) enhancedParams.populate = "*";
-
     const res = await axios.get(Endpoints.getListing, {
-      params: enhancedParams,
+      params,
     });
 
     return res.data;

@@ -70,6 +70,7 @@ export default function PropertiesListingPage() {
   const minTax = filters.minTax;
   const maxTax = filters.maxTax;
   const status = filters.status;
+  const propertyType = filters.propertyType;
   const location = filters.location;
   const whenListed = filters.whenListed;
   const features = filters.features;
@@ -111,11 +112,10 @@ export default function PropertiesListingPage() {
   };
 
   if (!isForSale) {
-    params["filters[property_sub_type][$notNull]"] = true;
     if (status === "sold") {
-      params["filters[property_status][$eq]"] = "Closed";
+      params.propertyType = "sold";
     } else if (status === "expired") {
-      params["filters[property_status][$eq]"] = "Expired";
+      params.propertyType = "expired";
     }
   }
 
