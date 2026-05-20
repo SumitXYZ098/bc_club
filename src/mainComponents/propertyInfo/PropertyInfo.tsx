@@ -54,6 +54,7 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
 
       {/* Sections */}
       <PropertySimilarAndSoldListing
+        propertyId={listing.documentId}
         city={listing?.city}
         bedsVariance={listing.bedrooms}
         lotSizeAreaVariance={listing?.lot_size_area}

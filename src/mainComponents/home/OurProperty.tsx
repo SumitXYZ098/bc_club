@@ -17,6 +17,7 @@ import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import {
   useGetActiveListings,
   useGetListings,
+  useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
 import { getOfficeName } from "@/src/utilities/utilities";
 import { useRouter } from "next/navigation";
@@ -77,6 +78,8 @@ const OurProperty = () => {
     }
   };
 
+  const { data: me } = useGetMe();
+
   // 🔹 Mapping Function
   const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
     id: listing.documentId,
@@ -94,23 +97,25 @@ const OurProperty = () => {
     priceDrop:
       listing.PreviousListPrice > listing.ListPrice
         ? Number(
-            (
-              (listing.PreviousListPrice - listing.ListPrice) /
-              listing.ListPrice
-            ).toFixed(1),
-          )
+          (
+            (listing.PreviousListPrice - listing.ListPrice) /
+            listing.ListPrice
+          ).toFixed(1),
+        )
         : undefined,
     assessedDiff: listing.price
       ? Number(
-          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
-            1,
-          ),
-        )
+        ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+          1,
+        ),
+      )
       : 0,
     mls: listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
     status: listing?.status || "",
-    isFavourite: listing?.is_favorite || false,
+    isFavourite: listing?.users?.some(
+      (user: any) => user?.documentId === me?.documentId,
+    ),
     isDdf: !!isDdf,
   });
 

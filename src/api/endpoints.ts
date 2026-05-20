@@ -21,4 +21,8 @@ export const Endpoints = {
   getMyDdfFavorites: `${BASE_URL}/api/ddf-listings/my-favorites`,
   getNearbyPlaces: (id: string) =>
     `${BASE_URL}/api/ddf-listings/${id}/neighbourhood?radius=16000&limit=4`,
+  getSimilarProperties: (id: string) =>
+    `${BASE_URL}/api/ddf-listings/${id}/similar?radiusKm=5&limit=12`,
+  getSimilarSoldProperties: (id: string) =>
+    `${BASE_URL}/api/properties/${id}/similar-sold?radiusKm=5&limit=12`,
 };

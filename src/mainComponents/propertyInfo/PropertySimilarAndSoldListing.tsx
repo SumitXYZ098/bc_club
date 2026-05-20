@@ -6,6 +6,9 @@ import { useAuthContext } from "../auth/AuthContext";
 import {
   useGetActiveListings,
   useGetListings,
+  useGetMe,
+  useGetSimilarProperties,
+  useGetSimilarSoldProperties,
 } from "@/src/hooks/listing/useListingQueries";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -43,17 +46,20 @@ const PropertySimilarAndSoldListing = ({
   city,
   bedsVariance,
   lotSizeAreaVariance,
+  propertyId
 }: {
   city?: string;
   bedsVariance: number;
   lotSizeAreaVariance?: number;
+  propertyId: string;
 }) => {
   const { isLoggedIn } = useAuthContext();
+    const { data: me } = useGetMe()
 
   // 🔹 Mapping Function
   const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
     id: listing.documentId,
-    image: listing?.media_url ?? listing?.media[0]?.MediaURL,
+    image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.ModificationTimestamp ?? 0,
@@ -67,100 +73,46 @@ const PropertySimilarAndSoldListing = ({
     priceDrop:
       listing.PreviousListPrice > listing.ListPrice
         ? Number(
-            (
-              (listing.PreviousListPrice - listing.ListPrice) /
-              listing.ListPrice
-            ).toFixed(1),
-          )
-        : undefined,
-    assessedDiff: listing.ListPrice
-      ? Number(
-          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
-            1,
-          ),
+          (
+            (listing.PreviousListPrice - listing.ListPrice) /
+            listing.ListPrice
+          ).toFixed(1),
         )
+        : undefined,
+    assessedDiff: listing.price
+      ? Number(
+        ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+          1,
+        ),
+      )
       : 0,
-    mls: listing?.mls_number ?? listing?.listing_id,
-    realtor: getOfficeName(listing),
-    isFavourite: listing?.is_favorite || false,
+    mls: listing?.listing_id,
+    realtor: listing?.office_name ?? getOfficeName(listing),
+    status: listing?.status || "",
+    isFavourite: listing?.users?.some(
+      (user: any) => user?.documentId === me?.documentId,
+    ),
     isDdf: !!isDdf,
   });
 
   // Similar Properties
-  const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
-    {
-      location: city,
-      lotSizeAreaVariance,
-      bedsVariance,
-      page: 1,
-      pageSize: 30,
+  const { data: similarList = [], isLoading: isLoadingSimilar } = useGetSimilarProperties(propertyId, {
+    select(data) {
+      return data?.data?.map((item: any) => mapProperty(item, true))
     },
-    {
-      select: (res: any) => {
-        const nonResidentialTypes = [
-          "office",
-          "business",
-          "agriculture",
-          "vacant land",
-          "industrial",
-          "retail",
-        ];
+  })
 
-        return (
-          res?.data
-            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-            .filter((l: any) => {
-              const type = (l?.property_sub_type || "").toLowerCase();
-              return !nonResidentialTypes.some((nonRes) =>
-                type.includes(nonRes),
-              );
-            })
-            .map((l: any) => mapProperty(l, true)) || []
-        );
-      },
+  // Similar Sold Properties
+  const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } = useGetSimilarSoldProperties(propertyId, {
+    select(data) {
+      return data?.data?.map((item: any) => mapProperty(item, false))
     },
-  );
-
-  // Sold Listings
-  const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
-    {
-      "filters[property_status][$eq]": "Closed",
-      location: city,
-      bedsVariance,
-      "pagination[page]": 1,
-      "pagination[pageSize]": 30,
-    },
-    {
-      select: (res: any) => {
-        const nonResidentialTypes = [
-          "office",
-          "business",
-          "agriculture",
-          "vacant land",
-          "industrial",
-          "retail",
-        ];
-        return (
-          res?.data
-            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-            .filter((l: any) => {
-              const type = (l?.property_sub_type || "").toLowerCase();
-              return !nonResidentialTypes.some((nonRes) =>
-                type.includes(nonRes),
-              );
-            })
-            .map((l: any) => mapProperty(l, false)) || []
-        );
-      },
-    },
-  );
+  })
 
   const renderSlider = (
     list: PropertyCardProps[],
     isLoading: boolean,
     isLoginOverride?: boolean,
-    isSold?: boolean,
-    isExpired?: boolean,
     navId?: string,
   ) => {
     if (isLoading) {
@@ -174,7 +126,7 @@ const PropertySimilarAndSoldListing = ({
     }
 
     if (!list.length) {
-      return <p className="text-center py-10">No properties found</p>;
+      return <p className="text-center py-10 font-semibold">{`No Sold Properties Found in ${city}`}</p>;
     }
 
     return (
@@ -251,8 +203,8 @@ const PropertySimilarAndSoldListing = ({
               <PropertiesCard
                 {...item}
                 isLogin={isLoginOverride ?? isLoggedIn}
-                isSold={isSold}
-                isExpired={isExpired}
+                isSold={item.status === 'Closed'}
+                isExpired={item.status === 'Expired'}
               />
             </SwiperSlide>
           ))}
@@ -272,11 +224,9 @@ const PropertySimilarAndSoldListing = ({
           content="Similar Properties"
         />
         {renderSlider(
-          newList,
-          isLoadingNew,
+          similarList,
+          isLoadingSimilar,
           true,
-          false,
-          false,
           "newly-listed",
         )}
       </div>
@@ -287,7 +237,7 @@ const PropertySimilarAndSoldListing = ({
           type={IHeadingTypes.heading20}
           content="Sold Properties"
         />
-        {renderSlider(soldList, isLoadingSold, isLoggedIn, true, false, "sold")}
+        {renderSlider(similarSoldList, isLoadingSimilarSold, isLoggedIn, "sold")}
       </div>
     </div>
   );

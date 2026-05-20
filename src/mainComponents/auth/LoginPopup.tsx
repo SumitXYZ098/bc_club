@@ -79,14 +79,14 @@ const LoginPopup = ({
 
       const data = await res.json();
 
-      if (data.message && !data.token) {
+      if (data.message && !data.jwt) {
         toast.info(data.message); // "Please verify your email"
         return;
       }
 
-      if (data.message && data.token) {
-        localStorage.setItem("token", data.token);
-        loginUser(data.user, data.token, false);
+      if (data.message && data.jwt) {
+        localStorage.setItem("token", data.jwt);
+        loginUser(data.user, data.jwt, false);
         onClose();
         toast.success("Login successful!");
       } else {

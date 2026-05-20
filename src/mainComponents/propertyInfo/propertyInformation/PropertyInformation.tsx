@@ -82,7 +82,6 @@ const PropertyInformation = ({ property }: { property: any }) => {
 
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
     useGetNearbyPlaces(property.documentId);
-  console.log("nearbyPlaces", nearbyPlaces);
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
       <div className="flex flex-col xl:w-[70%] w-full h-full  relative">

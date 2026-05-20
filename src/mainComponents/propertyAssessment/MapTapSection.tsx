@@ -5,15 +5,12 @@ import PropertiesMap from "../properties/PropertiesMap";
 import NeighboringProperties from "./NeighboringProperties";
 import SampleSoldProperties from "./SampleSoldProperties";
 import { getListings } from "@/src/api/listing/listingApi";
-import PropertySimilarAndSoldListing from "../propertyInfo/PropertySimilarAndSoldListing";
 
-const MapTapSection = ({property}: {property: any}) => {
-  console.log(property);
+const MapTapSection = () => {
   const tabsLabel = [
     { id: 0, label: "Map" },
     { id: 1, label: "Neighboring properties" },
     { id: 2, label: "Sample sold properties" },
-    { id: 3, label: "Comparables" },
   ];
   const [activeTab, setActiveTab] = useState<number>(1);
   const [listingData, setListingData] = useState<any[]>([]);
@@ -55,12 +52,6 @@ const MapTapSection = ({property}: {property: any}) => {
       )}
       {activeTab === 1 && <NeighboringProperties />}
       {activeTab === 2 && <SampleSoldProperties />}
-      {activeTab === 3 && (
-        <PropertySimilarAndSoldListing
-          bedsVariance={Number(property?.propertyInfo?.Bedrooms)}
-          lotSizeAreaVariance={property?.propertyInfo?.["Lot size area"]}
-        />
-      )}
     </div>
   );
 };

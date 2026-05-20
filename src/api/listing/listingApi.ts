@@ -262,3 +262,30 @@ export async function getNearbyPlaces(id: string): Promise<any> {
     throw new Error("An unexpected error occurred");
   }
 }
+
+// Similar Properties
+export async function getSimilarProperties(id: string): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getSimilarProperties(id));
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+// Similar Sold Properties
+export async function getSimilarSoldProperties(id: string): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getSimilarSoldProperties(id));
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+

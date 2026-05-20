@@ -6,7 +6,6 @@ import LineGradient from "../lineGradient/LineGradient";
 import Description, { IDescriptionTypes } from "../../description/Description";
 import { Icons, Images } from "@/src/app/exports";
 import CustomButton from "../../button/CustomButton";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import {
@@ -67,7 +66,6 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   likesCount,
   structureType,
 }) => {
-  const pathname = usePathname();
   const { data: me } = useGetMe();
   const normalToggle = useToggleWishlist();
   const ddfToggle = useToggleDdfWishlist();
@@ -172,9 +170,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
       }}
     >
       <div
-        className={`relative rounded-2xl flex overflow-hidden shadow-[0_0_5px_0_rgba(21,21,21,0.19)] transition h-fit w-full ${
-          isLogin ? "group" : ""
-        }`}
+        className={`relative rounded-2xl flex overflow-hidden shadow-[0_0_5px_0_rgba(21,21,21,0.19)] transition h-fit w-full ${isLogin ? "group" : ""
+          }`}
       >
         <div className="flex flex-col w-full h-full justify-between">
           <div className="relative flex items-center">
@@ -183,9 +180,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 <Image
                   src={img}
                   alt={title}
-                  className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
-                    isLogin ? "group-hover:scale-125" : "blur-sm"
-                  }`}
+                  className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${isLogin ? "group-hover:scale-125" : "blur-sm"
+                    }`}
                   width={700}
                   height={403}
                   loading="eager"
@@ -270,11 +266,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               {/* </div> */}
               {/* Assessed Diff */}
               <p
-                className={`text-[10px] leading-4 inline-flex items-center gap-1 p-1 rounded-md ${
-                  assessedDiff < 0
+                className={`text-[10px] leading-4 inline-flex items-center gap-1 p-1 rounded-md ${assessedDiff < 0
                     ? "text-green bg-lightGreen"
                     : "text-red bg-lightRed"
-                }`}
+                  }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -287,9 +282,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                     width="20"
                     height="20"
                     rx="2"
-                    className={`${
-                      assessedDiff < 0 ? "fill-green" : "fill-red"
-                    }`}
+                    className={`${assessedDiff < 0 ? "fill-green" : "fill-red"
+                      }`}
                   />
                   {assessedDiff > 0 ? (
                     <path

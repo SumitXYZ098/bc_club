@@ -21,6 +21,8 @@ import {
   getMapZoomListings,
   getImportPropertyList,
   getNearbyPlaces,
+  getSimilarProperties,
+  getSimilarSoldProperties,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -381,6 +383,7 @@ export function useGetImportPropertyList<TData = any>(
   });
 }
 
+// Get nearby places
 export function useGetNearbyPlaces<TData = any>(
   id: string,
   options?: Omit<
@@ -391,6 +394,38 @@ export function useGetNearbyPlaces<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: ["nearbyPlaces", id],
     queryFn: () => getNearbyPlaces(id),
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// Similar Properties
+export function useGetSimilarProperties<TData = any>(
+  id: string,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["similarProperties", id],
+    queryFn: () => getSimilarProperties(id),
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// Similar Sold Properties
+export function useGetSimilarSoldProperties<TData = any>(
+  id: string,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["similarSoldProperties", id],
+    queryFn: () => getSimilarSoldProperties(id),
     enabled: !!id,
     ...options,
   });

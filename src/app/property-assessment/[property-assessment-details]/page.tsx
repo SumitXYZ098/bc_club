@@ -29,12 +29,12 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
         {/* <RegisterWithBC /> */}
         {/* <MapTapSection property={property}  /> */}
       </section>
-      <PropertySimilarAndSoldListing
+      {/* <PropertySimilarAndSoldListing
         bedsVariance={property?.propertyInfo?.Bedrooms
           ? Number(property?.propertyInfo?.Bedrooms)
           : 3
         }
-      />
+      /> */}
 
       <GetInTouch />
     </>
