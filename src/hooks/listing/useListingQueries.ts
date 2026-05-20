@@ -23,6 +23,8 @@ import {
   getNearbyPlaces,
   getSimilarProperties,
   getSimilarSoldProperties,
+  getSimilarAssignmentProperties,
+  getSimilarAssignmentSoldProperties,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -248,7 +250,7 @@ export function useRemoveFromWishlist() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: listingKeys.wishlists() });
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
   });
 }
 
@@ -305,7 +307,7 @@ export function useToggleDdfWishlist() {
         queryKey: [...listingKeys.wishlists(), "ddf"],
       });
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
   });
 }
 
@@ -364,12 +366,12 @@ export function useRemoveDdfWishlist() {
         queryKey: [...listingKeys.wishlists(), "ddf"],
       });
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
   });
 }
 
 export function useGetImportPropertyList<TData = any>(
-  params?: { address?: string; [key: string]: any },
+  params?: { address?: string;[key: string]: any },
   options?: Omit<
     UseQueryOptions<any, Error, TData, any>,
     "queryKey" | "queryFn"
@@ -426,6 +428,39 @@ export function useGetSimilarSoldProperties<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: ["similarSoldProperties", id],
     queryFn: () => getSimilarSoldProperties(id),
+    enabled: !!id,
+    ...options,
+  });
+}
+
+
+// Similar Assignment Properties
+export function useGetSimilarAssignmentProperties<TData = any>(
+  id: string,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["similarAssignmentProperties", id],
+    queryFn: () => getSimilarAssignmentProperties(id),
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// Similar Assignment Sold Properties
+export function useGetSimilarAssignmentSoldProperties<TData = any>(
+  id: string,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["similarAssignmentSoldProperties", id],
+    queryFn: () => getSimilarAssignmentSoldProperties(id),
     enabled: !!id,
     ...options,
   });

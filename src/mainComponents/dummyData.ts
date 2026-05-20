@@ -239,16 +239,18 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Listing Date",
-      value: property?.ModificationTimestamp
-        ? dayjs(property.ModificationTimestamp).format("DD MMM, YYYY")
+      value: property?.raw_data?.OriginalEntryTimestamp
+        ? dayjs(property.raw_data.OriginalEntryTimestamp)
+            .tz("America/Vancouver")
+            .format("DD MMM, YYYY")
         : "-",
     },
     subRows: [
       {
         data: {
           label: "Days On Market",
-          value: property?.ModificationTimestamp
-            ? `${getTime(property.ModificationTimestamp)}`
+          value: property?.raw_data?.OriginalEntryTimestamp
+            ? `${getTime(property.raw_data.OriginalEntryTimestamp)}`
             : "-",
         },
       },

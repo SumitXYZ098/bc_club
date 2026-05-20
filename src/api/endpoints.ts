@@ -25,4 +25,8 @@ export const Endpoints = {
     `${BASE_URL}/api/ddf-listings/${id}/similar?radiusKm=5&limit=12`,
   getSimilarSoldProperties: (id: string) =>
     `${BASE_URL}/api/properties/${id}/similar-sold?radiusKm=5&limit=12`,
+  getSimilarAssignmentProperties: (id: string) =>
+    `${BASE_URL}/api/property-assignment-lists/${id}/similar?radius=10&limit=12`,
+  getSimilarAssignmentSoldProperties: (id: string) =>
+    `${BASE_URL}/api/property-assignment-lists/${id}/similar-sold?radiusKm=10&limit=12`,
 };

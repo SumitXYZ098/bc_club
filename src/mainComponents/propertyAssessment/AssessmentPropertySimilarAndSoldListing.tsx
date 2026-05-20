@@ -5,6 +5,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { useAuthContext } from "../auth/AuthContext";
 import {
   useGetMe,
+  useGetSimilarAssignmentProperties,
+  useGetSimilarAssignmentSoldProperties,
   useGetSimilarProperties,
   useGetSimilarSoldProperties,
 } from "@/src/hooks/listing/useListingQueries";
@@ -40,13 +42,9 @@ const swiperConfig = {
   speed: 900,
 };
 
-const PropertySimilarAndSoldListing = ({
-  city,
+const AssessmentPropertySimilarAndSoldListing = ({
   propertyId
 }: {
-  city?: string;
-  bedsVariance: number;
-  lotSizeAreaVariance?: number;
   propertyId: string;
 }) => {
   const { isLoggedIn } = useAuthContext();
@@ -92,14 +90,14 @@ const PropertySimilarAndSoldListing = ({
   });
 
   // Similar Properties
-  const { data: similarList = [], isLoading: isLoadingSimilar } = useGetSimilarProperties(propertyId, {
+  const { data: similarList = [], isLoading: isLoadingSimilar } = useGetSimilarAssignmentProperties(propertyId, {
     select(data) {
       return data?.data?.map((item: any) => mapProperty(item, true))
     },
   })
 
   // Similar Sold Properties
-  const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } = useGetSimilarSoldProperties(propertyId, {
+  const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } = useGetSimilarAssignmentSoldProperties(propertyId, {
     select(data) {
       return data?.data?.map((item: any) => mapProperty(item, false))
     },
@@ -122,7 +120,7 @@ const PropertySimilarAndSoldListing = ({
     }
 
     if (!list.length) {
-      return <p className="text-center py-10 font-semibold">{`No Sold Properties Found in ${city}`}</p>;
+      return <p className="text-center py-10 font-semibold">{similarSoldList?.message ?? 'No Sold Properties Found Nearby'}</p>;
     }
 
     return (
@@ -239,4 +237,4 @@ const PropertySimilarAndSoldListing = ({
   );
 };
 
-export default PropertySimilarAndSoldListing;
+export default AssessmentPropertySimilarAndSoldListing;

@@ -289,3 +289,30 @@ export async function getSimilarSoldProperties(id: string): Promise<any> {
   }
 }
 
+// Similar Assignment Properties
+export async function getSimilarAssignmentProperties(id: string): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getSimilarAssignmentProperties(id));
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+// Similar Assignment Sold Properties
+export async function getSimilarAssignmentSoldProperties(id: string): Promise<any> {
+  try {
+    const res = await axios.get(
+      Endpoints.getSimilarAssignmentSoldProperties(id),
+    );
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
