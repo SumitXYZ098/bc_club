@@ -730,7 +730,7 @@ export default function PropertiesListingPage() {
             <div className="w-full flex flex-col h-full">
               <div
                 ref={scrollRef}
-                className="gap-7 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 2xl:grid-cols-4 justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
+                className="gap-7 grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 2xl:grid-cols-4 items-stretch justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
               >
                 {data.map((property: any) => (
                   <PropertiesCard

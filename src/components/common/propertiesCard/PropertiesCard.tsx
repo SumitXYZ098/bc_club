@@ -175,10 +175,10 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
       }}
     >
       <div
-        className={`relative rounded-2xl flex overflow-hidden shadow-[0_0_5px_0_rgba(21,21,21,0.19)] transition h-fit w-full ${isLogin ? "group" : ""
+        className={`relative rounded-2xl flex overflow-hidden shadow-[0_0_5px_0_rgba(21,21,21,0.19)] transition h-auto w-full ${isLogin ? "group" : ""
           }`}
       >
-        <div className="flex flex-col w-full h-full justify-between">
+        <div className="flex flex-col justify-between w-full h-full">
           <div className="relative flex items-center">
             <div className="w-full h-67 overflow-clip rounded-t-2xl">
               {img ? (
@@ -227,7 +227,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             )}
 
             {/* Price Drop Banner */}
-            {oldPrice && (
+            {oldPrice !== 0 && oldPrice && (
               <span
                 className={`absolute bottom-5 right-0 p-1.5 text-xs inline-flex text-background h-auto items-center gap-0.5 uppercase  rounded-l-sm ${price < oldPrice
                   ? "bg-red/90"
@@ -269,7 +269,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             )}
           </div>
 
-          <div className="space-y-2.5 mt-2.5 px-5 pb-5">
+          <div className="space-y-2.5 mt-2.5 px-3 pb-3 lg:px-5 lg:pb-5">
             <div className={`flex justify-between items-center`}>
               <p className="text-[32px] leading-10 font-bold text-primary">
                 {displayPrice}
@@ -321,7 +321,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 {Math.abs(assessedDiff)}% than Assessed Value {dayjs().year()}
               </p>
             </div>
-            {oldPrice && (
+            {oldPrice !== 0 && (
               <div className="flex justify-between items-center">
                 <p className="text-base text-lightWhite line-through">
                   ${Number(oldPrice).toLocaleString()}
