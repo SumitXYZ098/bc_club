@@ -77,6 +77,7 @@ export const transformNormalListing = (listing: any, me: any) => {
     baths: listing?.bathrooms ?? 0,
     longitude,
     latitude,
+    oldPrice: Number(listing?.old_price),
     mls: listing?.mls_number,
     realtor: getOfficeName(listing),
     isLogin: false,
@@ -85,20 +86,11 @@ export const transformNormalListing = (listing: any, me: any) => {
       (user: any) => user.documentId === me?.documentId,
     ),
     isDdf: false,
-    priceDrop:
-      listing.PreviousListPrice && listing.PreviousListPrice > listing.ListPrice
-        ? Number(
-            (
-              (listing.PreviousListPrice - listing.ListPrice) /
-              listing.ListPrice
-            ).toFixed(1),
-          )
-        : undefined,
-    assessedDiff: listing.ListPrice
+    assessedDiff: listing.price
       ? Number(
           (
-            (listing.ListPrice - (listing.annual_tax ?? 0)) /
-            listing.ListPrice
+            (listing.price - (listing.annual_tax ?? 0)) /
+            listing.price
           ).toFixed(1),
         )
       : 0,

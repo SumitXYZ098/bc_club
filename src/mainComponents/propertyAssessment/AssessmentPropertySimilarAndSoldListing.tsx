@@ -64,15 +64,7 @@ const AssessmentPropertySimilarAndSoldListing = ({
     likesCount: listing?.likesCount ?? 0,
     lotSize: listing?.lot_size_area ?? "",
     structureType: listing?.structure_type ?? "",
-    priceDrop:
-      listing.PreviousListPrice > listing.ListPrice
-        ? Number(
-          (
-            (listing.PreviousListPrice - listing.ListPrice) /
-            listing.ListPrice
-          ).toFixed(1),
-        )
-        : undefined,
+    oldPrice: Number(listing?.old_price),
     assessedDiff: listing.price
       ? Number(
         ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(

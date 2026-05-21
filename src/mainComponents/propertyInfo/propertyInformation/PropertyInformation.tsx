@@ -258,11 +258,6 @@ const PropertyInformation = ({ property }: { property: any }) => {
                     ))}
               </div>
             </div>
-            {/* <DynamicTable
-              title={"Nearby Schools (Dummy Data)"}
-              headers={nearbySchoolsHeaders}
-              rows={nearbySchoolsRows}
-            /> */}
           </div>
 
           {/* Building Complex Information */}

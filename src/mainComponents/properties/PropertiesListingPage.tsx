@@ -212,6 +212,7 @@ export default function PropertiesListingPage() {
             : listing?.media?.[0]?.MediaURL,
         title: listing?.property_sub_type,
         price: listing?.price,
+        oldPrice: Number(listing?.old_price),
         daysAgo:
           listing?.ModificationTimestamp ??
           listing?.raw_data?.BridgeModificationTimestamp ??
@@ -223,15 +224,6 @@ export default function PropertiesListingPage() {
         likesCount: listing?.likesCount ?? 0,
         lotSize: listing?.lot_size_area ?? "",
         structureType: listing?.structure_type ?? "",
-        priceDrop:
-          listing.PreviousListPrice > listing.ListPrice
-            ? Number(
-              (
-                (listing.PreviousListPrice - listing.ListPrice) /
-                listing.ListPrice
-              ).toFixed(1),
-            )
-            : undefined,
         assessedDiff: listing.price
           ? Number(
             (
@@ -579,7 +571,7 @@ export default function PropertiesListingPage() {
           (filters.whenListed && filters.whenListed !== "any") ||
           filters.location ||
           filters.features ||
-          filters.structureType) && (
+          filters.structureType || (filters.activeProperty && filters.activeProperty !== "any")) && (
             <div className="w-full flex flex-row justify-between items-center mb-4">
               <span className="font-medium text-sm">Selected Filters:</span>
               <div className="flex flex-row gap-2">

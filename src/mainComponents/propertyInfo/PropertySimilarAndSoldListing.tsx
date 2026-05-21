@@ -50,7 +50,7 @@ const PropertySimilarAndSoldListing = ({
   propertyId: string;
 }) => {
   const { isLoggedIn } = useAuthContext();
-    const { data: me } = useGetMe()
+  const { data: me } = useGetMe()
 
   // 🔹 Mapping Function
   const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
@@ -66,15 +66,7 @@ const PropertySimilarAndSoldListing = ({
     likesCount: listing?.likesCount ?? 0,
     lotSize: listing?.lot_size_area ?? "",
     structureType: listing?.structure_type ?? "",
-    priceDrop:
-      listing.PreviousListPrice > listing.ListPrice
-        ? Number(
-          (
-            (listing.PreviousListPrice - listing.ListPrice) /
-            listing.ListPrice
-          ).toFixed(1),
-        )
-        : undefined,
+    oldPrice: Number(listing?.old_price) ?? 0,
     assessedDiff: listing.price
       ? Number(
         ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(

@@ -382,18 +382,18 @@ export const getRoomRows = (property: any) => {
 
 export const getPropertyRoomRows = (property: any) => {
   const rooms = property?.rooms || [];
-
-  return rooms
+  console.log("Room", rooms);
+ return rooms
     .filter(
       (room: any) =>
-        room.RoomType && room.RoomLevel && room.RoomWidth && room.RoomLength,
+        room.RoomType && room.RoomLevel,
     )
     .map((room: any) => {
       return {
         data: {
           room: room.RoomType,
           level: room.RoomLevel,
-          dimensions: `${room.RoomWidth} × ${room.RoomLength}`,
+          dimensions: room.RoomDimensions,
         },
       };
     });

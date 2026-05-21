@@ -54,10 +54,10 @@ export default function GeoJsonLayer({
       const active = hasPropertyInside(feature);
 
       return {
-        fillColor: active ? "#eea500" : "#22558b",
+        fillColor: active ? "#22558b" : "#eea500",
         fillOpacity: active ? 0.18 : 0.08,
-        strokeColor: active ? "#eea500" : "#22558b",
-        strokeWeight: active ? 2 : 1,
+        strokeColor: active ? "#22558b" : "#eea500",
+        strokeWeight: active ? 3 : 2,
         clickable: false,
       };
     });

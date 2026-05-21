@@ -20,6 +20,7 @@ export type MapProperty = {
   baths: number;
   longitude: number;
   latitude: number;
+  oldPrice?:number;
   mls?: string;
   realtor?: string;
   isLogin?: boolean;

@@ -46,16 +46,7 @@ const NeighboringProperties = () => {
               beds: listing?.bedrooms ?? 0,
               baths: listing?.bathrooms ?? 0,
               likesCount: listing?.likesCount ?? 0,
-              priceDrop:
-                listing.PreviousListPrice &&
-                listing.PreviousListPrice > listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.PreviousListPrice - listing.ListPrice) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : undefined,
+              oldPrice: Number(listing?.old_price),
               assessedDiff: listing.ListPrice
                 ? Number(
                     (

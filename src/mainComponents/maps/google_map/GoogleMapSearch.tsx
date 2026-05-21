@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, OverlayView, useJsApiLoader } from "@react-google-maps/api";
 import Supercluster from "supercluster";
 import { useRouter } from "next/navigation";
 import {
@@ -53,6 +53,7 @@ import GetInTouch from "../../getInTouch/GetInTouch";
 import MapSidebar from "../MapSidebar";
 import MapActiveFilters from "../MapActiveFilters";
 import MapTopFilterBar from "../MapTopFilterBar";
+import { IoSchool } from "react-icons/io5";
 
 export default function GoogleMapSearch() {
   const { isLoaded } = useJsApiLoader({
@@ -75,8 +76,6 @@ export default function GoogleMapSearch() {
   const {
     location = "",
     status = "forSale",
-    activeProperty = "any",
-    propertyType,
     minPrice,
     maxPrice,
     minSqft,
@@ -107,14 +106,15 @@ export default function GoogleMapSearch() {
   const [fitBoundsDone, setFitBoundsDone] = useState(false);
   const [parcelGeoJSON, setParcelGeoJSON] = useState<any>(null);
   const [geocodedCache, setGeocodedCache] = useState<Record<string, any>>({});
+  const [schools, setSchools] = useState<any[]>([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
+  const [hoveredSchool, setHoveredSchool] = useState<any>(null);
 
   const superclusterRef = useRef<Supercluster | null>(null);
   const idleTimeout = useRef<any>(null);
   const lastFetchedBounds = useRef<string>("");
   const popupRef = useRef<HTMLDivElement | null>(null);
 
-  const setActiveProperty = (val: string) =>
-    updateInstanceFilter("map", "activeProperty", val);
   const setActiveBedRoom = (val: string) =>
     updateInstanceFilter("map", "activeBedRoom", val);
   const setActiveBathRoom = (val: string) =>
@@ -434,6 +434,124 @@ export default function GoogleMapSearch() {
     );
   };
 
+  const handleSchool = () => {
+    // REMOVE SCHOOLS IF ALREADY OPEN
+    if (schools.length > 0) {
+      setSchools([]);
+      setHoveredSchool(null);
+      return;
+    }
+
+    if (!map || !window.google) return;
+
+    const bounds = map.getBounds();
+
+    if (!bounds) return;
+
+    const center = map.getCenter();
+
+    if (!center) return;
+
+    setLoadingSchools(true);
+
+    const north = bounds.getNorthEast().lat();
+    const east = bounds.getNorthEast().lng();
+    const south = bounds.getSouthWest().lat();
+    const west = bounds.getSouthWest().lng();
+
+    const service = new google.maps.places.PlacesService(map);
+
+    service.nearbySearch(
+      {
+        location: center,
+        radius: 5000,
+        type: "school",
+      },
+      (results, status) => {
+        setLoadingSchools(false);
+
+        if (
+          status !== google.maps.places.PlacesServiceStatus.OK ||
+          !results
+        ) {
+          setSchools([]);
+          return;
+        }
+
+        const filteredSchools = results.filter((school: any) => {
+          const lat = school.geometry.location.lat();
+          const lng = school.geometry.location.lng();
+
+          return (
+            lat <= north &&
+            lat >= south &&
+            lng <= east &&
+            lng >= west
+          );
+        });
+
+        setSchools(filteredSchools);
+      }
+    );
+  };
+
+  useEffect(() => {
+  if (!map || schools.length === 0) return;
+
+  const listener = map.addListener("idle", () => {
+    const bounds = map.getBounds();
+
+    if (!bounds) return;
+
+    const north = bounds.getNorthEast().lat();
+    const east = bounds.getNorthEast().lng();
+    const south = bounds.getSouthWest().lat();
+    const west = bounds.getSouthWest().lng();
+
+    const center = map.getCenter();
+
+    if (!center) return;
+
+    const service = new google.maps.places.PlacesService(map);
+
+    service.nearbySearch(
+      {
+        location: center,
+        radius: 5000,
+        type: "school",
+      },
+      (results, status) => {
+        if (
+          status !== google.maps.places.PlacesServiceStatus.OK ||
+          !results
+        ) {
+          setSchools([]);
+          return;
+        }
+
+        // UPDATE SCHOOL LIST BASED ON CURRENT MAP BOUNDS
+        const filteredSchools = results.filter((school: any) => {
+          const lat = school.geometry.location.lat();
+          const lng = school.geometry.location.lng();
+
+          return (
+            lat <= north &&
+            lat >= south &&
+            lng <= east &&
+            lng >= west
+          );
+        });
+
+        setSchools(filteredSchools);
+      }
+    );
+  });
+
+  return () => {
+    google.maps.event.removeListener(listener);
+  };
+}, [map, schools.length]);
+
   useEffect(() => {
     if (!mapLoaded || !map || properties.length === 0 || fitBoundsDone) return;
     if (location) return;
@@ -550,8 +668,6 @@ export default function GoogleMapSearch() {
           setActiveBedRoom={setActiveBedRoom}
           activeBathRoom={activeBathRoom}
           setActiveBathRoom={setActiveBathRoom}
-          // activeProperty={activeProperty}
-          // setActiveProperty={setActiveProperty}
           location={location}
           setLocation={setLocation}
           pillBase={pillBase}
@@ -598,6 +714,59 @@ export default function GoogleMapSearch() {
                 />
               )}
 
+              {mapZoomVal && mapZoomVal >= 15 &&schools.map((school: any) => (
+                <OverlayView
+                  key={school.place_id}
+                  position={{
+                    lat: school.geometry.location.lat(),
+                    lng: school.geometry.location.lng(),
+                  }}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div
+                    onMouseEnter={() => setHoveredSchool(school)}
+                    onMouseLeave={() => setHoveredSchool(null)}
+                    className="relative"
+                  >
+                    {/* SCHOOL ICON */}
+                    <div className="w-10 h-10 rounded-full bg-blue-600 border-2 border-white shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-all">
+                      <IoSchool className="text-white text-xl" />
+                    </div>
+
+                    {/* HOVER CARD */}
+                    {hoveredSchool?.place_id === school.place_id && (
+                      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-60 bg-white rounded-2xl shadow-2xl p-3 z-50">
+                        <h3 className="text-sm font-semibold">
+                          {school.name}
+                        </h3>
+
+                        <p className="text-xs text-gray-500 mt-1">
+                          {school.vicinity}
+                        </p>
+
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs">
+                            ⭐ {school.rating || "N/A"}
+                          </span>
+
+                          <span className="text-xs text-gray-500">
+                            ({school.user_ratings_total || 0})
+                          </span>
+                        </div>
+
+                        <a
+                          href={`https://www.google.com/maps/place/?q=place_id:${school.place_id}`}
+                          target="_blank"
+                          className="text-blue-600 text-xs underline mt-2 inline-block"
+                        >
+                          Open in Google Maps
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </OverlayView>
+              ))}
+
               <MapMarkerLayer
                 clusters={clusters}
                 map={map}
@@ -636,6 +805,7 @@ export default function GoogleMapSearch() {
               isSatellite={isSatellite}
               toggleMapStyle={toggleMapStyle}
               handleGeolocation={handleGeolocation}
+              handleSchool={handleSchool}
             />
           </div>
         </div>

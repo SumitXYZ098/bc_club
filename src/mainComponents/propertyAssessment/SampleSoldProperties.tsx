@@ -46,21 +46,12 @@ const SampleSoldProperties = () => {
               beds: listing?.bedrooms ?? 0,
               baths: listing?.bathrooms ?? 0,
               likesCount: listing?.likesCount ?? 0,
-              priceDrop:
-                listing.PreviousListPrice &&
-                listing.PreviousListPrice > listing.ListPrice
-                  ? Number(
-                      (
-                        (listing.PreviousListPrice - listing.ListPrice) /
-                        listing.ListPrice
-                      ).toFixed(1),
-                    )
-                  : undefined,
-              assessedDiff: listing.ListPrice
+              oldPrice: Number(listing?.old_price) ?? 0,
+              assessedDiff: listing.price
                 ? Number(
                     (
-                      (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-                      listing.ListPrice
+                      (listing.price - (listing.annual_tax ?? 0)) /
+                      listing.price
                     ).toFixed(1),
                   )
                 : 0,

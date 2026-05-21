@@ -17,6 +17,8 @@ import {
 } from "@/src/hooks/listing/useListingQueries";
 import dayjs from "dayjs";
 import { getTime } from "@/src/utilities/utilities";
+import { IoArrowUpOutline, IoArrowDownOutline } from "react-icons/io5";
+
 
 export interface PropertyCardProps {
   id: string;
@@ -41,6 +43,7 @@ export interface PropertyCardProps {
   status?: string;
   likesCount?: number;
   structureType?: string;
+  oldPrice?: number;
 }
 
 const PropertiesCard: React.FC<PropertyCardProps> = ({
@@ -65,6 +68,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   isDdf,
   likesCount,
   structureType,
+  oldPrice,
+
 }) => {
   const { data: me } = useGetMe();
   const normalToggle = useToggleWishlist();
@@ -175,7 +180,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
       >
         <div className="flex flex-col w-full h-full justify-between">
           <div className="relative flex items-center">
-            <div className="w-full h-[268px] overflow-clip rounded-t-2xl">
+            <div className="w-full h-67 overflow-clip rounded-t-2xl">
               {img ? (
                 <Image
                   src={img}
@@ -222,14 +227,22 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             )}
 
             {/* Price Drop Banner */}
-            {priceDrop !== undefined && priceDrop > 0 && (
+            {oldPrice && (
               <span
-                className="absolute bottom-3 right-0 bg-secondary text-background pl-7 pr-3 pt-2 pb-2 text-xs h-auto font-medium"
-                style={{
-                  clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
-                }}
+                className={`absolute bottom-5 right-0 p-1.5 text-xs inline-flex text-background h-auto items-center gap-0.5 uppercase  rounded-l-sm ${price < oldPrice
+                  ? "bg-red/90"
+                  : "bg-green/90"
+                  }`}
+
               >
-                Price Drop {priceDrop}%
+                {price < oldPrice
+                  ? <IoArrowDownOutline className="w-4 h-4 text-background" />
+                  : <IoArrowUpOutline className="w-4 h-4 text-background" />
+                }
+                {price < oldPrice
+                  ? "Price Drop"
+                  : "Price Increase "
+                }
               </span>
             )}
 
@@ -258,17 +271,14 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
           <div className="space-y-2.5 mt-2.5 px-5 pb-5">
             <div className={`flex justify-between items-center`}>
-              {/* <div className="flex flex-col"> */}
-              {/* <span className="text-xs text-lightWhite">List Price Now</span> */}
               <p className="text-[32px] leading-10 font-bold text-primary">
                 {displayPrice}
               </p>
-              {/* </div> */}
               {/* Assessed Diff */}
               <p
                 className={`text-[10px] leading-4 inline-flex items-center gap-1 p-1 rounded-md ${assessedDiff < 0
-                    ? "text-green bg-lightGreen"
-                    : "text-red bg-lightRed"
+                  ? "text-green bg-lightGreen"
+                  : "text-red bg-lightRed"
                   }`}
               >
                 <svg
@@ -311,6 +321,13 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 {Math.abs(assessedDiff)}% than Assessed Value {dayjs().year()}
               </p>
             </div>
+            {oldPrice && (
+              <div className="flex justify-between items-center">
+                <p className="text-base text-lightWhite line-through">
+                  ${Number(oldPrice).toLocaleString()}
+                </p>
+              </div>
+            )}
 
             <div className="flex justify-between items-center">
               <h3 className="font-bold text-foreground text-sm">

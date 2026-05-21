@@ -45,8 +45,8 @@ const AssessmentHistory = () => {
         <h2 className="text-lg font-semibold">BC Assessment History (Dummy Data)</h2>
       </div>
 
-      <div className="h-70">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full min-h-[290px]">
+        <ResponsiveContainer width="100%"  aspect={3}>
           <AreaChart data={data}>
             <defs>
               <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
