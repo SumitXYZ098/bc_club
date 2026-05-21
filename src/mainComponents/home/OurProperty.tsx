@@ -83,7 +83,7 @@ const OurProperty = () => {
   // 🔹 Mapping Function
   const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
     id: listing.documentId,
-    image: listing?.media_url ?? listing?.media[0]?.MediaURL,
+    image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo: listing?.ModificationTimestamp ?? 0,
@@ -151,6 +151,7 @@ const OurProperty = () => {
     {
       propertyType: "sold",
       location: city,
+      page: 1, pageSize: 30
     },
     {
       select: (res: any) => {
@@ -182,6 +183,7 @@ const OurProperty = () => {
       {
         propertyType: "expired",
         location: city,
+        page: 1, pageSize: 30
       },
       {
         select: (res: any) => {
