@@ -22,11 +22,11 @@ export const Endpoints = {
   getNearbyPlaces: (id: string) =>
     `${BASE_URL}/api/ddf-listings/${id}/neighbourhood?radius=16000&limit=4`,
   getSimilarProperties: (id: string) =>
-    `${BASE_URL}/api/ddf-listings/${id}/similar?radiusKm=5&limit=12`,
+    `${BASE_URL}/api/ddf-listings/${id}/similar?radiusKm=5&limit=20`,
   getSimilarSoldProperties: (id: string) =>
-    `${BASE_URL}/api/properties/${id}/similar-sold?radiusKm=5&limit=12`,
+    `${BASE_URL}/api/properties/${id}/similar-sold?radiusKm=5&limit=20`,
   getSimilarAssignmentProperties: (id: string) =>
-    `${BASE_URL}/api/property-assignment-lists/${id}/similar?radius=10&limit=12`,
+    `${BASE_URL}/api/property-assignment-lists/${id}/similar?radius=10&limit=20`,
   getSimilarAssignmentSoldProperties: (id: string) =>
-    `${BASE_URL}/api/property-assignment-lists/${id}/similar-sold?radiusKm=10&limit=12`,
+    `${BASE_URL}/api/property-assignment-lists/${id}/similar-sold?radiusKm=10&limit=20`,
 };
