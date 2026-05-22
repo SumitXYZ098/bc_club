@@ -57,6 +57,7 @@ export default function PropertiesListingPage() {
   const activePrice = filters.activePrice || "newest";
   const activeBathRoom = filters.activeBathRoom || "any";
   const activeBedRoom = filters.activeBedRoom || "any";
+  const activePriceChange = filters.activePriceChange || "any";
   const activeProperty = filters.activeProperty || "any";
   const page = filters.page || 1;
   const pageSize = 30;
@@ -87,6 +88,8 @@ export default function PropertiesListingPage() {
     updateInstanceFilter("list", "activeBathRoom", val);
   const setActiveBedRoom = (val: string) =>
     updateInstanceFilter("list", "activeBedRoom", val);
+  const setActivePriceChange = (val: string) =>
+    updateInstanceFilter("list", "activePriceChange", val);
   const setActiveProperty = (val: string) =>
     updateInstanceFilter("list", "activeProperty", val);
   const setPage = (val: number | ((prev: number) => number)) => {
@@ -145,6 +148,10 @@ export default function PropertiesListingPage() {
   // bathroom filter
   if (activeBathRoom && activeBathRoom !== "any") {
     params.baths = activeBathRoom;
+  }
+
+  if (activePriceChange && activePriceChange !== "any") {
+    params.priceChange = activePriceChange;
   }
 
   // property type filter
@@ -241,7 +248,7 @@ export default function PropertiesListingPage() {
           listing?.raw_data?.MlsNumber ??
           "N/A",
         realtor: listing?.office_name ?? getOfficeName(listing),
-        isFavourite: listing?.users_permissions_users?.some(
+        isFavourite: listing?.users?.some(
           (user: any) => user?.documentId === me?.documentId,
         ),
         isDdf: isForSale,
@@ -473,6 +480,21 @@ export default function PropertiesListingPage() {
                 { label: "2", value: "2" },
                 { label: "3", value: "3" },
                 { label: "4+", value: "4" },
+              ]}
+            />
+
+            <FilterPillSelect
+              label="Price"
+              value={activePriceChange}
+              onChange={setActivePriceChange}
+              pillBase={pillBase}
+              pillActive={pillActive}
+              pillInactive={pillInactive}
+              options={[
+                { label: "Any", value: "any" },
+                { label: "All", value: "all" },
+                { label: "Price Drop", value: "drop" },
+                { label: "Price Increase", value: "increase" },
               ]}
             />
 
@@ -730,7 +752,7 @@ export default function PropertiesListingPage() {
             <div className="w-full flex flex-col h-full">
               <div
                 ref={scrollRef}
-                className="gap-7 grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 2xl:grid-cols-4 items-stretch justify-between overflow-y-scroll xl:h-[80svh] no-scrollbar w-full xl:p-3"
+                className="gap-7 grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 2xl:grid-cols-4 items-stretch justify-between overflow-y-scroll xl:min-h-[50svh] xl:max-h-[80svh] no-scrollbar w-full xl:p-3"
               >
                 {data.map((property: any) => (
                   <PropertiesCard
