@@ -77,7 +77,7 @@ export const transformNormalListing = (listing: any, me: any) => {
     baths: listing?.bathrooms ?? 0,
     longitude,
     latitude,
-    oldPrice: Number(listing?.old_price),
+    oldPrice: Number(listing?.old_price) || 0,
     mls: listing?.mls_number,
     realtor: getOfficeName(listing),
     isLogin: false,

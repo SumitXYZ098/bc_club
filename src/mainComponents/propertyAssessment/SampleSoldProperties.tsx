@@ -46,7 +46,7 @@ const SampleSoldProperties = () => {
               beds: listing?.bedrooms ?? 0,
               baths: listing?.bathrooms ?? 0,
               likesCount: listing?.likesCount ?? 0,
-              oldPrice: Number(listing?.old_price) ?? 0,
+              oldPrice: Number(listing?.old_price) || 0,
               assessedDiff: listing.price
                 ? Number(
                     (

@@ -10,7 +10,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import NavBarDrawer from "./NavBarDrawer";
-import CustomButton from "@/src/components/button/CustomButton";
 
 import { useAuthContext } from "../auth/AuthContext";
 import { usePathname } from "next/navigation";
@@ -96,7 +95,7 @@ const Header = () => {
         }`}
       >
         {/* Logo */}
-        <Link href={"/"} className="xl:hidden block">
+        <Link href={"/"} onClick={() => !isLaptop && setShowMenu(false)} className="xl:hidden block">
           <Image
             alt="logo"
             src={Icons.bcClub}

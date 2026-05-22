@@ -94,7 +94,7 @@ const OurProperty = () => {
     likesCount: listing?.likesCount ?? 0,
     lotSize: listing?.lot_size_area ?? "",
     structureType: listing?.structure_type ?? "",
-    oldPrice: Number(listing?.old_price) ?? 0,
+    oldPrice: Number(listing?.old_price) || 0,
     assessedDiff: listing.price
       ? Number(
         ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(

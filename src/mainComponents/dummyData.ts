@@ -264,6 +264,32 @@ export const getPropertyDetailsRows = (property: any) => [
   },
   {
     data: {
+      label: "Modified Date",
+      value: property?.ModificationTimestamp
+        ? dayjs(property.ModificationTimestamp)
+          .tz("America/Vancouver")
+          .format("DD MMM, YYYY")
+        : "-",
+    },
+    subRows: [
+      {
+        data: {
+          label: "Days On Market",
+          value: property?.ModificationTimestamp
+            ? `${getTime(property.ModificationTimestamp)}`
+            : "-",
+        },
+      },
+      {
+        data: {
+          label: "Status",
+          value: property?.standard_status || "-",
+        },
+      },
+    ],
+  },
+  {
+    data: {
       label: "Floor Area",
       value:
         property?.Living_area || property?.area

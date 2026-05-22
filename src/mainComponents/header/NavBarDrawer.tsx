@@ -22,16 +22,17 @@ const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
       anchor="right"
       PaperProps={{
         width: "100%",
-        backgroundColor: "transparent",
       }}
       sx={{
         zIndex: 99,
-        backgroundColor: "transparent",
         "@media(max-width: 1210px)": {
           display: "block",
         },
         "& .MuiDrawer-paper": {
-          width: " 100%",
+          width: {
+            sm: "70%",
+            xs: "100%",
+          },
         },
       }}
     >

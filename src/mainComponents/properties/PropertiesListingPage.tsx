@@ -219,7 +219,7 @@ export default function PropertiesListingPage() {
             : listing?.media?.[0]?.MediaURL,
         title: listing?.property_sub_type,
         price: listing?.price,
-        oldPrice: Number(listing?.old_price),
+        oldPrice: Number(listing?.old_price) || 0,
         daysAgo:
           listing?.ModificationTimestamp ??
           listing?.raw_data?.BridgeModificationTimestamp ??

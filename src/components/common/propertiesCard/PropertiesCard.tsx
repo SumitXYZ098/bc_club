@@ -57,7 +57,6 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   beds,
   baths,
   lotSize,
-  priceDrop,
   assessedDiff,
   mls,
   realtor,
@@ -68,7 +67,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   isDdf,
   likesCount,
   structureType,
-  oldPrice,
+  oldPrice = 0,
 
 }) => {
   const { data: me } = useGetMe();
@@ -146,14 +145,14 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
       ? structureType
       : title
     : "Property Details Restricted";
-  const displaySqft = isLogin ? `${sqft} sqft` : "---- sqft";
+  const displaySqft = isLogin ? `${sqft} sft` : "---- sft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
   const displayLotSize = isLogin
     ? lotSize
-      ? `${lotSize} sqft`
-      : "--- sqft"
-    : "---- sqft";
+      ? `${lotSize} sft`
+      : "--- sft"
+    : "---- sft";
   const displayMls = isLogin ? `MLS® ${mls}` : "MLS® *******";
   const displayRealtor = isLogin
     ? `Courtesy of: ${realtor}`
@@ -321,7 +320,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 {Math.abs(assessedDiff)}% than Assessed Value {dayjs().year()}
               </p>
             </div>
-            {oldPrice !== 0 && (
+            { oldPrice !== 0 && (
               <div className="flex justify-between items-center">
                 <p className="text-base text-lightWhite line-through">
                   ${Number(oldPrice).toLocaleString()}
