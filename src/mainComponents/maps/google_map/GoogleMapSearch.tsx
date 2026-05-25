@@ -7,7 +7,12 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { GoogleMap, OverlayView, useJsApiLoader } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  OverlayView,
+  Polyline,
+  useJsApiLoader,
+} from "@react-google-maps/api";
 import Supercluster from "supercluster";
 import { useRouter } from "next/navigation";
 import {
@@ -109,6 +114,21 @@ export default function GoogleMapSearch() {
   const [schools, setSchools] = useState<any[]>([]);
   const [loadingSchools, setLoadingSchools] = useState(false);
   const [hoveredSchool, setHoveredSchool] = useState<any>(null);
+  const [measureMode, setMeasureMode] = useState(false);
+  const [measurePoints, setMeasurePoints] = useState<
+    google.maps.LatLngLiteral[]
+  >([]);
+  const [distance, setDistance] = useState<{
+    segment: number;
+    total: number;
+  } | null>(null);
+  const [movingPoint, setMovingPoint] =
+    useState<google.maps.LatLngLiteral | null>(null);
+
+  const [userLocation, setUserLocation] =
+    useState<google.maps.LatLngLiteral | null>(null);
+
+  const [locationChecked, setLocationChecked] = useState(false);
 
   const superclusterRef = useRef<Supercluster | null>(null);
   const idleTimeout = useRef<any>(null);
@@ -289,6 +309,26 @@ export default function GoogleMapSearch() {
     setMap(mapInstance);
     setMapLoaded(true);
 
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const center = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+
+        setUserLocation(center);
+        setLocationChecked(true);
+
+        mapInstance.panTo(center);
+        mapInstance.setZoom(14);
+      },
+      () => {
+        setLocationChecked(true);
+        mapInstance.panTo(defaultCenter);
+        mapInstance.setZoom(14);
+      },
+    );
+
     setTimeout(() => {
       const bounds = mapInstance.getBounds();
       if (!bounds) return;
@@ -308,7 +348,7 @@ export default function GoogleMapSearch() {
       setMapBounds(newBounds);
       setMapZoomVal(Math.round(zoom));
       lastFetchedBounds.current = JSON.stringify(newBounds);
-    }, 300);
+    }, 700);
   }, []);
 
   const fetchParcels = async (bounds: MapBounds) => {
@@ -390,12 +430,109 @@ export default function GoogleMapSearch() {
     [clusterPosition?.lat, clusterPosition?.lng],
   );
 
+  // Measurement Tools
+  const formatMeter = (meter: number) => {
+    const feet = meter * 3.28084;
+
+    if (meter >= 1000) {
+      return `${(meter / 1000).toFixed(1)} km • ${(feet / 5280).toFixed(1)} mi`;
+    }
+
+    return `${meter.toFixed(1)} m • ${feet.toFixed(1)} ft`;
+  };
+
+  const getDistanceBetweenPoints = (
+    start: google.maps.LatLngLiteral,
+    end: google.maps.LatLngLiteral,
+  ) => {
+    return google.maps.geometry.spherical.computeDistanceBetween(
+      new google.maps.LatLng(start),
+      new google.maps.LatLng(end),
+    );
+  };
+
+  const getMiddlePoint = (
+    start: google.maps.LatLngLiteral,
+    end: google.maps.LatLngLiteral,
+  ) => ({
+    lat: (start.lat + end.lat) / 2,
+    lng: (start.lng + end.lng) / 2,
+  });
+
+  const clearMeasurement = () => {
+    setMeasureMode(false);
+    setMeasurePoints([]);
+    setDistance(null);
+  };
+
+  const handleMeasureMove = (e: google.maps.MapMouseEvent) => {
+    if (!measureMode || measurePoints.length === 0 || !e.latLng) return;
+
+    setMovingPoint({
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+    });
+  };
+
+  const handleMeasureClick = (e: google.maps.MapMouseEvent) => {
+    if (!measureMode || !e.latLng) return;
+    setMovingPoint(null);
+    const point = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+    };
+
+    setMeasurePoints((prev) => {
+      const updated = [...prev, point];
+
+      if (updated.length >= 2) {
+        let total = 0;
+
+        for (let i = 1; i < updated.length; i++) {
+          total += google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(updated[i - 1]),
+            new google.maps.LatLng(updated[i]),
+          );
+        }
+
+        const segment = google.maps.geometry.spherical.computeDistanceBetween(
+          new google.maps.LatLng(updated[updated.length - 2]),
+          new google.maps.LatLng(updated[updated.length - 1]),
+        );
+
+        setDistance({ segment, total });
+      }
+
+      return updated;
+    });
+  };
+
+  const handleMeasure = () => {
+    setMeasureMode((prev) => !prev);
+
+    if (measureMode) {
+      setMeasurePoints([]);
+      setDistance(null);
+    }
+
+    setSelectedProperty(null);
+    setSelectedClusterProperties([]);
+    setClusterPosition(null);
+  };
+
   useEffect(() => {
-    if (!mapLoaded || !map) return;
+    if (!mapLoaded || !map || !locationChecked) return;
 
     if (!location) {
-      map.panTo(defaultCenter);
-      map.setZoom(14);
+      if (userLocation) {
+        map.panTo(userLocation);
+        map.setZoom(14);
+      } else {
+        map.panTo(defaultCenter);
+        map.setZoom(14);
+      }
+
+      setTimeout(() => triggerSearch(), 300);
       return;
     }
 
@@ -410,25 +547,23 @@ export default function GoogleMapSearch() {
       }, 300);
       return;
     }
-
-    if (properties.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
-      properties.slice(0, 5).forEach((p: any) => {
-        if (hasValidCoordinates(p))
-          bounds.extend({ lat: p.latitude, lng: p.longitude });
-      });
-      fitBoundsWithZoom(map, bounds, 14);
-    }
-  }, [location, mapLoaded, map]);
+  }, [location, mapLoaded, map, locationChecked, userLocation]);
 
   const handleGeolocation = () => {
     if (!map) return;
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude, longitude } = pos.coords;
-        map.panTo({ lat: latitude, lng: longitude });
-        map.setZoom(17);
+        const center = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+
+        setUserLocation(center);
+        map.panTo(center);
+        map.setZoom(14);
+
+        setTimeout(() => triggerSearch(), 300);
       },
       () => alert("Please enable location services to use this feature."),
     );
@@ -470,10 +605,7 @@ export default function GoogleMapSearch() {
       (results, status) => {
         setLoadingSchools(false);
 
-        if (
-          status !== google.maps.places.PlacesServiceStatus.OK ||
-          !results
-        ) {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
           setSchools([]);
           return;
         }
@@ -482,75 +614,65 @@ export default function GoogleMapSearch() {
           const lat = school.geometry.location.lat();
           const lng = school.geometry.location.lng();
 
-          return (
-            lat <= north &&
-            lat >= south &&
-            lng <= east &&
-            lng >= west
-          );
+          return lat <= north && lat >= south && lng <= east && lng >= west;
         });
 
         setSchools(filteredSchools);
-      }
+      },
     );
   };
 
   useEffect(() => {
-  if (!map || schools.length === 0) return;
+    if (!map || schools.length === 0) return;
 
-  const listener = map.addListener("idle", () => {
-    const bounds = map.getBounds();
+    const listener = map.addListener("idle", () => {
+      const bounds = map.getBounds();
 
-    if (!bounds) return;
+      if (!bounds) return;
 
-    const north = bounds.getNorthEast().lat();
-    const east = bounds.getNorthEast().lng();
-    const south = bounds.getSouthWest().lat();
-    const west = bounds.getSouthWest().lng();
+      const north = bounds.getNorthEast().lat();
+      const east = bounds.getNorthEast().lng();
+      const south = bounds.getSouthWest().lat();
+      const west = bounds.getSouthWest().lng();
 
-    const center = map.getCenter();
+      const center = map.getCenter();
 
-    if (!center) return;
+      if (!center) return;
 
-    const service = new google.maps.places.PlacesService(map);
+      const service = new google.maps.places.PlacesService(map);
 
-    service.nearbySearch(
-      {
-        location: center,
-        radius: 5000,
-        type: "school",
-      },
-      (results, status) => {
-        if (
-          status !== google.maps.places.PlacesServiceStatus.OK ||
-          !results
-        ) {
-          setSchools([]);
-          return;
-        }
+      service.nearbySearch(
+        {
+          location: center,
+          radius: 5000,
+          type: "school",
+        },
+        (results, status) => {
+          if (
+            status !== google.maps.places.PlacesServiceStatus.OK ||
+            !results
+          ) {
+            setSchools([]);
+            return;
+          }
 
-        // UPDATE SCHOOL LIST BASED ON CURRENT MAP BOUNDS
-        const filteredSchools = results.filter((school: any) => {
-          const lat = school.geometry.location.lat();
-          const lng = school.geometry.location.lng();
+          // UPDATE SCHOOL LIST BASED ON CURRENT MAP BOUNDS
+          const filteredSchools = results.filter((school: any) => {
+            const lat = school.geometry.location.lat();
+            const lng = school.geometry.location.lng();
 
-          return (
-            lat <= north &&
-            lat >= south &&
-            lng <= east &&
-            lng >= west
-          );
-        });
+            return lat <= north && lat >= south && lng <= east && lng >= west;
+          });
 
-        setSchools(filteredSchools);
-      }
-    );
-  });
+          setSchools(filteredSchools);
+        },
+      );
+    });
 
-  return () => {
-    google.maps.event.removeListener(listener);
-  };
-}, [map, schools.length]);
+    return () => {
+      google.maps.event.removeListener(listener);
+    };
+  }, [map, schools.length]);
 
   useEffect(() => {
     if (!mapLoaded || !map || properties.length === 0 || fitBoundsDone) return;
@@ -701,10 +823,12 @@ export default function GoogleMapSearch() {
               onDragStart={() => setSelectedProperty(null)}
               onZoomChanged={() => setSelectedProperty(null)}
               options={mapOptions}
-              onClick={() => {
+              onClick={(e: any) => {
+                handleMeasureClick(e);
                 setSelectedClusterProperties([]);
                 setClusterPosition(null);
               }}
+              onMouseMove={handleMeasureMove}
             >
               {parcelGeoJSON && mapZoomVal && mapZoomVal >= 17 && (
                 <GeoJsonLayer
@@ -714,56 +838,160 @@ export default function GoogleMapSearch() {
                 />
               )}
 
-              {mapZoomVal && mapZoomVal >= 15 &&schools.map((school: any) => (
-                <OverlayView
-                  key={school.place_id}
-                  position={{
-                    lat: school.geometry.location.lat(),
-                    lng: school.geometry.location.lng(),
+              {mapZoomVal &&
+                mapZoomVal >= 15 &&
+                schools.map((school: any) => (
+                  <OverlayView
+                    key={school.place_id}
+                    position={{
+                      lat: school.geometry.location.lat(),
+                      lng: school.geometry.location.lng(),
+                    }}
+                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                  >
+                    <div
+                      onMouseEnter={() => setHoveredSchool(school)}
+                      onMouseLeave={() => setHoveredSchool(null)}
+                      className="relative"
+                    >
+                      {/* SCHOOL ICON */}
+                      <div className="w-10 h-10 rounded-full bg-blue-600 border-2 border-white shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-all">
+                        <IoSchool className="text-white text-xl" />
+                      </div>
+
+                      {/* HOVER CARD */}
+                      {hoveredSchool?.place_id === school.place_id && (
+                        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-60 bg-white rounded-2xl shadow-2xl p-3 z-50">
+                          <h3 className="text-sm font-semibold">
+                            {school.name}
+                          </h3>
+
+                          <p className="text-xs text-gray-500 mt-1">
+                            {school.vicinity}
+                          </p>
+
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs">
+                              ⭐ {school.rating || "N/A"}
+                            </span>
+
+                            <span className="text-xs text-gray-500">
+                              ({school.user_ratings_total || 0})
+                            </span>
+                          </div>
+
+                          <a
+                            href={`https://www.google.com/maps/place/?q=place_id:${school.place_id}`}
+                            target="_blank"
+                            className="text-blue-600 text-xs underline mt-2 inline-block"
+                          >
+                            Open in Google Maps
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </OverlayView>
+                ))}
+
+              {measureMode && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-[330px] bg-yellow-300 border border-black text-center text-xs shadow-md">
+                  <div className="bg-yellow-400 border-b border-black font-bold text-[10px]">
+                    MEASUREMENT TOOL
+                  </div>
+
+                  <div className="px-2 py-1 font-medium">
+                    {measurePoints.length === 0
+                      ? "Tap after moving to the starting point."
+                      : "Tap after moving to the next point or Double-Tap to set the last point."}
+                  </div>
+
+                  <button
+                    onClick={clearMeasurement}
+                    className="mb-1 px-3 py-0.5 bg-white border border-black rounded text-xs"
+                  >
+                    Cancel
+                  </button>
+
+                  {distance && (
+                    <div className="pb-1 leading-4">
+                      <div>
+                        Segment distance: {formatMeter(distance.segment)}
+                      </div>
+                      <div>Total distance: {formatMeter(distance.total)}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {measureMode && measurePoints.length > 0 && movingPoint && (
+                <Polyline
+                  path={[measurePoints[measurePoints.length - 1], movingPoint]}
+                  options={{
+                    strokeColor: "#22558b",
+                    strokeOpacity: 1,
+                    strokeWeight: 3,
+                    clickable: false,
                   }}
+                />
+              )}
+
+              {measurePoints.length >= 2 && (
+                <Polyline
+                  path={measurePoints}
+                  options={{
+                    strokeColor: "#22558b",
+                    strokeOpacity: 1,
+                    strokeWeight: 3,
+                    clickable: false,
+                  }}
+                />
+              )}
+
+              {measurePoints.length >= 2 &&
+                measurePoints.slice(1).map((point, index) => {
+                  const start = measurePoints[index];
+                  const end = point;
+                  const segmentDistance = getDistanceBetweenPoints(start, end);
+
+                  return (
+                    <OverlayView
+                      key={`segment-distance-${index}`}
+                      position={getMiddlePoint(start, end)}
+                      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                    >
+                      <div className="bg-white border border-gray-500 rounded px-2 py-1 text-xs font-semibold shadow w-fit text-nowrap">
+                        {formatMeter(segmentDistance)}
+                      </div>
+                    </OverlayView>
+                  );
+                })}
+
+              {measureMode && measurePoints.length > 0 && movingPoint && (
+                <OverlayView
+                  position={getMiddlePoint(
+                    measurePoints[measurePoints.length - 1],
+                    movingPoint,
+                  )}
                   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
-                  <div
-                    onMouseEnter={() => setHoveredSchool(school)}
-                    onMouseLeave={() => setHoveredSchool(null)}
-                    className="relative"
-                  >
-                    {/* SCHOOL ICON */}
-                    <div className="w-10 h-10 rounded-full bg-blue-600 border-2 border-white shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-all">
-                      <IoSchool className="text-white text-xl" />
-                    </div>
-
-                    {/* HOVER CARD */}
-                    {hoveredSchool?.place_id === school.place_id && (
-                      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-60 bg-white rounded-2xl shadow-2xl p-3 z-50">
-                        <h3 className="text-sm font-semibold">
-                          {school.name}
-                        </h3>
-
-                        <p className="text-xs text-gray-500 mt-1">
-                          {school.vicinity}
-                        </p>
-
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs">
-                            ⭐ {school.rating || "N/A"}
-                          </span>
-
-                          <span className="text-xs text-gray-500">
-                            ({school.user_ratings_total || 0})
-                          </span>
-                        </div>
-
-                        <a
-                          href={`https://www.google.com/maps/place/?q=place_id:${school.place_id}`}
-                          target="_blank"
-                          className="text-blue-600 text-xs underline mt-2 inline-block"
-                        >
-                          Open in Google Maps
-                        </a>
-                      </div>
+                  <div className="bg-white border border-gray-500 rounded px-2 py-1 text-xs font-semibold shadow w-fit text-nowrap">
+                    {formatMeter(
+                      getDistanceBetweenPoints(
+                        measurePoints[measurePoints.length - 1],
+                        movingPoint,
+                      ),
                     )}
                   </div>
+                </OverlayView>
+              )}
+
+              {measurePoints.map((point, index) => (
+                <OverlayView
+                  key={`measure-point-${index}`}
+                  position={point}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div className="w-3 h-3 bg-white border-2 border-primary rounded-full shadow-md -translate-x-1/2 -translate-y-1/2" />
                 </OverlayView>
               ))}
 
@@ -803,9 +1031,11 @@ export default function GoogleMapSearch() {
             <MapControls
               map={map}
               isSatellite={isSatellite}
+              measureMode={measureMode}
               toggleMapStyle={toggleMapStyle}
               handleGeolocation={handleGeolocation}
               handleSchool={handleSchool}
+              handleMeasure={handleMeasure}
             />
           </div>
         </div>

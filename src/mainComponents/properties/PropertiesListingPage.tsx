@@ -233,11 +233,11 @@ export default function PropertiesListingPage() {
         structureType: listing?.structure_type ?? "",
         assessedDiff: listing.price
           ? Number(
-            (
-              (listing.price - (listing.annual_tax ?? 0)) /
-              listing.price
-            ).toFixed(1),
-          )
+              (
+                (listing.price - (listing.annual_tax ?? 0)) /
+                listing.price
+              ).toFixed(1),
+            )
           : 0,
         mls:
           listing?.mls_number ??
@@ -399,29 +399,30 @@ export default function PropertiesListingPage() {
                   behavior: "smooth",
                 });
               }}
-              className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${activePrice !== "any" ||
-                  activeBedRoom !== "any" ||
-                  activeBathRoom !== "any" ||
-                  activeProperty !== "any" ||
-                  filters.status ||
-                  (filters.minPrice !== undefined && filters.minPrice > 1000) ||
-                  (filters.maxPrice !== undefined &&
-                    filters.maxPrice < 20000000) ||
-                  (filters.minSqft !== undefined && filters.minSqft > 100) ||
-                  (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
-                  (filters.minLotSizeArea !== undefined &&
-                    filters.minLotSizeArea > 100) ||
-                  (filters.maxLotSizeArea !== undefined &&
-                    filters.maxLotSizeArea < 100000) ||
-                  (filters.minTax !== undefined && filters.minTax > 0) ||
-                  (filters.maxTax !== undefined && filters.maxTax < 50000) ||
-                  (filters.whenListed && filters.whenListed !== "any") ||
-                  filters.location ||
-                  filters.features ||
-                  filters.structureType
+              className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] lg:hidden flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-full justify-center text-nowrap ${
+                activePrice !== "any" ||
+                activeBedRoom !== "any" ||
+                activeBathRoom !== "any" ||
+                activeProperty !== "any" ||
+                filters.status ||
+                (filters.minPrice !== undefined && filters.minPrice > 1000) ||
+                (filters.maxPrice !== undefined &&
+                  filters.maxPrice < 20000000) ||
+                (filters.minSqft !== undefined && filters.minSqft > 100) ||
+                (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+                (filters.minLotSizeArea !== undefined &&
+                  filters.minLotSizeArea > 100) ||
+                (filters.maxLotSizeArea !== undefined &&
+                  filters.maxLotSizeArea < 100000) ||
+                (filters.minTax !== undefined && filters.minTax > 0) ||
+                (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+                (filters.whenListed && filters.whenListed !== "any") ||
+                filters.location ||
+                filters.features ||
+                filters.structureType
                   ? "bg-primary text-white"
                   : "bg-white"
-                }`}
+              }`}
             >
               <FiX size={16} />
               <span className="font-medium">Reset Filters</span>
@@ -492,9 +493,9 @@ export default function PropertiesListingPage() {
               pillInactive={pillInactive}
               options={[
                 { label: "Any", value: "any" },
-                { label: "All", value: "all" },
-                { label: "Price Drop", value: "drop" },
-                { label: "Price Increase", value: "increase" },
+                // { label: "All", value: "all" },
+                { label: "Drop", value: "drop" },
+                { label: "Increase", value: "increase" },
               ]}
             />
 
@@ -551,28 +552,29 @@ export default function PropertiesListingPage() {
                 behavior: "smooth",
               });
             }}
-            className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${activePrice !== "any" ||
-                activeBedRoom !== "any" ||
-                activeBathRoom !== "any" ||
-                activeProperty !== "any" ||
-                filters.status ||
-                (filters.minPrice !== undefined && filters.minPrice > 1000) ||
-                (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
-                (filters.minSqft !== undefined && filters.minSqft > 100) ||
-                (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
-                (filters.minLotSizeArea !== undefined &&
-                  filters.minLotSizeArea > 100) ||
-                (filters.maxLotSizeArea !== undefined &&
-                  filters.maxLotSizeArea < 100000) ||
-                (filters.minTax !== undefined && filters.minTax > 0) ||
-                (filters.maxTax !== undefined && filters.maxTax < 50000) ||
-                (filters.whenListed && filters.whenListed !== "any") ||
-                filters.location ||
-                filters.features ||
-                filters.structureType
+            className={`px-4 py-3 text-sm rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] hidden lg:flex flex-nowrap flex-row items-center gap-2 border border-[#30548733] cursor-pointer w-auto text-nowrap ${
+              activePrice !== "any" ||
+              activeBedRoom !== "any" ||
+              activeBathRoom !== "any" ||
+              activeProperty !== "any" ||
+              filters.status ||
+              (filters.minPrice !== undefined && filters.minPrice > 1000) ||
+              (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
+              (filters.minSqft !== undefined && filters.minSqft > 100) ||
+              (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
+              (filters.minLotSizeArea !== undefined &&
+                filters.minLotSizeArea > 100) ||
+              (filters.maxLotSizeArea !== undefined &&
+                filters.maxLotSizeArea < 100000) ||
+              (filters.minTax !== undefined && filters.minTax > 0) ||
+              (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+              (filters.whenListed && filters.whenListed !== "any") ||
+              filters.location ||
+              filters.features ||
+              filters.structureType
                 ? "bg-primary text-white"
                 : "bg-white"
-              }`}
+            }`}
           >
             <FiX size={16} />
             <span className="font-medium">Reset Filters</span>
@@ -593,141 +595,142 @@ export default function PropertiesListingPage() {
           (filters.whenListed && filters.whenListed !== "any") ||
           filters.location ||
           filters.features ||
-          filters.structureType || (filters.activeProperty && filters.activeProperty !== "any")) && (
-            <div className="w-full flex flex-row justify-between items-center mb-4">
-              <span className="font-medium text-sm">Selected Filters:</span>
-              <div className="flex flex-row gap-2">
-                {(filters.minPrice !== undefined && filters.minPrice > 1000) ||
-                  (filters.maxPrice !== undefined &&
-                    filters.maxPrice < 20000000) ? (
+          filters.structureType ||
+          (filters.activeProperty && filters.activeProperty !== "any")) && (
+          <div className="w-full flex flex-row justify-between items-center mb-4">
+            <span className="font-medium text-sm">Selected Filters:</span>
+            <div className="flex flex-row gap-2">
+              {(filters.minPrice !== undefined && filters.minPrice > 1000) ||
+              (filters.maxPrice !== undefined &&
+                filters.maxPrice < 20000000) ? (
+                <Chip
+                  label={`Price: $${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minPrice", 0);
+                    updateInstanceFilter("list", "maxPrice", 20000000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {(filters.minSqft !== undefined && filters.minSqft > 100) ||
+              (filters.maxSqft !== undefined && filters.maxSqft < 15000) ? (
+                <Chip
+                  label={`Area: ${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minSqft", 0);
+                    updateInstanceFilter("list", "maxSqft", 15000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {(filters.minLotSizeArea !== undefined &&
+                filters.minLotSizeArea > 100) ||
+              (filters.maxLotSizeArea !== undefined &&
+                filters.maxLotSizeArea < 100000) ? (
+                <Chip
+                  label={`${filters.minLotSizeArea}sqft to ${filters.maxLotSizeArea === 100000 ? "Max" : `${filters.maxLotSizeArea}sqft`} (Lot)`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minLotSizeArea", 0);
+                    updateInstanceFilter("list", "maxLotSizeArea", 100000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {(filters.minTax !== undefined && filters.minTax > 0) ||
+              (filters.maxTax !== undefined && filters.maxTax < 50000) ? (
+                <Chip
+                  label={`$${filters.minTax} to ${filters.maxTax === 50000 ? "Max" : `$${filters.maxTax}`} (Tax)`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minTax", 0);
+                    updateInstanceFilter("list", "maxTax", 50000);
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {filters.whenListed && filters.whenListed !== "any" && (
+                <Chip
+                  label={`Listed: ${filters.whenListed}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "whenListed", "any");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.status && filters.status !== "forSale" && (
+                <Chip
+                  label={`Status: ${filters.status}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "status", "forSale");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.activeBedRoom && filters.activeBedRoom !== "any" && (
+                <Chip
+                  label={`Beds: ${filters.activeBedRoom}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "activeBedRoom", "any");
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              )}
+              {filters.activeBathRoom && filters.activeBathRoom !== "any" && (
+                <Chip
+                  label={`Baths: ${filters.activeBathRoom}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "activeBathRoom", "any");
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              )}
+              {filters.activeProperty && filters.activeProperty !== "any" && (
+                <Chip
+                  label={`Property: ${filters.activeProperty
+                    .split(",")
+                    .map((t: string) => t.replace(/([A-Z])/g, " $1").trim())
+                    .join(", ")}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "activeProperty", "any");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.features && (
+                <Chip
+                  label={`Feature: ${filters.features
+                    .split(",")
+                    .map((feat: string) =>
+                      feat.replace(/([A-Z])/g, " $1").trim(),
+                    )
+                    .join(", ")}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "features", "");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.structureType && (
+                <Chip
+                  label={`Type: ${filters.structureType.split(",").join(", ")}`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "structureType", "");
+                  }}
+                  className="bg-gray-100 text-sm capitalize"
+                />
+              )}
+              {filters.location &&
+                filters.location.split(",").filter(Boolean).length > 0 && (
                   <Chip
-                    label={`Price: $${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
+                    label={`Location: ${filters.location.split(",").filter(Boolean).join(", ")}`}
                     onDelete={() => {
-                      updateInstanceFilter("list", "minPrice", 0);
-                      updateInstanceFilter("list", "maxPrice", 20000000);
-                    }}
-                    className="bg-gray-100 text-sm"
-                  />
-                ) : null}
-                {(filters.minSqft !== undefined && filters.minSqft > 100) ||
-                  (filters.maxSqft !== undefined && filters.maxSqft < 15000) ? (
-                  <Chip
-                    label={`Area: ${filters.minSqft}sqft to ${filters.maxSqft === 15000 ? "Max" : `${filters.maxSqft}sqft`}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "minSqft", 0);
-                      updateInstanceFilter("list", "maxSqft", 15000);
-                    }}
-                    className="bg-gray-100 text-sm"
-                  />
-                ) : null}
-                {(filters.minLotSizeArea !== undefined &&
-                  filters.minLotSizeArea > 100) ||
-                  (filters.maxLotSizeArea !== undefined &&
-                    filters.maxLotSizeArea < 100000) ? (
-                  <Chip
-                    label={`${filters.minLotSizeArea}sqft to ${filters.maxLotSizeArea === 100000 ? "Max" : `${filters.maxLotSizeArea}sqft`} (Lot)`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "minLotSizeArea", 0);
-                      updateInstanceFilter("list", "maxLotSizeArea", 100000);
-                    }}
-                    className="bg-gray-100 text-sm"
-                  />
-                ) : null}
-                {(filters.minTax !== undefined && filters.minTax > 0) ||
-                  (filters.maxTax !== undefined && filters.maxTax < 50000) ? (
-                  <Chip
-                    label={`$${filters.minTax} to ${filters.maxTax === 50000 ? "Max" : `$${filters.maxTax}`} (Tax)`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "minTax", 0);
-                      updateInstanceFilter("list", "maxTax", 50000);
-                    }}
-                    className="bg-gray-100 text-sm"
-                  />
-                ) : null}
-                {filters.whenListed && filters.whenListed !== "any" && (
-                  <Chip
-                    label={`Listed: ${filters.whenListed}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "whenListed", "any");
+                      updateInstanceFilter("list", "location", "");
                     }}
                     className="bg-gray-100 text-sm capitalize"
                   />
                 )}
-                {filters.status && filters.status !== "forSale" && (
-                  <Chip
-                    label={`Status: ${filters.status}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "status", "forSale");
-                    }}
-                    className="bg-gray-100 text-sm capitalize"
-                  />
-                )}
-                {filters.activeBedRoom && filters.activeBedRoom !== "any" && (
-                  <Chip
-                    label={`Beds: ${filters.activeBedRoom}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "activeBedRoom", "any");
-                    }}
-                    className="bg-gray-100 text-sm"
-                  />
-                )}
-                {filters.activeBathRoom && filters.activeBathRoom !== "any" && (
-                  <Chip
-                    label={`Baths: ${filters.activeBathRoom}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "activeBathRoom", "any");
-                    }}
-                    className="bg-gray-100 text-sm"
-                  />
-                )}
-                {filters.activeProperty && filters.activeProperty !== "any" && (
-                  <Chip
-                    label={`Property: ${filters.activeProperty
-                      .split(",")
-                      .map((t: string) => t.replace(/([A-Z])/g, " $1").trim())
-                      .join(", ")}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "activeProperty", "any");
-                    }}
-                    className="bg-gray-100 text-sm capitalize"
-                  />
-                )}
-                {filters.features && (
-                  <Chip
-                    label={`Feature: ${filters.features
-                      .split(",")
-                      .map((feat: string) =>
-                        feat.replace(/([A-Z])/g, " $1").trim(),
-                      )
-                      .join(", ")}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "features", "");
-                    }}
-                    className="bg-gray-100 text-sm capitalize"
-                  />
-                )}
-                {filters.structureType && (
-                  <Chip
-                    label={`Type: ${filters.structureType.split(",").join(", ")}`}
-                    onDelete={() => {
-                      updateInstanceFilter("list", "structureType", "");
-                    }}
-                    className="bg-gray-100 text-sm capitalize"
-                  />
-                )}
-                {filters.location &&
-                  filters.location.split(",").filter(Boolean).length > 0 && (
-                    <Chip
-                      label={`Location: ${filters.location.split(",").filter(Boolean).join(", ")}`}
-                      onDelete={() => {
-                        updateInstanceFilter("list", "location", "");
-                      }}
-                      className="bg-gray-100 text-sm capitalize"
-                    />
-                  )}
-              </div>
             </div>
-          )}
+          </div>
+        )}
 
         {/* Property Grid */}
         {isLoading ? (
