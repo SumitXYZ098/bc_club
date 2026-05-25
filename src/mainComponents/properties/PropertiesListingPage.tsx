@@ -221,9 +221,11 @@ export default function PropertiesListingPage() {
         price: listing?.price,
         oldPrice: Number(listing?.old_price) || 0,
         daysAgo:
-          listing?.ModificationTimestamp ??
-          listing?.raw_data?.BridgeModificationTimestamp ??
-          0,
+          Number(listing?.old_price) > 0
+            ? listing?.ModificationTimestamp
+            : (listing?.OriginalEntryTimestamp ??
+              listing?.raw_data?.BridgeModificationTimestamp ??
+              0),
         address: listing?.address,
         sqft: listing?.Living_area ?? listing?.area ?? 0,
         beds: listing?.bedrooms ?? 0,
@@ -465,8 +467,7 @@ export default function PropertiesListingPage() {
                 { label: "4+", value: "4" },
               ]}
             />
-            {/* </div> */}
-            {/* <div className="w-auto flex flex-row sm:flex-nowrap flex-wrap justify-between items-center gap-4"> */}
+
             {/* BathRoom */}
             <FilterPillSelect
               label="BathRoom"
@@ -493,56 +494,10 @@ export default function PropertiesListingPage() {
               pillInactive={pillInactive}
               options={[
                 { label: "Any", value: "any" },
-                // { label: "All", value: "all" },
                 { label: "Drop", value: "drop" },
                 { label: "Increase", value: "increase" },
               ]}
             />
-
-            {/* Property Type */}
-            {/* <FilterPillSelect
-              label="Property Type"
-              value={activeProperty}
-              onChange={setActiveProperty}
-              pillBase={pillBase}
-              pillActive={pillActive}
-              pillInactive={pillInactive}
-              options={
-                status === "sold" || status === "expired"
-                  ? [
-                      { label: "All", value: "any" },
-                      {
-                        label: "Apartment/Condo",
-                        value: "Apartment/Condo",
-                      },
-                      {
-                        label: "Single Family Residence",
-                        value: "Single Family Residence",
-                      },
-                      { label: "Townhouse", value: "Townhouse" },
-                      { label: "Half Duplex", value: "Half Duplex" },
-                      {
-                        label: "Row House (Non-Strata)",
-                        value: "Row House (Non-Strata)",
-                      },
-                    ]
-                  : [
-                      { label: "All", value: "any" },
-                      {
-                        label: "Single-Family",
-                        value: "Single-Family",
-                      },
-                      {
-                        label: "Multi-Family",
-                        value: "Multi-Family",
-                      },
-                      { label: "Office", value: "Office" },
-                      { label: "Business", value: "Business" },
-                      { label: "Agriculture", value: "Agriculture" },
-                      { label: "Vacant Land", value: "Vacant Land" },
-                    ]
-              }
-            /> */}
           </div>
           <button
             onClick={() => {

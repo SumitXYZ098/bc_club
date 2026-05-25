@@ -64,9 +64,11 @@ export const transformNormalListing = (listing: any, me: any) => {
     title: listing?.property_sub_type || "Property",
     price: Number(listing?.price) || 0,
     daysAgo:
-      listing?.ModificationTimestamp ??
-      listing?.raw_data?.BridgeModificationTimestamp ??
-      0,
+      Number(listing?.old_price) > 0
+        ? listing?.ModificationTimestamp
+        : (listing?.OriginalEntryTimestamp ??
+          listing?.raw_data?.BridgeModificationTimestamp ??
+          0),
     address: listing?.address
       ? `${listing?.address}, ${listing?.city || ""}`
       : listing?.city || "",
@@ -88,10 +90,9 @@ export const transformNormalListing = (listing: any, me: any) => {
     isDdf: false,
     assessedDiff: listing.price
       ? Number(
-          (
-            (listing.price - (listing.annual_tax ?? 0)) /
-            listing.price
-          ).toFixed(1),
+          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+            1,
+          ),
         )
       : 0,
   };
@@ -110,7 +111,12 @@ export const transformActiveListing = (listing: any, me: any) => {
           : listing?.media?.[0]?.MediaURL,
     title: listing?.property_sub_type || "Property",
     price: Number(listing?.price) || 0,
-    daysAgo: listing?.ModificationTimestamp ?? 0,
+    daysAgo:
+      Number(listing?.old_price) > 0
+        ? listing?.ModificationTimestamp
+        : (listing?.OriginalEntryTimestamp ??
+          listing?.raw_data?.BridgeModificationTimestamp ??
+          0),
     address: listing?.address,
     sqft: listing?.Living_area ?? listing?.area ?? 0,
     beds: listing?.bedrooms ?? 0,

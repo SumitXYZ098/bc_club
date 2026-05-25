@@ -222,7 +222,9 @@ export default function FiltersPopup({
       : null,
   );
   const [status, setStatus] = useState<string>(filters.status ?? "");
-  const [whenListed, setWhenListed] = useState<string>(filters.whenListed ?? "any");
+  const [whenListed, setWhenListed] = useState<string>(
+    filters.whenListed ?? "any",
+  );
   const [selectedLocations, setSelectedLocations] = useState<string[]>(
     filters.location ? filters.location.split(",").filter(Boolean) : [],
   );
@@ -232,11 +234,15 @@ export default function FiltersPopup({
       : [],
   );
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
-    filters.features ? filters.features.split(",").filter(Boolean) : []
+    filters.features ? filters.features.split(",").filter(Boolean) : [],
   );
 
-  const [selectedStructureTypes, setSelectedStructureTypes] = useState<string[]>(
-    filters.structureType ? filters.structureType.split(",").filter(Boolean) : []
+  const [selectedStructureTypes, setSelectedStructureTypes] = useState<
+    string[]
+  >(
+    filters.structureType
+      ? filters.structureType.split(",").filter(Boolean)
+      : [],
   );
 
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
@@ -297,13 +303,17 @@ export default function FiltersPopup({
       "Half Duplex",
       "Row House (Non-Strata)",
     ];
-    const currentSF = selectedProperties.filter((p) => singleFamilyOptions.includes(p));
+    const currentSF = selectedProperties.filter((p) =>
+      singleFamilyOptions.includes(p),
+    );
     if (currentSF.length !== selectedProperties.length) {
       setSelectedProperties(currentSF);
     }
 
     if (selectedStructureTypes.includes(type)) {
-      setSelectedStructureTypes(selectedStructureTypes.filter((t) => t !== type));
+      setSelectedStructureTypes(
+        selectedStructureTypes.filter((t) => t !== type),
+      );
     } else {
       setSelectedStructureTypes([...selectedStructureTypes, type]);
     }
@@ -317,7 +327,6 @@ export default function FiltersPopup({
     }
   };
 
-
   useEffect(() => {
     if (open) {
       const currentFilters = getInstanceFilters(id);
@@ -330,10 +339,7 @@ export default function FiltersPopup({
         currentFilters.minLotSizeArea ?? 0,
         currentFilters.maxLotSizeArea ?? 100000,
       ]);
-      setTax([
-        currentFilters.minTax ?? 0,
-        currentFilters.maxTax ?? 50000,
-      ]);
+      setTax([currentFilters.minTax ?? 0, currentFilters.maxTax ?? 50000]);
       setBedrooms(
         currentFilters.activeBedRoom && currentFilters.activeBedRoom !== "any"
           ? Number(currentFilters.activeBedRoom.replace("+", ""))
@@ -357,10 +363,14 @@ export default function FiltersPopup({
           : [],
       );
       setSelectedFeatures(
-        currentFilters.features ? currentFilters.features.split(",").filter(Boolean) : []
+        currentFilters.features
+          ? currentFilters.features.split(",").filter(Boolean)
+          : [],
       );
       setSelectedStructureTypes(
-        currentFilters.structureType ? currentFilters.structureType.split(",").filter(Boolean) : []
+        currentFilters.structureType
+          ? currentFilters.structureType.split(",").filter(Boolean)
+          : [],
       );
     }
   }, [open, id, getInstanceFilters]);
@@ -430,7 +440,12 @@ export default function FiltersPopup({
       {/* Popup Content */}
       <div
         className="bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto md:px-6 md:pt-6 p-4 pb-0 w-full scrollbar-hide"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (locationDropdownOpen) {
+            setLocationDropdownOpen(!locationDropdownOpen);
+          }
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between cursor-pointer mb-6">
@@ -589,7 +604,7 @@ export default function FiltersPopup({
         </div>
         <LineGradient />
 
-          {/* When Listed */}
+        {/* When Listed */}
         <div className="mb-6 space-y-2 flex flex-col gap-y-1 pt-5">
           <label className="font-medium">When Listed</label>
           <div className="relative w-full">
@@ -597,11 +612,21 @@ export default function FiltersPopup({
               onClick={() => setWhenListedDropdownOpen(!whenListedDropdownOpen)}
               className="w-full border border-[#33333333] rounded-xl px-3 py-3 cursor-pointer text-sm flex justify-between items-center bg-white"
             >
-              <span className={whenListed !== "any" ? "text-black capitalize" : "text-gray-500"}>
+              <span
+                className={
+                  whenListed !== "any"
+                    ? "text-black capitalize"
+                    : "text-gray-500"
+                }
+              >
                 {whenListed === "any" ? "Any time" : whenListed}
               </span>
               <span className="text-gray-400">
-                {whenListedDropdownOpen ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
+                {whenListedDropdownOpen ? (
+                  <FiChevronUp size={18} />
+                ) : (
+                  <FiChevronDown size={18} />
+                )}
               </span>
             </div>
 
@@ -611,7 +636,10 @@ export default function FiltersPopup({
                   { label: "Any time", value: "any" },
                   { label: "Today", value: "today" },
                   { label: "Yesterday", value: "yesterday" },
-                  { label: "Today and yesterday", value: "today and yesterday" },
+                  {
+                    label: "Today and yesterday",
+                    value: "today and yesterday",
+                  },
                   { label: "Last 7 days", value: "last 7 days" },
                   { label: "Last 14 days", value: "last 14 days" },
                   { label: "This month", value: "this month" },
@@ -621,7 +649,9 @@ export default function FiltersPopup({
                   <div
                     key={option.value}
                     className={`px-6 py-2.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center transition ${
-                      whenListed === option.value ? "bg-gray-100 font-medium text-primary" : "text-gray-700"
+                      whenListed === option.value
+                        ? "bg-gray-100 font-medium text-primary"
+                        : "text-gray-700"
                     }`}
                     onClick={() => {
                       setWhenListed(option.value);
@@ -695,32 +725,7 @@ export default function FiltersPopup({
               <>
                 {/* Single Family Section */}
                 <div className="bg-gray-50/50 rounded-xl p-4 border border-[#33333311]">
-                  <div
-                    className="flex items-center gap-3 cursor-pointer group mb-3"
-                    onClick={() => handleToggleProperty("Single-Family", true)}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                        selectedProperties.includes("Single-Family")
-                          ? "bg-primary border-primary"
-                          : "border-gray-300 group-hover:border-primary"
-                      }`}
-                    >
-                      {selectedProperties.includes("Single-Family") && (
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      )}
-                    </div>
+                  <div className="flex items-center gap-3 cursor-pointer group mb-3">
                     <span className="font-medium text-sm text-gray-700">
                       Single Family
                     </span>
@@ -1026,8 +1031,6 @@ export default function FiltersPopup({
         </div>
         <LineGradient />
 
-       
-
         {/* Property Info */}
         <div className="mb-6 border-[#33333333] pt-5">
           <h3 className="font-medium mb-4">Property Info</h3>
@@ -1077,34 +1080,34 @@ export default function FiltersPopup({
         <LineGradient />
 
         {/* Features */}
-         <div className="mb-6  border-[#33333333] pt-5">
-            <h3 className="font-bold mb-5">Features</h3>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                // { label: "Parking", value: "parking" },
-                { label: "View", value: "view" },
-                { label: "Fireplace", value: "firePlace" },
-                { label: "Suite", value: "suite" },
-                // { label: "Security", value: "security" },
-                { label: "Waterfront", value: "waterfront" },
-                { label: "Pool", value: "pool" },
-                { label: "Workshop", value: "workshop" },
-              ].map((f) => (
-                <div
-                  key={f.value}
-                  onClick={() => handleToggleFeature(f.value)}
-                  className={`text-center py-3 rounded-xl border cursor-pointer text-sm transition-all ${
-                    selectedFeatures.includes(f.value)
-                      ? "bg-primary border-primary text-white"
-                      : "border-[#0F0F0F1F] text-gray-400 hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  {f.label}
-                </div>
-              ))}
-            </div>
+        <div className="mb-6  border-[#33333333] pt-5">
+          <h3 className="font-bold mb-5">Features</h3>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              // { label: "Parking", value: "parking" },
+              { label: "View", value: "view" },
+              { label: "Fireplace", value: "firePlace" },
+              { label: "Suite", value: "suite" },
+              // { label: "Security", value: "security" },
+              { label: "Waterfront", value: "waterfront" },
+              { label: "Pool", value: "pool" },
+              { label: "Workshop", value: "workshop" },
+            ].map((f) => (
+              <div
+                key={f.value}
+                onClick={() => handleToggleFeature(f.value)}
+                className={`text-center py-3 rounded-xl border cursor-pointer text-sm transition-all ${
+                  selectedFeatures.includes(f.value)
+                    ? "bg-primary border-primary text-white"
+                    : "border-[#0F0F0F1F] text-gray-400 hover:border-primary hover:text-primary"
+                }`}
+              >
+                {f.label}
+              </div>
+            ))}
           </div>
-          <LineGradient /> 
+        </div>
+        <LineGradient />
 
         {/* Extra Features */}
         {/* <div className="border-[#33333333] pt-2">

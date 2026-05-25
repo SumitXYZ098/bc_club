@@ -1,18 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Images } from "@/src/app/exports";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
-import {
-  CallRegular,
-  People12Filled,
-  People24Regular,
-  Person32Filled,
-  StarFilled,
-} from "@fluentui/react-icons";
+import { CallRegular, Person32Filled, StarFilled } from "@fluentui/react-icons";
 import { MapPin } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import BookingDialog from "./BookingDialog";
 
 const PropertyContactUs = ({ property }: { property: any }) => {
@@ -21,7 +13,11 @@ const PropertyContactUs = ({ property }: { property: any }) => {
     <div className="w-full flex flex-col gap-y-4 p-6 border border-borderColor rounded-2xl ">
       <div className="flex items-center gap-x-1.5">
         <StarFilled className="text-primary w-6 h-6" />
-        <span className="text-xl font-bold">High-rise Townhouse</span>
+        <span className="text-xl font-bold capitalize">
+          {property?.structure_type
+            ? property?.structure_type
+            : property?.property_sub_type}
+        </span>
       </div>
       <div className="flex items-center gap-x-1.5 text-[#636366]">
         <MapPin className="w-6 h-6" />

@@ -26,6 +26,7 @@ import { useAuthContext } from "../auth/AuthContext";
 
 const tabList = [
   "Newly Listed properties",
+  "Recent Priced Properties",
   "Previously Listed Properties",
   "Sold properties",
 ];
@@ -63,6 +64,7 @@ const OurProperty = () => {
 
   const refs = {
     "Newly Listed properties": useRef<HTMLDivElement>(null),
+    "Recent Priced Properties": useRef<HTMLDivElement>(null),
     "Previously Listed Properties": useRef<HTMLDivElement>(null),
     "Sold properties": useRef<HTMLDivElement>(null),
   };
@@ -86,7 +88,11 @@ const OurProperty = () => {
     image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing?.ModificationTimestamp ?? 0,
+    daysAgo: listing?.old_price
+      ? listing?.ModificationTimestamp
+      : listing?.OriginalEntryTimestamp
+        ? listing?.OriginalEntryTimestamp
+        : listing?.raw_data?.BridgeModificationTimestamp,
     address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
@@ -97,10 +103,10 @@ const OurProperty = () => {
     oldPrice: Number(listing?.old_price) || 0,
     assessedDiff: listing.price
       ? Number(
-        ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
-          1,
-        ),
-      )
+          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+            1,
+          ),
+        )
       : 0,
     mls: listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
@@ -127,7 +133,11 @@ const OurProperty = () => {
         return (
           res?.data
             ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-            .filter((l: any) => {
+            ?.filter((l: any) => {
+              const oldPrice = Number(l?.old_price || 0);
+              return oldPrice <= 0;
+            })
+            ?.filter((l: any) => {
               const type = (l?.property_sub_type || "").toLowerCase();
               return !nonResidentialTypes.some((nonRes) =>
                 type.includes(nonRes),
@@ -139,11 +149,41 @@ const OurProperty = () => {
     },
   );
 
+  const { data: priceUpdateList = [], isLoading: isLoadingPriceUpdate } =
+    useGetActiveListings(
+      { location: city, page: 1, pageSize: 30, priceChange: "all" },
+      {
+        select: (res: any) => {
+          const nonResidentialTypes = [
+            "office",
+            "business",
+            "agriculture",
+            "vacant land",
+            "industrial",
+            "retail",
+          ];
+
+          return (
+            res?.data
+              ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+              .filter((l: any) => {
+                const type = (l?.property_sub_type || "").toLowerCase();
+                return !nonResidentialTypes.some((nonRes) =>
+                  type.includes(nonRes),
+                );
+              })
+              .map((l: any) => mapProperty(l, true)) || []
+          );
+        },
+      },
+    );
+
   const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
     {
       propertyType: "sold",
       location: city,
-      page: 1, pageSize: 30
+      page: 1,
+      pageSize: 30,
     },
     {
       select: (res: any) => {
@@ -175,7 +215,8 @@ const OurProperty = () => {
       {
         propertyType: "expired",
         location: city,
-        page: 1, pageSize: 30
+        page: 1,
+        pageSize: 30,
       },
       {
         select: (res: any) => {
@@ -378,7 +419,7 @@ const OurProperty = () => {
 
       {/* Tab  */}
       <div className="xl:mt-13 md:mt-6 mt-4 w-full flex items-center-safe justify-between flex-col gap-y-2 md:flex-row">
-        <div className="w-full md:w-[70%] xl:w-[60%] flex flex-nowrap flex-row h-auto shadow-[0_0_20px_0_rgba(0,0,0,0.12)] gap-x-2 rounded-xl p-2">
+        <div className="w-full md:w-[70%] xl:w-[80%] grid grid-cols-2 gap-3 xl:flex flex-nowrap flex-row h-auto shadow-[0_0_20px_0_rgba(0,0,0,0.12)] gap-x-2 rounded-xl p-2">
           {tabList.map((item, idx) => (
             <CustomButton
               buttonType={tab === item ? "primary" : "disabled"}
@@ -424,6 +465,22 @@ const OurProperty = () => {
             content="Newly Listed Properties"
           />
           {renderSlider(newList, isLoadingNew, true, "newly-listed")}
+        </div>
+        <div
+          ref={refs["Recent Priced Properties"]}
+          className="flex flex-col gap-4 h-full"
+        >
+          <Heading
+            tagType="h3"
+            type={IHeadingTypes.heading20}
+            content="Recent Price Properties"
+          />
+          {renderSlider(
+            priceUpdateList,
+            isLoadingPriceUpdate,
+            true,
+            "price-update",
+          )}
         </div>
 
         <div

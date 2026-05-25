@@ -17,15 +17,12 @@ import {
   getPropertyRoomRows,
   marketStatsHeaders,
   marketStatsRows,
-  nearbySchoolsHeaders,
-  nearbySchoolsRows,
   propertyDetailsHeaders,
   roomHeaders,
   taxHistoryHeaders,
   taxHistoryRows,
 } from "../../dummyData";
 import AssessmentHistory from "./AssessmentHistory";
-import PropertyMap from "./PropertyMap";
 import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 
@@ -53,15 +50,18 @@ const PropertyInformation = ({ property }: { property: any }) => {
     },
     {
       icon: Icons.scale,
-      label: "Area Size",
-      value: `${property?.Living_area}`,
+      label: "Living Area Size",
+      value:
+        property?.Living_area && property?.Living_area !== 0
+          ? `${property?.Living_area} sft`
+          : "Na",
     },
     ...(property?.lot_size_area != null && property?.lot_size_area !== ""
       ? [
           {
             icon: Icons.lot,
             label: "Lot Size",
-            value: `${property?.lot_size_area}`,
+            value: `${property?.lot_size_area} sft`,
           },
         ]
       : []),
@@ -157,12 +157,18 @@ const PropertyInformation = ({ property }: { property: any }) => {
                 Open Map
               </Link>
             </div>
-            <PropertyMap
-              location={[Number(property.longitude), Number(property.latitude)]}
-              address={property.address}
-              city={property.city}
-              state={property.state}
-            />
+            {property.latitude && property.longitude && (
+              <iframe
+                className="w-full top-0 left-0 md:rounded-[30px] xl:mb-14 mb-10 rounded-none h-64 xl:h-106"
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${property.latitude},${property.longitude}&maptype=satellite`}
+                width=" 100%"
+                height="424"
+                allowFullScreen={false}
+                style={{ borderRadius: "12px" }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            )}
           </div>
           {/* Property Details */}
           <DynamicTable
@@ -239,7 +245,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
               </div>
             </div>
 
-            <div className="mt-12">
+            {/* <div className="mt-12">
               <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
                 Nearby Hospitals
               </h2>
@@ -257,7 +263,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
                       />
                     ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Building Complex Information */}

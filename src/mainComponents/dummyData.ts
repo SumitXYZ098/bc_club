@@ -262,32 +262,36 @@ export const getPropertyDetailsRows = (property: any) => [
       },
     ],
   },
-  {
-    data: {
-      label: "Modified Date",
-      value: property?.ModificationTimestamp
-        ? dayjs(property.ModificationTimestamp)
-          .tz("America/Vancouver")
-          .format("DD MMM, YYYY")
-        : "-",
-    },
-    subRows: [
-      {
-        data: {
-          label: "Days On Market",
-          value: property?.ModificationTimestamp
-            ? `${getTime(property.ModificationTimestamp)}`
-            : "-",
+  ...(property?.old_price > 0
+    ? [
+        {
+          data: {
+            label: "Modified Date",
+            value: property?.ModificationTimestamp
+              ? dayjs(property.ModificationTimestamp)
+                  .tz("America/Vancouver")
+                  .format("DD MMM, YYYY")
+              : "-",
+          },
+          subRows: [
+            {
+              data: {
+                label: "Days On Market",
+                value: property?.ModificationTimestamp
+                  ? `${getTime(property.ModificationTimestamp)}`
+                  : "-",
+              },
+            },
+            {
+              data: {
+                label: "Status",
+                value: property?.standard_status || "-",
+              },
+            },
+          ],
         },
-      },
-      {
-        data: {
-          label: "Status",
-          value: property?.standard_status || "-",
-        },
-      },
-    ],
-  },
+      ]
+    : []),
   {
     data: {
       label: "Floor Area",
@@ -409,17 +413,16 @@ export const getRoomRows = (property: any) => {
 export const getPropertyRoomRows = (property: any) => {
   const rooms = property?.rooms || [];
   console.log("Room", rooms);
- return rooms
-    .filter(
-      (room: any) =>
-        room.RoomType && room.RoomLevel,
-    )
+  return rooms
+    .filter((room: any) => room.RoomType && room.RoomLevel)
     .map((room: any) => {
       return {
         data: {
           room: room.RoomType,
           level: room.RoomLevel,
-          dimensions: room.RoomDimensions,
+          dimensions: room.RoomDimensions
+            ? room.RoomDimensions
+            : `${room.RoomWidth} × ${room.RoomLength}`,
         },
       };
     });

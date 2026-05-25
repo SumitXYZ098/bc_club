@@ -43,12 +43,12 @@ const swiperConfig = {
 };
 
 const AssessmentPropertySimilarAndSoldListing = ({
-  propertyId
+  propertyId,
 }: {
   propertyId: string;
 }) => {
   const { isLoggedIn } = useAuthContext();
-    const { data: me } = useGetMe()
+  const { data: me } = useGetMe();
 
   // 🔹 Mapping Function
   const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
@@ -56,7 +56,12 @@ const AssessmentPropertySimilarAndSoldListing = ({
     image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing?.ModificationTimestamp ?? 0,
+    daysAgo:
+      Number(listing?.old_price) > 0
+        ? listing?.ModificationTimestamp
+        : (listing?.OriginalEntryTimestamp ??
+          listing?.raw_data?.BridgeModificationTimestamp ??
+          0),
     address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
@@ -67,10 +72,10 @@ const AssessmentPropertySimilarAndSoldListing = ({
     oldPrice: Number(listing?.old_price) || 0,
     assessedDiff: listing.price
       ? Number(
-        ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
-          1,
-        ),
-      )
+          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+            1,
+          ),
+        )
       : 0,
     mls: listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
@@ -82,18 +87,20 @@ const AssessmentPropertySimilarAndSoldListing = ({
   });
 
   // Similar Properties
-  const { data: similarList = [], isLoading: isLoadingSimilar } = useGetSimilarAssignmentProperties(propertyId, {
-    select(data) {
-      return data?.data?.map((item: any) => mapProperty(item, true))
-    },
-  })
+  const { data: similarList = [], isLoading: isLoadingSimilar } =
+    useGetSimilarAssignmentProperties(propertyId, {
+      select(data) {
+        return data?.data?.map((item: any) => mapProperty(item, true));
+      },
+    });
 
   // Similar Sold Properties
-  const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } = useGetSimilarAssignmentSoldProperties(propertyId, {
-    select(data) {
-      return data?.data?.map((item: any) => mapProperty(item, false))
-    },
-  })
+  const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } =
+    useGetSimilarAssignmentSoldProperties(propertyId, {
+      select(data) {
+        return data?.data?.map((item: any) => mapProperty(item, false));
+      },
+    });
 
   const renderSlider = (
     list: PropertyCardProps[],
@@ -112,7 +119,11 @@ const AssessmentPropertySimilarAndSoldListing = ({
     }
 
     if (!list.length) {
-      return <p className="text-center py-10 font-semibold">{similarSoldList?.message ?? 'No Sold Properties Found Nearby'}</p>;
+      return (
+        <p className="text-center py-10 font-semibold">
+          {similarSoldList?.message ?? "No Sold Properties Found Nearby"}
+        </p>
+      );
     }
 
     return (
@@ -189,8 +200,8 @@ const AssessmentPropertySimilarAndSoldListing = ({
               <PropertiesCard
                 {...item}
                 isLogin={isLoginOverride ?? isLoggedIn}
-                isSold={item.status === 'Closed'}
-                isExpired={item.status === 'Expired'}
+                isSold={item.status === "Closed"}
+                isExpired={item.status === "Expired"}
               />
             </SwiperSlide>
           ))}
@@ -209,12 +220,7 @@ const AssessmentPropertySimilarAndSoldListing = ({
           type={IHeadingTypes.heading20}
           content="Similar Properties"
         />
-        {renderSlider(
-          similarList,
-          isLoadingSimilar,
-          true,
-          "newly-listed",
-        )}
+        {renderSlider(similarList, isLoadingSimilar, true, "newly-listed")}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -223,7 +229,12 @@ const AssessmentPropertySimilarAndSoldListing = ({
           type={IHeadingTypes.heading20}
           content="Sold Properties"
         />
-        {renderSlider(similarSoldList, isLoadingSimilarSold, isLoggedIn, "sold")}
+        {renderSlider(
+          similarSoldList,
+          isLoadingSimilarSold,
+          isLoggedIn,
+          "sold",
+        )}
       </div>
     </div>
   );

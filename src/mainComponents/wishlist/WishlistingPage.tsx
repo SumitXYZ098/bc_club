@@ -6,11 +6,7 @@ import { getOfficeName } from "@/src/utilities/utilities";
 import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
-import {
-  useGetMe,
-  useGetMyDdfFavorites,
-  useGetWishlistProperties,
-} from "@/src/hooks/listing/useListingQueries";
+import { useGetMyDdfFavorites } from "@/src/hooks/listing/useListingQueries";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import { Box, Chip, Pagination } from "@mui/material";
 import CustomButton from "@/src/components/button/CustomButton";
@@ -20,7 +16,6 @@ import Link from "next/link";
 
 const WishlistingPage = () => {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
-  const { data: me } = useGetMe();
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
     useListingStore();
   const filters = getInstanceFilters("wishlist");
@@ -61,9 +56,11 @@ const WishlistingPage = () => {
       title: listing?.property_sub_type,
       price: listing?.price,
       daysAgo:
-        listing?.ModificationTimestamp ??
-        listing?.raw_data?.BridgeModificationTimestamp ??
-        0,
+        Number(listing?.old_price) > 0
+          ? listing?.ModificationTimestamp
+          : (listing?.OriginalEntryTimestamp ??
+            listing?.raw_data?.BridgeModificationTimestamp ??
+            0),
       address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
       sqft: listing?.area ?? listing?.lot_size_area ?? 0,
       beds: listing?.bedrooms ?? 0,
@@ -103,15 +100,6 @@ const WishlistingPage = () => {
   };
 
   const {
-    data: wishlistData,
-    isLoading: wishlistLoading,
-    refetch: refetchWishlist,
-  } = useGetWishlistProperties(params, {
-    select,
-    enabled: isLoggedIn,
-  });
-
-  const {
     data: ddfWishlistData,
     isLoading: ddfWishlistLoading,
     refetch: refetchDdfWishlist,
@@ -119,18 +107,14 @@ const WishlistingPage = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      refetchWishlist();
       refetchDdfWishlist();
     }
-  }, [isLoggedIn, refetchWishlist, refetchDdfWishlist]);
+  }, [isLoggedIn, refetchDdfWishlist]);
 
-  const data = [
-    ...(wishlistData?.properties || []),
-    ...(ddfWishlistData?.properties || []),
-  ];
+  const data = [...(ddfWishlistData?.properties || [])];
 
-  const pageCount = wishlistData?.pagination?.pageCount || 1;
-  const isLoading = wishlistLoading || ddfWishlistLoading;
+  const pageCount = ddfWishlistData?.pagination?.pageCount || 1;
+  const isLoading = ddfWishlistLoading;
 
   // 🚀 Scroll to top of the container on filter change
   const scrollRef = useRef<HTMLDivElement>(null);

@@ -57,7 +57,7 @@ export default function GeoJsonLayer({
         fillColor: active ? "#22558b" : "#eea500",
         fillOpacity: active ? 0.18 : 0.08,
         strokeColor: active ? "#22558b" : "#eea500",
-        strokeWeight: active ? 3 : 2,
+        strokeWeight: active ? 1 : 2,
         clickable: false,
       };
     });

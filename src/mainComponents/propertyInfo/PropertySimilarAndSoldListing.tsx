@@ -14,6 +14,9 @@ import PropertyCardSkeleton from "@/src/components/common/propertiesCard/Propert
 import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
+import SimilarPropertiesCard, {
+  SimilarPropertiesCardProps,
+} from "@/src/components/common/propertiesCard/SimilarPropertiesCard";
 
 const swiperConfig = {
   spaceBetween: 12,
@@ -42,7 +45,7 @@ const swiperConfig = {
 
 const PropertySimilarAndSoldListing = ({
   city,
-  propertyId
+  propertyId,
 }: {
   city?: string;
   bedsVariance: number;
@@ -50,15 +53,22 @@ const PropertySimilarAndSoldListing = ({
   propertyId: string;
 }) => {
   const { isLoggedIn } = useAuthContext();
-  const { data: me } = useGetMe()
+  const { data: me } = useGetMe();
 
   // 🔹 Mapping Function
-  const mapProperty = (listing: any, isDdf?: boolean): PropertyCardProps => ({
+  const mapProperty = (
+    listing: any,
+    isDdf?: boolean,
+  ): SimilarPropertiesCardProps => ({
     id: listing.documentId,
     image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing?.ModificationTimestamp ?? 0,
+    daysAgo: listing?.old_price
+      ? listing?.ModificationTimestamp
+      : listing?.OriginalEntryTimestamp
+        ? listing?.OriginalEntryTimestamp
+        : listing?.raw_data?.BridgeModificationTimestamp,
     address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
@@ -69,14 +79,17 @@ const PropertySimilarAndSoldListing = ({
     oldPrice: Number(listing?.old_price) || 0,
     assessedDiff: listing.price
       ? Number(
-        ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
-          1,
-        ),
-      )
+          ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
+            1,
+          ),
+        )
       : 0,
     mls: listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
     status: listing?.status || "",
+    age: listing?.age,
+    distance: listing?.distanceKm,
+    listingDate: listing?.OriginalEntryTimestamp,
     isFavourite: listing?.users?.some(
       (user: any) => user?.documentId === me?.documentId,
     ),
@@ -84,18 +97,20 @@ const PropertySimilarAndSoldListing = ({
   });
 
   // Similar Properties
-  const { data: similarList = [], isLoading: isLoadingSimilar } = useGetSimilarProperties(propertyId, {
-    select(data) {
-      return data?.data?.map((item: any) => mapProperty(item, true))
-    },
-  })
+  const { data: similarList = [], isLoading: isLoadingSimilar } =
+    useGetSimilarProperties(propertyId, {
+      select(data) {
+        return data?.data?.map((item: any) => mapProperty(item, true));
+      },
+    });
 
   // Similar Sold Properties
-  const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } = useGetSimilarSoldProperties(propertyId, {
-    select(data) {
-      return data?.data?.map((item: any) => mapProperty(item, false))
-    },
-  })
+  const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } =
+    useGetSimilarSoldProperties(propertyId, {
+      select(data) {
+        return data?.data?.map((item: any) => mapProperty(item, false));
+      },
+    });
 
   const renderSlider = (
     list: PropertyCardProps[],
@@ -114,7 +129,9 @@ const PropertySimilarAndSoldListing = ({
     }
 
     if (!list.length) {
-      return <p className="text-center py-10 font-semibold">{`No Sold Properties Found in ${city}`}</p>;
+      return (
+        <p className="text-center py-10 font-semibold">{`No Sold Properties Found in ${city}`}</p>
+      );
     }
 
     return (
@@ -188,11 +205,11 @@ const PropertySimilarAndSoldListing = ({
         >
           {list.map((item) => (
             <SwiperSlide key={item.id}>
-              <PropertiesCard
+              <SimilarPropertiesCard
                 {...item}
                 isLogin={isLoginOverride ?? isLoggedIn}
-                isSold={item.status === 'Closed'}
-                isExpired={item.status === 'Expired'}
+                isSold={item.status === "Closed"}
+                isExpired={item.status === "Expired"}
               />
             </SwiperSlide>
           ))}
@@ -211,12 +228,7 @@ const PropertySimilarAndSoldListing = ({
           type={IHeadingTypes.heading20}
           content="Similar Properties"
         />
-        {renderSlider(
-          similarList,
-          isLoadingSimilar,
-          true,
-          "newly-listed",
-        )}
+        {renderSlider(similarList, isLoadingSimilar, true, "newly-listed")}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -225,7 +237,12 @@ const PropertySimilarAndSoldListing = ({
           type={IHeadingTypes.heading20}
           content="Sold Properties"
         />
-        {renderSlider(similarSoldList, isLoadingSimilarSold, isLoggedIn, "sold")}
+        {renderSlider(
+          similarSoldList,
+          isLoadingSimilarSold,
+          isLoggedIn,
+          "sold",
+        )}
       </div>
     </div>
   );

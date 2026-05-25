@@ -166,3 +166,14 @@ export const monthName = (range: string) => {
             ? ""
             : "";
 };
+
+export const calculateAge = (yearBuilt?: string | number | null) => {
+  const year = Number(yearBuilt);
+
+  if (!year || Number.isNaN(year)) return null;
+
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - year;
+
+  return age >= 0 ? age : null;
+};
