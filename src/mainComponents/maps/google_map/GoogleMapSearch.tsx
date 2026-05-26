@@ -35,9 +35,6 @@ import {
   defaultCenter,
   mapContainerStyle,
   mapOptions,
-  pillActive,
-  pillBase,
-  pillInactive,
 } from "./googleMapConfig";
 import {
   buildActiveFilterPills,
@@ -792,9 +789,6 @@ export default function GoogleMapSearch() {
           setActiveBathRoom={setActiveBathRoom}
           location={location}
           setLocation={setLocation}
-          pillBase={pillBase}
-          pillActive={pillActive}
-          pillInactive={pillInactive}
         />
 
         <MapActiveFilters

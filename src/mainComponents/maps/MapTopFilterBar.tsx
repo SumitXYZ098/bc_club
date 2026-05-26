@@ -17,13 +17,8 @@ interface MapTopFilterBarProps {
   setActiveBedRoom: (val: string) => void;
   activeBathRoom: string | undefined;
   setActiveBathRoom: (val: string) => void;
-  // activeProperty: string;
-  // setActiveProperty: (val: string) => void;
   location: string;
   setLocation: (val: string) => void;
-  pillBase: string;
-  pillActive: string;
-  pillInactive: string;
 }
 
 export default function MapTopFilterBar({
@@ -37,13 +32,8 @@ export default function MapTopFilterBar({
   setActiveBedRoom,
   activeBathRoom,
   setActiveBathRoom,
-  // activeProperty,
-  // setActiveProperty,
   location,
   setLocation,
-  pillBase,
-  pillActive,
-  pillInactive,
 }: MapTopFilterBarProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPriceAreaOpen, setIsPriceAreaOpen] = useState(false);

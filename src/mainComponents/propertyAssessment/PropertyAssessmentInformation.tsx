@@ -22,13 +22,13 @@ const PropertyAssessmentInformation = ({ data }: Props) => {
                   <div className="h-4 w-32 bg-gray-200 rounded" />
                   <div className="h-4 w-24 bg-gray-200 rounded" />
                 </div>
-                <div className="h-[1px] bg-gray-200 mt-2" />
+                <div className="h-px bg-gray-200 mt-2" />
               </div>
             ))}
           </div>
         </div>
 
-        <div className="hidden xl:block w-[1px] bg-gray-200" />
+        <div className="hidden xl:block w-px bg-gray-200" />
 
         <div className="xl:w-[40%] w-full flex flex-col gap-y-6">
           {[1, 2, 3].map((_, i) => (

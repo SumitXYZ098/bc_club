@@ -4,7 +4,6 @@ import { FiSearch, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import { Box, Chip, Pagination } from "@mui/material";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesCard, {
   PropertyCardProps,
@@ -71,7 +70,6 @@ export default function PropertiesListingPage() {
   const minTax = filters.minTax;
   const maxTax = filters.maxTax;
   const status = filters.status;
-  const propertyType = filters.propertyType;
   const location = filters.location;
   const whenListed = filters.whenListed;
   const features = filters.features;
@@ -183,10 +181,6 @@ export default function PropertiesListingPage() {
   }
   if (minTax !== undefined && minTax > 0) params.minTax = minTax;
   if (maxTax !== undefined && maxTax < 50000) params.maxTax = maxTax;
-
-  // if (status && status !== "any") {
-  //   params.propertyType = status;
-  // }
 
   if (location && location !== "") {
     params.location = location;
@@ -372,11 +366,6 @@ export default function PropertiesListingPage() {
               <FiSearch size={18} className="text-white" />
             </button>
           </div>
-
-          <button className="px-4 py-4 bg-gray rounded-xl shadow items-center gap-2 hidden">
-            <BookmarkIcon sx={{ color: "#33333333" }} />
-            Save Search
-          </button>
         </div>
 
         {/* Filters */}
@@ -536,7 +525,7 @@ export default function PropertiesListingPage() {
           </button>
         </div>
 
-        {((filters.status && filters.status !== "forSale") ||
+        {(filters.status !== "forSale" ||
           (filters.minPrice !== undefined && filters.minPrice > 1000) ||
           (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
           (filters.minSqft !== undefined && filters.minSqft > 100) ||
@@ -548,8 +537,9 @@ export default function PropertiesListingPage() {
           (filters.minTax !== undefined && filters.minTax > 0) ||
           (filters.maxTax !== undefined && filters.maxTax < 50000) ||
           (filters.whenListed && filters.whenListed !== "any") ||
-          filters.location ||
           filters.features ||
+          (filters.location &&
+            filters.location.split(",").filter(Boolean).length > 1) ||
           filters.structureType ||
           (filters.activeProperty && filters.activeProperty !== "any")) && (
           <div className="w-full flex flex-row justify-between items-center mb-4">
@@ -674,7 +664,7 @@ export default function PropertiesListingPage() {
                 />
               )}
               {filters.location &&
-                filters.location.split(",").filter(Boolean).length > 0 && (
+                filters.location.split(",").filter(Boolean).length > 1 && (
                   <Chip
                     label={`Location: ${filters.location.split(",").filter(Boolean).join(", ")}`}
                     onDelete={() => {
@@ -686,6 +676,19 @@ export default function PropertiesListingPage() {
             </div>
           </div>
         )}
+
+        {filters.location &&
+          filters.location.split(",").filter(Boolean).length < 2 && (
+            <h1 className="text-2xl font-bold mb-4">
+              Homes for{" "}
+              {filters.status === "forSale"
+                ? "Sale"
+                : filters.status === "sold"
+                  ? "Sold"
+                  : "Expired"}{" "}
+              in {filters.location}, BC
+            </h1>
+          )}
 
         {/* Property Grid */}
         {isLoading ? (

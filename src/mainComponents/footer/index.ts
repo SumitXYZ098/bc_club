@@ -47,10 +47,6 @@ export const buyAndSell: LinkListProps = {
       label: "Home Estimation",
       href: "/home-estimation",
     },
-    // {
-    //   label: "Neighborhood Insights",
-    //   href: "/neighborhood-insights",
-    // },
     {
       label: "Compare Market Trends",
       href: "/market-trends",
@@ -99,36 +95,20 @@ export const contactUs: LinkListProps = {
       label: "Support / Help Center",
       href: "/contact-us",
     },
-    // {
-    //   label: "Live Chat",
-    //   href: "/Live Chat",
-    // },
     {
       label: "Renovation",
       href: "/renovation",
     },
-    // {
-    //   label: "FAQs",
-    //   href: "/faqs",
-    // },
   ],
 };
 
 export const company: LinkListProps = {
   title: "Company",
   linkList: [
-    // {
-    //   label: "About BCClub",
-    //   href: "/about",
-    // },
     {
       label: "Our Story",
       href: "/blogs",
     },
-    // {
-    //   label: "News & Articles",
-    //   href: "/news-and-articles",
-    // },
     {
       label: "Privacy Policy",
       href: "/privacy-policy",

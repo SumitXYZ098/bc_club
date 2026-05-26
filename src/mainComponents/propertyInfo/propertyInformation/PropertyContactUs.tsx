@@ -14,7 +14,7 @@ const PropertyContactUs = ({ property }: { property: any }) => {
       <div className="flex items-center gap-x-1.5">
         <StarFilled className="text-primary w-6 h-6" />
         <span className="text-xl font-bold capitalize">
-          {property?.structure_type
+          {property?.property_sub_type === "Single Family"
             ? property?.structure_type
             : property?.property_sub_type}
         </span>

@@ -130,7 +130,7 @@ const PropertySimilarAndSoldListing = ({
 
     if (!list.length) {
       return (
-        <p className="text-center py-10 font-semibold">{`No Sold Properties Found in ${city}`}</p>
+        <p className="text-center py-10 font-semibold">{`No Properties Found in ${city}`}</p>
       );
     }
 

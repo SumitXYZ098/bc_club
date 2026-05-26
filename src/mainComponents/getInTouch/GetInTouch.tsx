@@ -62,10 +62,10 @@ const GetInTouch = () => {
       return;
     }
 
-    updateInstanceFilter("map", "status", status);
+    updateInstanceFilter("list", "status", status);
 
-    if (path !== "/map-search") {
-      router.push("/map-search");
+    if (path !== "/properties") {
+      router.push("/properties");
     } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -87,13 +87,13 @@ const GetInTouch = () => {
     const cityMatch = label.match(/in\s+(.+)$/i);
     const location = cityMatch ? cityMatch[1].trim() : "";
 
-    updateInstanceFilter("map", "status", status);
+    updateInstanceFilter("list", "status", status);
     if (location && !location.toLowerCase().includes("sitemap")) {
-      updateInstanceFilter("map", "location", location);
+      updateInstanceFilter("list", "location", location);
     }
 
-    if (path !== "/map-search") {
-      router.push("/map-search");
+    if (path !== "/properties") {
+      router.push("/properties");
     } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }

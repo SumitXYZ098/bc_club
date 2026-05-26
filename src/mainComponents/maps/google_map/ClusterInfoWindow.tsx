@@ -78,7 +78,7 @@ export default function ClusterInfoWindow({
           </div>
         ))}
 
-        <button
+        {/* <button
           onClick={onViewAll}
           style={{
             width: "100%",
@@ -92,7 +92,7 @@ export default function ClusterInfoWindow({
           }}
         >
           View All
-        </button>
+        </button> */}
       </div>
     </InfoWindow>
   );

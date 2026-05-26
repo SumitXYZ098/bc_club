@@ -177,3 +177,9 @@ export const calculateAge = (yearBuilt?: string | number | null) => {
 
   return age >= 0 ? age : null;
 };
+
+export const sqftToAcresFormatted = (sqft: number, decimals = 2): string => {
+  if (!sqft || isNaN(sqft)) return "0";
+
+  return (sqft / 43560).toFixed(decimals);
+};

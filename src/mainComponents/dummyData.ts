@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { Images } from "../app/exports";
 import { TableHeader } from "../components/common/dynamicTable/DynamicTable";
 import { PropertyCardProps } from "../components/common/propertiesCard/PropertiesCard";
-import { getTime } from "../utilities/utilities";
+import { getTime, sqftToAcresFormatted } from "../utilities/utilities";
 
 export const propertyData: PropertyCardProps[] = [
   {
@@ -297,13 +297,13 @@ export const getPropertyDetailsRows = (property: any) => [
       label: "Floor Area",
       value:
         property?.Living_area || property?.area
-          ? `${property?.Living_area || property?.area} sqft`
+          ? `${property?.Living_area || property?.area} sft`
           : "-",
     },
     subRows: [
       {
         data: {
-          label: "Price per SqFt",
+          label: "Price per sft",
           value:
             property?.price && property?.area
               ? `$${Math.round(property.price / property.area)}`
@@ -312,6 +312,18 @@ export const getPropertyDetailsRows = (property: any) => [
       },
     ],
   },
+  ...(property?.lot_size_area > 0
+    ? [
+        {
+          data: {
+            label: "Lot Size Area",
+            value: property?.lot_size_area
+              ? `${sqftToAcresFormatted(property.lot_size_area)} ac (${property?.lot_size_area} sft)`
+              : "-",
+          },
+        },
+      ]
+    : []),
   {
     data: {
       label: "Year Built",

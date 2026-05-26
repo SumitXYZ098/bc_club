@@ -51,9 +51,3 @@ export const cityCoords: Record<string, { lat: number; lng: number }> = {
   "Maple Ridge": { lat: 49.2194, lng: -122.6011 },
   Chilliwack: { lat: 49.1573, lng: -121.9515 },
 };
-
-export const pillBase =
-  "pl-4 pr-2 py-3 bg-white rounded-[10px] appearance-none font-medium cursor-pointer border transition w-full";
-
-export const pillActive = "border-primary text-primary ring-1 ring-blue-200";
-export const pillInactive = "border-[#30548733] text-gray-800";
