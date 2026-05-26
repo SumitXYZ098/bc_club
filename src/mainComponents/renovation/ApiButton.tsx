@@ -1,8 +1,8 @@
 "use client";
 
-import CustomButton from '@/src/components/button/CustomButton'
-import React, { useRef, useState } from 'react'
-import { Endpoints } from '../../api/endpoints'
+import CustomButton from "@/src/components/button/CustomButton";
+import React, { useRef, useState } from "react";
+import { Endpoints } from "../../api/endpoints";
 
 const ApiButton = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -26,7 +26,6 @@ const ApiButton = () => {
     try {
       setLoading(true);
 
-      
       try {
         const text = await file.text();
         const json = JSON.parse(text);
@@ -43,9 +42,9 @@ const ApiButton = () => {
       }
 
       const formData = new FormData();
-      formData.append("file", file); 
+      formData.append("file", file);
 
-      const res = await fetch(Endpoints.importPropertyList, {
+      const res = await fetch(Endpoints.getAssessmentPropertiesList, {
         method: "POST",
         body: formData,
       });
@@ -62,14 +61,12 @@ const ApiButton = () => {
       } else {
         alert(`Success: ${data?.success || 0}, Skipped: ${data?.skipped || 0}`);
       }
-
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
     } finally {
       setLoading(false);
 
-      
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -77,17 +74,17 @@ const ApiButton = () => {
   };
 
   return (
-    <div className='max-w-screen-2xl mx-auto flex items-center justify-center px-25 py-20'>
-      
-      
-      <div onClick={handleClick} style={{ pointerEvents: loading ? 'none' : 'auto' }}>
-        <CustomButton 
-          label={loading ? 'Importing...' : 'Import Property List'} 
-          buttonType='primary' 
+    <div className="max-w-screen-2xl mx-auto flex items-center justify-center px-25 py-20">
+      <div
+        onClick={handleClick}
+        style={{ pointerEvents: loading ? "none" : "auto" }}
+      >
+        <CustomButton
+          label={loading ? "Importing..." : "Import Property List"}
+          buttonType="primary"
         />
       </div>
 
-      
       <input
         type="file"
         accept=".json,.geojson,application/geo+json"
@@ -95,9 +92,8 @@ const ApiButton = () => {
         onChange={handleFileChange}
         style={{ display: "none" }}
       />
-
     </div>
-  )
-}
+  );
+};
 
 export default ApiButton;

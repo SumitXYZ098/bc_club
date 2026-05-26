@@ -1,43 +1,38 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { Icons } from "@/src/app/exports";
-import CustomButton from "@/src/components/button/CustomButton";
 import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Endpoints } from "@/src/api/endpoints";
 import { MapPin, Search } from "lucide-react";
+import { useGetAssessmentPropertiesList } from "@/src/hooks/listing/useListingQueries";
 
 const HomeEstimationTop = () => {
-  const [search, setSearch] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [navigating, setNavigating] = useState(false);
 
+  const { data: assessmentPropertiesList, isLoading } =
+    useGetAssessmentPropertiesList({
+      address: query,
+    });
+
   const fetchProperties = async () => {
     if (!query || query.length < 2) return;
 
-    setIsFetching(true);
+    setIsFetching(isLoading);
     try {
-      const res = await fetch(
-        `${Endpoints.importPropertyList}?address=${encodeURIComponent(query)}`,
-      );
-
-      const json = await res.json();
-
-      const results = json?.data || [];
-
-      setFilteredResults(results);
+      setFilteredResults(assessmentPropertiesList?.data || []);
       setShowDropdown(true);
     } catch (err) {
       console.error("❌ API ERROR:", err);
     } finally {
-      setIsFetching(false);
+      setIsFetching(isLoading);
     }
   };
 

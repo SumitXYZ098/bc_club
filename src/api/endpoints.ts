@@ -10,7 +10,6 @@ export const Endpoints = {
   addToFavourite: (id: string) => `${BASE_URL}/api/properties/${id}/favorite`,
   getFavouriteProperties: `${BASE_URL}/api/my-favorites`,
   me: `${BASE_URL}/api/users/me`,
-  importPropertyList: `${BASE_URL}/api/property-assignment-lists`,
   getActivePropertyLists: `${BASE_URL}/api/ddf-listings`,
   mapZoom: `${BASE_URL}/api/map-zoom`,
   getActiveListingById: (id: string) => `${BASE_URL}/api/ddf-listings/${id}`,
@@ -25,8 +24,13 @@ export const Endpoints = {
     `${BASE_URL}/api/ddf-listings/${id}/similar?radiusKm=5&limit=20`,
   getSimilarSoldProperties: (id: string) =>
     `${BASE_URL}/api/properties/${id}/similar-sold?radiusKm=5&limit=20`,
+
+  getAssessmentPropertiesList: `${BASE_URL}/api/property-assignment-lists`,
+  getPropertiesAssignmentDetails: (id: string) =>
+    `${BASE_URL}/api/property-assignment-lists/${id}`,
   getSimilarAssignmentProperties: (id: string) =>
     `${BASE_URL}/api/property-assignment-lists/${id}/similar?radius=10&limit=20`,
   getSimilarAssignmentSoldProperties: (id: string) =>
     `${BASE_URL}/api/property-assignment-lists/${id}/similar-sold?radiusKm=10&limit=20`,
+  getDDFPropertiesListByAddress: `${BASE_URL}/api/ddf-listings/search-by-address`,
 };

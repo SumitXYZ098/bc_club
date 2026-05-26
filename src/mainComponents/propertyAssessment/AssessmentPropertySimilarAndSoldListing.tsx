@@ -7,8 +7,6 @@ import {
   useGetMe,
   useGetSimilarAssignmentProperties,
   useGetSimilarAssignmentSoldProperties,
-  useGetSimilarProperties,
-  useGetSimilarSoldProperties,
 } from "@/src/hooks/listing/useListingQueries";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { ChevronLeft, ChevronRight } from "lucide-react";

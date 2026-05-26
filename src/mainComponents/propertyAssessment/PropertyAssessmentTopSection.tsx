@@ -4,7 +4,6 @@ import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
-import LineGradient from "@/src/components/common/lineGradient/LineGradient";
 import { makeStyles } from "@mui/styles";
 import {
   Area,
@@ -124,7 +123,8 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
     .sort((a: any, b: any) => Number(a.year) - Number(b.year));
 
   // Calculate maxValue for both charts
-  const maxValue = chartData.length > 0 ? Math.max(...chartData.map((d: any) => d.value)) : 0;
+  const maxValue =
+    chartData.length > 0 ? Math.max(...chartData.map((d: any) => d.value)) : 0;
 
   // Calculate dynamic Y-axis upper bound to ensure the chart line never goes above the highest tick
   let step = 200000;

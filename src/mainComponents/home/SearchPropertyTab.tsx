@@ -4,66 +4,58 @@ import { Icons } from "@/src/app/exports";
 import CustomButton from "@/src/components/button/CustomButton";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { dummyListings } from "../dummyData";
 import { useRouter } from "next/navigation";
-import { Endpoints } from "@/src/api/endpoints";
 import { MapPin, Search } from "lucide-react";
+import {
+  useGetAssessmentPropertiesList,
+  useGetDDFPropertiesListByAddress,
+} from "@/src/hooks/listing/useListingQueries";
 
 const SearchPropertyTab = () => {
   const tabList = ["Find Home", "Home Assessment", "Market Trends"];
   const [activeTab, setActiveTab] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // Home Assessment State
   const [query, setQuery] = useState("");
-  const [filteredResults, setFilteredResults] = useState<typeof dummyListings>(
-    [],
-  );
   const [assessmentResults, setAssessmentResults] = useState<any[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
+
+  // Find Home State
+  const [ddfQuery, setDdfQuery] = useState("");
+  const [ddfResults, setDdfResults] = useState<any[]>([]);
+
   const [navigating, setNavigating] = useState(false);
 
-  // Fetch properties for Home Assessment
-  const fetchAssessmentProperties = async () => {
-    if (!query || query.length < 2) return;
+  const { data: assessmentPropertiesList, isLoading: isLoadingAssessment } =
+    useGetAssessmentPropertiesList({
+      address: query,
+    });
 
-    setIsFetching(true);
-    try {
-      const res = await fetch(
-        `${Endpoints.importPropertyList}?address=${encodeURIComponent(query)}`,
-      );
-      const json = await res.json();
-      const results = json?.data || [];
-      setAssessmentResults(results);
-      setShowDropdown(true);
-    } catch (err) {
-      console.error("❌ API ERROR:", err);
-    } finally {
-      setIsFetching(false);
-    }
-  };
+  const { data: ddfList, isLoading: isLoadingDdfListing } =
+    useGetDDFPropertiesListByAddress({
+      address: ddfQuery,
+    });
 
   useEffect(() => {
-    const delay = setTimeout(() => {
-      if (query.length > 1) {
-        if (activeTab === 0) {
-          // Find Home - filtering dummy for now as per original code
-          const filtered = dummyListings.filter((item) =>
-            item.address.toLowerCase().includes(query.toLowerCase()),
-          );
-          setFilteredResults(filtered);
-          setShowDropdown(true);
-        } else if (activeTab === 1) {
-          // Home Assessment - Fetch from API
-          fetchAssessmentProperties();
-        }
-      } else {
-        setShowDropdown(false);
-        setFilteredResults([]);
-        setAssessmentResults([]);
-      }
-    }, 400);
+    if (query.length > 1) {
+      setAssessmentResults(assessmentPropertiesList?.data || []);
+      setShowDropdown((assessmentPropertiesList?.data || []).length > 0);
+    } else {
+      setAssessmentResults([]);
+    }
+  }, [assessmentPropertiesList, query]);
 
-    return () => clearTimeout(delay);
-  }, [query, activeTab]);
+  useEffect(() => {
+    if (ddfQuery.length > 1) {
+      setDdfResults(ddfList?.data || []);
+      setShowDropdown((ddfList?.data || []).length > 0);
+    } else {
+      setDdfResults([]);
+    }
+  }, [ddfList, ddfQuery]);
+
+  const isFetchingAssessment = isLoadingAssessment;
+  const isFetchingDdf = isLoadingDdfListing;
 
   const router = useRouter();
 
@@ -71,6 +63,12 @@ const SearchPropertyTab = () => {
     setShowDropdown(false);
     setNavigating(true);
     router.push(`/property-assessment/${documentId}`);
+  };
+
+  const handleSelectProperty = (documentId: string) => {
+    setShowDropdown(false);
+    setNavigating(true);
+    router.push(`/property-info/${documentId}`);
   };
 
   return (
@@ -135,39 +133,48 @@ const SearchPropertyTab = () => {
         {activeTab === 0 && (
           <div
             className={`border border-borderColor md:p-1.5 p-1 flex flex-row items-center justify-between relative  ${
-              showDropdown && filteredResults.length > 0
+              showDropdown && ddfResults.length > 0
                 ? "rounded-t-xl rounded-b-0"
                 : "rounded-xl"
             }`}
           >
             <input
               className="outline-0 px-3 cursor-pointer w-full h-12 bg-transparent"
-              placeholder={`Enter an address, neighborhood, city, or ZIP code for Find Home`}
+              placeholder="Enter address for Find Home"
               required
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => query.length > 1 && setShowDropdown(true)}
+              value={ddfQuery}
+              onChange={(e) => setDdfQuery(e.target.value)}
+              onFocus={() => {
+                if (ddfResults.length > 0) setShowDropdown(true);
+              }}
               onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
             />
             <button
               onClick={() => {
-                if (query.trim()) {
-                  router.push(
-                    `/properties?search=${encodeURIComponent(query)}`,
-                  );
-                }
+                console.log("Search", ddfQuery);
               }}
               className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
             >
-              <Image
-                src={Icons.searchLine}
-                alt="Search"
-                width={100}
-                height={100}
-                className="w-full h-full object-contain"
-              />
+              {isFetchingDdf ? (
+                <div
+                  className="w-5 h-5 rounded-full"
+                  style={{
+                    border: "2px solid rgba(255,255,255,0.3)",
+                    borderTopColor: "#fff",
+                    animation: "spin 0.75s linear infinite",
+                  }}
+                />
+              ) : (
+                <Image
+                  src={Icons.searchLine}
+                  alt="Search"
+                  width={100}
+                  height={100}
+                  className="w-full h-full object-contain"
+                />
+              )}
             </button>
-            {showDropdown && filteredResults.length > 0 && (
+            {showDropdown && ddfResults.length > 0 && (
               <div
                 className="search-dropdown absolute left-0 w-full bg-background z-20 max-h-72 overflow-y-auto scrollbar-hide"
                 style={{
@@ -196,21 +203,17 @@ const SearchPropertyTab = () => {
                       color: "var(--primary)",
                     }}
                   >
-                    {filteredResults.length}
+                    {ddfResults.length}
                   </span>
                 </div>
-                {filteredResults.map((item, index) => (
+                {ddfResults.map((item, index) => (
                   <div
                     key={item.id}
-                    onMouseDown={() =>
-                      router.push(
-                        `/properties?search=${encodeURIComponent(item.address)}`,
-                      )
-                    }
+                    onMouseDown={() => handleSelectProperty(item.documentId)}
                     className="search-item cursor-pointer px-4 py-3 flex items-start gap-3"
                     style={{
                       borderBottom:
-                        index + 1 < filteredResults.length
+                        index + 1 < ddfResults.length
                           ? "1px solid var(--borderColor)"
                           : "none",
                     }}
@@ -251,11 +254,6 @@ const SearchPropertyTab = () => {
                 required
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && query.length > 1) {
-                    fetchAssessmentProperties();
-                  }
-                }}
                 onFocus={() => {
                   if (assessmentResults.length > 0) setShowDropdown(true);
                 }}
@@ -269,7 +267,7 @@ const SearchPropertyTab = () => {
               }}
               className="md:w-13 md:h-13 w-10 h-10 bg-secondary md:p-3.5 p-2 text-center flex items-center justify-center-safe md:rounded-xl rounded-md cursor-pointer"
             >
-              {isFetching ? (
+              {isFetchingAssessment ? (
                 <div
                   className="w-5 h-5 rounded-full"
                   style={{
@@ -345,14 +343,6 @@ const SearchPropertyTab = () => {
                       <span className="text-sm font-semibold text-foreground truncate">
                         {item.address}
                       </span>
-                      {item.city && (
-                        <span
-                          className="text-xs mt-0.5"
-                          style={{ color: "var(--lightWhite)" }}
-                        >
-                          {item.city}
-                        </span>
-                      )}
                     </div>
                   </div>
                 ))}

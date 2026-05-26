@@ -19,12 +19,14 @@ import {
   removeFromFavourite,
   getActiveListings,
   getMapZoomListings,
-  getImportPropertyList,
+  getAssessmentPropertiesList,
   getNearbyPlaces,
   getSimilarProperties,
   getSimilarSoldProperties,
   getSimilarAssignmentProperties,
   getSimilarAssignmentSoldProperties,
+  getPropertiesAssignmentDetails,
+  getDDFPropertiesListByAddress,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -250,7 +252,7 @@ export function useRemoveFromWishlist() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: listingKeys.wishlists() });
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
   });
 }
 
@@ -307,7 +309,7 @@ export function useToggleDdfWishlist() {
         queryKey: [...listingKeys.wishlists(), "ddf"],
       });
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
   });
 }
 
@@ -366,20 +368,20 @@ export function useRemoveDdfWishlist() {
         queryKey: [...listingKeys.wishlists(), "ddf"],
       });
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
   });
 }
 
-export function useGetImportPropertyList<TData = any>(
-  params?: { address?: string;[key: string]: any },
+export function useGetAssessmentPropertiesList<TData = any>(
+  params?: { address?: string },
   options?: Omit<
     UseQueryOptions<any, Error, TData, any>,
     "queryKey" | "queryFn"
   >,
 ) {
   return useQuery<any, Error, TData, any>({
-    queryKey: ["importPropertyList", params],
-    queryFn: () => getImportPropertyList(params),
+    queryKey: ["assessmentPropertiesList", params],
+    queryFn: () => getAssessmentPropertiesList(params),
     enabled: !!params?.address && params.address.length > 1,
     ...options,
   });
@@ -433,7 +435,6 @@ export function useGetSimilarSoldProperties<TData = any>(
   });
 }
 
-
 // Similar Assignment Properties
 export function useGetSimilarAssignmentProperties<TData = any>(
   id: string,
@@ -462,6 +463,38 @@ export function useGetSimilarAssignmentSoldProperties<TData = any>(
     queryKey: ["similarAssignmentSoldProperties", id],
     queryFn: () => getSimilarAssignmentSoldProperties(id),
     enabled: !!id,
+    ...options,
+  });
+}
+
+// Properties Assignment Details
+export function useGetPropertiesAssignmentDetails<TData = any>(
+  id: string,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["propertiesAssignmentDetails", id],
+    queryFn: () => getPropertiesAssignmentDetails(id),
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// Get DDF Properties List By Address
+export function useGetDDFPropertiesListByAddress<TData = any>(
+  params?: { address?: string },
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["ddfPropertiesListByAddress", params],
+    queryFn: () => getDDFPropertiesListByAddress(params),
+    enabled: !!params?.address && params.address.length > 1,
     ...options,
   });
 }
