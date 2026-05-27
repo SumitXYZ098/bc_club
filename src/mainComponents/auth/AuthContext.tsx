@@ -9,6 +9,7 @@ import OtpScreen from "./OtpScreen";
 import NewPassword from "./NewPassword";
 import AccountCreate from "./AccountCreate";
 import { useListingStore } from "@/src/store/useListingStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AuthContextType {
   openLogin: boolean;
@@ -55,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const { clearAllFilters } = useListingStore();
+  const query = useQueryClient();
 
   useEffect(() => {
     const userCookie = Cookies.get("username");
@@ -79,6 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logoutUser = () => {
+    query.clear();
     setIsLoggedIn(false);
     setUsername("");
     Cookies.remove("username");

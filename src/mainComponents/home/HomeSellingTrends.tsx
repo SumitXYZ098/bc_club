@@ -12,7 +12,7 @@ import MedianAveragePriceRecharts from "@/src/components/charts/MedianAveragePri
 import { useAuthContext } from "../auth/AuthContext";
 
 const HomeSellingTrends = () => {
-  const [location, setLocation] = useState<string>("Surrey, BC");
+  const [location, setLocation] = useState<string>("Surrey");
   const { isLoggedIn } = useAuthContext();
 
   const handleChange = (event: { target: { value: string } }) => {

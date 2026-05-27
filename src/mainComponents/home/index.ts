@@ -1,9 +1,9 @@
 export const cities = [
-  "Surrey, BC",
-  "Vancouver, BC",
-  "Victoria, BC",
-  "Kelowna, BC",
-  "Prince George, BC",
+  "Surrey",
+  "Vancouver",
+  "Victoria",
+  "Kelowna",
+  "Prince George",
 ];
 
 export interface PropertySoldData {
@@ -16,7 +16,7 @@ export interface PropertySoldData {
 }
 
 export const propertyDataByCity: Record<string, PropertySoldData[]> = {
-  "Surrey, BC": [
+  Surrey: [
     {
       type: "Detached Homes",
       sold: 520,
@@ -43,7 +43,7 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  "Vancouver, BC": [
+  Vancouver: [
     {
       type: "Detached Homes",
       sold: 680,
@@ -70,7 +70,7 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  "Victoria, BC": [
+  Victoria: [
     {
       type: "Detached Homes",
       sold: 450,
@@ -97,7 +97,7 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  "Kelowna, BC": [
+  Kelowna: [
     {
       type: "Detached Homes",
       sold: 390,
@@ -124,7 +124,7 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  "Prince George, BC": [
+  "Prince George": [
     {
       type: "Detached Homes",
       sold: 320,

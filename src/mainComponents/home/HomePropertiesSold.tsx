@@ -9,7 +9,7 @@ import { useAuthContext } from "../auth/AuthContext";
 import ChartSignInOverlay from "@/src/components/common/charts/ChartSignInOverlay";
 
 const HomePropertiesSold = () => {
-  const [location, setLocation] = useState<string>("Surrey, BC");
+  const [location, setLocation] = useState<string>("Surrey");
   const { isLoggedIn, setOpenLogin } = useAuthContext();
 
   const handleChange = (event: { target: { value: string } }) => {

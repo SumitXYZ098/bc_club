@@ -33,4 +33,7 @@ export const Endpoints = {
   getSimilarAssignmentSoldProperties: (id: string) =>
     `${BASE_URL}/api/property-assignment-lists/${id}/similar-sold?radiusKm=10&limit=20`,
   getDDFPropertiesListByAddress: `${BASE_URL}/api/ddf-listings/search-by-address`,
+
+  // Sale Report
+  getSaleReport: `${BASE_URL}/api/sales-reported`,
 };

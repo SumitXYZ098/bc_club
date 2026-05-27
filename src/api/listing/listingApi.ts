@@ -350,3 +350,22 @@ export async function getDDFPropertiesListByAddress(params?: {
     throw new Error("An unexpected error occurred");
   }
 }
+
+// Sale Report
+export async function getSalesReported(params?: {
+  location?: string;
+  days?: string;
+}): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getSaleReport, {
+      params,
+    });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}

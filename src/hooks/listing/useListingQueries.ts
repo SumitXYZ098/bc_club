@@ -27,6 +27,7 @@ import {
   getSimilarAssignmentSoldProperties,
   getPropertiesAssignmentDetails,
   getDDFPropertiesListByAddress,
+  getSalesReported,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -495,6 +496,21 @@ export function useGetDDFPropertiesListByAddress<TData = any>(
     queryKey: ["ddfPropertiesListByAddress", params],
     queryFn: () => getDDFPropertiesListByAddress(params),
     enabled: !!params?.address && params.address.length > 1,
+    ...options,
+  });
+}
+
+// Sale Report
+export function useGetSalesReported<TData = any>(
+  params?: { location?: string; days?: string },
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["saleReported", params],
+    queryFn: () => getSalesReported(params),
     ...options,
   });
 }

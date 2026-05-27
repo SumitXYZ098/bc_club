@@ -9,15 +9,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import PoweredBy from "../common/poweredby/PoweredBy";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import ChartSignInOverlay from "../common/charts/ChartSignInOverlay";
 import { monthName } from "@/src/utilities/utilities";
+import { useGetSalesReported } from "@/src/hooks/listing/useListingQueries";
 
 const timeRanges = ["12D", "1M", "3M", "6M", "Custom"];
 type SeriesKey = "detached" | "apartment" | "townhouse";
@@ -31,13 +29,13 @@ const generateDashboardData = (
   start?: string,
   end?: string,
 ) => {
-  let totalDays = 15;
-  let startDate = dayjs().subtract(14, "day");
+  let totalDays = 12;
+  let startDate = dayjs().subtract(11, "day");
   let endDate = dayjs();
 
-  if (range === "15D") {
-    totalDays = 15;
-    startDate = dayjs().subtract(14, "day");
+  if (range === "12D") {
+    totalDays = 12;
+    startDate = dayjs().subtract(11, "day");
   } else if (range === "1M") {
     totalDays = 30;
     startDate = dayjs().subtract(29, "day");
@@ -48,11 +46,11 @@ const generateDashboardData = (
     totalDays = 180;
     startDate = dayjs().subtract(179, "day");
   } else {
-    totalDays = 15;
+    totalDays = 12;
   }
 
   // Use 15 points for fixed ranges, but use daily resolution (one point per day) for Custom range
-  const points = 15;
+  const points = 12;
   const interval = totalDays > 1 ? (totalDays - 1) / (points - 1) : 0;
 
   const chartData = Array.from({ length: points }, (_, i) => {
@@ -124,14 +122,26 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 /* Summary Card Component */
-const SummaryCard = ({ title, value }: { title: string; value: number }) => (
+const SummaryCard = ({
+  title,
+  value,
+  isLoading,
+}: {
+  title: string;
+  value: number;
+  isLoading: boolean;
+}) => (
   <div className="rounded-xl lg:p-6 p-4 bg-gray flex flex-col items-center justify-center gap-y-2 flex-1 w-1/2">
     <h3 className="text-foreground lg:text-sm text-xs font-medium opacity-70">
       {title}
     </h3>
-    <p className="lg:text-4xl text-2xl font-bold text-black">
-      {value.toLocaleString()}
-    </p>
+    {isLoading ? (
+      <div className="h-8 w-60 bg-white/50 animate-pulse rounded" />
+    ) : (
+      <p className="lg:text-4xl text-2xl font-bold text-black">
+        {value.toLocaleString()}
+      </p>
+    )}
   </div>
 );
 
@@ -158,9 +168,54 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
     setIsMounted(true);
   }, []);
 
-  const data = useMemo(
-    () => generateDashboardData(location, range, customStart, customEnd),
-    [location, range, customStart, customEnd],
+  const salesParams = useMemo(
+    () => ({
+      location,
+      days: range,
+    }),
+    [location, range],
+  );
+
+  const {
+    data: salesRes,
+    isLoading,
+    isFetching,
+  } = useGetSalesReported(salesParams, {
+    enabled: !!location && !isProtectedRange && range !== "Custom",
+  });
+
+  const data = salesRes?.data || {
+    summary: {
+      sold: 0,
+      newListings: 0,
+
+      total_detached_sold: 0,
+      total_apartment_sold: 0,
+      total_townhouse_sold: 0,
+
+      total_detached_listed: 0,
+      total_apartment_listed: 0,
+      total_townhouse_listed: 0,
+    },
+    chartData: [],
+  };
+
+  const isChartLoading = isLoading || isFetching;
+
+  const ChartSkeleton = () => (
+    <div className="flex flex-col w-full h-full">
+      <div className="w-full h-full animate-pulse flex">
+        <div className="h-full w-px bg-gray-300" />
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="flex-1 flex items-end gap-1 px-3">
+            <div className="w-3 bg-gray-200 rounded-t-md h-[120px]" />
+            <div className="w-3 bg-gray-200 rounded-t-md h-[180px]" />
+            <div className="w-3 bg-gray-200 rounded-t-md h-[90px]" />
+          </div>
+        ))}
+      </div>
+      <div className="w-full h-px bg-gray-300" />
+    </div>
   );
 
   const [visibleSeries, setVisibleSeries] = useState({
@@ -170,7 +225,7 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
   });
 
   // Always show all names generated for the chart
-  const xTicks = data.chartData.map((d) => d.name);
+  const xTicks = data.chartData.map((d: any) => d.name);
 
   if (!isMounted)
     return (
@@ -181,10 +236,15 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
     <div className="lg:p-8 p-4 space-y-8 bg-white border border-transparent rounded-3xl">
       {/* 1st Row: Summary Cards */}
       <div className="flex flex-row flex-wrap gap-6 justify-center w-full">
-        <SummaryCard title="Total properties sold" value={data.summary.sold} />
+        <SummaryCard
+          title="Total properties sold"
+          value={data.summary.sold}
+          isLoading={isChartLoading}
+        />
         <SummaryCard
           title="Total properties listed"
           value={data.summary.newListings}
+          isLoading={isChartLoading}
         />
       </div>
 
@@ -265,6 +325,8 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
               monthContent={monthName(range)}
               onSignIn={() => setOpenLogin(true)}
             />
+          ) : isChartLoading ? (
+            <ChartSkeleton />
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -361,7 +423,55 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
           )}
         </div>
       </div>
-      <PoweredBy className="justify-end" />
+      <div className="w-full flex flex-nowrap justify-between items-start">
+        <div className="grid grid-cols-3 gap-4 w-fit">
+          {[
+            {
+              key: "Total Detached Listed",
+              color: "#FF0400",
+              total: data?.summary?.total_detached_listed || 0,
+            },
+            {
+              key: "Total Apartment Listed",
+              color: "#1D00FF",
+              total: data?.summary?.total_apartment_listed || 0,
+            },
+            {
+              key: "Total Townhouse Listed",
+              color: "#007E64",
+              total: data?.summary?.total_townhouse_listed || 0,
+            },
+            {
+              key: "Total Detached Sold",
+              color: "#FF8A88",
+              total: data?.summary?.total_detached_sold || 0,
+            },
+
+            {
+              key: "Total Apartment Sold",
+              color: "#8A88FF",
+              total: data?.summary?.total_apartment_sold || 0,
+            },
+
+            {
+              key: "Total Townhouse Sold",
+              color: "#80C1B3",
+              total: data?.summary?.total_townhouse_sold || 0,
+            },
+          ].map(({ key, color, total }) => (
+            <div key={key} className="flex items-center gap-1">
+              <span
+                className="w-3 h-3 rounded-xs"
+                style={{ background: color }}
+              />
+              <span className="text-sm font-medium capitalize">
+                {key}: {total}
+              </span>
+            </div>
+          ))}
+        </div>
+        <PoweredBy className="justify-end" />
+      </div>
     </div>
   );
 };
