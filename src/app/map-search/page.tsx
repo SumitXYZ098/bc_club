@@ -1,7 +1,5 @@
-import GoogleMapSearch from "@/src/mainComponents/maps/google_map/GoogleMapSearch";
+import OpenStreetMapSearchWrapper from "@/src/mainComponents/openstreet_map/OpenStreetMapSearchWrapper";
 
-const page = () => {
-  return <GoogleMapSearch />;
-};
-
-export default page;
+export default function MapSearchPage() {
+  return <OpenStreetMapSearchWrapper />;
+}
