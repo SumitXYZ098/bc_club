@@ -68,7 +68,7 @@ export default function MapTopFilterBar({
   }, []);
 
   return (
-    <div className="flex flex-wrap md:justify-start justify-center items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full pl-5 mt-4">
+    <div className="hidden md:flex flex-wrap md:justify-start justify-center items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full pl-5 mt-4">
       <FiltersPopup
         id="map"
         open={isFilterOpen}

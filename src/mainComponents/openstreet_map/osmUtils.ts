@@ -31,10 +31,10 @@ export const boundsKey = (bounds: any) =>
 
 export const getClusterRadius = (zoom: number) => {
   if (zoom >= 16) return 50;
-  if (zoom >= 14) return 255;
-  if (zoom >= 12) return 270;
-  if (zoom >= 10) return 300;
-  return 340;
+  if (zoom >= 14) return 155;
+  if (zoom >= 12) return 170;
+  if (zoom >= 10) return 130;
+  return 200;
 };
 
 export const formatMeter = (meter: number) => {

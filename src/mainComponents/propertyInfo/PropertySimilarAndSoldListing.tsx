@@ -219,7 +219,7 @@ const PropertySimilarAndSoldListing = ({
   };
   return (
     <div
-      className={`space-y-10 mb-20 h-auto xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6  
+      className={`space-y-10 lg:mb-20 mb-10 h-auto xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6  
       `}
     >
       <div className="flex flex-col gap-4 h-full">

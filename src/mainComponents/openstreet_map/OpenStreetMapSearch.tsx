@@ -468,7 +468,7 @@ export default function OpenStreetMapSearch() {
         const center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setUserLocation(center);
         setLocationChecked(true);
-        mapInstance.setView([center.lat, center.lng], 14);
+        mapInstance.setView([center.lat, center.lng], 13);
 
         setTimeout(() => {
           const nextBounds = getBoundsPayload(mapInstance);
@@ -479,7 +479,7 @@ export default function OpenStreetMapSearch() {
       },
       () => {
         setLocationChecked(true);
-        mapInstance.setView(osmDefaultCenter, 14);
+        mapInstance.setView(osmDefaultCenter, 13);
 
         setTimeout(() => {
           const nextBounds = getBoundsPayload(mapInstance);
@@ -497,8 +497,8 @@ export default function OpenStreetMapSearch() {
     lastLocationRef.current = location;
 
     if (!location) {
-      if (userLocation) map.setView([userLocation.lat, userLocation.lng], 14);
-      else map.setView(osmDefaultCenter, 14);
+      if (userLocation) map.setView([userLocation.lat, userLocation.lng], 13);
+      else map.setView(osmDefaultCenter, 13);
       setTimeout(() => triggerSearch(), 300);
       return;
     }
@@ -507,7 +507,7 @@ export default function OpenStreetMapSearch() {
     const coords = cityCoords[firstCity];
 
     if (coords) {
-      map.setView(coords, 14);
+      map.setView(coords, 13);
       setTimeout(() => triggerSearch(), 300);
     }
   }, [location, mapLoaded, map, locationChecked, userLocation, triggerSearch]);
@@ -527,7 +527,7 @@ export default function OpenStreetMapSearch() {
     });
 
     if (hasValidPoints && bounds.isValid()) {
-      map.fitBounds(bounds, { maxZoom: 14 });
+      map.fitBounds(bounds, { maxZoom: 13 });
       setFitBoundsDone(true);
     }
   }, [properties, mapLoaded, map, fitBoundsDone, location]);
@@ -543,7 +543,7 @@ export default function OpenStreetMapSearch() {
 
     if (!map) return;
 
-    const zoom = map.getZoom() || 14;
+    const zoom = map.getZoom() || 13;
     const bounds = map.getBounds();
 
     const points = properties.map((p: any) => ({
@@ -600,7 +600,7 @@ export default function OpenStreetMapSearch() {
       (pos) => {
         const center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setUserLocation(center);
-        map.setView([center.lat, center.lng], 14);
+        map.setView([center.lat, center.lng], 13);
         setTimeout(() => triggerSearch(), 300);
       },
       () => alert("Please enable location services to use this feature."),
@@ -764,11 +764,11 @@ export default function OpenStreetMapSearch() {
             setHoveredPropertyId={setHoveredPropertyId}
           />
 
-          <div className="hidden md:block flex-1 relative z-10">
+          <div className="flex relative z-10 w-full h-full">
             <MapContainer
               center={osmDefaultCenter}
-              zoom={14}
-              minZoom={6}
+              zoom={13}
+              minZoom={8}
               maxZoom={18}
               zoomControl={false}
               scrollWheelZoom

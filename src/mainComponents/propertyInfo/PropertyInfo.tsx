@@ -8,6 +8,7 @@ import PropertyInfoSkeleton from "./PropertyInfoSkeleton";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
 import PropertySimilarAndSoldListing from "./PropertySimilarAndSoldListing";
+import FaqsSection from "./propertyInformation/FaqsSection";
 
 const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const {
@@ -59,6 +60,8 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
         bedsVariance={listing.bedrooms}
         lotSizeAreaVariance={listing?.lot_size_area}
       />
+
+      <FaqsSection />
 
       <GetInTouch />
     </>
