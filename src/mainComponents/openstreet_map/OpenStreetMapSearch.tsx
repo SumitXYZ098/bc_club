@@ -732,7 +732,7 @@ export default function OpenStreetMapSearch() {
 
   return (
     <>
-      <div className="w-full h-[90svh] flex flex-col overflow-hidden mt-20">
+      <div className="w-full lg:h-[90svh] h-screen flex flex-col overflow-hidden mt-20">
         <MapTopFilterBar
           status={status}
           setStatus={setStatus}
@@ -764,7 +764,7 @@ export default function OpenStreetMapSearch() {
             setHoveredPropertyId={setHoveredPropertyId}
           />
 
-          <div className="flex relative z-10 w-full h-full">
+          <div className="flex flex-1 relative z-10 w-full h-full">
             <MapContainer
               center={osmDefaultCenter}
               zoom={13}

@@ -68,7 +68,7 @@ export default function MapTopFilterBar({
   }, []);
 
   return (
-    <div className="hidden md:flex flex-wrap md:justify-start justify-center items-center gap-4 lg:flex-nowrap mb-6 h-auto w-full pl-5 mt-4">
+    <div className="flex flex-wrap justify-start items-center gap-4 lg:gap-2 xl:gap-4 h-auto w-full pl-5 md:mb-6 mb-3">
       <FiltersPopup
         id="map"
         open={isFilterOpen}
@@ -77,14 +77,15 @@ export default function MapTopFilterBar({
 
       <div
         onClick={() => setIsFilterOpen(true)}
-        className="px-6 py-3 bg-background rounded-[10px] shadow-[0_0_20px_0_rgba(0,0,0,0.12)] flex items-center justify-center gap-3 border-[#30548733] cursor-pointer shrink-0"
+        className="px-5 py-2.5 bg-background rounded-[10px] text-sm border flex items-center justify-center gap-1 border-[#30548733] cursor-pointer shrink-0"
       >
-        <FilterListIcon sx={{ color: "#305487" }} /> Filters
+        <FilterListIcon sx={{ color: "#305487", width: 18, height: 18 }} />
+        Filters
       </div>
 
       <div
         onClick={() => setStatus("forSale")}
-        className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
+        className={`hidden md:flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
           status === "forSale"
             ? "bg-primary text-white border-primary"
             : "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -95,7 +96,7 @@ export default function MapTopFilterBar({
 
       <div
         onClick={() => setStatus("sold")}
-        className={`flex items-center gap-1 border rounded-[10px] px-4 py-2.5 bg-background text-sm font-normal cursor-pointer shrink-0 transition-all ${
+        className={`hidden md:flex items-center gap-1 border rounded-[10px] px-4 py-2.5 bg-background text-sm font-normal cursor-pointer shrink-0 transition-all ${
           status === "sold"
             ? "bg-primary text-white border-primary"
             : "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -106,7 +107,7 @@ export default function MapTopFilterBar({
 
       <div
         onClick={() => setStatus("expired")}
-        className={`flex items-center gap-1 border rounded-[10px] px-4 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
+        className={`hidden md:flex items-center gap-1 border rounded-[10px] px-4 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
           status === "expired"
             ? "bg-primary text-white border-primary"
             : "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -115,7 +116,7 @@ export default function MapTopFilterBar({
         Expired
       </div>
 
-      <div className="relative" ref={priceAreaRef}>
+      <div className="hidden md:flex relative" ref={priceAreaRef}>
         <div
           onClick={() => setIsPriceAreaOpen(!isPriceAreaOpen)}
           className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
@@ -239,7 +240,7 @@ export default function MapTopFilterBar({
         )}
       </div>
 
-      <div className="relative" ref={bedsRef}>
+      <div className="hidden md:flex relative" ref={bedsRef}>
         <div
           onClick={() => setIsBedsOpen(!isBedsOpen)}
           className={`flex items-center gap-1 border rounded-[10px] px-7 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
@@ -338,7 +339,7 @@ export default function MapTopFilterBar({
         />
       </div> */}
 
-      <div className="relative" ref={locationRef}>
+      <div className="hidden md:flex relative" ref={locationRef}>
         <div
           onClick={() => setIsLocationOpen(!isLocationOpen)}
           className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${

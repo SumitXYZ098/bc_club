@@ -101,7 +101,7 @@ export default function OpenStreetMapMarkerLayer({
               const currentZoom = map.getZoom() || 0;
               setSelectedProperty(null);
 
-              if (currentZoom >= 18) {
+              if (currentZoom >= 17) {
                 const leaves =
                   superclusterRef.current?.getLeaves(cluster.id, 50) || [];
                 setSelectedClusterProperties(
@@ -110,13 +110,7 @@ export default function OpenStreetMapMarkerLayer({
                 setClusterPosition({ lat: latitude, lng: longitude });
                 return;
               }
-
-              const expansionZoom =
-                superclusterRef.current?.getClusterExpansionZoom(
-                  cluster.id as number,
-                ) || 10;
-
-              map.flyTo([latitude, longitude], expansionZoom);
+              map.flyTo([latitude, longitude], 18);
             },
           }}
         />
@@ -127,7 +121,7 @@ export default function OpenStreetMapMarkerLayer({
     const zoom = map?.getZoom() || 8;
     const isHovered = hoveredPropertyId === property.id;
 
-    if (zoom < 17) return null;
+    if (zoom < 15) return null;
 
     return (
       <Marker
