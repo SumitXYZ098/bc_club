@@ -7,7 +7,7 @@ import { styled } from "@mui/material/styles";
 import { Images } from "@/src/app/exports";
 import LineGradient from "../lineGradient/LineGradient";
 import CustomButton from "../../button/CustomButton";
-import { Dialog } from "@mui/material";
+import { Dialog, TextField } from "@mui/material";
 
 // ================= Constants =================
 const ALL_CITIES = [
@@ -196,17 +196,23 @@ export default function FiltersPopup({
 
   const [price, setPrice] = useState<[number | null, number | null]>([
     filters.minPrice ?? 0,
-    filters.maxPrice ?? 20000000,
+    filters.maxPrice ?? 100000000,
   ]);
 
   const [sqft, setSqft] = useState<[number | null, number | null]>([
     filters.minSqft ?? 0,
     filters.maxSqft ?? 15000,
   ]);
+
+  const [pricePerSft, setPricePerSft] = useState<
+    [number | null, number | null]
+  >([filters.minPricePerSft ?? 0, filters.maxPricePerSft ?? 25000]);
+
   const [lotSqft, setLotSqft] = useState<[number | null, number | null]>([
     filters.minLotSizeArea ?? 0,
     filters.maxLotSizeArea ?? 100000,
   ]);
+
   const [tax, setTax] = useState<[number | null, number | null]>([
     filters.minTax ?? 0,
     filters.maxTax ?? 50000,
@@ -251,6 +257,20 @@ export default function FiltersPopup({
     "all" | "popular" | null
   >("popular");
 
+  const [minPriceInput, setMinPriceInput] = useState("");
+  const [maxPriceInput, setMaxPriceInput] = useState("");
+  const [minSqftInput, setMinSqftInput] = useState("");
+  const [maxSqftInput, setMaxSqftInput] = useState("");
+
+  const [minLotSqftInput, setMinLotSqftInput] = useState("");
+  const [maxLotSqftInput, setMaxLotSqftInput] = useState("");
+
+  const [minPricePerSftInput, setMinPricePerSftInput] = useState("");
+  const [maxPricePerSftInput, setMaxPricePerSftInput] = useState("");
+
+  const [minTaxInput, setMinTaxInput] = useState("");
+  const [maxTaxInput, setMaxTaxInput] = useState("");
+
   const handleToggleLocation = (city: string) => {
     if (selectedLocations.includes(city)) {
       setSelectedLocations(selectedLocations.filter((c) => c !== city));
@@ -290,6 +310,35 @@ export default function FiltersPopup({
     }
   };
 
+  // const handleToggleStructureType = (type: string) => {
+  //   const singleFamilyOptions = [
+  //     "Single-Family",
+  //     "Townhouse",
+  //     "Detached House",
+  //     "Detached Home",
+  //     "Duplex",
+  //     "Apartment/Condo",
+  //     "Apartment",
+  //     "Single Family Residence",
+  //     "Half Duplex",
+  //     "Row House (Non-Strata)",
+  //   ];
+  //   const currentSF = selectedProperties.filter((p) =>
+  //     singleFamilyOptions.includes(p),
+  //   );
+  //   if (currentSF.length !== selectedProperties.length) {
+  //     setSelectedProperties(currentSF);
+  //   }
+
+  //   if (selectedStructureTypes.includes(type)) {
+  //     setSelectedStructureTypes(
+  //       selectedStructureTypes.filter((t) => t !== type),
+  //     );
+  //   } else {
+  //     setSelectedStructureTypes([...selectedStructureTypes, type]);
+  //   }
+  // };
+
   const handleToggleStructureType = (type: string) => {
     const singleFamilyOptions = [
       "Single-Family",
@@ -303,20 +352,17 @@ export default function FiltersPopup({
       "Half Duplex",
       "Row House (Non-Strata)",
     ];
+
     const currentSF = selectedProperties.filter((p) =>
       singleFamilyOptions.includes(p),
     );
+
     if (currentSF.length !== selectedProperties.length) {
       setSelectedProperties(currentSF);
     }
 
-    if (selectedStructureTypes.includes(type)) {
-      setSelectedStructureTypes(
-        selectedStructureTypes.filter((t) => t !== type),
-      );
-    } else {
-      setSelectedStructureTypes([...selectedStructureTypes, type]);
-    }
+    // Only one selection at a time
+    setSelectedStructureTypes((prev) => (prev[0] === type ? [] : [type]));
   };
 
   const handleToggleFeature = (feat: string) => {
@@ -330,57 +376,110 @@ export default function FiltersPopup({
   useEffect(() => {
     if (open) {
       const currentFilters = getInstanceFilters(id);
-      setPrice([
-        currentFilters.minPrice ?? 0,
-        currentFilters.maxPrice ?? 20000000,
-      ]);
-      setSqft([currentFilters.minSqft ?? 0, currentFilters.maxSqft ?? 15000]);
-      setLotSqft([
-        currentFilters.minLotSizeArea ?? 0,
-        currentFilters.maxLotSizeArea ?? 100000,
-      ]);
-      setTax([currentFilters.minTax ?? 0, currentFilters.maxTax ?? 50000]);
+
+      const minPrice = currentFilters.minPrice ?? 0;
+      const maxPrice = currentFilters.maxPrice ?? 100000000;
+
+      const minSqft = currentFilters.minSqft ?? 0;
+      const maxSqft = currentFilters.maxSqft ?? 15000;
+
+      const minLot = currentFilters.minLotSizeArea ?? 0;
+      const maxLot = currentFilters.maxLotSizeArea ?? 100000;
+
+      const minTax = currentFilters.minTax ?? 0;
+      const maxTax = currentFilters.maxTax ?? 50000;
+
+      const minPps = currentFilters.minPricePerSft ?? 0;
+      const maxPps = currentFilters.maxPricePerSft ?? 25000;
+
+      setPrice([minPrice, maxPrice]);
+      setSqft([minSqft, maxSqft]);
+      setLotSqft([minLot, maxLot]);
+      setTax([minTax, maxTax]);
+      setPricePerSft([minPps, maxPps]);
+
+      // input reset / sync
+      setMinPriceInput(minPrice > 0 ? String(minPrice) : "");
+      setMaxPriceInput(maxPrice < 100000000 ? String(maxPrice) : "");
+
+      setMinSqftInput(minSqft > 0 ? String(minSqft) : "");
+      setMaxSqftInput(maxSqft < 15000 ? String(maxSqft) : "");
+
+      setMinLotSqftInput(minLot > 0 ? String(minLot) : "");
+      setMaxLotSqftInput(maxLot < 100000 ? String(maxLot) : "");
+
+      setMinTaxInput(minTax > 0 ? String(minTax) : "");
+      setMaxTaxInput(maxTax < 50000 ? String(maxTax) : "");
+
+      setMinPricePerSftInput(minPps > 0 ? String(minPps) : "");
+      setMaxPricePerSftInput(maxPps < 25000 ? String(maxPps) : "");
+
       setBedrooms(
         currentFilters.activeBedRoom && currentFilters.activeBedRoom !== "any"
           ? Number(currentFilters.activeBedRoom.replace("+", ""))
           : null,
       );
+
       setBathrooms(
         currentFilters.activeBathRoom && currentFilters.activeBathRoom !== "any"
           ? Number(currentFilters.activeBathRoom.replace("+", ""))
           : null,
       );
-      setStatus(currentFilters.status ?? "");
+
+      setStatus(currentFilters.status ?? "forSale");
       setWhenListed(currentFilters.whenListed ?? "any");
+
       setSelectedLocations(
         currentFilters.location
           ? currentFilters.location.split(",").filter(Boolean)
           : [],
       );
+
       setSelectedProperties(
         currentFilters.activeProperty && currentFilters.activeProperty !== "any"
           ? currentFilters.activeProperty.split(",").filter(Boolean)
           : [],
       );
+
       setSelectedFeatures(
         currentFilters.features
           ? currentFilters.features.split(",").filter(Boolean)
           : [],
       );
+
       setSelectedStructureTypes(
         currentFilters.structureType
           ? currentFilters.structureType.split(",").filter(Boolean)
           : [],
       );
     }
-  }, [open, id, getInstanceFilters]);
+  }, [open, id]);
+
+  const resetRangeInputs = () => {
+    setMinPriceInput("");
+    setMaxPriceInput("");
+
+    setMinSqftInput("");
+    setMaxSqftInput("");
+
+    setMinLotSqftInput("");
+    setMaxLotSqftInput("");
+
+    setMinPricePerSftInput("");
+    setMaxPricePerSftInput("");
+
+    setMinTaxInput("");
+    setMaxTaxInput("");
+  };
 
   const handleClearAll = () => {
     clearInstanceFilters(id);
-    setPrice([0, 20000000]);
+    resetRangeInputs();
+    setPrice([0, 100000000]);
     setSqft([0, 15000]);
     setLotSqft([0, 100000]);
     setTax([0, 50000]);
+    setPricePerSft([0, 25000]);
     setBedrooms(null);
     setBathrooms(null);
     setStatus("");
@@ -401,6 +500,8 @@ export default function FiltersPopup({
     updateInstanceFilter(id, "maxLotSizeArea", lotSqft[1]);
     updateInstanceFilter(id, "minTax", tax[0]);
     updateInstanceFilter(id, "maxTax", tax[1]);
+    updateInstanceFilter(id, "minPricePerSft", pricePerSft[0]);
+    updateInstanceFilter(id, "maxPricePerSft", pricePerSft[1]);
     updateInstanceFilter(
       id,
       "activeBedRoom",
@@ -422,6 +523,35 @@ export default function FiltersPopup({
     updateInstanceFilter(id, "features", selectedFeatures.join(","));
     updateInstanceFilter(id, "structureType", selectedStructureTypes.join(","));
     onClose();
+  };
+
+  const handleRangeInputChange = (
+    value: string,
+    index: 0 | 1,
+    setter: React.Dispatch<
+      React.SetStateAction<[number | null, number | null]>
+    >,
+    inputSetter: React.Dispatch<React.SetStateAction<string>>,
+    defaultMin: number,
+    defaultMax: number,
+  ) => {
+    inputSetter(value);
+
+    if (value === "") {
+      setter((prev) => (index === 0 ? [null, prev[1]] : [prev[0], null]));
+      return;
+    }
+
+    const num = Number(value);
+
+    setter((prev) => {
+      const min = prev[0] ?? defaultMin;
+      const max = prev[1] ?? defaultMax;
+
+      return index === 0
+        ? [Math.min(num, max), max]
+        : [min, Math.max(num, min)];
+    });
   };
 
   return (
@@ -722,55 +852,47 @@ export default function FiltersPopup({
               </div>
             ) : (
               /* For Sale Options */
-              <>
+              <div className="flex flex-col gap-3 py-2">
                 {/* Single Family Section */}
-                <div className="bg-gray-50/50 rounded-xl p-4 border border-[#33333311]">
-                  <div className="flex items-center gap-3 cursor-pointer group mb-3">
-                    <span className="font-medium text-sm text-gray-700">
-                      Single Family
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-8">
-                    {[
-                      { label: "Townhouse", value: "Townhouse" },
-                      { label: "Detached Home", value: "Detached Home" },
-                      { label: "Duplex", value: "Duplex" },
-                      { label: "Apartment", value: "Apartment" },
-                    ].map((prop) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1">
+                  {[
+                    { label: "Townhouse", value: "Townhouse" },
+                    { label: "Detached Home", value: "Detached Home" },
+                    { label: "Duplex", value: "Duplex" },
+                    { label: "Apartment", value: "Apartment" },
+                  ].map((prop) => (
+                    <div
+                      key={prop.value}
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => handleToggleStructureType(prop.value)}
+                    >
                       <div
-                        key={prop.value}
-                        className="flex items-center gap-3 cursor-pointer group"
-                        onClick={() => handleToggleStructureType(prop.value)}
+                        className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
+                          selectedStructureTypes.includes(prop.value)
+                            ? "bg-primary border-primary"
+                            : "border-gray-300 group-hover:border-primary"
+                        }`}
                       >
-                        <div
-                          className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                            selectedStructureTypes.includes(prop.value)
-                              ? "bg-primary border-primary"
-                              : "border-gray-300 group-hover:border-primary"
-                          }`}
-                        >
-                          {selectedStructureTypes.includes(prop.value) && (
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="white"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          )}
-                        </div>
-                        <span className="text-sm text-gray-700">
-                          {prop.label}
-                        </span>
+                        {selectedStructureTypes.includes(prop.value) && (
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                      <span className="text-sm text-gray-700 font-medium">
+                        {prop.label}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Other Types Section */}
@@ -815,7 +937,7 @@ export default function FiltersPopup({
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -826,11 +948,17 @@ export default function FiltersPopup({
           <h3 className="font-medium md:mb-3">Price Range</h3>
           <div className="relative">
             <PriceSlider
-              value={[price[0] ?? 1000, price[1] ?? 20000000]}
+              value={[price[0] ?? 1000, price[1] ?? 100000000]}
               min={1000}
-              max={20000000}
-              step={2000}
-              onChange={(_, v) => setPrice(v as [number, number])}
+              max={100000000}
+              step={10000}
+              onChange={(_, v) => {
+                const next = v as [number, number];
+
+                setPrice(next);
+                setMinPriceInput(String(next[0]));
+                setMaxPriceInput(String(next[1]));
+              }}
               disableSwap
               valueLabelDisplay="auto"
             />
@@ -844,7 +972,265 @@ export default function FiltersPopup({
               </p>
               <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
                 <span className="text-secondary">$</span>
-                <span className="">{price[0]}</span>
+                <input
+                  type="number"
+                  value={minPriceInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      0,
+                      setPrice,
+                      setMinPriceInput,
+                      1000,
+                      100000000,
+                    )
+                  }
+                  placeholder="Min"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+
+            {/* Divider */}
+            <LineGradient
+              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+              vr
+            />
+
+            {/* Max */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Max Price
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-40.5 px-2 sm:px-4 py-2 h-full">
+                <span className="text-secondary">$</span>
+                <input
+                  type="number"
+                  value={maxPriceInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      1,
+                      setPrice,
+                      setMaxPriceInput,
+                      1000,
+                      100000000,
+                    )
+                  }
+                  placeholder="Max"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <LineGradient />
+        {/* Living Area Range */}
+        <div className="md:mb-6 mb-3 pt-5">
+          <h3 className="font-medium md:mb-3">Living Area</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
+              min={100}
+              max={15000}
+              step={100}
+              onChange={(_, v) => {
+                const next = v as [number, number];
+                setSqft(next);
+                setMinSqftInput(String(next[0]));
+                setMaxSqftInput(String(next[1]));
+              }}
+              disableSwap
+              valueLabelDisplay="auto"
+            />
+          </div>
+
+          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
+            {/* Min */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Min Living Area
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <input
+                  type="number"
+                  value={minSqftInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      0,
+                      setSqft,
+                      setMinSqftInput,
+                      100,
+                      15000,
+                    )
+                  }
+                  placeholder="Min"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-secondary">sft</span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <LineGradient
+              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+              vr
+            />
+
+            {/* Max */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Max Living Area
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <input
+                  type="number"
+                  value={maxSqftInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      1,
+                      setSqft,
+                      setMaxSqftInput,
+                      100,
+                      15000,
+                    )
+                  }
+                  placeholder="Max"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-secondary">sft</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <LineGradient />
+        {/* Lot Size Range */}
+        <div className="md:mb-6 mb-3 pt-5">
+          <h3 className="font-medium md:mb-3">Lot Size</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[lotSqft[0] ?? 100, lotSqft[1] ?? 100000]}
+              min={100}
+              max={100000}
+              step={100}
+              onChange={(_, v) => {
+                const next = v as [number, number];
+                setLotSqft(next);
+                setMinLotSqftInput(String(next[0]));
+                setMaxLotSqftInput(String(next[1]));
+              }}
+              disableSwap
+              valueLabelDisplay="auto"
+            />
+          </div>
+
+          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
+            {/* Min */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Min Lot Size
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <input
+                  type="number"
+                  value={minLotSqftInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      0,
+                      setLotSqft,
+                      setMinLotSqftInput,
+                      100,
+                      100000,
+                    )
+                  }
+                  placeholder="Min"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-secondary">sft</span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <LineGradient
+              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+              vr
+            />
+
+            {/* Max */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Max Lot Size
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <input
+                  type="number"
+                  value={maxLotSqftInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      1,
+                      setLotSqft,
+                      setMaxLotSqftInput,
+                      100,
+                      100000,
+                    )
+                  }
+                  placeholder="Max"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-secondary">sft</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <LineGradient />
+        {/* Price Per Sft Range */}
+        <div className="md:mb-6 mb-3 pt-5">
+          <h3 className="font-medium md:mb-3">Price Per Sft</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[pricePerSft[0] ?? 100, pricePerSft[1] ?? 25000]}
+              min={100}
+              max={25000}
+              step={100}
+              onChange={(_, v) => {
+                const next = v as [number, number];
+                setPricePerSft(next);
+                setMinPricePerSftInput(String(next[0]));
+                setMaxPricePerSftInput(String(next[1]));
+              }}
+              disableSwap
+              valueLabelDisplay="auto"
+            />
+          </div>
+
+          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
+            {/* Min */}
+            <div className="flex items-center gap-1 sm:gap-4 h-full">
+              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                Min Price
+              </p>
+              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
+                <span className="text-secondary">$</span>
+                <input
+                  type="number"
+                  value={minPricePerSftInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      0,
+                      setPricePerSft,
+                      setMinPricePerSftInput,
+                      100,
+                      25000,
+                    )
+                  }
+                  placeholder="Min"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
               </div>
             </div>
 
@@ -860,118 +1246,23 @@ export default function FiltersPopup({
                 Max Price
               </p>
               <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                {price[1] === 20000000 ? (
-                  <span className="">Max</span>
-                ) : (
-                  <>
-                    <span className="text-secondary">$</span>
-                    <span className="">{price[1]}</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        <LineGradient />
-        {/* Area Range */}
-        <div className="md:mb-6 mb-3 pt-5">
-          <h3 className="font-medium md:mb-3">Built Area</h3>
-          <div className="relative">
-            <PriceSlider
-              value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
-              min={100}
-              max={15000}
-              step={100}
-              onChange={(_, v) => setSqft(v as [number, number])}
-              disableSwap
-              valueLabelDisplay="auto"
-            />
-          </div>
-
-          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
-            {/* Min */}
-            <div className="flex items-center gap-1 sm:gap-4 h-full">
-              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                Min Sqft
-              </p>
-              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                <span className="">{sqft[0]}</span>
-                <span className="text-secondary">sqft</span>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <LineGradient
-              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
-              vr
-            />
-
-            {/* Max */}
-            <div className="flex items-center gap-1 sm:gap-4 h-full">
-              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                Max Sqft
-              </p>
-              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                {sqft[1] === 15000 ? (
-                  <span className="">Max</span>
-                ) : (
-                  <>
-                    <span className="">{sqft[1]}</span>
-                    <span className="text-secondary">sqft</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        <LineGradient />
-        {/* Lot Size */}
-        <div className="md:mb-6 mb-3 pt-5">
-          <h3 className="font-medium md:mb-3">Lot Size</h3>
-          <div className="relative">
-            <PriceSlider
-              value={[lotSqft[0] ?? 100, lotSqft[1] ?? 100000]}
-              min={100}
-              max={100000}
-              step={100}
-              onChange={(_, v) => setLotSqft(v as [number, number])}
-              disableSwap
-              valueLabelDisplay="auto"
-            />
-          </div>
-
-          <div className="flex items-center mt-5 justify-between gap-2 sm:gap-4">
-            {/* Min */}
-            <div className="flex items-center gap-1 sm:gap-4 h-full">
-              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                Min Sqft
-              </p>
-              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                <span className="">{lotSqft[0]}</span>
-                <span className="text-secondary">sqft</span>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <LineGradient
-              customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
-              vr
-            />
-
-            {/* Max */}
-            <div className="flex items-center gap-1 sm:gap-4 h-full">
-              <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
-                Max Sqft
-              </p>
-              <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                {lotSqft[1] === 100000 ? (
-                  <span className="">Max</span>
-                ) : (
-                  <>
-                    <span className="">{lotSqft[1]}</span>
-                    <span className="text-secondary">sqft</span>
-                  </>
-                )}
+                <span className="text-secondary">$</span>
+                <input
+                  type="number"
+                  value={maxPricePerSftInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      1,
+                      setPricePerSft,
+                      setMaxPricePerSftInput,
+                      100,
+                      25000,
+                    )
+                  }
+                  placeholder="Min"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
               </div>
             </div>
           </div>
@@ -987,7 +1278,12 @@ export default function FiltersPopup({
               min={0}
               max={50000}
               step={100}
-              onChange={(_, v) => setTax(v as [number, number])}
+              onChange={(_, v) => {
+                const next = v as [number, number];
+                setTax(next);
+                setMinTaxInput(String(next[0]));
+                setMaxTaxInput(String(next[1]));
+              }}
               disableSwap
               valueLabelDisplay="auto"
             />
@@ -1001,7 +1297,22 @@ export default function FiltersPopup({
               </p>
               <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
                 <span className="text-secondary">$</span>
-                <span className="">{tax[0]}</span>
+                <input
+                  type="number"
+                  value={minTaxInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      0,
+                      setTax,
+                      setMinTaxInput,
+                      100,
+                      50000,
+                    )
+                  }
+                  placeholder="Min"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
               </div>
             </div>
 
@@ -1017,14 +1328,23 @@ export default function FiltersPopup({
                 Max Tax
               </p>
               <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-30.5 px-2 sm:px-4 py-2 h-full">
-                {tax[1] === 50000 ? (
-                  <span className="">Max</span>
-                ) : (
-                  <>
-                    <span className="text-secondary">$</span>
-                    <span className="">{tax[1]}</span>
-                  </>
-                )}
+                <span className="text-secondary">$</span>
+                <input
+                  type="number"
+                  value={maxTaxInput}
+                  onChange={(e) =>
+                    handleRangeInputChange(
+                      e.target.value,
+                      1,
+                      setTax,
+                      setMaxTaxInput,
+                      100,
+                      50000,
+                    )
+                  }
+                  placeholder="Min"
+                  className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
               </div>
             </div>
           </div>

@@ -10,11 +10,23 @@ interface FilterState {
   maxLotSizeArea?: number;
   minTax?: number;
   maxTax?: number;
+  minPricePerSft?: number;
+  maxPricePerSft?: number;
   activeBedRoom?: string;
   activeBathRoom?: string;
   propertyType?: string;
   status?: string;
   whenListed?: string;
+  minPriceInput?: string;
+  maxPriceInput?: string;
+  minSqftInput?: string;
+  maxSqftInput?: string;
+  minLotSqftInput?: string;
+  maxLotSqftInput?: string;
+  minPricePerSftInput?: string;
+  maxPricePerSftInput?: string;
+  minTaxInput?: string;
+  maxTaxInput?: string;
   activeProperty?: string;
   [key: string]: any;
 }
@@ -36,13 +48,23 @@ interface ListingState {
 const DEFAULT_FILTERS: FilterState = {
   location: "",
   minPrice: 0,
-  maxPrice: 20000000,
+  maxPrice: 100000000,
   minSqft: 0,
   maxSqft: 15000,
   minLotSizeArea: 0,
   maxLotSizeArea: 100000,
   minTax: 0,
   maxTax: 50000,
+  minPriceInput: "",
+  maxPriceInput: "",
+  minSqftInput: "",
+  maxSqftInput: "",
+  minLotSqftInput: "",
+  maxLotSqftInput: "",
+  minPricePerSftInput: "",
+  maxPricePerSftInput: "",
+  minTaxInput: "",
+  maxTaxInput: "",
   activeBedRoom: "any",
   activeBathRoom: "any",
   propertyType: "any",

@@ -244,34 +244,16 @@ const PropertyInformation = ({ property }: { property: any }) => {
                     ))}
               </div>
             </div>
-
-            {/* <div className="mt-12">
-              <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
-                Nearby Hospitals
-              </h2>
-
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {nearbyPlacesLoading
-                  ? Array.from({ length: 6 }).map((_, index) => (
-                      <NearbyPlaceSkeleton key={index} />
-                    ))
-                  : nearbyPlaces?.data?.hospitals?.map((hospital: any) => (
-                      <NearbyPlaceCard
-                        key={hospital.place_id}
-                        place={hospital}
-                        type="hospital"
-                      />
-                    ))}
-              </div>
-            </div> */}
           </div>
 
           {/* Building Complex Information */}
-          <DynamicTable
-            title={"Building Complex Information (Dummy Data)"}
-            headers={buildingComplexHeaders}
-            rows={buildingComplexRows}
-          />
+          {property?.structure_type !== "Detached Home" && (
+            <DynamicTable
+              title={"Building Complex Information (Dummy Data)"}
+              headers={buildingComplexHeaders}
+              rows={buildingComplexRows}
+            />
+          )}
           {/* Market Statistics */}
           <div id="stats" className="scroll-mt-40">
             <DynamicTable

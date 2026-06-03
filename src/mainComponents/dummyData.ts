@@ -239,8 +239,8 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Listing Date",
-      value: property?.raw_data?.OriginalEntryTimestamp
-        ? dayjs(property.raw_data.OriginalEntryTimestamp)
+      value: property?.OriginalEntryTimestamp
+        ? dayjs(property.OriginalEntryTimestamp)
             .tz("America/Vancouver")
             .format("DD MMM, YYYY")
         : "-",
@@ -249,8 +249,8 @@ export const getPropertyDetailsRows = (property: any) => [
       {
         data: {
           label: "Days On Market",
-          value: property?.raw_data?.OriginalEntryTimestamp
-            ? `${getTime(property.raw_data.OriginalEntryTimestamp)}`
+          value: property?.OriginalEntryTimestamp
+            ? `${getTime(property.OriginalEntryTimestamp)}`
             : "-",
         },
       },
@@ -305,8 +305,8 @@ export const getPropertyDetailsRows = (property: any) => [
         data: {
           label: "Price per sft",
           value:
-            property?.price && property?.area
-              ? `$${Math.round(property.price / property.area)}`
+            property?.price && (property?.Living_area || property?.area)
+              ? `$${Math.round(property.price / (property?.Living_area || property?.area))}`
               : "-",
         },
       },

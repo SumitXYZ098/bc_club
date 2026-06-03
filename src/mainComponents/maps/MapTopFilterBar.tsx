@@ -137,7 +137,7 @@ export default function MapTopFilterBar({
               <div className="flex items-center justify-between md:mb-3">
                 <h3 className="font-bold text-gray-800 text-lg">Price Range</h3>
                 <button
-                  onClick={() => setPrice([1000, 20000000])}
+                  onClick={() => setPrice([1000, 100000000])}
                   className="text-xs font-bold text-primary hover:underline cursor-pointer"
                 >
                   Reset Price
@@ -145,9 +145,9 @@ export default function MapTopFilterBar({
               </div>
               <div className="relative px-2">
                 <PriceSlider
-                  value={[price[0] ?? 1000, price[1] ?? 20000000]}
+                  value={[price[0] ?? 1000, price[1] ?? 100000000]}
                   min={1000}
-                  max={20000000}
+                  max={100000000}
                   step={20000}
                   onChange={(_, v) => setPrice(v as [number, number])}
                   disableSwap
@@ -171,7 +171,7 @@ export default function MapTopFilterBar({
                     Max Price
                   </p>
                   <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                    {price[1] === 20000000 ? (
+                    {price[1] === 100000000 ? (
                       <span>Max</span>
                     ) : (
                       <>

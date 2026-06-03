@@ -151,7 +151,7 @@ export default function GoogleMapSearch() {
     setFitBoundsDone(false);
   }, [filters]);
 
-  const price = [minPrice ?? 1000, maxPrice ?? 20000000];
+  const price = [minPrice ?? 1000, maxPrice ?? 100000000];
   const sqft = [minSqft ?? 100, maxSqft ?? 15000];
 
   const setPrice = (val: [number, number]) => {

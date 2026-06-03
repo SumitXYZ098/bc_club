@@ -69,6 +69,8 @@ export default function PropertiesListingPage() {
   const maxLotSizeArea = filters.maxLotSizeArea;
   const minTax = filters.minTax;
   const maxTax = filters.maxTax;
+  const minPricePerSft = filters.minPricePerSft;
+  const maxPricePerSft = filters.maxPricePerSft;
   const status = filters.status;
   const location = filters.location;
   const whenListed = filters.whenListed;
@@ -170,7 +172,8 @@ export default function PropertiesListingPage() {
 
   // popup filters
   if (minPrice !== undefined && minPrice > 1000) params.minPrice = minPrice;
-  if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
+  if (maxPrice !== undefined && maxPrice < 100000000)
+    params.maxPrice = maxPrice;
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
   if (minLotSizeArea !== undefined && minLotSizeArea > 100) {
@@ -181,6 +184,13 @@ export default function PropertiesListingPage() {
   }
   if (minTax !== undefined && minTax > 0) params.minTax = minTax;
   if (maxTax !== undefined && maxTax < 50000) params.maxTax = maxTax;
+
+  if (minPricePerSft !== undefined && minPricePerSft > 100) {
+    params.minPricePerSft = minPricePerSft;
+  }
+  if (maxPricePerSft !== undefined && maxPricePerSft < 25000) {
+    params.maxPricePerSft = maxPricePerSft;
+  }
 
   if (location && location !== "") {
     params.location = location;
@@ -324,6 +334,8 @@ export default function PropertiesListingPage() {
     maxLotSizeArea,
     minTax,
     maxTax,
+    minPricePerSft,
+    maxPricePerSft,
     status,
     location,
     whenListed,
@@ -398,7 +410,7 @@ export default function PropertiesListingPage() {
                 filters.status ||
                 (filters.minPrice !== undefined && filters.minPrice > 1000) ||
                 (filters.maxPrice !== undefined &&
-                  filters.maxPrice < 20000000) ||
+                  filters.maxPrice < 100000000) ||
                 (filters.minSqft !== undefined && filters.minSqft > 100) ||
                 (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
                 (filters.minLotSizeArea !== undefined &&
@@ -503,7 +515,8 @@ export default function PropertiesListingPage() {
               activeProperty !== "any" ||
               filters.status ||
               (filters.minPrice !== undefined && filters.minPrice > 1000) ||
-              (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
+              (filters.maxPrice !== undefined &&
+                filters.maxPrice < 100000000) ||
               (filters.minSqft !== undefined && filters.minSqft > 100) ||
               (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
               (filters.minLotSizeArea !== undefined &&
@@ -512,6 +525,10 @@ export default function PropertiesListingPage() {
                 filters.maxLotSizeArea < 100000) ||
               (filters.minTax !== undefined && filters.minTax > 0) ||
               (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+              (filters.minPricePerSft !== undefined &&
+                filters.minPricePerSft > 100) ||
+              (filters.maxPricePerSft !== undefined &&
+                filters.maxPricePerSft < 25000) ||
               (filters.whenListed && filters.whenListed !== "any") ||
               filters.location ||
               filters.features ||
@@ -527,7 +544,7 @@ export default function PropertiesListingPage() {
 
         {(filters.status !== "forSale" ||
           (filters.minPrice !== undefined && filters.minPrice > 1000) ||
-          (filters.maxPrice !== undefined && filters.maxPrice < 20000000) ||
+          (filters.maxPrice !== undefined && filters.maxPrice < 100000000) ||
           (filters.minSqft !== undefined && filters.minSqft > 100) ||
           (filters.maxSqft !== undefined && filters.maxSqft < 15000) ||
           (filters.minLotSizeArea !== undefined &&
@@ -536,6 +553,10 @@ export default function PropertiesListingPage() {
             filters.maxLotSizeArea < 100000) ||
           (filters.minTax !== undefined && filters.minTax > 0) ||
           (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+          (filters.minPricePerSft !== undefined &&
+            filters.minPricePerSft > 100) ||
+          (filters.maxPricePerSft !== undefined &&
+            filters.maxPricePerSft < 25000) ||
           (filters.whenListed && filters.whenListed !== "any") ||
           filters.features ||
           (filters.location &&
@@ -547,12 +568,14 @@ export default function PropertiesListingPage() {
             <div className="flex flex-row gap-2">
               {(filters.minPrice !== undefined && filters.minPrice > 1000) ||
               (filters.maxPrice !== undefined &&
-                filters.maxPrice < 20000000) ? (
+                filters.maxPrice < 100000000) ? (
                 <Chip
-                  label={`Price: $${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 20000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
+                  label={`Price: $${Number(filters.minPrice).toLocaleString()} to ${filters.maxPrice === 100000000 ? "Max" : `$${Number(filters.maxPrice).toLocaleString()}`}`}
                   onDelete={() => {
                     updateInstanceFilter("list", "minPrice", 0);
-                    updateInstanceFilter("list", "maxPrice", 20000000);
+                    updateInstanceFilter("list", "maxPrice", 100000000);
+                    updateInstanceFilter("list", "minPriceInput", "");
+                    updateInstanceFilter("list", "maxPriceInput", "");
                   }}
                   className="bg-gray-100 text-sm"
                 />
@@ -564,6 +587,8 @@ export default function PropertiesListingPage() {
                   onDelete={() => {
                     updateInstanceFilter("list", "minSqft", 0);
                     updateInstanceFilter("list", "maxSqft", 15000);
+                    updateInstanceFilter("list", "minSqftInput", "");
+                    updateInstanceFilter("list", "maxSqftInput", "");
                   }}
                   className="bg-gray-100 text-sm"
                 />
@@ -577,6 +602,8 @@ export default function PropertiesListingPage() {
                   onDelete={() => {
                     updateInstanceFilter("list", "minLotSizeArea", 0);
                     updateInstanceFilter("list", "maxLotSizeArea", 100000);
+                    updateInstanceFilter("list", "minLotSqftInput", "");
+                    updateInstanceFilter("list", "maxLotSqftInput", "");
                   }}
                   className="bg-gray-100 text-sm"
                 />
@@ -588,6 +615,23 @@ export default function PropertiesListingPage() {
                   onDelete={() => {
                     updateInstanceFilter("list", "minTax", 0);
                     updateInstanceFilter("list", "maxTax", 50000);
+                    updateInstanceFilter("list", "minTaxInput", "");
+                    updateInstanceFilter("list", "maxTaxInput", "");
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {(filters.minPricePerSft !== undefined &&
+                filters.minPricePerSft > 100) ||
+              (filters.maxPricePerSft !== undefined &&
+                filters.maxPricePerSft < 25000) ? (
+                <Chip
+                  label={`$${filters.minPricePerSft} to ${filters.maxPricePerSft === 25000 ? "Max" : `$${filters.maxPricePerSft}`} (Price Per Sft)`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minPricePerSft", 0);
+                    updateInstanceFilter("list", "maxPricePerSft", 25000);
+                    updateInstanceFilter("list", "minPriceInput", "");
+                    updateInstanceFilter("list", "maxPriceInput", "");
                   }}
                   className="bg-gray-100 text-sm"
                 />

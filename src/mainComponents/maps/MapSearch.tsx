@@ -102,7 +102,7 @@
 //     }
 //   }, [status, isLoggedIn, updateInstanceFilter, setOpenLogin]);
 
-//   const price = [minPrice ?? 1000, maxPrice ?? 20000000];
+//   const price = [minPrice ?? 1000, maxPrice ?? 100000000];
 //   const setPrice = (val: [number, number]) => {
 //     updateInstanceFilter("map", "minPrice", val[0]);
 //     updateInstanceFilter("map", "maxPrice", val[1]);
@@ -154,10 +154,10 @@
 //     });
 //   }
 
-//   if (maxPrice !== undefined && maxPrice < 20000000) {
+//   if (maxPrice !== undefined && maxPrice < 100000000) {
 //     activeFilterPills.push({
 //       label: `Max Price: $${Number(maxPrice).toLocaleString()}`,
-//       onRemove: () => updateInstanceFilter("map", "maxPrice", 20000000),
+//       onRemove: () => updateInstanceFilter("map", "maxPrice", 100000000),
 //     });
 //   }
 
@@ -281,7 +281,7 @@
 //   if (location && location !== "" && location !== "British Columbia")
 //     commonParams.location = location;
 //   if (minPrice !== undefined) commonParams.minPrice = minPrice;
-//   if (maxPrice !== undefined && maxPrice !== 20000000)
+//   if (maxPrice !== undefined && maxPrice !== 100000000)
 //     commonParams.maxPrice = maxPrice;
 //   if (minSqft !== undefined) commonParams.minSqft = minSqft;
 //   if (maxSqft !== undefined && maxSqft !== 15000)
@@ -317,7 +317,7 @@
 //     if (location && location !== "" && location !== "British Columbia")
 //       p.location = location;
 //     if (minPrice !== undefined && minPrice > 1000) p.minPrice = minPrice;
-//     if (maxPrice !== undefined && maxPrice < 20000000) p.maxPrice = maxPrice;
+//     if (maxPrice !== undefined && maxPrice < 100000000) p.maxPrice = maxPrice;
 //     if (minSqft !== undefined && minSqft > 100) p.minSqft = minSqft;
 //     if (maxSqft !== undefined && maxSqft < 15000) p.maxSqft = maxSqft;
 //     if (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) p["filters[lot_size_area][$gte]"] = filters.minLotSizeArea;
@@ -399,7 +399,7 @@
 //   if (location && location !== "" && location !== "British Columbia")
 //     params.location = location;
 //   if (minPrice !== undefined && minPrice > 1000) params.minPrice = minPrice;
-//   if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
+//   if (maxPrice !== undefined && maxPrice < 100000000) params.maxPrice = maxPrice;
 //   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
 //   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
 //   if (filters.minLotSizeArea !== undefined && filters.minLotSizeArea > 100) params["filters[lot_size_area][$gte]"] = filters.minLotSizeArea;

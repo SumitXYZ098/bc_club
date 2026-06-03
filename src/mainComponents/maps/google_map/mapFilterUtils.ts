@@ -58,10 +58,10 @@ export const buildActiveFilterPills = ({
     });
   }
 
-  if (maxPrice !== undefined && maxPrice < 20000000) {
+  if (maxPrice !== undefined && maxPrice < 100000000) {
     activeFilterPills.push({
       label: `Max Price: $${Number(maxPrice).toLocaleString()}`,
-      onRemove: () => updateInstanceFilter("map", "maxPrice", 20000000),
+      onRemove: () => updateInstanceFilter("map", "maxPrice", 100000000),
     });
   }
 
@@ -243,7 +243,7 @@ const appendCommonParams = (params: any, filters: any) => {
   if (search) params.search = search;
   if (location) params.location = location;
   if (minPrice !== undefined && minPrice > 1000) params.minPrice = minPrice;
-  if (maxPrice !== undefined && maxPrice < 20000000) params.maxPrice = maxPrice;
+  if (maxPrice !== undefined && maxPrice < 100000000) params.maxPrice = maxPrice;
   if (minSqft !== undefined && minSqft > 100) params.minSqft = minSqft;
   if (maxSqft !== undefined && maxSqft < 15000) params.maxSqft = maxSqft;
   if (minLotSizeArea !== undefined && minLotSizeArea > 100)
