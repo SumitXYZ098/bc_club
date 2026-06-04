@@ -224,12 +224,11 @@ export default function PropertiesListingPage() {
         title: listing?.property_sub_type,
         price: listing?.price,
         oldPrice: Number(listing?.old_price) || 0,
-        daysAgo:
-          Number(listing?.old_price) > 0
-            ? listing?.ModificationTimestamp
-            : (listing?.OriginalEntryTimestamp ??
-              listing?.raw_data?.BridgeModificationTimestamp ??
-              0),
+        daysAgo: listing?.old_price
+          ? listing?.ModificationTimestamp
+          : (listing?.OriginalEntryTimestamp ??
+            listing?.raw_data?.BridgeModificationTimestamp ??
+            0),
         address: listing?.address,
         sqft: listing?.Living_area ?? listing?.area ?? 0,
         beds: listing?.bedrooms ?? 0,

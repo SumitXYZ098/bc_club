@@ -24,7 +24,9 @@ import Supercluster from "supercluster";
 import { useRouter } from "next/navigation";
 import {
   useGetListings,
+  useGetMapZoomAssignmentList,
   useGetMapZoomListings,
+  useGetMapZoomSoldList,
   useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
 import { useListingStore } from "@/src/store/useListingStore";
@@ -71,6 +73,7 @@ import MapSidebar from "../maps/MapSidebar";
 import MapLoadingBadge from "../maps/google_map/MapLoadingBadge";
 import GetInTouch from "../getInTouch/GetInTouch";
 import OSMGeoJsonLayer from "./OSMGeoJsonLayer";
+import OpenStreetMapSoldMakerLayer from "./OpenStreetMapSoldMakerLayer";
 
 type SchoolItem = {
   id: string;
@@ -338,6 +341,28 @@ export default function OpenStreetMapSearch() {
             Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
         ),
     enabled: isForSale && !!mapBounds,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // const {
+  //   data: queryDataAssignment,
+  //   isLoading: isLoadingAssignment,
+  //   isFetching: isFetchingAssignment,
+  // } = useGetMapZoomAssignmentList(mapZoomParams, {
+  //   select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
+  //   enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
+  //   staleTime: 1000 * 60 * 5,
+  // });
+
+  // console.log(queryDataAssignment, "queryDataAssignment");
+
+  const {
+    data: queryDataSold,
+    isLoading: isLoadingSold,
+    isFetching: isFetchingSold,
+  } = useGetMapZoomSoldList(mapZoomParams, {
+    select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
+    enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -930,6 +955,12 @@ export default function OpenStreetMapSearch() {
                 setSelectedProperty={setSelectedProperty}
                 setSelectedClusterProperties={setSelectedClusterProperties}
                 setClusterPosition={setClusterPosition}
+              />
+
+              <OpenStreetMapSoldMakerLayer
+                map={map}
+                soldListings={queryDataSold || []}
+                zoomVal={mapZoomVal}
               />
 
               <OpenStreetPropertyPopup

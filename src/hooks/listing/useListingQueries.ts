@@ -28,6 +28,8 @@ import {
   getPropertiesAssignmentDetails,
   getDDFPropertiesListByAddress,
   getSalesReported,
+  getMapZoomAssignmentList,
+  getMapZoomSoldList,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -72,6 +74,7 @@ export function useGetActiveListings<TData = any>(
   });
 }
 
+// Map Zoom Listing
 export function useGetMapZoomListings<TData = any>(
   params?: any,
   options?: Omit<
@@ -82,6 +85,36 @@ export function useGetMapZoomListings<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: ["mapZoomListings", params || {}],
     queryFn: () => getMapZoomListings(params),
+    ...options,
+  });
+}
+
+// Map Zoom Assignment List
+export function useGetMapZoomAssignmentList<TData = any>(
+  params?: any,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["mapZoomAssignmentList", params || {}],
+    queryFn: () => getMapZoomAssignmentList(params),
+    ...options,
+  });
+}
+
+// Map Zoom Sold List
+export function useGetMapZoomSoldList<TData = any>(
+  params?: any,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["mapZoomSoldList", params || {}],
+    queryFn: () => getMapZoomSoldList(params),
     ...options,
   });
 }

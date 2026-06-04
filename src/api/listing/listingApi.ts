@@ -32,7 +32,7 @@ export async function getActiveListings(params?: any): Promise<any> {
     throw new Error("An unexpected error occurred");
   }
 }
-
+// Map Zoom Listings
 export async function getMapZoomListings(params?: any): Promise<any> {
   try {
     const res = await axios.get(Endpoints.mapZoom, { params });
@@ -41,6 +41,38 @@ export async function getMapZoomListings(params?: any): Promise<any> {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+// Map Zoom Assignment List
+export async function getMapZoomAssignmentList(params?: any): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getMapZoomAssignmentList, {
+      params,
+    });
+    console.log(res.data, "getMapZoomAssignmentList res");
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data.error.message);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+// Map Zoom Sold List
+export async function getMapZoomSoldList(params?: any): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getMapZoomSold, {
+      params,
+    });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data.error.message);
     }
     throw new Error("An unexpected error occurred");
   }

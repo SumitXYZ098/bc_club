@@ -208,7 +208,7 @@ const SearchPropertyTab = () => {
                 </div>
                 {ddfResults.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={`${item.documentId}-${index}`}
                     onMouseDown={() => handleSelectProperty(item.documentId)}
                     className="search-item cursor-pointer px-4 py-3 flex items-start gap-3"
                     style={{

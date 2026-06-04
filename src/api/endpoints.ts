@@ -36,4 +36,8 @@ export const Endpoints = {
 
   // Sale Report
   getSaleReport: `${BASE_URL}/api/sales-reported`,
+
+  // MapZoom
+  getMapZoomAssignmentList: `${BASE_URL}/api/property-assignment-lists/map-zoom`,
+  getMapZoomSold: `${BASE_URL}/api/properties/sold/map-zoom`,
 };
