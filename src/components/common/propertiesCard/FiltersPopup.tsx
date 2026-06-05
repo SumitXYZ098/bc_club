@@ -217,6 +217,10 @@ export default function FiltersPopup({
     filters.minTax ?? 0,
     filters.maxTax ?? 50000,
   ]);
+
+  const [associationFee, setAssociationFee] = useState<
+    [number | null, number | null]
+  >([filters.minAssociationFee ?? 0, filters.maxAssociationFee ?? 3000]);
   const [bedrooms, setBedrooms] = useState<number | null>(
     filters.activeBedRoom && filters.activeBedRoom !== "any"
       ? Number(filters.activeBedRoom.replace("+", ""))
@@ -270,6 +274,9 @@ export default function FiltersPopup({
 
   const [minTaxInput, setMinTaxInput] = useState("");
   const [maxTaxInput, setMaxTaxInput] = useState("");
+
+  const [minAssociationFeeInput, setMinAssociationFeeInput] = useState("");
+  const [maxAssociationFeeInput, setMaxAssociationFeeInput] = useState("");
 
   const handleToggleLocation = (city: string) => {
     if (selectedLocations.includes(city)) {
@@ -363,11 +370,15 @@ export default function FiltersPopup({
       const minPps = currentFilters.minPricePerSft ?? 0;
       const maxPps = currentFilters.maxPricePerSft ?? 25000;
 
+      const minFee = currentFilters.minAssociationFee ?? 0;
+      const maxFee = currentFilters.maxAssociationFee ?? 3000;
+
       setPrice([minPrice, maxPrice]);
       setSqft([minSqft, maxSqft]);
       setLotSqft([minLot, maxLot]);
       setTax([minTax, maxTax]);
       setPricePerSft([minPps, maxPps]);
+      setAssociationFee([minFee, maxFee]);
 
       // input reset / sync
       setMinPriceInput(minPrice > 0 ? String(minPrice) : "");
@@ -384,6 +395,9 @@ export default function FiltersPopup({
 
       setMinPricePerSftInput(minPps > 0 ? String(minPps) : "");
       setMaxPricePerSftInput(maxPps < 25000 ? String(maxPps) : "");
+
+      setMinAssociationFeeInput(minFee > 0 ? String(minFee) : "");
+      setMaxAssociationFeeInput(maxFee < 3000 ? String(maxFee) : "");
 
       setBedrooms(
         currentFilters.activeBedRoom && currentFilters.activeBedRoom !== "any"
@@ -441,6 +455,9 @@ export default function FiltersPopup({
 
     setMinTaxInput("");
     setMaxTaxInput("");
+
+    setMinAssociationFeeInput("");
+    setMaxAssociationFeeInput("");
   };
 
   const handleClearAll = () => {
@@ -451,6 +468,7 @@ export default function FiltersPopup({
     setLotSqft([0, 100000]);
     setTax([0, 50000]);
     setPricePerSft([0, 25000]);
+    setAssociationFee([0, 3000]);
     setBedrooms(null);
     setBathrooms(null);
     setStatus("");
@@ -473,6 +491,8 @@ export default function FiltersPopup({
     updateInstanceFilter(id, "maxTax", tax[1]);
     updateInstanceFilter(id, "minPricePerSft", pricePerSft[0]);
     updateInstanceFilter(id, "maxPricePerSft", pricePerSft[1]);
+    updateInstanceFilter(id, "minAssociationFee", associationFee[0]);
+    updateInstanceFilter(id, "maxAssociationFee", associationFee[1]);
     updateInstanceFilter(
       id,
       "activeBedRoom",
@@ -998,6 +1018,95 @@ export default function FiltersPopup({
           </div>
         </div>
         <LineGradient />
+
+        {/* Maintenance Fee Range */}
+        <div className="md:mb-6 mb-3 pt-5">
+          <h3 className="font-medium md:mb-3">Maintenance Fee</h3>
+          <div className="relative">
+            <PriceSlider
+              value={[associationFee[0] ?? 0, associationFee[1] ?? 3000]}
+              min={0}
+              max={3000}
+              step={10}
+              onChange={(_, v) => {
+                const next = v as [number, number];
+                setAssociationFee(next);
+                setMinAssociationFeeInput(String(next[0]));
+                setMaxAssociationFeeInput(String(next[1]));
+              }}
+              disableSwap
+              valueLabelDisplay="auto"
+              // marks={[
+              //   { value: 0, label: "$0" },
+              //   { value: 1000, label: "$1K" },
+              //   { value: 2000, label: "$2K" },
+              //   { value: 3000, label: "$3K" },
+              // ]}
+            />
+            {/* Input Boxes */}
+            <div className="flex items-center justify-between gap-2 sm:gap-4 mt-3">
+              {/* Min */}
+              <div className="flex items-center gap-1 sm:gap-4 h-full">
+                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                  Min Fee
+                </p>
+                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-40.5 px-2 sm:px-4 py-2 h-full">
+                  <span className="text-secondary">$</span>
+                  <input
+                    type="number"
+                    value={minAssociationFeeInput}
+                    onChange={(e) =>
+                      handleRangeInputChange(
+                        e.target.value,
+                        0,
+                        setAssociationFee,
+                        setMinAssociationFeeInput,
+                        0,
+                        3000,
+                      )
+                    }
+                    placeholder="Min"
+                    className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
+
+              {/* Divider */}
+              <LineGradient
+                customClasses="mx-1 h-10 sm:h-15 hidden sm:block"
+                vr
+              />
+
+              {/* Max */}
+              <div className="flex items-center gap-1 sm:gap-4 h-full">
+                <p className="text-[10px] sm:text-xs text-[#333]/30 mb-1 whitespace-nowrap">
+                  Max Fee
+                </p>
+                <div className="flex text-xs sm:text-sm font-medium items-center gap-1 border border-[#33333333] rounded-xl w-24 sm:w-40.5 px-2 sm:px-4 py-2 h-full">
+                  <span className="text-secondary">$</span>
+                  <input
+                    type="number"
+                    value={maxAssociationFeeInput}
+                    onChange={(e) =>
+                      handleRangeInputChange(
+                        e.target.value,
+                        1,
+                        setAssociationFee,
+                        setMaxAssociationFeeInput,
+                        0,
+                        3000,
+                      )
+                    }
+                    placeholder="Max"
+                    className="w-full bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <LineGradient />
+
         {/* Living Area Range */}
         <div className="md:mb-6 mb-3 pt-5">
           <h3 className="font-medium md:mb-3">Living Area</h3>

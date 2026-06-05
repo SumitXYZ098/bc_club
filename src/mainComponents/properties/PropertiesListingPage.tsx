@@ -71,6 +71,8 @@ export default function PropertiesListingPage() {
   const maxTax = filters.maxTax;
   const minPricePerSft = filters.minPricePerSft;
   const maxPricePerSft = filters.maxPricePerSft;
+  const minAssociationFee = filters.minAssociationFee;
+  const maxAssociationFee = filters.maxAssociationFee;
   const status = filters.status;
   const location = filters.location;
   const whenListed = filters.whenListed;
@@ -190,6 +192,12 @@ export default function PropertiesListingPage() {
   }
   if (maxPricePerSft !== undefined && maxPricePerSft < 25000) {
     params.maxPricePerSft = maxPricePerSft;
+  }
+  if (minAssociationFee !== undefined && minAssociationFee > 100) {
+    params.minAssociationFee = minAssociationFee;
+  }
+  if (maxAssociationFee !== undefined && maxAssociationFee < 3000) {
+    params.maxAssociationFee = maxAssociationFee;
   }
 
   if (location && location !== "") {
@@ -335,6 +343,8 @@ export default function PropertiesListingPage() {
     maxTax,
     minPricePerSft,
     maxPricePerSft,
+    minAssociationFee,
+    maxAssociationFee,
     status,
     location,
     whenListed,
@@ -418,6 +428,14 @@ export default function PropertiesListingPage() {
                   filters.maxLotSizeArea < 100000) ||
                 (filters.minTax !== undefined && filters.minTax > 0) ||
                 (filters.maxTax !== undefined && filters.maxTax < 50000) ||
+                (filters.minPricePerSft !== undefined &&
+                  filters.minPricePerSft > 100) ||
+                (filters.maxPricePerSft !== undefined &&
+                  filters.maxPricePerSft < 25000) ||
+                (filters.minAssociationFee !== undefined &&
+                  filters.minAssociationFee > 100) ||
+                (filters.maxAssociationFee !== undefined &&
+                  filters.maxAssociationFee < 3000) ||
                 (filters.whenListed && filters.whenListed !== "any") ||
                 filters.location ||
                 filters.features ||
@@ -528,6 +546,10 @@ export default function PropertiesListingPage() {
                 filters.minPricePerSft > 100) ||
               (filters.maxPricePerSft !== undefined &&
                 filters.maxPricePerSft < 25000) ||
+              (filters.minAssociationFee !== undefined &&
+                filters.minAssociationFee > 100) ||
+              (filters.maxAssociationFee !== undefined &&
+                filters.maxAssociationFee < 3000) ||
               (filters.whenListed && filters.whenListed !== "any") ||
               filters.location ||
               filters.features ||
@@ -556,6 +578,10 @@ export default function PropertiesListingPage() {
             filters.minPricePerSft > 100) ||
           (filters.maxPricePerSft !== undefined &&
             filters.maxPricePerSft < 25000) ||
+          (filters.minAssociationFee !== undefined &&
+            filters.minAssociationFee > 100) ||
+          (filters.maxAssociationFee !== undefined &&
+            filters.maxAssociationFee < 3000) ||
           (filters.whenListed && filters.whenListed !== "any") ||
           filters.features ||
           (filters.location &&
@@ -631,6 +657,21 @@ export default function PropertiesListingPage() {
                     updateInstanceFilter("list", "maxPricePerSft", 25000);
                     updateInstanceFilter("list", "minPriceInput", "");
                     updateInstanceFilter("list", "maxPriceInput", "");
+                  }}
+                  className="bg-gray-100 text-sm"
+                />
+              ) : null}
+              {(filters.minAssociationFee !== undefined &&
+                filters.minAssociationFee > 100) ||
+              (filters.maxAssociationFee !== undefined &&
+                filters.maxAssociationFee < 3000) ? (
+                <Chip
+                  label={`$${filters.minAssociationFee} to ${filters.maxAssociationFee === 3000 ? "Max" : `$${filters.maxAssociationFee}`} (Maintenance Fee)`}
+                  onDelete={() => {
+                    updateInstanceFilter("list", "minAssociationFee", 0);
+                    updateInstanceFilter("list", "maxAssociationFee", 3000);
+                    updateInstanceFilter("list", "minAssociationFeeInput", "");
+                    updateInstanceFilter("list", "maxAssociationFeeInput", "");
                   }}
                   className="bg-gray-100 text-sm"
                 />

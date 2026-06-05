@@ -27,6 +27,10 @@ interface FilterState {
   maxPricePerSftInput?: string;
   minTaxInput?: string;
   maxTaxInput?: string;
+  minAssociationFee?: number;
+  maxAssociationFee?: number;
+  minAssociationFeeInput?: string;
+  maxAssociationFeeInput?: string;
   activeProperty?: string;
   [key: string]: any;
 }
@@ -55,6 +59,8 @@ const DEFAULT_FILTERS: FilterState = {
   maxLotSizeArea: 100000,
   minTax: 0,
   maxTax: 50000,
+  minAssociationFee: 0,
+  maxAssociationFee: 3000,
   minPriceInput: "",
   maxPriceInput: "",
   minSqftInput: "",
@@ -65,6 +71,8 @@ const DEFAULT_FILTERS: FilterState = {
   maxPricePerSftInput: "",
   minTaxInput: "",
   maxTaxInput: "",
+  minAssociationFeeInput: "",
+  maxAssociationFeeInput: "",
   activeBedRoom: "any",
   activeBathRoom: "any",
   propertyType: "any",

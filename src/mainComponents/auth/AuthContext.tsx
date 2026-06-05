@@ -27,6 +27,7 @@ interface AuthContextType {
   resetEmail: string;
   setResetEmail: (email: string) => void;
   resetToken: string;
+  authLoading: boolean;
   setResetToken: (token: string) => void;
   isLoggedIn: boolean;
   username: any;
@@ -55,21 +56,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [resetToken, setResetToken] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
+  const [authLoading, setAuthLoading] = useState(true);
   const { clearAllFilters } = useListingStore();
   const query = useQueryClient();
 
   useEffect(() => {
     const userCookie = Cookies.get("username");
-    if (userCookie || Cookies.get("token")) {
+    const token = Cookies.get("token");
+
+    if (userCookie || token) {
       setIsLoggedIn(true);
+
       if (userCookie) {
         try {
           setUsername(JSON.parse(userCookie));
-        } catch (error) {
+        } catch {
           setUsername(userCookie);
         }
       }
     }
+
+    setAuthLoading(false);
   }, []);
 
   const loginUser = (user: any, token?: string, keepLoggedIn?: boolean) => {
@@ -98,6 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
+        authLoading,
         openLogin,
         setOpenLogin,
         openSignup,

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-import PropertyContactUs from "./PropertyContactUs";
-import PropertyTabs from "./PropertyTabs";
+"use client";
+import PropertyTabs from "./SoldPropertyTabs";
 import Description, {
   IDescriptionTypes,
 } from "@/src/components/description/Description";
@@ -14,7 +13,7 @@ import {
   buildingComplexHeaders,
   buildingComplexRows,
   getPropertyDetailsRows,
-  getPropertyRoomRows,
+  getRoomRows,
   marketStatsHeaders,
   marketStatsRows,
   propertyDetailsHeaders,
@@ -25,12 +24,16 @@ import {
 import AssessmentHistory from "./AssessmentHistory";
 import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
+import SoldPropertyContactUs from "./SoldPropertyContactUs";
+import { useState } from "react";
 import CustomButton from "@/src/components/button/CustomButton";
+import { Dialog, IconButton } from "@mui/material";
+import { FiX } from "react-icons/fi";
 
 const SCHOOL_LOCATOR_URL =
   "https://mybaragar.com/index.cfm?event=page.SchoolLocatorPublic&DistrictGUID=E6EC1BC2-3986-463A-9ED9-FFF4DECA3AB3&DistrictCode=BC36&DataStatus=1";
 
-const PropertyInformation = ({ property }: { property: any }) => {
+const SoldPropertyInformation = ({ property }: { property: any }) => {
   const featureslist = [
     {
       icon: Icons.bedroom,
@@ -56,9 +59,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
       icon: Icons.scale,
       label: "Living Area Size",
       value:
-        property?.Living_area && property?.Living_area !== 0
-          ? `${property?.Living_area} sft`
-          : "Na",
+        property?.area && property?.area !== 0 ? `${property?.area} sft` : "Na",
     },
     ...(property?.lot_size_area != null && property?.lot_size_area !== ""
       ? [
@@ -99,6 +100,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`,
     );
   };
+
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
       <div className="flex flex-col xl:w-[70%] w-full h-full  relative">
@@ -194,11 +196,11 @@ const PropertyInformation = ({ property }: { property: any }) => {
             rows={getPropertyDetailsRows(property)}
           />
           {/* Room Information */}
-          {property?.rooms && property?.rooms?.length > 0 && (
+          {property?.raw_data && (
             <DynamicTable
               title="Room Information"
               headers={roomHeaders}
-              rows={getPropertyRoomRows(property)}
+              rows={getRoomRows(property)}
             />
           )}
 
@@ -241,27 +243,29 @@ const PropertyInformation = ({ property }: { property: any }) => {
           </div>
 
           {/* Nearby Schools */}
-          <div id="neighbourhood" className="scroll-mt-40">
-            <div>
-              <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
-                Nearby Schools
-              </h2>
+          {nearbyPlaces?.data?.schools.length > 0 && (
+            <div id="neighbourhood" className="scroll-mt-40">
+              <div>
+                <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
+                  Nearby Schools
+                </h2>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {nearbyPlacesLoading
-                  ? Array.from({ length: 6 }).map((_, index) => (
-                      <NearbyPlaceSkeleton key={index} />
-                    ))
-                  : nearbyPlaces?.data?.schools?.map((school: any) => (
-                      <NearbyPlaceCard
-                        key={school.place_id}
-                        place={school}
-                        type="school"
-                      />
-                    ))}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {nearbyPlacesLoading
+                    ? Array.from({ length: 6 }).map((_, index) => (
+                        <NearbyPlaceSkeleton key={index} />
+                      ))
+                    : nearbyPlaces?.data?.schools?.map((school: any) => (
+                        <NearbyPlaceCard
+                          key={school.place_id}
+                          place={school}
+                          type="school"
+                        />
+                      ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* School Locator */}
           <CustomButton
@@ -292,10 +296,10 @@ const PropertyInformation = ({ property }: { property: any }) => {
       </div>
       {/* ================= RIGHT SIDEBAR ================= */}
       <aside className="h-fit sticky top-14 self-start md:w-[30%] xl:block hidden  ">
-        <PropertyContactUs property={property} />
+        <SoldPropertyContactUs property={property} />
       </aside>
     </div>
   );
 };
 
-export default PropertyInformation;
+export default SoldPropertyInformation;

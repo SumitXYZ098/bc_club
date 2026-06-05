@@ -16,7 +16,6 @@ export function OpenStreetPropertyPopup({
     selectedProperty.title === "Single Family"
       ? selectedProperty.structureType
       : selectedProperty.title;
-
   return (
     <Popup
       position={[selectedProperty.latitude, selectedProperty.longitude]}
@@ -36,10 +35,20 @@ export function OpenStreetPropertyPopup({
         }}
         onClick={(e) => {
           e.stopPropagation();
-          window.location.href = `/property-info/${selectedProperty.id}`;
+          window.location.href = selectedProperty.isDdf
+            ? `/property-info/${selectedProperty.id}`
+            : `/sold-property-info/${selectedProperty.id}`;
         }}
       >
-        <div style={{ width: "100%", height: 130, overflow: "hidden", borderRadius: 3, backgroundColor: "#f1f5f9" }}>
+        <div
+          style={{
+            width: "100%",
+            height: 130,
+            overflow: "hidden",
+            borderRadius: 3,
+            backgroundColor: "#f1f5f9",
+          }}
+        >
           <img
             src={selectedProperty.image || Images.apartment}
             alt={selectedProperty.title}
@@ -47,14 +56,46 @@ export function OpenStreetPropertyPopup({
           />
         </div>
 
-        <div style={{ padding: "12px 2px 4px 2px", display: "flex", flexDirection: "column", gap: 4 }}>
-          <h3 style={{ margin: 0, color: "#305487", fontSize: 18, fontWeight: 700 }}>
+        <div
+          style={{
+            padding: "12px 2px 4px 2px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              color: "#305487",
+              fontSize: 18,
+              fontWeight: 700,
+            }}
+          >
             ${Number(selectedProperty.price).toLocaleString()}
           </h3>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 14,
+              fontWeight: 700,
+              color: "#333",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             {displayTitle}
           </p>
-          <p style={{ margin: 0, fontSize: 12, color: "#6e6e6e", lineHeight: 1.4, fontWeight: 500 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 12,
+              color: "#6e6e6e",
+              lineHeight: 1.4,
+              fontWeight: 500,
+            }}
+          >
             {selectedProperty.address}
           </p>
         </div>
@@ -72,7 +113,8 @@ export function OpenStreetClusterPopup({
   stableClusterPosition: { lat: number; lng: number } | null;
   onClose: () => void;
 }) {
-  if (selectedClusterProperties.length === 0 || !stableClusterPosition) return null;
+  if (selectedClusterProperties.length === 0 || !stableClusterPosition)
+    return null;
 
   return (
     <Popup
@@ -81,7 +123,15 @@ export function OpenStreetClusterPopup({
       closeButton
       autoPan
     >
-      <div style={{ width: 300, maxHeight: 320, overflowY: "auto", padding: 8, fontFamily: "Plus Jakarta Display" }}>
+      <div
+        style={{
+          width: 300,
+          maxHeight: 320,
+          overflowY: "auto",
+          padding: 8,
+          fontFamily: "Plus Jakarta Display",
+        }}
+      >
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
           Properties ({selectedClusterProperties.length})
         </h3>
@@ -93,18 +143,38 @@ export function OpenStreetClusterPopup({
               e.stopPropagation();
               window.location.href = `/property-info/${p.id}`;
             }}
-            style={{ display: "flex", gap: 10, marginBottom: 12, cursor: "pointer", borderBottom: "1px solid #eee", paddingBottom: 10 }}
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 12,
+              cursor: "pointer",
+              borderBottom: "1px solid #eee",
+              paddingBottom: 10,
+            }}
           >
             <img
               src={p.image || Images.apartment}
               alt=""
-              style={{ width: 70, height: 55, objectFit: "cover", borderRadius: 6, background: "#f1f5f9" }}
+              style={{
+                width: 70,
+                height: 55,
+                objectFit: "cover",
+                borderRadius: 6,
+                background: "#f1f5f9",
+              }}
             />
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: 13, color: "#305487" }}>
                 ${Number(p.price).toLocaleString()}
               </div>
-              <div style={{ fontSize: 12, color: "#444", fontWeight: 600, marginTop: 2 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#444",
+                  fontWeight: 600,
+                  marginTop: 2,
+                }}
+              >
                 {p.title === "Single Family" ? p.structureType : p.title}
               </div>
               <div style={{ fontSize: 11, color: "#777", marginTop: 2 }}>
