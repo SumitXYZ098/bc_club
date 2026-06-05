@@ -1,5 +1,5 @@
 const Icons = {
-  bcClub: "../BCClub.svg",
+  bcClub: "../BCRealEstateMarket.svg",
   closeMenu: "../close-rounded.svg",
   openMenu: "../menu-motion.svg",
   heroMapVector: "../heroMapVector.svg",

@@ -60,12 +60,12 @@ export default function OpenStreetMapSoldMakerLayer({
       const icon = L.divIcon({
         className: "",
         html: `
-          <div class="sold-marker flex items-center justify-center rounded-full bg-red-600 shadow-md cursor-pointer"
-            style="width:10px;height:10px;">
+          <div class="sold-marker flex items-center justify-center rounded-sm text-[#dc2626] bg-background hover:border border-[#dc2626] text-xs font-semibold text-nowrap shadow-md cursor-pointer w-fit px-1 py-0.5">
+           Sold ${soldYear}
           </div>
         `,
-        iconSize: [10, 10],
-        iconAnchor: [5, 5],
+        iconSize: [15, 15],
+        iconAnchor: [7.5, 7.5],
       });
 
       const popupHtml = `
@@ -166,12 +166,6 @@ export default function OpenStreetMapSoldMakerLayer({
       `;
 
       const marker = L.marker([lat, lng], { icon }).addTo(map);
-
-      // marker.bindTooltip(`Sold ${soldYear}`, {
-      //   direction: "top",
-      //   offset: [0, -2],
-      //   opacity: 1,
-      // });
 
       marker.bindPopup(popupHtml, {
         closeButton: true,

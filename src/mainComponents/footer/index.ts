@@ -25,10 +25,10 @@ export const citiesWeCover: LinkListProps = {
       label: "Richmond, BC",
       href: "/properties?location=Richmond",
     },
-    {
-      label: "Victoria, BC",
-      href: "/properties?location=Victoria",
-    },
+    // {
+    //   label: "Victoria, BC",
+    //   href: "/properties?location=Victoria",
+    // },
   ],
 };
 

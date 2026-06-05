@@ -673,7 +673,7 @@ export default function PropertiesListingPage() {
               )}
               {filters.activeProperty && filters.activeProperty !== "any" && (
                 <Chip
-                  label={`Property: ${filters.activeProperty
+                  label={`Property Type: ${filters.activeProperty
                     .split(",")
                     .map((t: string) => t.replace(/([A-Z])/g, " $1").trim())
                     .join(", ")}`}
@@ -699,7 +699,7 @@ export default function PropertiesListingPage() {
               )}
               {filters.structureType && (
                 <Chip
-                  label={`Type: ${filters.structureType.split(",").join(", ")}`}
+                  label={`Property Type: ${filters.structureType.split(",").join(", ")}`}
                   onDelete={() => {
                     updateInstanceFilter("list", "structureType", "");
                   }}

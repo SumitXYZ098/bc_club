@@ -310,35 +310,6 @@ export default function FiltersPopup({
     }
   };
 
-  // const handleToggleStructureType = (type: string) => {
-  //   const singleFamilyOptions = [
-  //     "Single-Family",
-  //     "Townhouse",
-  //     "Detached House",
-  //     "Detached Home",
-  //     "Duplex",
-  //     "Apartment/Condo",
-  //     "Apartment",
-  //     "Single Family Residence",
-  //     "Half Duplex",
-  //     "Row House (Non-Strata)",
-  //   ];
-  //   const currentSF = selectedProperties.filter((p) =>
-  //     singleFamilyOptions.includes(p),
-  //   );
-  //   if (currentSF.length !== selectedProperties.length) {
-  //     setSelectedProperties(currentSF);
-  //   }
-
-  //   if (selectedStructureTypes.includes(type)) {
-  //     setSelectedStructureTypes(
-  //       selectedStructureTypes.filter((t) => t !== type),
-  //     );
-  //   } else {
-  //     setSelectedStructureTypes([...selectedStructureTypes, type]);
-  //   }
-  // };
-
   const handleToggleStructureType = (type: string) => {
     const singleFamilyOptions = [
       "Single-Family",
@@ -645,11 +616,12 @@ export default function FiltersPopup({
                 {/* Popular Group */}
                 <div>
                   <div
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setExpandedCityGroup(
                         expandedCityGroup === "popular" ? null : "popular",
-                      )
-                    }
+                      );
+                    }}
                     className="px-4 py-2 bg-gray-50/80 font-medium text-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center"
                   >
                     <span>Popular Cities</span>
@@ -688,14 +660,15 @@ export default function FiltersPopup({
                 {/* All Cities Group */}
                 <div className="mb-1">
                   <div
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setExpandedCityGroup(
                         expandedCityGroup === "all" ? null : "all",
-                      )
-                    }
+                      );
+                    }}
                     className="px-4 py-2 bg-gray-50/80 font-medium text-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center"
                   >
-                    <span>All Cities</span>
+                    <span>All BC Cities</span>
                     <span className="text-gray-500">
                       {expandedCityGroup === "all" ? (
                         <FiChevronUp />

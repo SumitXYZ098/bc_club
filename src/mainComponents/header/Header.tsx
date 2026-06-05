@@ -95,13 +95,17 @@ const Header = () => {
         }`}
       >
         {/* Logo */}
-        <Link href={"/"} onClick={() => !isLaptop && setShowMenu(false)} className="xl:hidden block">
+        <Link
+          href={"/"}
+          onClick={() => !isLaptop && setShowMenu(false)}
+          className="xl:hidden block"
+        >
           <Image
             alt="logo"
             src={Icons.bcClub}
             width={119}
             height={42}
-            className="w-22.5 h-9 object-contain"
+            className="w-45 h-10 object-contain"
           />
         </Link>
 
@@ -111,7 +115,7 @@ const Header = () => {
             src={Icons.bcClub}
             width={119}
             height={42}
-            className="w-29.75 h-10.5 object-contain"
+            className="w-65 h-11 object-contain"
           />
         </Link>
 

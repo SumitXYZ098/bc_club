@@ -21,7 +21,7 @@ import {
   roomHeaders,
   taxHistoryHeaders,
   taxHistoryRows,
-} from "../../dummyData";
+} from "..";
 import AssessmentHistory from "./AssessmentHistory";
 import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";

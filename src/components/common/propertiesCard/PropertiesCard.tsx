@@ -10,12 +10,9 @@ import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import {
   useGetMe,
-  useRemoveFromWishlist,
-  useToggleWishlist,
   useToggleDdfWishlist,
   useRemoveDdfWishlist,
 } from "@/src/hooks/listing/useListingQueries";
-import dayjs from "dayjs";
 import { getTime } from "@/src/utilities/utilities";
 import { IoArrowUpOutline, IoArrowDownOutline } from "react-icons/io5";
 
@@ -156,8 +153,12 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
 
   const img = image ? image : Images.apartment;
 
-  const isLinkDisabled = isExpired || isSold;
-  const getHref = isLinkDisabled ? "#" : `/property-info/${id}`;
+  const isLinkDisabled = isExpired;
+  const getHref = isLinkDisabled
+    ? "#"
+    : isSold
+      ? `/sold-property-info/${id}`
+      : `/property-info/${id}`;
 
   return (
     <Link

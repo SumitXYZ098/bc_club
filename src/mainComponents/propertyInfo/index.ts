@@ -1,193 +1,6 @@
 import dayjs from "dayjs";
-import { Images } from "../app/exports";
-import { TableHeader } from "../components/common/dynamicTable/DynamicTable";
-import { PropertyCardProps } from "../components/common/propertiesCard/PropertiesCard";
-import { getTime, sqftToAcresFormatted } from "../utilities/utilities";
-
-export const propertyData: PropertyCardProps[] = [
-  {
-    id: "1",
-    title: "Apartment/Condo",
-    price: 350000,
-    daysAgo: 10,
-    image: Images.apartment,
-    address: "1056 Nicola St, Vancouver, BC V6G 2E1, Canada",
-    sqft: "1200",
-    beds: 2,
-    baths: 2,
-    priceDrop: 10,
-    assessedDiff: -1,
-    realtor: "Jane Smith / Smith Realty Group",
-    mls: "R3059142",
-  },
-  {
-    id: "2",
-    title: "Townhouse",
-    price: 450000,
-    daysAgo: 10,
-    image: Images.townHouse,
-    address: "1690 Nelson St., Vancouver, BC V6G 1M5, Canada",
-    sqft: "1500",
-    beds: 4,
-    baths: 3,
-    priceDrop: 10,
-    assessedDiff: 5,
-    realtor: "Jane Smith / Smith Realty Group",
-    mls: "R3059999",
-  },
-  {
-    id: "3",
-    title: "Single Family Residence ",
-    price: 555000,
-    daysAgo: 10,
-    image: Images.singleFamily,
-    address: "10941 141a St, Surrey, BC V3R 7R8, Canada",
-    sqft: "1200",
-    beds: 4,
-    baths: 3,
-    priceDrop: 10,
-    assessedDiff: 3,
-    realtor: "Jane Smith / Smith Realty Group",
-    mls: "R3059999",
-  },
-  {
-    id: "4",
-    title: "Townhouse",
-    price: 450000,
-    daysAgo: 10,
-    image: Images.condoTwo,
-    address: "11021 136 St, Surrey, BC V3R 3B2, Canada",
-    sqft: "1500",
-    beds: 4,
-    baths: 3,
-    priceDrop: 10,
-    assessedDiff: 5,
-    realtor: "Jane Smith / Smith Realty Group",
-    mls: "R3059999",
-  },
-  {
-    id: "5",
-    title: "Apartment/Condo",
-    price: 350000,
-    daysAgo: 10,
-    image: Images.singleFamilyTwo,
-    address: "519 Union St, Vancouver, BC V6A 2B7, Canada",
-    sqft: "1200",
-    beds: 2,
-    baths: 2,
-    priceDrop: 10,
-    assessedDiff: -1,
-    realtor: "Jane Smith / Smith Realty Group",
-    mls: "R3059142",
-  },
-  {
-    id: "6",
-    title: "Single Family Residence ",
-    price: 555000,
-    daysAgo: 10,
-    image: Images.singleFamilyThree,
-    address: "4080 Littlewood Ave, Burnaby, BC V5G 3N4, Canada",
-    sqft: "1200",
-    beds: 4,
-    baths: 3,
-    priceDrop: 10,
-    assessedDiff: 3,
-    realtor: "Jane Smith / Smith Realty Group",
-    mls: "R3059999",
-  },
-  {
-    id: "7",
-    title: "Apartment/Condo",
-    price: 350000,
-    daysAgo: 10,
-    image: Images.condoTwo,
-    address: "4805 Baytree Ct, Burnaby, BC V5G 4H1, Canada",
-    sqft: "1200",
-    beds: 2,
-    baths: 2,
-    priceDrop: 10,
-    assessedDiff: -1,
-    realtor: "Jane Smith / Smith Realty Group",
-    mls: "R3059142",
-  },
-];
-
-export const dummyListings = [
-  {
-    id: 1,
-    address: "90 Highland Dr #W/Sea, Orangeville, Ontario, Canada",
-    beds: 2,
-    baths: 5,
-  },
-  {
-    id: 2,
-    address: "2185 11th Concession W/Se, Trent Hills, Ontario, Canada",
-    beds: 2,
-    baths: 1,
-  },
-  {
-    id: 3,
-    address: "32 Weston Rd, Toronto, Ontario, Canada",
-    beds: 3,
-    baths: 2,
-  },
-  {
-    id: 4,
-    address: "32 Weston Rd, Toronto, Canada",
-    beds: 3,
-    baths: 2,
-  },
-  {
-    id: 6,
-    address: "90 Highland Dr #W/Sea, , Ontario, Canada",
-    beds: 5,
-    baths: 4,
-  },
-  {
-    id: 7,
-    address: "90 12th Concession W/Se, Ontario, Canada",
-    beds: 5,
-    baths: 4,
-  },
-  {
-    id: 8,
-    address: "9045 Weston Rd, Concession W/Se, BC, Canada",
-    beds: 5,
-    baths: 4,
-  },
-  {
-    id: 9,
-    address: "113 13TH AVE S CRANBROOK V1C 2V6",
-    beds: 5,
-    baths: 4,
-  },
-];
-
-export const propertyDetails = {
-  land: { label: "Land", value: 176000 },
-  description: { label: "Description", value: 42400 },
-  bedrooms: { label: "Bedrooms", value: 42400 },
-  baths: { label: "Baths", value: 42400 },
-  carports: { label: "Carports", value: 42400 },
-  garages: { label: "Garages", value: 42400 },
-  landSize: { label: "Land Size", value: 42400 },
-  firstFloorArea: { label: "First Floor Area", value: 42400 },
-  secondFloorArea: { label: "Second Floor Area", value: 198400 },
-  basementFinishArea: { label: "Basement Finish Area", value: 156000 },
-  buildingStoreys: { label: "Building Storeys", value: 42400 },
-  grossLeasableArea: { label: "Gross Leasable Area", value: 42400 },
-  netLeasableArea: { label: "Net Leasable Area", value: 42400 },
-  numberOfApartmentUnits: { label: "No. of Apartment Units", value: 42400 },
-};
-
-export const propertyImages = [
-  Images.apartment,
-  Images.apartment,
-  Images.apartment,
-  Images.apartment,
-  Images.apartment,
-  Images.apartment,
-];
+import { TableHeader } from "../../components/common/dynamicTable/DynamicTable";
+import { getTime, sqftToAcresFormatted } from "../../utilities/utilities";
 
 export const propertyDetailsHeaders: TableHeader[] = [
   { key: "label", label: "" },
@@ -228,14 +41,18 @@ export const getPropertyDetailsRows = (property: any) => [
         : "-",
     },
   },
-  {
-    data: {
-      label: "Maintenance Fee",
-      value: property?.raw_data?.AssociationFee
-        ? `$${property.raw_data.AssociationFee}`
-        : "-",
-    },
-  },
+  ...(property?.raw_data?.AssociationFee
+    ? [
+        {
+          data: {
+            label: "Maintenance Fee",
+            value: property?.raw_data?.AssociationFee
+              ? `$${property.raw_data.AssociationFee}`
+              : "-",
+          },
+        },
+      ]
+    : []),
   {
     data: {
       label: "Listing Date",
@@ -338,12 +155,28 @@ export const getPropertyDetailsRows = (property: any) => [
         : "-",
     },
   },
-  {
-    data: {
-      label: "Property Taxes",
-      value: property?.annual_tax ? `$${property.annual_tax}` : "-",
-    },
-  },
+  ...(property?.raw_data?.ParcelNumber
+    ? [
+        {
+          data: {
+            label: "PID",
+            value: property?.raw_data?.ParcelNumber
+              ? `${property.raw_data.ParcelNumber}`
+              : "-",
+          },
+        },
+      ]
+    : []),
+  ...(property?.annual_tax
+    ? [
+        {
+          data: {
+            label: "Property Taxes",
+            value: property?.annual_tax ? `$${property.annual_tax}` : "-",
+          },
+        },
+      ]
+    : []),
   {
     data: {
       label: "Ownership",
@@ -368,18 +201,26 @@ export const getPropertyDetailsRows = (property: any) => [
       value: property?.raw_data?.ParkingTotal ?? "-",
     },
   },
-  {
-    data: {
-      label: "Heating",
-      value: property?.raw_data?.Heating?.join(", ") || "-",
-    },
-  },
-  {
-    data: {
-      label: "Water Supply",
-      value: property?.raw_data?.WaterSource?.join(", ") || "-",
-    },
-  },
+  ...(property?.raw_data?.Heating?.length > 0
+    ? [
+        {
+          data: {
+            label: "Heating",
+            value: property?.raw_data?.Heating?.join(", ") || "-",
+          },
+        },
+      ]
+    : []),
+  ...(property?.raw_data?.WaterSource?.length > 0
+    ? [
+        {
+          data: {
+            label: "Water Supply",
+            value: property?.raw_data?.WaterSource?.join(", ") || "-",
+          },
+        },
+      ]
+    : []),
 ];
 
 export const roomHeaders: TableHeader[] = [
@@ -439,64 +280,6 @@ export const getPropertyRoomRows = (property: any) => {
       };
     });
 };
-
-export const nearbySchoolsHeaders: TableHeader[] = [
-  { key: "school", label: "School Name" },
-  { key: "address", label: "Address", align: "center" },
-  { key: "details", label: "Details", align: "right" },
-];
-
-export const nearbySchoolsRows = [
-  {
-    data: {
-      school: "Blakeburn Elementary",
-      address: "1040 Riverside Dr",
-      details: "0.5 km Public • SD 39",
-    },
-  },
-  {
-    data: {
-      school: "Terry Fox Secondary",
-      address: "1260 Riverwood Gate",
-      details: "0.3 km Public • SD 39",
-    },
-  },
-  {
-    data: {
-      school: "Archbishop Carney Regional Secondary",
-      address: "1335 Dominion Ave",
-      details: "0.9 km Independent • SD 39",
-    },
-  },
-  {
-    data: {
-      school: "Cedar Drive Elementary",
-      address: "3150 Cedar Dr",
-      details: "1.1 km Public • SD 39",
-    },
-  },
-  {
-    data: {
-      school: "Birchland Elementary",
-      address: "1331 Fraser Ave",
-      details: "1.4 km Public • SD 39",
-    },
-  },
-  {
-    data: {
-      school: "James Park Elementary",
-      address: "1761 Westminster Ave",
-      details: "1.9 km Public • SD 39",
-    },
-  },
-  {
-    data: {
-      school: "Henry Hudson Elementary",
-      address: "1551 Cypress St",
-      details: "2.3 km Independent • SD 39",
-    },
-  },
-];
 
 export const buildingComplexHeaders: TableHeader[] = [
   { key: "label", label: "" },

@@ -35,10 +35,12 @@ const Footer = () => {
       <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center-safe gap-y-4">
         <div className="flex flex-col gap-y-4 md:w-[60%]">
           <Link href={"/"} title="BC Club">
-            <span className="text-2xl font-bold md:text-5xl">BCClub</span>
+            <span className="text-2xl font-bold md:text-5xl">
+              BCRealEstateMarket
+            </span>
           </Link>
           <Description
-            content="BC RealeState Market helps you explore, buy, and sell properties across British Columbia with confidence and ease.
+            content="BC Real Estate Market helps you explore, buy, and sell properties across British Columbia with confidence and ease.
 From market insights to home valuation, we guide you every step of your real estate journey...."
             type={IDescriptionTypes.dec16}
             customClasses="text-lightWhite"

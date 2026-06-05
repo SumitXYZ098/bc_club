@@ -9,6 +9,7 @@ import SearchPropertyTab from "./SearchPropertyTab";
 import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
 import CustomButton from "@/src/components/button/CustomButton";
 import CityStatsPopup from "./CityStatsPopup";
+import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 
 const HomeHeroSection = () => {
   const [hoveredCity, setHoveredCity] = React.useState<string | null>(null);
@@ -38,16 +39,17 @@ const HomeHeroSection = () => {
 
   return (
     <section className="xl:max-w-screen-2xl mx-auto xl:px-0 md:px-13 px-6 flex flex-col gap-y-8 xl:flex-row xl:flex-nowrap justify-between relative h-auto overflow-x-clip bg-background">
-      <div className="flex flex-col h-auto xl:w-[39%] xl:pl-16 w-full lg:pt-49.5 pt-31.5">
+      <div className="flex flex-col h-auto xl:w-[42%] xl:pl-16 w-full lg:pt-49.5 pt-31.5">
         <h1 className="xl:text-6xl xl:leading-17 md:text-5xl md:leading-14 text-[40px] leading-12 whitespace-break-spaces md:text-start text-center font-bold self-stretch">
-          {`Your Data-Driven\nGuide to BC\n`}
-          <span className="text-primary">Real</span>{" "}
-          <span className="text-secondary">Estate</span>
+          {`Search BC Real Estate Market\nwith Better`}
+          <span className="text-primary"> Local</span>{" "}
+          <span className="text-secondary">Insights</span>
         </h1>
-        <Description
-          type={IDescriptionTypes.dec16}
-          customClasses="md:text-start text-center md:mt-5 mt-2.5 w-full md:whitespace-break-spaces"
-          content={`See market trends, neighbored prices, and find tour perfect\nproperty.`}
+        <Heading
+          tagType="h2"
+          type={IHeadingTypes.heading16}
+          customClasses="md:text-start text-center md:mt-5 mt-2.5 w-full md:whitespace-break-spaces font-normal!"
+          content={`Don’t just browse listings. See price trends in each neighbourhood,\nexplore past sales, and find your perfect home with up-to-date \nMLS listings.`}
         />
         <div className="w-full xl:mt-8 md:mt-6 mt-5 relative">
           <SearchPropertyTab />
@@ -93,7 +95,7 @@ const HomeHeroSection = () => {
             }
             onMouseLeave={handleMouseLeave}
           />
-          <CustomButton
+          {/* <CustomButton
             startIcon={Icons.grahp}
             label="Victoria"
             buttonType="secondary"
@@ -102,8 +104,8 @@ const HomeHeroSection = () => {
               handleMouseEnter("Victoria", { bottom: "-60px", left: "200px" })
             }
             onMouseLeave={handleMouseLeave}
-          />
-          <CustomButton
+          /> */}
+          {/* <CustomButton
             startIcon={Icons.grahp}
             label="Kelowna"
             buttonType="secondary"
@@ -112,7 +114,7 @@ const HomeHeroSection = () => {
               handleMouseEnter("Kelowna", { bottom: "-10px", right: "120px" })
             }
             onMouseLeave={handleMouseLeave}
-          />
+          /> */}
 
           <CityStatsPopup
             city={hoveredCity || ""}

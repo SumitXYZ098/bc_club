@@ -37,8 +37,10 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
     <>
       <section className="xl:max-w-screen-2xl mx-auto w-full bg-background flex flex-col xl:px-16 md:px-13 px-6 xl:pt-35.5 xl:pb-28.25 md:pt-28 md:pb-25 pt-21 pb-13 items-center-safe">
         <PropertyTopAddressSection property={listing} />
-        {listing?.media_url.length > 0 ? (
-          <PropertyGallery images={listing?.media ?? listing?.media_url} />
+        {listing?.media_url && listing.media_url.length > 0 ? (
+          <PropertyGallery images={listing?.media_url} />
+        ) : listing?.media && listing.media.length > 0 ? (
+          <PropertyGallery images={listing?.media} />
         ) : (
           <div className="w-1/2 xl:h-134 md:h-76.5 h-56.5 relative cursor-pointer md:rounded-2xl rounded-xl">
             <Image
