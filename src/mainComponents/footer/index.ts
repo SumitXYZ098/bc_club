@@ -107,6 +107,10 @@ export const company: LinkListProps = {
   linkList: [
     {
       label: "Our Story",
+      href: "/our-story",
+    },
+    {
+      label: "Our Blogs",
       href: "/blogs",
     },
     {

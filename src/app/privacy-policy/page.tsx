@@ -6,41 +6,54 @@ import React from "react";
 
 const page = () => {
   return (
-    <section className="mt-25 max-w-6xl mx-auto w-full md:px-13 px-6 xl:space-y-15 space">
+    <section className="my-25 max-w-6xl mx-auto w-full md:px-13 px-6 xl:space-y-15 space md:text-lg text-base">
       <Heading
         tagType="h1"
         type={IHeadingTypes.heading48}
-        content="BC Club Privacy Policy"
+        content="Privacy Policy"
         customClasses="text-center"
       />
       <div className="xl:xl:space-y-4 space-y-2 xl:mb-10 mb-6">
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="Introduction"
+          content="1. Introduction & Territorial Scope"
         />
         <div className="space-y-3">
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="Welcome and thank you for your interest in BC Club (operated by BC Club Online Search Inc.). At BC Club, we deeply value your privacy and the trust you place in us. This Privacy Statement transparently outlines our practices related to the collection, use, protection, and responsible disclosure of your personal information, ensuring your privacy rights are respected and protected."
-          />
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="In our digital age, safeguarding personal information is more than a policy; it's a fundamental aspect of our ethical commitment to you, our valued users. Whether you're browsing BC Club.ca (the “Website”) or exploring our services, we want you to feel secure and informed every step of the way."
-          />
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="This statement outlines the types of personal information we may collect during your interaction with the Website, the rationale behind its collection, how we intend to use it to enhance your experience, and under what circumstances we might disclose it. We are dedicated to not only complying with the Personal Information Protection Act (PIPA) of British Columbia, and the Personal Information Protection and Electronic Document Act (PIPEDA) of Canada, but also exceeding its standards to protect your privacy. "
-          />
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="By accessing and using the Website, you acknowledge that you have read, understood, and agree to the terms outlined in this Privacy Statement. We encourage you to review this statement thoroughly and reach out to us with any questions or concerns. "
-          />
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="For disputes specifically related to privacy concerns, we aim for amicable resolutions. However, if an agreement cannot be reached, disputes will be resolved through arbitration in British Columbia, Canada, as detailed in our Terms of Use, ensuring a fair and expedited process. "
-          />
-          <Description type={IDescriptionTypes.dec18} content="" />
+          <p>
+            Welcome to{" "}
+            <a
+              href="https://bcrealestatemarket.com/"
+              className="text-blue-600 underline"
+              target="_blank"
+            >
+              bcrealestatemarket.com
+            </a>{" "}
+            (the “Website” or “Platform”). We deeply value your privacy and the
+            trust you place in us. This Privacy Policy transparently outlines
+            our practices related to the collection, use, protection, and
+            responsible disclosure of your personal information, ensuring your
+            privacy rights are respected and protected.
+          </p>
+          <p>
+            This Platform operates strictly within Canada and is uniquely built
+            for residents browsing or tracking properties across British
+            Columbia. We are fully dedicated to complying with the{" "}
+            <i>Personal Information Protection Act</i>(PIPA) of British
+            Columbia, the{" "}
+            <i>Personal Information Protection and Electronic Documents Act</i>
+            (PIPEDA) of Canada, and local real estate board regulatory
+            guidelines.
+          </p>
+          <p>
+            By accessing, creating an account, or using the Website, you
+            acknowledge that you have read, understood, and explicitly agree to
+            the terms outlined in this Privacy Policy. For disputes specifically
+            related to privacy concerns, we aim for amicable resolutions.
+            However, if an agreement cannot be reached, disputes will be
+            resolved exclusively through final and binding arbitration in the
+            City of Vancouver, BC, as detailed in our Terms of Use.
+          </p>
         </div>
       </div>
 
@@ -48,67 +61,52 @@ const page = () => {
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="What is Personal Information? "
+          content="2. Definition of Personal Information"
         />
 
-        <Description
-          type={IDescriptionTypes.dec18}
-          content="“Personal Information” means any information that identifies, relates to, describes, is reasonably capable of being associated with, or could reasonably be linked, directly or indirectly, with a specific individual. It does not include anonymized or aggregated information that cannot reasonably be linked to a specific person. "
-        />
+        <p>
+          “Personal Information” means any information that identifies, relates
+          to, describes, is reasonably capable of being associated with, or
+          could reasonably be linked, directly or indirectly, with a specific
+          individual. It does not include anonymized, de-identified, or
+          aggregated market data that cannot be traced back to a specific
+          person.
+        </p>
       </div>
 
       <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="Information We Collect"
+          content="3. Information We Collect"
         />
         <div className="space-y-3">
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="a) Information You Provide"
-            />
-            <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-              <li>Contact details (e.g., name, email, phone number)</li>
-              <li>
-                Property-related information (e.g., home address, property
-                preferences)
-              </li>
-              <li>
-                Messages or content submitted through our forms or Website{" "}
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="b) Automatically Collected Information"
-            />
-            <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-              <li>IP address, browser type, device information, OS</li>
-              <li>Access times, page views, session duration, referral URLs</li>
-              <li>Location data (approximate or, with permission, precise)</li>
-              <li>Cookies, beacons, pixels, and similar technologies</li>
-            </ul>
-          </div>
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="c) Information from Third Parties"
-            />
-            <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-              <li>Business partners (e.g., agents, brokers)</li>
-              <li>Public data sources</li>
-              <li>
-                Social media and third-party sign-in platforms (e.g., Google,
-                Facebook)
-              </li>
-            </ul>
-          </div>
+          <p>
+            To provide a high-utility provincial property intelligence engine,
+            we collect info through three primary pathways:
+          </p>
+          <ul className="list-disc ml-7 space-y-2">
+            <li>
+              <strong>A. Information You Provide Directly:</strong> During
+              mandatory registration to view historical market analytics,
+              property boundaries, or sold data, you voluntarily provide your
+              first and last name, phone number, and email address.
+            </li>
+            <li>
+              <strong>B. Automatically Collected Information:</strong> While you
+              navigate the platform, our database automatically logs your IP
+              address, browser type, device specifications, operating system,
+              access times, page views, search history, and tracking behavior.
+              We also utilize cookies, tracking pixels, and secure system logs
+              to monitor system health and detect data misuse.
+            </li>
+            <li>
+              <strong>C. Public and Authorized Data Sources:</strong> We
+              securely integrate public datasets, localized municipal
+              registries, and provincial mapping systems to display property
+              attributes.
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -116,20 +114,37 @@ const page = () => {
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="How We Use Your Information"
+          content="4. How We Use Your Information"
         />
-        <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-          <li>Operate and improve the Website</li>
+        <p>
+          We leverage your personal information to operate your account and
+          protect our underlying data assets through the following methods:
+        </p>
+        <ul className="list-disc list-outside ml-7 space-y-2">
           <li>
-            Connect you with real estate agents, lawyers, brokers, and other
-            professionals
+            Providing you with uninhibited access to historical sold data,
+            precise parcel metrics, and custom school catchment mapping.
           </li>
           <li>
-            Send marketing, transactional, and service-related communications
+            Responding to your direct inquiries, property search requests, or
+            technical support tickets.
           </li>
-          <li>Conduct analytics and performance monitoring</li>
-          <li>Respond to inquiries and provide customer support</li>
-          <li>Comply with legal obligations</li>
+          <li>
+            Evaluating API call frequencies and user behavior to detect,
+            prevent, and legally prosecute unauthorized commercial data scraping
+            or systematic redistribution.
+          </li>
+          <li>
+            Sending you essential transactional communications, account
+            verification updates, and periodic market updates in which you have
+            expressed interest.
+          </li>
+          <li>
+            Personalizing and measuring advertising campaigns on third-party
+            platforms (such as suppressing platform ads to users who already
+            possess an active account, or showing relevant neighborhood trends
+            to our active community).
+          </li>
         </ul>
       </div>
 
@@ -137,102 +152,39 @@ const page = () => {
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="Sharing Your Information"
+          content="5. Sharing Your Information & Real Estate Board Auditing"
         />
         <div className="space-y-3">
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="a) Real Estate Professionals"
-            />
-            <Description
-              type={IDescriptionTypes.dec18}
-              content="Real Estate Agents, Mortgage brokers, and lawyers to help facilitate your real estate transactions."
-            />
-          </div>
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="b) Business Partners and Affiliates"
-            />
-            <Description
-              type={IDescriptionTypes.dec18}
-              content="For referral, lead sharing, analytics, and marketing support."
-            />
-          </div>
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="c) Service Providers"
-            />
-            <Description
-              type={IDescriptionTypes.dec18}
-              content="Vendors that help operate our services (e.g., hosting, marketing, support, analytics, payment processors)."
-            />
-          </div>
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="d) Legal Authorities"
-            />
-            <Description
-              type={IDescriptionTypes.dec18}
-              content="Where required by law or to protect rights and safety."
-            />
-          </div>
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="e) With Your Consent"
-            />
-            <Description
-              type={IDescriptionTypes.dec18}
-              content="When you request it or give us permission."
-            />
-          </div>
-          <div className="space-y-2">
-            <Heading
-              tagType="h3"
-              type={IHeadingTypes.heading30}
-              content="f) In Corporate Transactions"
-            />
-            <Description
-              type={IDescriptionTypes.dec18}
-              content="In case of mergers, acquisitions, financing, or similar events."
-            />
-          </div>
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="You can opt out of this by emailing support@BCClub.ca. "
-          />
-        </div>
-      </div>
-
-      <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
-        <Heading
-          tagType="h2"
-          type={IHeadingTypes.heading32}
-          content="Aggregated and De-Identified Data"
-        />
-        <div className="space-y-2">
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="We may use and share anonymized or aggregated data that does not identify individuals for:"
-          />
-          <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-            <li>Market research and trend analysis</li>
-            <li>Product development</li>
-            <li>Monetization through partnerships or publication</li>
+          <p>
+            We are the sole owners of the information collected on this site. We
+            will never sell or rent your personal information to anyone. Your
+            information is only shared under the following specific parameters:
+          </p>
+          <ul className="list-disc ml-7 space-y-2">
+            <li>
+              <strong>Mandatory Board Audits & Compliance:</strong> By creating
+              an account to view protected real estate metrics or historical
+              sold listings, you provide your explicit consent for your
+              registration data and contact information to be shared securely
+              with regional real estate boards (including Greater Vancouver
+              REALTORS®, Fraser Valley Real Estate Board, Chilliwack and
+              District Real Estate Board, and Vancouver Island Real Estate
+              Board) and their legal representatives for auditing, monitoring,
+              and structural enforcement of VOW rules.
+            </li>
+            <li>
+              <strong>Professional Transactional Facilitation:</strong> Where
+              you explicitly request assistance, your information may be shared
+              with your chosen real estate lawyer, mortgage professional, or our
+              immediate advisory team to help fulfill your property transaction.
+            </li>
+            <li>
+              <strong>Legal Authorities:</strong> We will disclose your
+              information where legally forced to do so by court order,
+              provincial regulations, or to protect the safety, structural
+              integrity, and intellectual property rights of the Platform.
+            </li>
           </ul>
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="We do not attempt to re-identify this data."
-          />
         </div>
       </div>
 
@@ -240,13 +192,91 @@ const page = () => {
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="Cookies and Tracking"
+          content="6. Targeted Advertising Platforms (Matched Audiences)"
         />
-        <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-          <li>Improve Platform performance and usability</li>
-          <li>Analyze traffic and trends</li>
-          <li>Remember your preferences</li>
-          <li>Deliver targeted advertising and content</li>
+        <div className="space-y-3">
+          <p>
+            We may share securely hashed (one-way SHA-256) versions of your
+            email address or mobile phone number with third-party advertising
+            platforms, including Google Ads (Customer Match) and Meta (Custom
+            Audiences), for the strict purposes of:
+          </p>
+          <ol className="list-decimal list-outside ml-9 space-y-2">
+            <li>
+              Showing you relevant real estate updates on those platforms.
+            </li>
+            <li>
+              Suppressing platform ads to users who already maintain an active
+              account on{" "}
+              <a
+                href="https://bcrealestatemarket.com/"
+                className="text-blue-600 underline"
+                target="_blank"
+              >
+                bcrealestatemarket.com
+              </a>
+            </li>
+            <li>
+              Building lookalike or similar audiences to reach prospective users
+              who resemble our existing user base.
+            </li>
+          </ol>
+
+          <p className="ml-4">
+            <strong>Our Privacy Guard:</strong> Hashing is entirely one-way; the
+            platforms cannot recover your raw email or phone number.
+            Furthermore, we do not purchase contact info from data brokers, nor
+            do we ever share your name, property preferences, search history, or
+            browsing activity with these advertising networks. You can easily
+            opt out of hashed audience sharing at any time by contacting our
+            support team.
+          </p>
+        </div>
+      </div>
+
+      <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
+        <Heading
+          tagType="h2"
+          type={IHeadingTypes.heading32}
+          content="7. Cookies, Pixels, and Third-Party Tracking Tools"
+        />
+        <p>
+          We utilize cookies, web beacons, and advanced tracking pixels to
+          analyze platform traffic and measure marketing performance. The
+          third-party tools deployed on this platform include Google Analytics,
+          Google Ads conversion tags, Microsoft Clarity, and the Meta Pixel.
+        </p>
+        <p>
+          These integrations may log actions you take on the platform (such as
+          account sign-ups, leads, or completed searches), your IP address, and
+          device parameters. You can seamlessly manage, restrict, or block
+          cookies at any time through your individual browser settings or via{" "}
+          <i>AdChoices Canada</i>.
+        </p>
+      </div>
+
+      <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
+        <Heading
+          tagType="h2"
+          type={IHeadingTypes.heading32}
+          content="8. Your Access to and Control Over Information"
+        />
+        <p>
+          You maintain complete control over your personal data. You can perform
+          the following actions at any time by submitting a direct request to
+          our administration team via email or phone:
+        </p>
+        <ul className="list-disc list-outside ml-9 space-y-1.5">
+          <li>
+            Review exactly what data our system has stored about you, if any.
+          </li>
+          <li>Change, update, or correct any personal data we have on file.</li>
+          <li>
+            Request the permanent deletion of your account and associated
+            personal data (subject to real estate board regulatory
+            data-retention audit windows).
+          </li>
+          <li>Opt out of any future marketing contacts from us.</li>
         </ul>
       </div>
 
@@ -254,37 +284,25 @@ const page = () => {
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="Your Privacy Choices"
-        />
-        <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-          <li>IAccess or Correct Info: Contactsupport@BCClub.ca </li>
-          <li>Opt Out of Marketing: Use unsubscribe links or email us</li>
-          <li>Data Sharing Opt-Out: Emailsupport@BCClub.ca</li>
-          <li>Withdraw Location Access: Use your device/browser settings</li>
-          <li>Delete Account/Data: Contact us for deletion requests</li>
-        </ul>
-      </div>
-
-      <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
-        <Heading
-          tagType="h2"
-          type={IHeadingTypes.heading32}
-          content="Data Retention"
+          content="9. Data Security & Encryption Safeguards"
         />
         <div className="space-y-2">
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="We retain personal data as long as needed to:"
-          />
-          <ul className="list-disc list-inside ml-4 md:text-lg text-base">
-            <li>Provide services and support</li>
-            <li>Comply with legal or regulatory requirements</li>
-            <li>Support auditing, dispute resolution, or security needs</li>
-          </ul>
-          <Description
-            type={IDescriptionTypes.dec18}
-            content="Data no longer needed is securely deleted or anonymized."
-          />
+          <p>
+            We take comprehensive technical and organizational precautions to
+            protect your information both online and offline. Wherever our
+            platform collects sensitive personal details or access credentials,
+            that information is encrypted and securely transmitted to our
+            servers using industry-standard Secure Sockets Layer (SSL) and
+            Hypertext Transfer Protocol Secure (HTTPS) frameworks.
+          </p>
+          <p>
+            Offline, access to personally identifiable information is strictly
+            restricted to employees or system administrators who require the
+            data to perform a specific, authorized function (such as customer
+            service or database auditing). The physical servers and cloud
+            containers housing our databases are maintained in a secure,
+            firewalled environment.
+          </p>
         </div>
       </div>
 
@@ -292,56 +310,82 @@ const page = () => {
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="Security"
+          content="10. AI and Third-Party Model Context Protocol (MCP) Integrations"
         />
-        <Description
-          type={IDescriptionTypes.dec18}
-          content="We use technical and organizational safeguards to protect your data. However, no method of transmission or storage is completely secure. You use the Website at your own risk."
-        />
+        <div className="space-y-3">
+          <p>
+            If you choose to interface with{" "}
+            <a
+              href="https://bcrealestatemarket.com/"
+              className="text-blue-600 underline"
+              target="_blank"
+            >
+              bcrealestatemarket.com
+            </a>{" "}
+            through an authorized, secure AI assistant utilizing a Model Context
+            Protocol (MCP) server configuration deployed explicitly by the
+            operators of this Platform, the following strict terms apply:
+          </p>
+          <ul className="list-disc list-outside ml-9 space-y-2">
+            <li>
+              <strong>Authentication Data:</strong> Upon authentication, we
+              receive only your name and email address to authorize your access
+              to protected data layers.
+            </li>
+            <li>
+              <strong> No Conversation Logging:</strong> We do not collect, log,
+              read, or have access to your personal text conversations with the
+              AI assistant.{" "}
+            </li>
+            <li>
+              <strong>No Model Training:</strong> Your data, search preferences,
+              and credentials are never utilized to train third-party AI models.
+            </li>
+            <li>
+              <strong>Request Performance Metrics:</strong> We collect only
+              anonymized, aggregate request counts and system response times to
+              monitor system performance and safeguard our databases against
+              commercial automated scraping.
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
         <Heading
           tagType="h2"
           type={IHeadingTypes.heading32}
-          content="Age Privacy"
+          content="11. Corporate Operator Identity & Contact Information"
         />
-        <Description
-          type={IDescriptionTypes.dec18}
-          content="The Website is not directed to individuals under the age of 19. We do not knowingly collect personal information from individuals under the age of 19. If we learn we’ve collected data from an individual under the age of 19, we will delete it promptly."
-        />
+        <p>
+          This real estate property intelligence platform and its
+          data-collection practices are operated and overseen exclusively by:
+        </p>
+        <p>
+          <strong>Harjit Sidhu Personal Real Estate Corporation (PREC)</strong>
+        </p>
+        <p>
+          Representing <strong>The Sidhu Team</strong> at{" "}
+          <strong>Planet Group Realty Inc.</strong>
+        </p>
+        <p>
+          <i>Office Location: Surrey, British Columbia, Canada</i>
+        </p>
+        <p>
+          If you have any questions or concerns regarding this Privacy Policy,
+          your personal data rights, or if you feel that the platform is not
+          actively abiding by the terms outlined above, you must contact our
+          Surrey administration team immediately:
+        </p>
+        <ul className="list-disc list-outside ml-9 space-y-2">
+          <li>
+            <strong>Email: </strong>
+            <a href="mailto:info@bcrealestatemarket.com">
+              info@bcrealestatemarket.com
+            </a>
+          </li>
+        </ul>
       </div>
-
-      <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
-        <Heading
-          tagType="h2"
-          type={IHeadingTypes.heading32}
-          content="Third-Party Sites and Services"
-        />
-        <Description
-          type={IDescriptionTypes.dec18}
-          content="Our Website may contain links to or integrations with third-party websites or services. We are not responsible for their privacy practices. Please review their policies separately."
-        />
-      </div>
-
-      <div className="xl:space-y-4 space-y-2 xl:mb-10 mb-6">
-        <Heading
-          tagType="h2"
-          type={IHeadingTypes.heading32}
-          content="Changes to This Policy"
-        />
-        <Description
-          type={IDescriptionTypes.dec18}
-          content="We may update this Privacy Policy from time to time. Changes will be posted with an updated effective date. Material changes will be communicated as required by law."
-        />
-      </div>
-
-      <div className="xl:space-y-4 space-y-2 xl:mb-20 mb-10 ">
-        <Heading tagType="h2" type={IHeadingTypes.heading32} content="" />
-        <Description type={IDescriptionTypes.dec18} content="" />
-      </div>
-
-      
     </section>
   );
 };
