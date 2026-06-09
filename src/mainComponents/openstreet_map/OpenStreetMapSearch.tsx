@@ -2,13 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import "./openstreet-map.css";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import {
   CircleMarker,
@@ -16,16 +10,16 @@ import {
   Marker,
   Polyline,
   TileLayer,
-  Tooltip,
+  Popup,
   useMap,
   useMapEvents,
 } from "react-leaflet";
+
 import Supercluster from "supercluster";
-import { useRouter } from "next/navigation";
 import {
   useGetListings,
-  useGetMapZoomAssignmentList,
   useGetMapZoomListings,
+  useGetMapZoomSchools,
   useGetMapZoomSoldList,
   useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
@@ -75,13 +69,28 @@ import GetInTouch from "../getInTouch/GetInTouch";
 import OSMGeoJsonLayer from "./OSMGeoJsonLayer";
 import OpenStreetMapSoldMakerLayer from "./OpenStreetMapSoldMakerLayer";
 import { Endpoints } from "@/src/api/endpoints";
+import {
+  MdApartment,
+  MdEmojiEvents,
+  MdLocationOn,
+  MdMap,
+  MdSchool,
+  MdStar,
+} from "react-icons/md";
+import { FiSearch } from "react-icons/fi";
+
+type SchoolType = "Elementary" | "Secondary";
 
 type SchoolItem = {
   id: string;
-  name: string;
-  lat: number;
-  lng: number;
+  school_name: string;
+  school_type: SchoolType;
+  city?: string;
+  rating?: number | string;
+  rank?: number;
   address?: string;
+  latitude: number;
+  longitude: number;
 };
 
 function MapReady({ onReady }: { onReady: (map: L.Map) => void }) {
@@ -142,57 +151,74 @@ function MapEvents({
   return null;
 }
 
-function SchoolMarker({
-  school,
-  hoveredSchool,
-  setHoveredSchool,
-}: {
-  school: SchoolItem;
-  hoveredSchool: SchoolItem | null;
-  setHoveredSchool: (school: SchoolItem | null) => void;
-}) {
+function SchoolMarker({ school }: { school: SchoolItem }) {
   const icon = useMemo(
     () =>
       L.divIcon({
         className: "bc-osm-marker",
         html: `<div class="bc-osm-school"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="22" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M256 32 20 160l236 128 192-104v104h44V160L256 32zM108 247.3V336c0 48.6 66.3 88 148 88s148-39.4 148-88v-88.7L256 328 108 247.3z"></path></svg></div>`,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
       }),
     [],
   );
-
+  // if (!school.city) return null;
   return (
-    <Marker
-      position={[school.lat, school.lng]}
-      icon={icon}
-      eventHandlers={{
-        mouseover: () => setHoveredSchool(school),
-        mouseout: () => setHoveredSchool(null),
-      }}
-    >
-      {hoveredSchool?.id === school.id && (
-        <Tooltip
-          permanent
-          direction="top"
-          offset={[0, -24]}
-          className="bc-osm-school-tooltip"
-        >
-          <div className="w-60 bg-white rounded-2xl shadow-2xl p-3 z-50">
-            <h3 className="text-sm font-semibold">{school.name}</h3>
-            {school.address && (
-              <p className="text-xs text-gray-500 mt-1">{school.address}</p>
-            )}
-            <a
-              href={`https://www.openstreetmap.org/?mlat=${school.lat}&mlon=${school.lng}#map=18/${school.lat}/${school.lng}`}
-              target="_blank"
-              className="text-blue-600 text-xs underline mt-2 inline-block"
-            >
-              Open in OpenStreetMap
-            </a>
+    <Marker position={[school.latitude, school.longitude]} icon={icon}>
+      <Popup className="school-popup w-[350px]">
+        <div className="w-[350px] overflow-hidden rounded-2xl bg-white p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50">
+              <MdSchool className="h-6 w-6 text-primary" />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base font-bold leading-snug text-[#15376b]">
+                {school.school_name || "-"}
+              </h3>
+
+              <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-primary">
+                <MdApartment className="h-3.5 w-3.5" />
+                {school.school_type || "-"}
+              </div>
+            </div>
           </div>
-        </Tooltip>
-      )}
+
+          <div className="my-4 border-t border-dashed border-gray-200" />
+
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-yellow-50">
+                <MdStar className="h-5 w-5 text-yellow-500" />
+              </div>
+              <span className="font-medium text-gray-600">Rating</span>
+              <span className="ml-auto font-bold text-primary">
+                {school.rating || "-"} / 10
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50">
+                <MdEmojiEvents className="h-5 w-5 text-purple-600" />
+              </div>
+              <span className="font-medium text-gray-600">Rank</span>
+              <span className="ml-auto font-bold text-purple-600">
+                {school.rank || "-"}
+              </span>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                <MdMap className="h-5 w-5 text-blue-500" />
+              </div>
+              <span className="font-medium text-gray-600">Address</span>
+              <span className="ml-auto max-w-[150px] text-right font-semibold leading-snug text-gray-800">
+                {school.address || "-"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </Popup>
     </Marker>
   );
 }
@@ -205,6 +231,7 @@ export default function OpenStreetMapSearch() {
 
   const filters = getInstanceFilters("map");
   const {
+    search = "",
     location = "",
     status = "forSale",
     minPrice,
@@ -237,9 +264,8 @@ export default function OpenStreetMapSearch() {
   const [fitBoundsDone, setFitBoundsDone] = useState(false);
   const [parcelGeoJSON, setParcelGeoJSON] = useState<any>(null);
   const [geocodedCache, setGeocodedCache] = useState<Record<string, any>>({});
-  // const [schools, setSchools] = useState<SchoolItem[]>([]);
-  // const [loadingSchools, setLoadingSchools] = useState(false);
-  // const [hoveredSchool, setHoveredSchool] = useState<SchoolItem | null>(null);
+  const [schoolMode, setSchoolMode] = useState(false);
+  const [schoolType, setSchoolType] = useState<SchoolType>("Elementary");
   const [measureMode, setMeasureMode] = useState(false);
   const [measurePoints, setMeasurePoints] = useState<LatLngPoint[]>([]);
   const [distance, setDistance] = useState<{
@@ -258,6 +284,7 @@ export default function OpenStreetMapSearch() {
   const popupRef = useRef<HTMLDivElement | null>(null);
   const lastLocationRef = useRef<string | null>(null);
 
+  const setSearch = (val: string) => updateInstanceFilter("map", "search", val);
   const setActiveBedRoom = (val: string) =>
     updateInstanceFilter("map", "activeBedRoom", val);
   const setActiveBathRoom = (val: string) =>
@@ -346,18 +373,6 @@ export default function OpenStreetMapSearch() {
     enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
   });
-
-  // const {
-  //   data: queryDataAssignment,
-  //   isLoading: isLoadingAssignment,
-  //   isFetching: isFetchingAssignment,
-  // } = useGetMapZoomAssignmentList(mapZoomParams, {
-  //   select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
-  //   enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
-  //   staleTime: 1000 * 60 * 5,
-  // });
-
-  // console.log(queryDataAssignment, "queryDataAssignment");
 
   const {
     data: queryDataSold,
@@ -493,11 +508,12 @@ export default function OpenStreetMapSearch() {
       const layer = L.geoJSON(geojson, {
         pane: "overlayPane",
         style: {
-          color: "#2563eb",
-          weight: 2,
+          color: "#dc2626",
+          weight: 1,
+          opacity: 1,
           dashArray: "10",
-          fillColor: "#2563eb",
-          fillOpacity: 0.55,
+          fillColor: "#dc2626",
+          fillOpacity: 0.75,
         },
         // onEachFeature: (feature, layer) => {
         //   const p = feature.properties || {};
@@ -685,74 +701,67 @@ export default function OpenStreetMapSearch() {
     );
   };
 
-  // Start fetchSchools
-  // const fetchSchools = useCallback(async () => {
-  //   if (!map) return;
+  const schoolParams = useMemo(
+    () => ({
+      north: mapBounds?.north,
+      south: mapBounds?.south,
+      east: mapBounds?.east,
+      west: mapBounds?.west,
+      zoom: mapBounds?.zoom,
+      schoolType,
+    }),
+    [mapBounds, schoolType],
+  );
 
-  //   const bounds = map.getBounds();
+  const { data: schoolsData, isLoading: isLoadingSchools } =
+    useGetMapZoomSchools(schoolParams, {
+      select: (res: any) =>
+        (res?.data || [])
+          .map((item: any) => ({
+            id: item.documentId,
+            school_name: item.school_name,
+            school_type: item.school_type,
+            city: item.city,
+            rating: item.rating,
+            rank: item.rank,
+            address: item.address,
+            latitude: Number(item.latitude),
+            longitude: Number(item.longitude),
+          }))
+          .filter(
+            (item: SchoolItem) =>
+              !Number.isNaN(item.latitude) &&
+              !Number.isNaN(item.longitude) &&
+              item.latitude !== 0 &&
+              item.longitude !== 0,
+          ),
+      enabled:
+        schoolMode && !!mapBounds && mapZoomVal !== null && mapZoomVal >= 15,
+      staleTime: 1000 * 60 * 5,
+    });
 
-  //   const south = bounds.getSouth();
-  //   const west = bounds.getWest();
-  //   const north = bounds.getNorth();
-  //   const east = bounds.getEast();
+  const schools =
+    mapZoomVal !== null && mapZoomVal >= 15 ? schoolsData || [] : [];
 
-  //   setLoadingSchools(true);
+  const handleSchool = () => {
+    setSchoolMode((prev) => !prev);
 
-  //   try {
-  //     const params = new URLSearchParams({
-  //       south: String(south),
-  //       west: String(west),
-  //       north: String(north),
-  //       east: String(east),
-  //     });
+    if (!schoolMode && map) {
+      const nextBounds = getBoundsPayload(map);
+      setMapBounds(nextBounds);
+      setMapZoomVal(Math.round(nextBounds.zoom));
+    }
+  };
 
-  //     const res = await fetch(`/api/overpass/schools?${params.toString()}`);
+  const handleSchoolTypeChange = (type: SchoolType) => {
+    setSchoolType(type);
 
-  //     const json = await res.json();
-
-  //     if (!res.ok || !json.success) {
-  //       throw new Error(json.message || "School API failed");
-  //     }
-
-  //     const nextSchools: SchoolItem[] = (json?.data || []).map((item: any) => ({
-  //       id: String(item.id),
-  //       name: item.name || "School",
-  //       lat: Number(item.latitude),
-  //       lng: Number(item.longitude),
-  //       address: item.address || "",
-  //     }));
-
-  //     setSchools(nextSchools);
-  //   } catch (error) {
-  //     console.error("OSM school fetch failed:", error);
-  //     setSchools([]);
-  //   } finally {
-  //     setLoadingSchools(false);
-  //   }
-  // }, [map]);
-
-  // const handleSchool = () => {
-  //   if (schools.length > 0) {
-  //     setSchools([]);
-  //     setHoveredSchool(null);
-  //     return;
-  //   }
-  //   fetchSchools();
-  // };
-
-  // useEffect(() => {
-  //   if (!map || schools.length === 0) return;
-
-  //   const onIdle = () => fetchSchools();
-  //   map.on("moveend", onIdle);
-  //   map.on("zoomend", onIdle);
-
-  //   return () => {
-  //     map.off("moveend", onIdle);
-  //     map.off("zoomend", onIdle);
-  //   };
-  // }, [map, schools.length, fetchSchools]);
-  // End fetchSchools
+    if (map) {
+      const nextBounds = getBoundsPayload(map);
+      setMapBounds(nextBounds);
+      setMapZoomVal(Math.round(nextBounds.zoom));
+    }
+  };
 
   const clearMeasurement = () => {
     setMeasureMode(false);
@@ -811,6 +820,27 @@ export default function OpenStreetMapSearch() {
   return (
     <>
       <div className="w-full lg:h-[90svh] h-screen flex flex-col overflow-hidden mt-20">
+        <div className="flex items-center gap-4 flex-wrap mb-6 justify-between pl-5">
+          {/* 🔍 CHIP SEARCH BAR (DESIGN SAME) */}
+          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] border border-gray-200 w-full max-w-md">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search city, neighborhood, or address..."
+              className="flex-1 text-sm outline-none bg-transparent"
+            />
+
+            <button
+              className="ml-auto bg-[#E6A500] p-2.5 rounded-lg flex items-center justify-center"
+              onClick={() => {
+                // Search is live, but we can keep the button for UX
+              }}
+            >
+              <FiSearch size={18} className="text-white" />
+            </button>
+          </div>
+        </div>
         <MapTopFilterBar
           status={status}
           setStatus={setStatus}
@@ -881,16 +911,12 @@ export default function OpenStreetMapSearch() {
                 <OSMGeoJsonLayer data={parcelGeoJSON} properties={properties} />
               )}
 
-              {/* {mapZoomVal &&
+              {schoolMode &&
+                mapZoomVal &&
                 mapZoomVal >= 15 &&
-                schools.map((school) => (
-                  <SchoolMarker
-                    key={school.id}
-                    school={school}
-                    hoveredSchool={hoveredSchool}
-                    setHoveredSchool={setHoveredSchool}
-                  />
-                ))} */}
+                schools.map((school: SchoolItem) => (
+                  <SchoolMarker key={school.id} school={school} />
+                ))}
 
               {measureMode && (
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 z-999 w-[330px] bg-yellow-300 border border-black text-center text-xs shadow-md">
@@ -1037,9 +1063,14 @@ export default function OpenStreetMapSearch() {
               measureMode={measureMode}
               floodProvinceMode={showFloodProvince}
               loadingFloodProvince={loadingFloodProvince}
+              schoolMode={schoolMode}
+              schoolType={schoolType}
+              mapZoomVal={mapZoomVal}
+              loadingSchools={isLoadingSchools}
               toggleMapStyle={toggleMapStyle}
               handleGeolocation={handleGeolocation}
-              // handleSchool={handleSchool}
+              handleSchool={handleSchool}
+              handleSchoolTypeChange={handleSchoolTypeChange}
               handleMeasure={handleMeasure}
               handleFloodProvince={toggleFloodLayer}
             />

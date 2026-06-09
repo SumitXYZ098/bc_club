@@ -19,7 +19,7 @@ export const Endpoints = {
     `${BASE_URL}/api/ddf-listings/remove-favorite/${id}`,
   getMyDdfFavorites: `${BASE_URL}/api/ddf-listings/my-favorites`,
   getNearbyPlaces: (id: string) =>
-    `${BASE_URL}/api/ddf-listings/${id}/neighbourhood?radius=16000&limit=4`,
+    `${BASE_URL}/api/ddf-listings/${id}/neighborhood?radius=16000&limit=4`,
   getSimilarProperties: (id: string) =>
     `${BASE_URL}/api/ddf-listings/${id}/similar?radiusKm=5&limit=20`,
   getSimilarSoldProperties: (id: string) =>
@@ -40,5 +40,8 @@ export const Endpoints = {
   // MapZoom
   getMapZoomAssignmentList: `${BASE_URL}/api/property-assignment-lists/map-zoom`,
   getMapZoomSold: `${BASE_URL}/api/properties/sold/map-zoom`,
+  getMapZoomSchools: `${BASE_URL}/api/schools/map-zoom`,
+
+  // Flood Province
   getFloodProvinceGeoJSON: `${BASE_URL}/api/flood-province/findGeoJSON`,
 };

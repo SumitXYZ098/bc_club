@@ -30,10 +30,10 @@ export const boundsKey = (bounds: any) =>
   });
 
 export const getClusterRadius = (zoom: number) => {
-  if (zoom >= 16) return 50;
-  if (zoom >= 14) return 155;
-  if (zoom >= 12) return 170;
-  if (zoom >= 10) return 130;
+  if (zoom >= 16) return 30;
+  if (zoom >= 14) return 100;
+  if (zoom >= 12) return 150;
+  if (zoom >= 10) return 120;
   return 200;
 };
 

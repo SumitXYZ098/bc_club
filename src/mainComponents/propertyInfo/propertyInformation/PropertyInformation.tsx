@@ -87,6 +87,8 @@ const PropertyInformation = ({ property }: { property: any }) => {
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
     useGetNearbyPlaces(property.documentId);
 
+  console.log("nearbyPlaces", nearbyPlaces?.data?.schools);
+
   const openSchoolLocatorPopup = () => {
     const width = 1200;
     const height = 800;
@@ -252,13 +254,15 @@ const PropertyInformation = ({ property }: { property: any }) => {
                   ? Array.from({ length: 6 }).map((_, index) => (
                       <NearbyPlaceSkeleton key={index} />
                     ))
-                  : nearbyPlaces?.data?.schools?.map((school: any) => (
-                      <NearbyPlaceCard
-                        key={school.place_id}
-                        place={school}
-                        type="school"
-                      />
-                    ))}
+                  : nearbyPlaces?.data?.schools?.map(
+                      (school: any, idx: number) => (
+                        <NearbyPlaceCard
+                          key={idx}
+                          place={school}
+                          type="school"
+                        />
+                      ),
+                    )}
               </div>
             </div>
           </div>

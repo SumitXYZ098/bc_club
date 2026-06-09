@@ -83,6 +83,7 @@ export default function OpenStreetMapMarkerLayer({
   setSelectedClusterProperties: (value: any[]) => void;
   setClusterPosition: (value: { lat: number; lng: number } | null) => void;
 }) {
+  console.log(clusters);
   return clusters.map((cluster, index) => {
     const [longitude, latitude] = cluster.geometry.coordinates;
     const { cluster: isCluster, point_count: pointCount } = cluster.properties;
@@ -112,6 +113,27 @@ export default function OpenStreetMapMarkerLayer({
               }
               map.flyTo([latitude, longitude], 18);
             },
+          }}
+        />
+      );
+    }
+
+    if (!isCluster) {
+      const property = cluster.properties.propertyData;
+      const isHovered = hoveredPropertyId === property.id;
+      return (
+        <Marker
+          key={`property-${property.id}`}
+          position={[property.latitude, property.longitude]}
+          icon={priceIcon(property, status, isHovered)}
+          eventHandlers={{
+            click: () => {
+              setSelectedClusterProperties([]);
+              setClusterPosition(null);
+              setSelectedProperty(property);
+            },
+            mouseover: () => setHoveredPropertyId(property.id),
+            mouseout: () => setHoveredPropertyId(null),
           }}
         />
       );

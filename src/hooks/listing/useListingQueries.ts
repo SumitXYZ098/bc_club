@@ -30,6 +30,7 @@ import {
   getSalesReported,
   getMapZoomAssignmentList,
   getMapZoomSoldList,
+  getMapZoomSchools,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -544,6 +545,21 @@ export function useGetSalesReported<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: ["saleReported", params],
     queryFn: () => getSalesReported(params),
+    ...options,
+  });
+}
+
+// School MapZoom
+export function useGetMapZoomSchools<TData = any>(
+  params?: any,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["mapZoomSchools", params || {}],
+    queryFn: () => getMapZoomSchools(params),
     ...options,
   });
 }
