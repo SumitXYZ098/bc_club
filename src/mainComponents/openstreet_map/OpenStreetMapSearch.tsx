@@ -74,6 +74,7 @@ import MapLoadingBadge from "../maps/google_map/MapLoadingBadge";
 import GetInTouch from "../getInTouch/GetInTouch";
 import OSMGeoJsonLayer from "./OSMGeoJsonLayer";
 import OpenStreetMapSoldMakerLayer from "./OpenStreetMapSoldMakerLayer";
+import { Endpoints } from "@/src/api/endpoints";
 
 type SchoolItem = {
   id: string;
@@ -197,7 +198,6 @@ function SchoolMarker({
 }
 
 export default function OpenStreetMapSearch() {
-  const router = useRouter();
   const { data: me } = useGetMe();
   const { isLoggedIn, setOpenLogin } = useAuthContext();
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
@@ -249,6 +249,9 @@ export default function OpenStreetMapSearch() {
   const [movingPoint, setMovingPoint] = useState<LatLngPoint | null>(null);
   const [userLocation, setUserLocation] = useState<LatLngPoint | null>(null);
   const [locationChecked, setLocationChecked] = useState(false);
+  const floodLayerRef = useRef<L.GeoJSON | null>(null);
+  const [showFloodProvince, setShowFloodProvince] = useState(false);
+  const [loadingFloodProvince, setLoadingFloodProvince] = useState(false);
 
   const superclusterRef = useRef<Supercluster | null>(null);
   const lastFetchedBounds = useRef<string>("");
@@ -467,6 +470,56 @@ export default function OpenStreetMapSearch() {
       console.error(err);
     }
   }, []);
+
+  const toggleFloodLayer = async () => {
+    if (!map) return;
+
+    if (floodLayerRef.current) {
+      map.removeLayer(floodLayerRef.current);
+      floodLayerRef.current = null;
+      setShowFloodProvince(false);
+      return;
+    }
+
+    try {
+      setLoadingFloodProvince(true);
+
+      const res = await fetch(`${Endpoints.getFloodProvinceGeoJSON}`);
+
+      if (!res.ok) throw new Error("Failed to fetch flood province layer");
+
+      const geojson = await res.json();
+
+      const layer = L.geoJSON(geojson, {
+        pane: "overlayPane",
+        style: {
+          color: "#2563eb",
+          weight: 2,
+          dashArray: "10",
+          fillColor: "#2563eb",
+          fillOpacity: 0.55,
+        },
+        // onEachFeature: (feature, layer) => {
+        //   const p = feature.properties || {};
+
+        //   layer.bindPopup(`
+        //   <strong>${p.floodplain_name || "Flood Province"}</strong><br/>
+        //   Feature: ${p.feature_name || "-"}<br/>
+        //   Code: ${p.feature_code || "-"}<br/>
+        //   Date: ${p.designation_date || "-"}
+        // `);
+        // },
+      });
+
+      layer.addTo(map);
+      floodLayerRef.current = layer;
+      setShowFloodProvince(true);
+    } catch (err) {
+      console.error("Flood layer error:", err);
+    } finally {
+      setLoadingFloodProvince(false);
+    }
+  };
 
   const triggerSearch = useCallback(() => {
     if (!map) return;
@@ -982,10 +1035,13 @@ export default function OpenStreetMapSearch() {
               map={map}
               isSatellite={isSatellite}
               measureMode={measureMode}
+              floodProvinceMode={showFloodProvince}
+              loadingFloodProvince={loadingFloodProvince}
               toggleMapStyle={toggleMapStyle}
               handleGeolocation={handleGeolocation}
               // handleSchool={handleSchool}
               handleMeasure={handleMeasure}
+              handleFloodProvince={toggleFloodLayer}
             />
           </div>
         </div>

@@ -1,12 +1,15 @@
 import type L from "leaflet";
 import { FiMap, FiMinus, FiNavigation, FiPlus } from "react-icons/fi";
-import { MdSchool } from "react-icons/md";
+import { WiFlood } from "react-icons/wi";
 import { TbRulerMeasure } from "react-icons/tb";
 
 export default function OpenStreetMapControls({
   map,
   isSatellite,
   measureMode,
+  floodProvinceMode,
+  loadingFloodProvince,
+  handleFloodProvince,
   toggleMapStyle,
   handleGeolocation,
   handleSchool,
@@ -15,6 +18,9 @@ export default function OpenStreetMapControls({
   map: L.Map | null;
   isSatellite: boolean;
   measureMode: boolean;
+  floodProvinceMode: boolean;
+  loadingFloodProvince?: boolean;
+  handleFloodProvince: () => void;
   toggleMapStyle: () => void;
   handleGeolocation: () => void;
   handleSchool?: () => void;
@@ -77,6 +83,18 @@ export default function OpenStreetMapControls({
       >
         <MdSchool className="w-5 h-5 text-gray-600 hover:text-primary" />
       </button> */}
+      <button
+        onClick={handleFloodProvince}
+        disabled={loadingFloodProvince}
+        className={`p-1 rounded-md shadow-lg border transition-colors ${
+          floodProvinceMode
+            ? "bg-primary text-white border-primary"
+            : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+        } ${loadingFloodProvince ? "opacity-60 cursor-not-allowed" : ""}`}
+        title="Flood Province Area"
+      >
+        <WiFlood fontSize={32} />
+      </button>
     </div>
   );
 }
