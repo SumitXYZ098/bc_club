@@ -255,13 +255,15 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
                     ? Array.from({ length: 6 }).map((_, index) => (
                         <NearbyPlaceSkeleton key={index} />
                       ))
-                    : nearbyPlaces?.data?.schools?.map((school: any) => (
-                        <NearbyPlaceCard
-                          key={school.place_id}
-                          place={school}
-                          type="school"
-                        />
-                      ))}
+                    : nearbyPlaces?.data?.schools?.map(
+                        (school: any, idx: number) => (
+                          <NearbyPlaceCard
+                            key={idx}
+                            place={school}
+                            type="school"
+                          />
+                        ),
+                      )}
                 </div>
               </div>
             </div>

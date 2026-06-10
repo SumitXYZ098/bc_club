@@ -1,6 +1,6 @@
 type NearbyPlace = {
-  place_id: string;
-  name: string;
+  school_name: string;
+  school_type: string;
   address: string;
   latitude: number;
   longitude: number;
@@ -32,26 +32,14 @@ const NearbyPlaceCard = ({
   place: NearbyPlace;
   type: "school" | "hospital";
 }) => {
-  const schoolType = place.name.toLowerCase().includes("secondary")
-    ? "Secondary"
-    : place.name.toLowerCase().includes("elementary")
-      ? "Elementary"
-      : "School";
-
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="text-xl font-bold">{place.name}</h3>
+      <h3 className="text-xl font-bold">{place.school_name}</h3>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        {type === "school" ? (
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold">
-            {schoolType}
-          </span>
-        ) : (
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold">
-            Hospital
-          </span>
-        )}
+        <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold">
+          {place?.school_type}
+        </span>
       </div>
 
       <p className="mt-8 md:text-xl text-base font-semibold ">
