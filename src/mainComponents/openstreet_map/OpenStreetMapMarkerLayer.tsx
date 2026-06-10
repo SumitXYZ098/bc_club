@@ -83,7 +83,6 @@ export default function OpenStreetMapMarkerLayer({
   setSelectedClusterProperties: (value: any[]) => void;
   setClusterPosition: (value: { lat: number; lng: number } | null) => void;
 }) {
-  console.log(clusters);
   return clusters.map((cluster, index) => {
     const [longitude, latitude] = cluster.geometry.coordinates;
     const { cluster: isCluster, point_count: pointCount } = cluster.properties;

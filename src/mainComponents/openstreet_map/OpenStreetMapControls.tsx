@@ -5,7 +5,7 @@ import { TbRulerMeasure } from "react-icons/tb";
 import { MdSchool } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 
-type SchoolType = "Elementary" | "Secondary";
+type SchoolType = "Elementary" | "Secondary" | "All";
 
 export default function OpenStreetMapControls({
   map,
@@ -148,7 +148,19 @@ export default function OpenStreetMapControls({
             <p className="text-xs font-semibold text-gray-600 mb-2">
               School Type
             </p>
-
+            <button
+              onClick={() => {
+                handleSchoolTypeChange("All");
+                setSchoolTypeBoxOpen(false);
+              }}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm ${
+                schoolType === "All"
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100 text-gray-700"
+              }`}
+            >
+              All Schools
+            </button>
             <button
               onClick={() => {
                 handleSchoolTypeChange("Elementary");

@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 
 interface CustomButtonProps extends ButtonProps {
-  label: string;
+  label?: string;
   onClick?: () => void;
   buttonType:
     | "primary"

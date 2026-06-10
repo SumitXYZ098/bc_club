@@ -1,15 +1,17 @@
 "use client";
-import { Icons } from "@/src/app/exports";
-import Description, {
-  IDescriptionTypes,
-} from "@/src/components/description/Description";
+import { Icons, Images } from "@/src/app/exports";
+// import Description, {
+//   IDescriptionTypes,
+// } from "@/src/components/description/Description";
 import Image from "next/image";
 import React from "react";
 import SearchPropertyTab from "./SearchPropertyTab";
 import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
-import CustomButton from "@/src/components/button/CustomButton";
+// import CustomButton from "@/src/components/button/CustomButton";
 import CityStatsPopup from "./CityStatsPopup";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
+import CustomButton from "@/src/components/button/CustomButton";
+import DotButton from "./DotButton";
 
 const HomeHeroSection = () => {
   const [hoveredCity, setHoveredCity] = React.useState<string | null>(null);
@@ -55,66 +57,127 @@ const HomeHeroSection = () => {
           <SearchPropertyTab />
         </div>
       </div>
-      <div className="xl:w-[58.5%] bg-gray h-auto xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl z-10 xl:p-[120px_48px_21px_65px] md:px-12 md:py-8 p-5 flex flex-col items-end gap-1">
-        <div className="w-full xl:h-155.5 md:h-128.5 h-66.25 relative">
+      <div className="xl:w-[58.5%] bg-gray h-auto xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl z-10">
+        <div className="w-full xl:h-195 md:h-128.5 h-66.25 relative">
           <Image
-            src={Icons.heroMapVector}
+            src={Images.map}
             alt="Map Vector"
-            width={400}
-            height={400}
-            className="w-full xl:h-155.5 md:h-128.5 h-66.25 relative object-fill"
+            width={1400}
+            height={1000}
+            className="w-full xl:h-195 md:h-128.5 h-66.25 relative object-fill xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl"
+          />
+          <DotButton
+            customClasses="absolute lg:top-[197px] lg:left-20 z-20 w-11!"
+            onMouseEnter={() =>
+              handleMouseEnter("Whistler", { top: "100px", left: "90px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute lg:top-[268px] lg:left-[127px] z-20 w-12!"
+            onMouseEnter={() =>
+              handleMouseEnter("Squamish", { top: "190px", left: "125px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute lg:top-[382px] lg:left-[95px] z-20 w-12!"
+            onMouseEnter={() =>
+              handleMouseEnter("Vancouver", { top: "90px", left: "100px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute lg:top-[380px] lg:left-[222px] z-20 w-10!"
+            onMouseEnter={() =>
+              handleMouseEnter("Burnaby", { top: "90px", left: "140px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute lg:top-[379px] lg:left-[313px] z-20 w-11!"
+            onMouseEnter={() =>
+              handleMouseEnter("Coquitlam", { top: "80px", left: "140px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute w-10! lg:top-[422px] lg:left-[264px] z-20 w-17!"
+            onMouseEnter={() =>
+              handleMouseEnter("New Westminster", {
+                top: "100px",
+                left: "140px",
+              })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute lg:top-[454px] lg:left-[328px] z-20 w-8!"
+            onMouseEnter={() =>
+              handleMouseEnter("Surrey", { top: "50px", left: "140px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute w-9! lg:top-[422px] lg:right-87 z-20 w-14!"
+            onMouseEnter={() =>
+              handleMouseEnter("Maple Ridge", { top: "80px", left: "140px" })
+            }
+            onMouseLeave={handleMouseLeave}
           />
 
-          <CustomButton
-            startIcon={Icons.grahp}
-            label="Langley"
-            buttonType="secondary"
-            customClasses="absolute lg:top-25 lg:left-[255px] md:top-20 md:left-56 top-4 left-30 flex flex-row gap-0.5 items-center rounded-full! px-4! py-2! z-20"
+          <DotButton
+            customClasses="absolute lg:bottom-[281px] lg:left-[398px] z-20 w-9!"
             onMouseEnter={() =>
-              handleMouseEnter("Langley", { top: "50px", left: "140px" })
+              handleMouseEnter("Langley", { top: "100px", left: "160px" })
             }
             onMouseLeave={handleMouseLeave}
           />
-          <CustomButton
-            startIcon={Icons.grahp}
-            label="Surrey"
-            buttonType="secondary"
-            customClasses="absolute lg:top-[224px] lg:left-[65px] md:top-50 md:left-16 top-23 left-6 flex flex-row gap-0.5 items-center rounded-full! px-4! py-2! z-20 "
+          <DotButton
+            customClasses="absolute lg:bottom-[250px] lg:right-74 z-20 w-12!"
             onMouseEnter={() =>
-              handleMouseEnter("Surrey", { top: "100px", left: "160px" })
+              handleMouseEnter("Abbotsford", { top: "170px", left: "140px" })
             }
             onMouseLeave={handleMouseLeave}
           />
-          <CustomButton
-            startIcon={Icons.grahp}
-            label="Vancouver"
-            buttonType="secondary"
-            customClasses="absolute lg:top-[294px] lg:left-[304px] md:top-62 md:left-76 top-30 left-40 flex flex-row gap-0.5 items-center rounded-full! px-4! py-2! z-20"
+          <DotButton
+            customClasses="absolute lg:bottom-[246px] lg:right-47 z-20 w-9!"
             onMouseEnter={() =>
-              handleMouseEnter("Vancouver", { top: "170px", left: "240px" })
+              handleMouseEnter("Mission", { bottom: "-10px", left: "200px" })
             }
             onMouseLeave={handleMouseLeave}
           />
-          {/* <CustomButton
-            startIcon={Icons.grahp}
-            label="Victoria"
-            buttonType="secondary"
-            customClasses="absolute lg:bottom-[77px] lg:left-[227px] md:bottom-30 md:left-26 bottom-15 left-13 flex flex-row gap-0.5 items-center rounded-full! px-4! py-2! z-20"
+          <DotButton
+            customClasses="absolute lg:bottom-[257px] lg:right-29 z-20 w-11!"
             onMouseEnter={() =>
-              handleMouseEnter("Victoria", { bottom: "-60px", left: "200px" })
+              handleMouseEnter("Chilliwack", {
+                bottom: "-10px",
+                right: "120px",
+              })
             }
             onMouseLeave={handleMouseLeave}
-          /> */}
-          {/* <CustomButton
-            startIcon={Icons.grahp}
-            label="Kelowna"
-            buttonType="secondary"
-            customClasses="absolute lg:bottom-[63px] lg:right-20 md:bottom-10 md:right-36 bottom-6 right-16 flex flex-row gap-0.5 items-center rounded-full! px-4! py-2! z-20"
+          />
+          <DotButton
+            customClasses="absolute lg:bottom-[318px] lg:right-6 z-20 w-7!"
             onMouseEnter={() =>
-              handleMouseEnter("Kelowna", { bottom: "-10px", right: "120px" })
+              handleMouseEnter("Hope", { bottom: "-10px", right: "50px" })
             }
             onMouseLeave={handleMouseLeave}
-          /> */}
+          />
+          <DotButton
+            customClasses="absolute lg:top-[435px] lg:left-[91px] z-20 w-12!"
+            onMouseEnter={() =>
+              handleMouseEnter("Richmond", { bottom: "-10px", left: "100px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
+          <DotButton
+            customClasses="absolute lg:bottom-[292px] lg:left-[183px] z-20 w-7!"
+            onMouseEnter={() =>
+              handleMouseEnter("Delta", { bottom: "-10px", left: "100px" })
+            }
+            onMouseLeave={handleMouseLeave}
+          />
 
           <CityStatsPopup
             city={hoveredCity || ""}
@@ -124,7 +187,7 @@ const HomeHeroSection = () => {
             onMouseLeave={handleMouseLeave}
           />
         </div>
-        <PoweredBy className="justify-end" />
+        <PoweredBy className="justify-end absolute xl:bottom-3 xl:right-2 md:bottom-2 md:right-15 bottom-1 right-8" />
       </div>
       <Image
         src={Icons.bgWaveLine}

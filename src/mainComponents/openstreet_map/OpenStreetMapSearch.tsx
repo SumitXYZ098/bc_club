@@ -79,7 +79,7 @@ import {
 } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
 
-type SchoolType = "Elementary" | "Secondary";
+type SchoolType = "Elementary" | "Secondary" | "All";
 
 type SchoolItem = {
   id: string;
@@ -265,7 +265,7 @@ export default function OpenStreetMapSearch() {
   const [parcelGeoJSON, setParcelGeoJSON] = useState<any>(null);
   const [geocodedCache, setGeocodedCache] = useState<Record<string, any>>({});
   const [schoolMode, setSchoolMode] = useState(false);
-  const [schoolType, setSchoolType] = useState<SchoolType>("Elementary");
+  const [schoolType, setSchoolType] = useState<SchoolType>("All");
   const [measureMode, setMeasureMode] = useState(false);
   const [measurePoints, setMeasurePoints] = useState<LatLngPoint[]>([]);
   const [distance, setDistance] = useState<{
@@ -814,7 +814,6 @@ export default function OpenStreetMapSearch() {
     setSelectedClusterProperties([]);
     setClusterPosition(null);
   };
-
   if (!mapLoaded && typeof window === "undefined") return <MapLoading />;
 
   return (

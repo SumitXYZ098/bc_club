@@ -65,6 +65,7 @@ const Images = {
   forSale: "/forSale.webp",
   sold: "/sold.webp",
   expired: "/expired.webp",
+  mapImage: "/Map.png",
 };
 
 export { Icons, Images };
