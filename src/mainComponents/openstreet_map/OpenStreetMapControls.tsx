@@ -120,7 +120,7 @@ export default function OpenStreetMapControls({
 
             if (schoolMode) {
               handleSchool();
-              handleSchoolTypeChange("Elementary");
+              handleSchoolTypeChange("All");
               setSchoolTypeBoxOpen(false);
               return;
             }
