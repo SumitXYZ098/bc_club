@@ -18,6 +18,7 @@ import {
 import Supercluster from "supercluster";
 import {
   useGetListings,
+  useGetMapZoomAssignmentList,
   useGetMapZoomListings,
   useGetMapZoomSchools,
   useGetMapZoomSoldList,
@@ -372,7 +373,6 @@ export default function OpenStreetMapSearch() {
         ),
     enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
-    // ✅ keep old properties while bounds/zoom API loading
     placeholderData: (previousData: any) => previousData,
   });
 
@@ -384,9 +384,21 @@ export default function OpenStreetMapSearch() {
     select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
     enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
     staleTime: 1000 * 60 * 5,
-    // ✅ keep old sold dots while new bounds loading
     placeholderData: (previousData: any) => previousData,
   });
+
+  const {
+    data: queryDataAssignment,
+    isLoading: isLoadingAssignment,
+    isFetching: isFetchingAssignment,
+  } = useGetMapZoomAssignmentList(mapZoomParams, {
+    select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
+    enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData: any) => previousData,
+  });
+
+  console.log(queryDataAssignment, "queryDataAssignment");
 
   const rawProperties = useMemo(
     () => (isForSale ? queryDataActive || [] : queryDataNormal || []),

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
+
 import { Icons } from "@/src/app/exports";
 import Description, {
   IDescriptionTypes,
@@ -11,45 +12,46 @@ import { MapPin, Search } from "lucide-react";
 import { useGetAssessmentPropertiesList } from "@/src/hooks/listing/useListingQueries";
 
 const HomeEstimationTop = () => {
+  const router = useRouter();
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
   const [navigating, setNavigating] = useState(false);
 
-  const { data: assessmentPropertiesList, isLoading } =
-    useGetAssessmentPropertiesList({
-      address: query,
-    });
-
-  const fetchProperties = async () => {
-    if (!query || query.length < 2) return;
-
-    setIsFetching(isLoading);
-    try {
-      setFilteredResults(assessmentPropertiesList?.data || []);
-      setShowDropdown(true);
-    } catch (err) {
-      console.error("❌ API ERROR:", err);
-    } finally {
-      setIsFetching(isLoading);
-    }
-  };
-
   useEffect(() => {
-    const delay = setTimeout(() => {
-      if (query.length > 1) {
-        fetchProperties();
-      } else {
-        setShowDropdown(false);
-        setFilteredResults([]);
-      }
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query.trim());
     }, 400);
 
-    return () => clearTimeout(delay);
+    return () => clearTimeout(timer);
   }, [query]);
 
-  const router = useRouter();
+  const {
+    data: assessmentPropertiesList,
+    isLoading,
+    isFetching,
+  } = useGetAssessmentPropertiesList(
+    {
+      address: debouncedQuery,
+    },
+    {
+      enabled: debouncedQuery.length > 1,
+    },
+  );
+
+  useEffect(() => {
+    if (debouncedQuery.length <= 1) {
+      setFilteredResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const list = assessmentPropertiesList?.data || [];
+    setFilteredResults(list);
+    setShowDropdown(list.length > 0);
+  }, [assessmentPropertiesList, debouncedQuery]);
 
   const handleSelectProperty = (documentId: string) => {
     setShowDropdown(false);
@@ -57,9 +59,10 @@ const HomeEstimationTop = () => {
     router.push(`/property-assessment/${documentId}`);
   };
 
+  const loadingSearch = isLoading || isFetching;
+
   return (
     <>
-      {/* Full-screen navigation loading overlay */}
       {navigating && (
         <div
           className="fixed inset-0 z-9999 flex flex-col items-center justify-center gap-4"
@@ -68,7 +71,6 @@ const HomeEstimationTop = () => {
             backdropFilter: "blur(2px)",
           }}
         >
-          {/* Spinning ring */}
           <div
             className="w-14 h-14 rounded-full"
             style={{
@@ -77,12 +79,7 @@ const HomeEstimationTop = () => {
               animation: "spin 0.75s linear infinite",
             }}
           />
-          <p
-            className="text-sm font-medium"
-            style={{ color: "var(--lightWhite)" }}
-          >
-            Loading property…
-          </p>
+          <p className="text-sm font-medium text-primary">Loading property…</p>
         </div>
       )}
 
@@ -101,15 +98,16 @@ const HomeEstimationTop = () => {
         <h1 className="xl:text-5xl xl:leading-17 md:text-5xl md:leading-14 text-[40px] leading-12 font-bold text-center">
           Get Your Free <span className="text-primary">Home Evaluation</span>
         </h1>
+
         <Description
           type={IDescriptionTypes.dec16}
-          content="Fill out form below to below to receive your personalized property valuation report."
+          content="Fill out form below to receive your personalized property valuation report."
           customClasses="xl:mt-5 mt-4 text-center mx-6"
         />
+
         <div className="xl:mt-8 mt-5 md:w-[80%] w-full md:p-6 p-4 shadow-[0_0_15px_0_rgba(0,0,0,0.12)] rounded-2xl flex flex-col gap-y-6 bg-background z-10">
           <p className="xl:text-xl font-bold">What’s my home worth?</p>
 
-          {/* Search input wrapper */}
           <div className="relative">
             <div
               className={`border border-borderColor md:p-1.5 py-2 flex items-center ${
@@ -117,35 +115,26 @@ const HomeEstimationTop = () => {
                   ? "rounded-t-xl"
                   : "rounded-xl"
               }`}
-              style={{
-                borderBottomLeftRadius:
-                  showDropdown && filteredResults.length > 0 ? 0 : undefined,
-                borderBottomRightRadius:
-                  showDropdown && filteredResults.length > 0 ? 0 : undefined,
-              }}
             >
               <Search
                 className="ml-3 shrink-0"
                 size={18}
                 style={{ color: "var(--lightWhite)" }}
               />
+
               <input
                 className="outline-0 px-3 w-full h-12 md:h-14 md:text-sm bg-transparent"
                 placeholder="Search Property Address"
                 required
                 value={query}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setQuery(value);
-                }}
+                onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => {
                   if (filteredResults.length > 0) setShowDropdown(true);
                 }}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
               />
 
-              {/* Fetching spinner inside input */}
-              {isFetching && (
+              {loadingSearch && query.length > 1 && (
                 <div
                   className="mr-3 shrink-0 w-4 h-4 rounded-full"
                   style={{
@@ -157,7 +146,6 @@ const HomeEstimationTop = () => {
               )}
             </div>
 
-            {/* Dropdown */}
             {showDropdown && filteredResults.length > 0 && (
               <div
                 className="estimation-dropdown absolute left-0 w-full bg-background z-20 max-h-72 overflow-y-auto scrollbar-hide"
@@ -170,7 +158,6 @@ const HomeEstimationTop = () => {
                   boxShadow: "0 12px 32px rgba(0,0,0,0.10)",
                 }}
               >
-                {/* Header */}
                 <div
                   className="px-4 py-2.5 flex items-center justify-between"
                   style={{ borderBottom: "1px solid var(--borderColor)" }}
@@ -181,6 +168,7 @@ const HomeEstimationTop = () => {
                   >
                     Properties
                   </span>
+
                   <span
                     className="text-xs font-bold px-2 py-0.5 rounded-full"
                     style={{
@@ -192,10 +180,9 @@ const HomeEstimationTop = () => {
                   </span>
                 </div>
 
-                {/* Items */}
                 {filteredResults.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={item.documentId || item.id}
                     onMouseDown={() => handleSelectProperty(item.documentId)}
                     className="estimation-item cursor-pointer px-4 py-3 flex items-start gap-3"
                     style={{
@@ -210,10 +197,12 @@ const HomeEstimationTop = () => {
                       className="mt-0.5 shrink-0"
                       style={{ color: "var(--primary)" }}
                     />
+
                     <div className="flex flex-col min-w-0">
                       <span className="text-sm font-semibold text-foreground truncate">
                         {item.address}
                       </span>
+
                       {item.city && (
                         <span
                           className="text-xs mt-0.5"
@@ -229,6 +218,7 @@ const HomeEstimationTop = () => {
             )}
           </div>
         </div>
+
         <Image
           title="image title"
           src={Icons.bgWaveLine}
