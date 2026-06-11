@@ -185,6 +185,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
             <div className="w-full h-56 overflow-clip rounded-t-2xl">
               {img ? (
                 <Image
+                  title="image title"
                   src={img}
                   alt={title}
                   className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
@@ -281,6 +282,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
             <div className="flex items-center justify-between w-full">
               <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
+                  title="image title"
                   src={Icons.square}
                   alt="sqft"
                   width={100}
@@ -292,6 +294,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
               <LineGradient vr />
               <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
+                  title="image title"
                   src={Icons.bed}
                   alt="bedroom"
                   width={100}
@@ -303,6 +306,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
               <LineGradient vr={true} />
               <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
+                  title="image title"
                   src={Icons.bath}
                   alt="bathtub"
                   width={100}
@@ -316,6 +320,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
                   <LineGradient vr={true} />
                   <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                     <Image
+                      title="image title"
                       src={Icons.lotSize}
                       alt="lotSize"
                       width={100}

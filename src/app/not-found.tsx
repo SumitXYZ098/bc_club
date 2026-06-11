@@ -11,6 +11,7 @@ const notFound = () => {
   return (
     <section className="xl:max-w-screen-2xl mx-auto w-full h-auto flex flex-col items-center-safe relative md:pt-13.5 pt-10 xl:px-16 md:px-13 px-6 ">
       <Image
+        title="image title"
         src={Icons.notFound}
         alt="Not Found"
         width={100}
@@ -35,6 +36,7 @@ const notFound = () => {
         Back to Home
       </Link>
       <Image
+        title="image title"
         src={Icons.bgWaveLine}
         alt="Wave line"
         className="w-full h-auto absolute object-cover xl:-bottom-8.5 md:-bottom-3 -bottom-1.5"

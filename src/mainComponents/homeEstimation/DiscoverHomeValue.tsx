@@ -54,6 +54,7 @@ const DiscoverHomeValue = () => {
             className="p-6 rounded-[20px] xl:w-[32%] md:w-[48%] w-full border border-[#00000033] xl:hover:shadow-[0_0_32px_0_rgba(0,0,0,0.12)] hover:border-none transition-shadow duration-300 flex flex-col items-start h-auto"
           >
             <Image
+              title="image title"
               src={card.icon}
               alt={card.label}
               width={80}

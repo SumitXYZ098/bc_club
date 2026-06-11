@@ -71,6 +71,7 @@ export default function page() {
                 {/* Featured Image */}
                 <div className="relative w-full h-60 sm:h-80 md:h-96 lg:h-105 rounded-xl overflow-hidden mb-8">
                   <Image
+                    title={"image title"}
                     src={Images.blogimg}
                     alt="Blog image"
                     fill
@@ -274,18 +275,26 @@ export default function page() {
 
                   <div className="flex gap-3">
                     <Image
+                      title="image title"
                       src={Icons.facebookicon}
                       alt=""
                       width={35}
                       height={30}
                     />
                     <Image
+                      title="image title"
                       src={Icons.twittericon}
                       alt=""
                       width={35}
                       height={30}
                     />
-                    <Image src={Icons.linkedin} alt="" width={35} height={30} />
+                    <Image
+                      title="image title"
+                      src={Icons.linkedin}
+                      alt=""
+                      width={35}
+                      height={30}
+                    />
                   </div>
                 </div>
 

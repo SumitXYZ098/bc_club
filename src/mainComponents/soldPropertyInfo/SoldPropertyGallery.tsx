@@ -35,6 +35,7 @@ export default function SoldPropertyGallery({ images }: Props) {
           }}
         >
           <Image
+            title="image title"
             src={getImageUrl(images[0])}
             alt="Property image"
             width={1020}
@@ -58,6 +59,7 @@ export default function SoldPropertyGallery({ images }: Props) {
                 }}
               >
                 <Image
+                  title="image title"
                   src={getImageUrl(img)}
                   alt={`Thumbnail ${i + 1}`}
                   width={450}

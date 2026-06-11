@@ -27,6 +27,7 @@ const Page = () => {
         {/* Wave */}
         <div className="absolute -bottom-10 left-0 w-full h-70">
           <Image
+            title="image title"
             src={Icons.bgWaveLine}
             alt="Wave line"
             fill
@@ -45,6 +46,7 @@ const Page = () => {
             <Link href="/blogs/blog-detail" className="block">
               <div className="relative h-64 sm:h-80 md:h-96 lg:h-95 w-full">
                 <Image
+                  title="image title"
                   src={Images.blogimg}
                   alt="Smart Property Investment"
                   fill
@@ -62,6 +64,7 @@ const Page = () => {
                     Smart Property Investment in 2025
                   </h3>
                   <Image
+                    title="image title"
                     alt="Smart Property Investment"
                     width={100}
                     height={100}
@@ -82,6 +85,7 @@ const Page = () => {
             {/* CARD 1 */}
             <div className="bg-white rounded-2xl p-4 flex flex-col sm:flex-row gap-4 w-full">
               <Image
+                title="image title"
                 src={Images.firsttown}
                 alt="First-Time Home Buyer"
                 className="object-cover w-full sm:w-55 lg:w-[320px] h-40 sm:h-full rounded-xl shrink-0"
@@ -104,6 +108,7 @@ const Page = () => {
             {/* CARD 2 */}
             <div className="bg-white rounded-2xl p-4 flex flex-col sm:flex-row gap-4 w-full">
               <Image
+                title="image title"
                 src={Images.secondtown}
                 alt="Home Investment"
                 className="object-cover w-full sm:w-55 lg:w-[320px] h-40 sm:h-full rounded-xl shrink-0"

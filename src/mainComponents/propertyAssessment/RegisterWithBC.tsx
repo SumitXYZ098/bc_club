@@ -49,6 +49,7 @@ const RegisterWithBC = () => {
             className="bg-background rounded-lg p-3 xl:w-[24%] md:w-[49%] w-full flex flex-col gap-y-3 text-foreground"
           >
             <Image
+              title="image title"
               width={80}
               height={80}
               alt={card.content}

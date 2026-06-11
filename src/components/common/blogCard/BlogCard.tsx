@@ -20,6 +20,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
       {/* Image */}
       <div className="relative w-full h-48 sm:h-52 lg:h-56">
         <Image
+          title="image title"
           src={image}
           alt={title}
           fill

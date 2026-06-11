@@ -22,6 +22,7 @@ const RenovationHeaderSection = () => {
       />
 
       <Image
+        title="image title"
         src={Icons.bgWaveLine}
         alt="Wave line"
         className="w-full md:h-65.5 h-29.5 absolute object-contain bottom-0 z-0 left-0"

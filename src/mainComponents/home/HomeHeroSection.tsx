@@ -1,16 +1,11 @@
 "use client";
 import { Icons, Images } from "@/src/app/exports";
-// import Description, {
-//   IDescriptionTypes,
-// } from "@/src/components/description/Description";
 import Image from "next/image";
 import React from "react";
 import SearchPropertyTab from "./SearchPropertyTab";
 import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
-// import CustomButton from "@/src/components/button/CustomButton";
 import CityStatsPopup from "./CityStatsPopup";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
-import CustomButton from "@/src/components/button/CustomButton";
 import DotButton from "./DotButton";
 
 const HomeHeroSection = () => {
@@ -60,6 +55,7 @@ const HomeHeroSection = () => {
       <div className="xl:w-[58.5%] bg-gray h-auto xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl z-10">
         <div className="w-full xl:h-195 md:h-128.5 h-66.25 relative">
           <Image
+            title="image title"
             src={Images.map}
             alt="Map Vector"
             width={1400}
@@ -190,6 +186,7 @@ const HomeHeroSection = () => {
         <PoweredBy className="justify-end absolute xl:bottom-3 xl:right-2 md:bottom-2 md:right-15 bottom-1 right-8" />
       </div>
       <Image
+        title="image title"
         src={Icons.bgWaveLine}
         alt="Wave line"
         className="w-full h-auto absolute object-cover bottom-0 z-0 xl:block hidden"

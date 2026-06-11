@@ -101,6 +101,7 @@ const Header = () => {
           className="xl:hidden block"
         >
           <Image
+            title="image title"
             alt="logo"
             src={Icons.bcClub}
             width={119}
@@ -111,6 +112,7 @@ const Header = () => {
 
         <Link href={"/"} className="xl:block hidden">
           <Image
+            title="image title"
             alt="logo"
             src={Icons.bcClub}
             width={119}

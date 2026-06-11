@@ -44,6 +44,7 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
         ) : (
           <div className="w-1/2 xl:h-134 md:h-76.5 h-56.5 relative cursor-pointer md:rounded-2xl rounded-xl">
             <Image
+              title="Property image not found*"
               className="w-full h-full object-cover rounded-xl"
               src={Images.apartment}
               alt="property image not found*"

@@ -182,6 +182,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 <Image
                   src={img}
                   alt={title}
+                  title={title}
                   className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
                     isLogin ? "group-hover:scale-125" : "blur-sm"
                   }`}
@@ -341,7 +342,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
                   src={Icons.square}
-                  alt="sqft"
+                  alt="square"
+                  title="Square"
                   width={100}
                   height={100}
                   className="w-5 h-5 object-contain"
@@ -352,7 +354,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
                   src={Icons.bed}
-                  alt="bedroom"
+                  alt="bed"
+                  title="Bed"
                   width={100}
                   height={100}
                   className="w-5 h-5 object-contain"
@@ -363,7 +366,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
                 <Image
                   src={Icons.bath}
-                  alt="bathtub"
+                  alt="bath"
+                  title="Bath"
                   width={100}
                   height={100}
                   className="w-5 h-5 object-contain"
@@ -377,6 +381,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                     <Image
                       src={Icons.lotSize}
                       alt="lotSize"
+                      title="Lot Size"
                       width={100}
                       height={100}
                       className="w-5 h-5 object-contain"

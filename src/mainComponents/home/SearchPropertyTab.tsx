@@ -166,6 +166,7 @@ const SearchPropertyTab = () => {
                 />
               ) : (
                 <Image
+                  title="image title"
                   src={Icons.searchLine}
                   alt="Search"
                   width={100}
@@ -278,6 +279,7 @@ const SearchPropertyTab = () => {
                 />
               ) : (
                 <Image
+                  title="image title"
                   src={Icons.searchLine}
                   alt="Search"
                   width={100}

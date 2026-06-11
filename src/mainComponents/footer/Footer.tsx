@@ -56,6 +56,7 @@ From market insights to home valuation, we guide you every step of your real est
               className="bg-secondary cursor-pointer md:p-2.5 p-2 rounded-lg md:w-12.5 md:h-12.5 w-10 h-10"
             >
               <Image
+                title="image title"
                 src={item.icon}
                 alt={item.label}
                 width={100}
@@ -75,6 +76,7 @@ From market insights to home valuation, we guide you every step of your real est
       {pathName.startsWith("/property-info") === true && (
         <div className="w-full h-auto flex flex-col gap-5 md:flex-row justify-center md:justify-between items-start md:py-6 py-4 border-t border-white">
           <Image
+            title="image title"
             alt="MLS"
             src={Images.mlsr}
             width={80}

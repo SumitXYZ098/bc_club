@@ -598,7 +598,13 @@ export default function FiltersPopup({
                   : "border-[#0F0F0F33]"
               }`}
             >
-              <Image src={s.i} width={36} height={36} alt={s.l} />
+              <Image
+                title="image title"
+                src={s.i}
+                width={36}
+                height={36}
+                alt={s.l}
+              />
               <span className="text-sm font-medium">{s.l}</span>
             </button>
           ))}
@@ -1524,7 +1530,8 @@ export default function FiltersPopup({
                   key={item.label}
                   className="flex items-center gap-2 px-3 py-3.5 border border-[rgba(15,15,15,0.12)] rounded-xl text-gray-400 text-xs"
                 >
-                  <Image src={item.icon} alt="" width={16} height={16} />
+                  <Image
+title="image title" src={item.icon} alt="" width={16} height={16} />
                   <span className="whitespace-normal leading-snug">
                     {item.label}
                   </span>
@@ -1535,7 +1542,8 @@ export default function FiltersPopup({
         {/* Bottom single item */}
         {/* <div className="mt-4 mb-5 ">
               <div className="flex items-center justify-center gap-2 px-3 py-3 border border-[rgba(15,15,15,0.12)] rounded-xl text-gray-400 text-xs">
-                <Image src={Icons.star} alt="" width={16} height={16} />
+                <Image
+title="image title" src={Icons.star} alt="" width={16} height={16} />
                 <span>Must Be on Favorites list</span>
               </div>
             </div>

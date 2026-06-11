@@ -120,6 +120,7 @@ const GetInTouch = () => {
           <div className="flex flex-row items-center-safe gap-x-3 md:mt-6 mt-4">
             <div className="bg-secondary cursor-pointer md:p-1.5 p-1 rounded-lg md:w-12.5 md:h-12.5 w-10 h-10">
               <Image
+                title="image title"
                 src={Icons.emailIcon}
                 alt={"mail"}
                 width={100}

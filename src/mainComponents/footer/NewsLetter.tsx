@@ -57,6 +57,7 @@ const NewsLetter = () => {
         <div className="w-full border rounded-xl pl-4 md:p-1.5 py-5 flex items-center-safe justify-between xl:mb-0 md:mb-3">
           <div className="flex flex-row gap-x-1 items-center-safe">
             <Image
+              title="image title"
               src={Icons.emailIcon}
               alt="email"
               width={100}

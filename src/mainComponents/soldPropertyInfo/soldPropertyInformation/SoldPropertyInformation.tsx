@@ -143,6 +143,7 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
                 >
                   <div className="flex flex-row items-center gap-x-2">
                     <Image
+                      title="image title"
                       src={features.icon}
                       alt={features.label}
                       width={40}
