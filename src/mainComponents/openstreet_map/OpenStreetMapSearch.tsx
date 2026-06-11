@@ -372,6 +372,8 @@ export default function OpenStreetMapSearch() {
         ),
     enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
+    // ✅ keep old properties while bounds/zoom API loading
+    placeholderData: (previousData: any) => previousData,
   });
 
   const {
@@ -382,6 +384,8 @@ export default function OpenStreetMapSearch() {
     select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
     enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
     staleTime: 1000 * 60 * 5,
+    // ✅ keep old sold dots while new bounds loading
+    placeholderData: (previousData: any) => previousData,
   });
 
   const rawProperties = useMemo(
@@ -463,7 +467,8 @@ export default function OpenStreetMapSearch() {
 
   const isFetching = isForSale ? isFetchingActive : isFetchingNormal;
   const isLoadingData = isForSale ? isLoadingActive : isLoadingNormal;
-  const isLoading = isLoadingData || isFetching;
+  const isLoading =
+    isLoadingData || isFetching || isLoadingSold || isFetchingSold;
 
   const fetchParcels = useCallback(async (bounds: MapBounds) => {
     try {
@@ -872,6 +877,12 @@ export default function OpenStreetMapSearch() {
           />
 
           <div className="flex flex-1 relative z-10 w-full h-full">
+            {isLoading && (
+              <div className="absolute left-0 top-0 z-9999 h-1 w-full overflow-hidden bg-gray-200">
+                <div className="h-full w-1/3 animate-[mapLoading_1.2s_ease-in-out_infinite] bg-[#305487]" />
+              </div>
+            )}
+
             <MapContainer
               center={osmDefaultCenter}
               zoom={13}
