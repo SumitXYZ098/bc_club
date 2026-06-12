@@ -362,6 +362,7 @@ export default function MapTopFilterBar({
                 "Vancouver",
                 "Burnaby",
                 "Surrey",
+                "Prince George",
                 "Richmond",
                 "Victoria",
                 "Kelowna",

@@ -164,6 +164,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     <Link
       href={`${!isLogin ? "#" : getHref}`}
       className="w-full h-full flex"
+      target="_blank"
       onClick={(e) => {
         if (isLinkDisabled) {
           e.preventDefault(); // Stop link from navigating

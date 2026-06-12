@@ -78,7 +78,7 @@ export default function OpenStreetMapSoldMakerLayer({
             cursor:pointer;
             padding:4px;
             position:relative;
-          " onclick="window.location.href='/sold-property-info/${item.documentId}'"
+          " onclick="window.open('/sold-property-info/${item.documentId}', '_blank')"
         >
           <div
             style="

@@ -78,25 +78,6 @@ const PropertyAssessmentTopSection = ({ data }: { data: any }) => {
 
   if (!data) return null;
 
-  // const years: string[] = Array.isArray(data?.valueHistory)
-  //   ? data.valueHistory.map((item: any) => item.year.toString())
-  //   : [];
-
-  // const [val, setVal] = useState(data?.valueHistory?.[0]?.year?.toString() || "");
-
-  // useEffect(() => {
-  //   if (data?.valueHistory?.length) {
-  //     setVal(data.valueHistory[data.valueHistory.length - 1].year.toString());
-  //   }
-  // }, [data]);
-
-  // const handleChange = (event: any) => setVal(event.target.value);
-
-  // const selectedYearData = data?.valueHistory?.find(
-  //   (item: any) => item.year.toString() === val
-  // );
-  // const selectedValue = selectedYearData?.value || data?.totalValue;
-
   const chartData = (data?.valueHistory || [])
     .map((item: any, index: number, arr: any[]) => {
       const numericVal =

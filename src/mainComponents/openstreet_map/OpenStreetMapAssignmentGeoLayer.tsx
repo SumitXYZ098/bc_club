@@ -17,10 +17,12 @@ export default function OpenStreetMapAssignmentGeoLayer({
   map,
   data = [],
   zoomVal,
+  onSelectProperty,
 }: {
   map: L.Map | null;
   data: AssignmentGeoItem[];
   zoomVal: number | null;
+  onSelectProperty?: (property: AssignmentGeoItem) => void;
 }) {
   const geoLayerRef = useRef<L.LayerGroup | null>(null);
 
@@ -38,8 +40,6 @@ export default function OpenStreetMapAssignmentGeoLayer({
 
     data.forEach((item) => {
       if (!item.coordinates?.length) return;
-
-      const price = Number(item.price || 0).toLocaleString();
 
       item.coordinates.forEach((ring) => {
         const latLngs = ring
@@ -62,13 +62,6 @@ export default function OpenStreetMapAssignmentGeoLayer({
             fillColor: "#808080",
             fillOpacity: 0.55,
           });
-
-          polygon.bindTooltip(item.address || "Assessment Property", {
-            direction: "top",
-            sticky: true,
-          });
-
-          polygon.openTooltip();
         });
 
         polygon.on("mouseout", () => {
@@ -78,55 +71,11 @@ export default function OpenStreetMapAssignmentGeoLayer({
             fillColor: "#30548700",
             fillOpacity: 0.12,
           });
-
-          polygon.closeTooltip();
         });
 
         polygon.on("click", () => {
-          polygon.openPopup();
+          onSelectProperty?.(item);
         });
-
-        polygon.bindPopup(
-          `
-    <div
-      style="
-        width:240px;
-        cursor:pointer;
-        font-family:Plus Jakarta Display, sans-serif;
-      "
-      onclick="window.location.href='/property-assessment/${item.documentId}'"
-    >
-      <h3 style="
-        margin:0;
-        color:#305487;
-        font-size:18px;
-        font-weight:700;
-      ">
-        $${Number(item.price || 0).toLocaleString()}
-      </h3>
-
-      <p style="
-        margin:6px 0 0;
-        font-size:12px;
-        color:#6e6e6e;
-      ">
-        ${item.address || ""}
-      </p>
-
-      <p style="
-        margin:6px 0 0;
-        font-size:11px;
-        color:#999;
-      ">
-        ${item.roll || ""}
-      </p>
-    </div>
-  `,
-          {
-            maxWidth: 260,
-            autoPan: true,
-          },
-        );
 
         polygon.addTo(layerGroup);
       });
@@ -138,7 +87,7 @@ export default function OpenStreetMapAssignmentGeoLayer({
       layerGroup.remove();
       geoLayerRef.current = null;
     };
-  }, [map, data, zoomVal]);
+  }, [map, data, zoomVal, onSelectProperty]);
 
   return null;
 }

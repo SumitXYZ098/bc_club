@@ -18,6 +18,7 @@ export const cityCoords: Record<string, [number, number]> = {
   Delta: [49.0847, -123.0583],
   "Maple Ridge": [49.2194, -122.6011],
   Chilliwack: [49.1573, -121.9515],
+  "Prince George": [53.917065, -122.749672],
 };
 
 export const osmRoadmapTile = {

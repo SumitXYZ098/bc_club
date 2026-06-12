@@ -35,9 +35,12 @@ export function OpenStreetPropertyPopup({
         }}
         onClick={(e) => {
           e.stopPropagation();
-          window.location.href = selectedProperty.isDdf
-            ? `/property-info/${selectedProperty.id}`
-            : `/sold-property-info/${selectedProperty.id}`;
+          window.open(
+            selectedProperty.isDdf
+              ? `/property-info/${selectedProperty.id}`
+              : `/sold-property-info/${selectedProperty.id}`,
+            `_blank`,
+          );
         }}
       >
         <div
@@ -141,7 +144,12 @@ export function OpenStreetClusterPopup({
             key={p.id}
             onClick={(e) => {
               e.stopPropagation();
-              window.location.href = `/property-info/${p.id}`;
+              window.open(
+                p.isDdf
+                  ? `/property-info/${p.id}`
+                  : `/sold-property-info/${p.id}`,
+                `_blank`,
+              );
             }}
             style={{
               display: "flex",

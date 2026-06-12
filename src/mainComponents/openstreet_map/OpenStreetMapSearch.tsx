@@ -280,6 +280,10 @@ export default function OpenStreetMapSearch() {
   const floodLayerRef = useRef<L.GeoJSON | null>(null);
   const [showFloodProvince, setShowFloodProvince] = useState(false);
   const [loadingFloodProvince, setLoadingFloodProvince] = useState(false);
+  const [selectedAssessmentProperty, setSelectedAssessmentProperty] =
+    useState<any>(null);
+
+  const [assessmentDrawerOpen, setAssessmentDrawerOpen] = useState(false);
 
   const superclusterRef = useRef<Supercluster | null>(null);
   const lastFetchedBounds = useRef<string>("");
@@ -394,12 +398,10 @@ export default function OpenStreetMapSearch() {
     isFetching: isFetchingAssignment,
   } = useGetMapZoomAssignmentList(mapZoomParams, {
     select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
-    enabled: isForSale && !!mapBounds && mapZoomVal! > 14,
+    enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData: any) => previousData,
   });
-
-  console.log(queryDataAssignment, "queryDataAssignment");
 
   const rawProperties = useMemo(
     () => (isForSale ? queryDataActive || [] : queryDataNormal || []),
@@ -568,7 +570,7 @@ export default function OpenStreetMapSearch() {
     setMapZoomVal(Math.round(zoom));
     lastFetchedBounds.current = key;
 
-    if (zoom >= 18) fetchParcels(newBounds);
+    if (zoom >= 17) fetchParcels(newBounds);
   }, [map, fetchParcels]);
 
   const onMapReady = useCallback((mapInstance: L.Map) => {
@@ -887,6 +889,9 @@ export default function OpenStreetMapSearch() {
             isLoggedIn={isLoggedIn}
             status={status}
             setHoveredPropertyId={setHoveredPropertyId}
+            assessmentDrawerOpen={assessmentDrawerOpen}
+            selectedAssessmentProperty={selectedAssessmentProperty}
+            setAssessmentDrawerOpen={setAssessmentDrawerOpen}
           />
 
           <div className="flex flex-1 relative z-10 w-full h-full">
@@ -899,7 +904,7 @@ export default function OpenStreetMapSearch() {
             <MapContainer
               center={osmDefaultCenter}
               zoom={13}
-              minZoom={6}
+              minZoom={8}
               maxZoom={22}
               zoomControl={false}
               scrollWheelZoom
@@ -940,9 +945,13 @@ export default function OpenStreetMapSearch() {
                 map={map}
                 data={queryDataAssignment || []}
                 zoomVal={mapZoomVal}
+                onSelectProperty={(property) => {
+                  setSelectedAssessmentProperty(property);
+                  setAssessmentDrawerOpen(true);
+                }}
               />
 
-              {parcelGeoJSON && mapZoomVal && mapZoomVal >= 18 && (
+              {parcelGeoJSON && mapZoomVal && mapZoomVal >= 17 && (
                 <OSMGeoJsonLayer data={parcelGeoJSON} properties={properties} />
               )}
 
