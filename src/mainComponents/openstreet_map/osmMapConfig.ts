@@ -24,9 +24,11 @@ export const osmRoadmapTile = {
   url: "https://api.maptiler.com/maps/openstreetmap/{z}/{x}/{y}.jpg?key=VbAYHAnzOQbneRNG9XfV",
   attribution:
     "<a href='https://www.maptiler.com/copyright/' target='_blank'>&copy; MapTiler</a> <a href='https://www.openstreetmap.org/copyright' target='_blank'>&copy; OpenStreetMap contributors</a>",
+  maxNativeZoom: 19,
 };
 
 export const osmSatelliteTile = {
   url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   attribution: "Tiles &copy; Esri",
+  maxNativeZoom: 18,
 };

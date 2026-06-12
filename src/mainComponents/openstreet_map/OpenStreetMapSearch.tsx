@@ -79,6 +79,7 @@ import {
   MdStar,
 } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
+import OpenStreetMapAssignmentGeoLayer from "./OpenStreetMapAssignmentGeoLayer";
 
 type SchoolType = "Elementary" | "Secondary" | "All";
 
@@ -393,7 +394,7 @@ export default function OpenStreetMapSearch() {
     isFetching: isFetchingAssignment,
   } = useGetMapZoomAssignmentList(mapZoomParams, {
     select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
-    enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
+    enabled: isForSale && !!mapBounds && mapZoomVal! > 14,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData: any) => previousData,
   });
@@ -567,7 +568,7 @@ export default function OpenStreetMapSearch() {
     setMapZoomVal(Math.round(zoom));
     lastFetchedBounds.current = key;
 
-    if (zoom >= 16) fetchParcels(newBounds);
+    if (zoom >= 18) fetchParcels(newBounds);
   }, [map, fetchParcels]);
 
   const onMapReady = useCallback((mapInstance: L.Map) => {
@@ -898,8 +899,8 @@ export default function OpenStreetMapSearch() {
             <MapContainer
               center={osmDefaultCenter}
               zoom={13}
-              minZoom={8}
-              maxZoom={18}
+              minZoom={6}
+              maxZoom={22}
               zoomControl={false}
               scrollWheelZoom
               className="w-full h-full bc-osm-map"
@@ -913,6 +914,12 @@ export default function OpenStreetMapSearch() {
                     : osmRoadmapTile.attribution
                 }
                 url={isSatellite ? osmSatelliteTile.url : osmRoadmapTile.url}
+                maxZoom={22}
+                maxNativeZoom={
+                  isSatellite
+                    ? osmSatelliteTile.maxNativeZoom
+                    : osmRoadmapTile.maxNativeZoom
+                }
               />
 
               <MapEvents
@@ -929,7 +936,13 @@ export default function OpenStreetMapSearch() {
                 handleMeasureMove={handleMeasureMove}
               />
 
-              {parcelGeoJSON && mapZoomVal && mapZoomVal >= 16 && (
+              <OpenStreetMapAssignmentGeoLayer
+                map={map}
+                data={queryDataAssignment || []}
+                zoomVal={mapZoomVal}
+              />
+
+              {parcelGeoJSON && mapZoomVal && mapZoomVal >= 18 && (
                 <OSMGeoJsonLayer data={parcelGeoJSON} properties={properties} />
               )}
 
