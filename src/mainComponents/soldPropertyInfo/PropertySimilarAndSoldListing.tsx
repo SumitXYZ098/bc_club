@@ -44,11 +44,19 @@ const swiperConfig = {
 const PropertySimilarAndSoldListing = ({
   city,
   propertyId,
+  beds,
+  lotSize,
+  price,
+  baths,
+  livingArea,
 }: {
   city?: string;
-  bedsVariance: number;
-  lotSizeAreaVariance?: number;
+  beds: number;
+  lotSize?: number;
   propertyId: string;
+  price?: number;
+  baths?: number;
+  livingArea?: number;
 }) => {
   const { isLoggedIn } = useAuthContext();
   const { data: me } = useGetMe();
@@ -208,6 +216,11 @@ const PropertySimilarAndSoldListing = ({
                 isLogin={isLoginOverride ?? isLoggedIn}
                 isSold={item.status === "Closed"}
                 isExpired={item.status === "Expired"}
+                targetPrice={price}
+                targetBeds={beds}
+                targetBaths={baths}
+                targetLotSize={lotSize}
+                targetLivingArea={livingArea}
               />
             </SwiperSlide>
           ))}

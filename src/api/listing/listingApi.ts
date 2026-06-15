@@ -52,7 +52,6 @@ export async function getMapZoomAssignmentList(params?: any): Promise<any> {
     const res = await axios.get(Endpoints.getMapZoomAssignmentList, {
       params,
     });
-    console.log(res.data, "getMapZoomAssignmentList res");
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

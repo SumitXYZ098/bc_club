@@ -265,7 +265,6 @@ export const getRoomRows = (property: any) => {
 
 export const getPropertyRoomRows = (property: any) => {
   const rooms = property?.rooms || [];
-  console.log("Room", rooms);
   return rooms
     .filter((room: any) => room.RoomType && room.RoomLevel)
     .map((room: any) => {

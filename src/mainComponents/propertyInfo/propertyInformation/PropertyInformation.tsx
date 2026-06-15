@@ -87,8 +87,6 @@ const PropertyInformation = ({ property }: { property: any }) => {
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
     useGetNearbyPlaces(property.documentId);
 
-  console.log("nearbyPlaces", nearbyPlaces?.data?.schools);
-
   const openSchoolLocatorPopup = () => {
     const width = 1200;
     const height = 800;

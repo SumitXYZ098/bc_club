@@ -46,7 +46,95 @@ export interface SimilarPropertiesCardProps {
   age?: string;
   listingDate?: string;
   distance?: string;
+  targetPrice?: number;
+  targetBeds?: number;
+  targetBaths?: number;
+  targetLotSize?: number;
+  targetLivingArea?: number;
 }
+
+const ComparisonIcon = ({
+  value,
+  targetValue,
+  isLogin,
+}: {
+  value?: number;
+  targetValue?: number;
+  isLogin?: boolean;
+}) => {
+  if (!isLogin) return null;
+  if (
+    value === undefined ||
+    targetValue === undefined ||
+    isNaN(value) ||
+    isNaN(targetValue) ||
+    value === 0 ||
+    targetValue === 0
+  )
+    return null;
+
+  if (value > targetValue) {
+    return (
+      <span className="ml-1.5 shrink-0" title="Greater than target property">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#14B514"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="16 12 12 8 8 12" />
+          <line x1="12" y1="16" x2="12" y2="8" />
+        </svg>
+      </span>
+    );
+  } else if (value < targetValue) {
+    return (
+      <span className="ml-1.5 shrink-0" title="Less than target property">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#FF0000"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="8 12 12 16 16 12" />
+          <line x1="12" y1="8" x2="12" y2="16" />
+        </svg>
+      </span>
+    );
+  } else {
+    return (
+      <span className="ml-1.5 shrink-0" title="Equal to target property">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#6B7280"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="16" y2="14" />
+        </svg>
+      </span>
+    );
+  }
+};
 
 const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   id,
@@ -59,20 +147,21 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   beds,
   baths,
   lotSize,
-  assessedDiff,
   mls,
   realtor,
   isExpired,
   isSold,
   isFavourite: isFavouriteProp,
   isLogin: isLoginProp,
-  isDdf,
   likesCount,
-  structureType,
-  oldPrice = 0,
   distance,
   age,
   listingDate,
+  targetPrice,
+  targetBeds,
+  targetBaths,
+  targetLotSize,
+  targetLivingArea,
 }) => {
   const { data: me } = useGetMe();
   const ddfToggle = useToggleDdfWishlist();
@@ -142,11 +231,6 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
     ? `$${Number(price || 0).toLocaleString()}`
     : "$*,***,***";
   const displayAddress = isLogin ? address : "Sign in to view address";
-  const displayTitle = isLogin
-    ? title === "Single Family"
-      ? structureType
-      : title
-    : "Property Details Restricted";
   const displaySqft = isLogin ? `${sqft} sft` : "---- sft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
@@ -155,11 +239,6 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
       ? `${lotSize} sft`
       : "--- sft"
     : "---- sft";
-  const displayMls = isLogin ? `MLS® ${mls}` : "MLS® *******";
-  const displayRealtor = isLogin
-    ? `Courtesy of: ${realtor}`
-    : "Courtesy of: **********";
-
   const img = image ? image : Images.apartment;
 
   const isLinkDisabled = isExpired || isSold;
@@ -230,22 +309,6 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
               </span>
             )}
 
-            {/* Price Drop Banner */}
-            {/* {oldPrice !== 0 && oldPrice && (
-              <span
-                className={`absolute bottom-5 right-0 p-1.5 text-xs inline-flex text-background h-auto items-center gap-0.5 uppercase  rounded-l-sm ${
-                  price < oldPrice ? "bg-red/90" : "bg-green/90"
-                }`}
-              >
-                {price < oldPrice ? (
-                  <IoArrowDownOutline className="w-4 h-4 text-background" />
-                ) : (
-                  <IoArrowUpOutline className="w-4 h-4 text-background" />
-                )}
-                {price < oldPrice ? "Price Drop" : "Price Increase "}
-              </span>
-            )} */}
-
             {isSold && (
               <span
                 className="absolute bottom-3 left-0 bg-red text-background pl-3 pr-7 pt-2 pb-2 text-xs h-auto font-medium"
@@ -279,63 +342,17 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
 
             {/* Specs */}
             <LineGradient />
-            <div className="flex items-center justify-between w-full">
-              <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
-                <Image
-                  title="image title"
-                  src={Icons.square}
-                  alt="sqft"
-                  width={100}
-                  height={100}
-                  className="w-5 h-5 object-contain"
-                />
-                <span>{displaySqft}</span>
-              </div>
-              <LineGradient vr />
-              <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
-                <Image
-                  title="image title"
-                  src={Icons.bed}
-                  alt="bedroom"
-                  width={100}
-                  height={100}
-                  className="w-5 h-5 object-contain"
-                />
-                <span>{displayBeds}</span>
-              </div>
-              <LineGradient vr={true} />
-              <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
-                <Image
-                  title="image title"
-                  src={Icons.bath}
-                  alt="bathtub"
-                  width={100}
-                  height={100}
-                  className="w-5 h-5 object-contain"
-                />
-                <span>{displayBaths}</span>
-              </div>
-              {lotSize && Number(lotSize) > 100 && (
-                <>
-                  <LineGradient vr={true} />
-                  <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">
-                    <Image
-                      title="image title"
-                      src={Icons.lotSize}
-                      alt="lotSize"
-                      width={100}
-                      height={100}
-                      className="w-5 h-5 object-contain"
-                    />
-                    <span>{displayLotSize}</span>
-                  </div>
-                </>
-              )}
-            </div>
             <div className="w-full flex flex-col flex-wrap items-center justify-between text-sm space-y-1">
               <div className="flex w-full justify-between flex-nowrap items-center">
                 <span className=" opacity-40">Asking Price:</span>
-                <span className="">{displayPrice}</span>
+                <span className="flex items-center">
+                  {displayPrice}
+                  <ComparisonIcon
+                    value={price}
+                    targetValue={targetPrice}
+                    isLogin={isLogin}
+                  />
+                </span>
               </div>
               <LineGradient />
               <div className="flex w-full justify-between flex-nowrap items-center">
@@ -347,6 +364,58 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
                 </span>
               </div>
               <LineGradient />
+              <div className="flex w-full justify-between flex-nowrap items-center">
+                <span className=" opacity-40">Living Area:</span>
+                <span className="flex items-center">
+                  {displaySqft}
+                  <ComparisonIcon
+                    value={Number(sqft)}
+                    targetValue={targetLivingArea}
+                    isLogin={isLogin}
+                  />
+                </span>
+              </div>
+              <LineGradient />
+              <div className="flex w-full justify-between flex-nowrap items-center">
+                <span className=" opacity-40">Bedrooms:</span>
+                <span className="flex items-center">
+                  {displayBeds}
+                  <ComparisonIcon
+                    value={beds}
+                    targetValue={targetBeds}
+                    isLogin={isLogin}
+                  />
+                </span>
+              </div>
+              <LineGradient />
+              <div className="flex w-full justify-between flex-nowrap items-center">
+                <span className=" opacity-40">Bathrooms:</span>
+                <span className="flex items-center">
+                  {displayBaths}
+                  <ComparisonIcon
+                    value={baths}
+                    targetValue={targetBaths}
+                    isLogin={isLogin}
+                  />
+                </span>
+              </div>
+              <LineGradient />
+              {lotSize && (
+                <>
+                  <div className="flex w-full justify-between flex-nowrap items-center">
+                    <span className=" opacity-40">Lot Size:</span>
+                    <span className="flex items-center">
+                      {displayLotSize}
+                      <ComparisonIcon
+                        value={Number(lotSize)}
+                        targetValue={targetLotSize}
+                        isLogin={isLogin}
+                      />
+                    </span>
+                  </div>
+                  <LineGradient />
+                </>
+              )}
               <div className="flex w-full justify-between flex-nowrap items-center">
                 <span className=" opacity-40">Age:</span>
                 <span className="">

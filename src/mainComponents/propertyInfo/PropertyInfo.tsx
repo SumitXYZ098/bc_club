@@ -60,8 +60,11 @@ const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
       <PropertySimilarAndSoldListing
         propertyId={listing.documentId}
         city={listing?.city}
-        bedsVariance={listing.bedrooms}
-        lotSizeAreaVariance={listing?.lot_size_area}
+        beds={listing.bedrooms}
+        lotSize={listing?.lot_size_area}
+        price={listing.price}
+        baths={listing.bathrooms}
+        livingArea={listing.Living_area}
       />
 
       <FaqsSection />
