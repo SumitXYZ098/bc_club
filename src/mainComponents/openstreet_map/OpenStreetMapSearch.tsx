@@ -209,7 +209,7 @@ function SchoolMarker({ school }: { school: SchoolItem }) {
               </span>
             </div>
 
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-3 border-b border-gray-100 pb-2">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-50">
                 <MdMap className="h-5 w-5 text-blue-500" />
               </div>
@@ -218,6 +218,9 @@ function SchoolMarker({ school }: { school: SchoolItem }) {
                 {school.address || "-"}
               </span>
             </div>
+            <span className="text-right text-[10px] font-medium text-gray-400">
+              Data Source: Fraser Institute
+            </span>
           </div>
         </div>
       </Popup>
@@ -570,7 +573,7 @@ export default function OpenStreetMapSearch() {
     setMapZoomVal(Math.round(zoom));
     lastFetchedBounds.current = key;
 
-    if (zoom >= 17) fetchParcels(newBounds);
+    if (zoom >= 19) fetchParcels(newBounds);
   }, [map, fetchParcels]);
 
   const onMapReady = useCallback((mapInstance: L.Map) => {
@@ -951,7 +954,7 @@ export default function OpenStreetMapSearch() {
                 }}
               />
 
-              {parcelGeoJSON && mapZoomVal && mapZoomVal >= 17 && (
+              {parcelGeoJSON && mapZoomVal && mapZoomVal >= 19 && (
                 <OSMGeoJsonLayer data={parcelGeoJSON} properties={properties} />
               )}
 

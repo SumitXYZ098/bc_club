@@ -7,8 +7,7 @@ import { useEffect, useState } from "react";
 const tabs = [
   { label: "Overview", id: "overview" },
   { label: "Features", id: "features" },
-  { label: "Estimate", id: "estimate" },
-  { label: "Pricing", id: "pricing" },
+  // { label: "Estimate", id: "estimate" },
   { label: "Assessment", id: "assessment" },
   // { label: "Financing", id: "financing" },
   { label: "Neighbourhood", id: "neighbourhood" },
@@ -43,7 +42,7 @@ export default function PropertyTabs() {
       {
         rootMargin: "-120px 0px -60% 0px",
         threshold: 0.1,
-      }
+      },
     );
 
     tabs.forEach(({ id }) => {
@@ -69,7 +68,7 @@ export default function PropertyTabs() {
       {
         rootMargin: "-100px 0px -60% 0px", // SAME as sticky top offset
         threshold: 0,
-      }
+      },
     );
 
     observer.observe(sentinel);

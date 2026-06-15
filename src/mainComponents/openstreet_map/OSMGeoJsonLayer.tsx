@@ -67,9 +67,9 @@ export default function OSMGeoJsonLayer({
         const active = hasPropertyInsideFeature(feature, properties);
 
         return {
-          fillColor: active ? "#22558b" : "#eea500",
+          fillColor: active ? "#eea500" : "#22558b",
           fillOpacity: active ? 0.18 : 0.08,
-          color: active ? "#22558b" : "#eea500",
+          color: active ? "#eea500" : "#22558b",
           weight: active ? 1 : 2,
           interactive: false,
         };

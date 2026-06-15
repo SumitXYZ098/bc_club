@@ -76,12 +76,12 @@ const PropertyInformation = ({ property }: { property: any }) => {
     return `$${Number(num).toLocaleString()}`;
   };
 
-  const price = property?.price;
-  const assessed = property?.raw_data?.TaxAssessedValue;
-  const rentEstimate = property?.raw_data?.RentEstimate; // if exists
+  // const price = property?.price;
+  // const assessed = property?.raw_data?.TaxAssessedValue;
+  // const rentEstimate = property?.raw_data?.RentEstimate; // if exists
 
-  const offerValue = price || assessed || 0;
-  const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
+  // const offerValue = price || assessed || 0;
+  // const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`;
 
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
@@ -215,7 +215,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
           </div>
 
           {/* Pricing Estimate */}
-          <div
+          {/* <div
             id="estimate"
             className="scroll-mt-40 p-5 rounded-xl bg-gray flex flex-col gap-y-4"
           >
@@ -223,9 +223,8 @@ const PropertyInformation = ({ property }: { property: any }) => {
               Pricing Estimate
             </h2>
             <LineGradient customClasses="" />
-            {/* Pricing content can be added here */}
             <div className="flex flex-row md:flex-nowrap flex-wrap justify-between w-full xl:gap-x-6 gap-x-5 gap-y-4">
-              {/* Offer Value */}
+       
               <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
                 <span className="text-sm">Offer Value Estimate</span>
                 <span className="text-primary font-bold text-xl xl:text-2xl">
@@ -233,7 +232,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
                 </span>
               </div>
 
-              {/* Rent Estimate */}
+
               <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
                 <span className="text-sm">Offer Rent Estimate</span>
                 <span className="text-primary font-bold text-xl xl:text-2xl">
@@ -241,7 +240,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
                 </span>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Nearby Schools */}
           <div id="neighbourhood" className="scroll-mt-40">

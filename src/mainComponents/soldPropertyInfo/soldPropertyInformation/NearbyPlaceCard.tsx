@@ -8,15 +8,31 @@ type NearbyPlace = {
   googleMapLink: string;
 };
 
-const MapPinIcon = () => (
+const NavigationIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="34"
-    height="34"
+    width="16"
+    height="16"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2.4"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polygon points="3 11 22 2 13 21 11 13 3 11" />
+  </svg>
+);
+
+const MapPinIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
@@ -33,33 +49,42 @@ const NearbyPlaceCard = ({
   type: "school" | "hospital";
 }) => {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="text-xl font-bold">{place.school_name}</h3>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold">
-          {place?.school_type}
-        </span>
-      </div>
-
-      <p className="mt-8 md:text-xl text-base font-semibold ">
-        {place.address}
-      </p>
-
-      <div className="mt-8 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4 md:text-base text-sm font-bold">
-          <span>{place.distanceKm} km</span>
-          <span className="h-7 w-px bg-gray-300" />
-          <span>{type === "school" ? "Nearby School" : "Nearby Hospital"}</span>
+    <div className="rounded-[24px] border border-gray-100 bg-white p-6 shadow-sm flex flex-col justify-between transition-shadow hover:shadow-md">
+      <div>
+        {/* Top Row: Badge & Distance */}
+        <div className="flex items-center justify-between">
+          <span className="rounded-lg bg-[#E0E7FF] px-3 py-1.5 text-sm font-bold text-[#1E1B4B]">
+            {place?.school_type}
+          </span>
+          <div className="flex items-center gap-1.5 text-sm font-bold text-gray-700">
+            <NavigationIcon />
+            <span>{place.distanceKm} km</span>
+          </div>
         </div>
 
+        {/* Title */}
+        <h3 className="mt-5 text-lg md:text-xl font-bold text-gray-900 leading-tight">
+          {place.school_name}
+        </h3>
+
+        {/* Address */}
+        <p className="mt-2.5 text-base font-semibold text-gray-500 leading-relaxed">
+          {place.address}
+        </p>
+      </div>
+
+      {/* Bottom Row: Nearby Link */}
+      <div className="mt-6 flex items-center">
         <a
           href={place.googleMapLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-primary transition hover:scale-110"
+          className="group flex items-center gap-2 text-primary font-bold transition hover:opacity-85"
         >
-          <MapPinIcon />
+          <span className="transition-transform group-hover:scale-110">
+            <MapPinIcon />
+          </span>
+          <span>{type === "school" ? "Nearby School" : "Nearby Hospital"}</span>
         </a>
       </div>
     </div>
@@ -70,29 +95,26 @@ export default NearbyPlaceCard;
 
 export const NearbyPlaceSkeleton = () => {
   return (
-    <div className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      {/* Title */}
-      <div className="h-7 w-3/4 rounded bg-gray-200" />
-
-      {/* Badge */}
-      <div className="mt-4 h-8 w-28 rounded-full bg-gray-200" />
-
-      {/* Address */}
-      <div className="mt-8 space-y-3">
-        <div className="h-6 w-full rounded bg-gray-200" />
-        <div className="h-6 w-2/3 rounded bg-gray-200" />
-      </div>
-
-      {/* Bottom */}
-      <div className="mt-8 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="animate-pulse rounded-[24px] border border-gray-100 bg-white p-6 shadow-sm flex flex-col justify-between">
+      <div>
+        {/* Top Row Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-24 rounded-lg bg-gray-200" />
           <div className="h-5 w-16 rounded bg-gray-200" />
-          <div className="h-6 w-px bg-gray-200" />
-          <div className="h-5 w-32 rounded bg-gray-200" />
         </div>
 
-        <div className="h-10 w-10 rounded-full bg-gray-200" />
+        {/* Title Skeleton */}
+        <div className="mt-5 h-7 w-3/4 rounded bg-gray-200" />
+
+        {/* Address Skeleton */}
+        <div className="mt-3 space-y-2">
+          <div className="h-5 w-full rounded bg-gray-200" />
+          <div className="h-5 w-2/3 rounded bg-gray-200" />
+        </div>
       </div>
+
+      {/* Bottom Row Skeleton */}
+      <div className="mt-6 h-6 w-36 rounded bg-gray-200" />
     </div>
   );
 };
