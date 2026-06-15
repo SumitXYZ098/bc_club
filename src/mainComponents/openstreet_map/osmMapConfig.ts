@@ -22,7 +22,7 @@ export const cityCoords: Record<string, [number, number]> = {
 };
 
 export const osmRoadmapTile = {
-  url: "https://api.maptiler.com/maps/openstreetmap/{z}/{x}/{y}.jpg?key=VbAYHAnzOQbneRNG9XfV",
+  url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
   attribution:
     "<a href='https://www.maptiler.com/copyright/' target='_blank'>&copy; MapTiler</a> <a href='https://www.openstreetmap.org/copyright' target='_blank'>&copy; OpenStreetMap contributors</a>",
   maxNativeZoom: 19,
