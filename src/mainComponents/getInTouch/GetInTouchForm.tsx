@@ -2,6 +2,7 @@
 import { contactApi } from "@/src/api/contact/contactApi";
 import { useForm } from "react-hook-form";
 import RippleButton from "@/src/components/button/RippleButton";
+import { toast } from "react-toastify";
 
 type FormValues = {
   firstName: string;
@@ -30,13 +31,15 @@ export default function GetInTouchForm() {
       const response = await contactApi(formData);
       if (response.message === "Email sent successfully!") {
         reset();
-        alert("Form submitted successfully! We will get back to you soon.");
+        toast.success(
+          "Form submitted successfully! We will get back to you soon.",
+        );
       } else {
-        alert("Failed to submit form. Please try again.");
+        toast.error("Failed to submit form. Please try again.");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("An error occurred. Please try again later.");
+      toast.error("An error occurred. Please try again later.");
     }
   };
 

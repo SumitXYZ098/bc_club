@@ -5,6 +5,7 @@ import { AxiosError } from "axios";
 import Image from "next/image";
 import React, { useState } from "react";
 import RippleButton from "@/src/components/button/RippleButton";
+import { toast } from "react-toastify";
 
 const NewsLetter = () => {
   const [email, setEmail] = useState("");
@@ -32,17 +33,15 @@ const NewsLetter = () => {
     try {
       const res = await newsletterApi({ email });
 
-      if (res) {
-        alert("Email subscribed successfully");
+      if (res?.message === "Subscription received!") {
+        toast.success("Email subscribed successfully");
         setEmail("");
+      } else {
+        toast.error("Failed to submit form. Please try again.");
       }
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.status === 400) {
-        alert("Email already subscribed");
-      } else {
-        alert("something went wrong");
-      }
+      console.error("Error submitting form:", error);
+      toast.error("An error occurred. Please try again later.");
     }
   };
   return (
