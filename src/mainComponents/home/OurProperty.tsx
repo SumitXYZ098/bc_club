@@ -88,11 +88,12 @@ const OurProperty = () => {
     image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing?.old_price
-      ? listing?.ModificationTimestamp
-      : listing?.OriginalEntryTimestamp
-        ? listing?.OriginalEntryTimestamp
-        : listing?.raw_data?.BridgeModificationTimestamp,
+    daysAgo:
+      Number(listing?.old_price) > 0
+        ? listing?.ModificationTimestamp
+        : (listing?.OriginalEntryTimestamp ??
+          listing?.raw_data?.BridgeModificationTimestamp ??
+          0),
     address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
@@ -121,29 +122,20 @@ const OurProperty = () => {
     { location: city, page: 1, pageSize: 30 },
     {
       select: (res: any) => {
-        const nonResidentialTypes = [
-          "office",
-          "business",
-          "agriculture",
-          "vacant land",
-          "industrial",
-          "retail",
-        ];
-
         return (
           res?.data
-            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-            ?.filter((l: any) => {
-              const oldPrice = Number(l?.old_price || 0);
-              return oldPrice <= 0;
+            ?.sort((a: any, b: any) => {
+              const aTime = a?.OriginalEntryTimestamp
+                ? Date.parse(a.OriginalEntryTimestamp)
+                : 0;
+
+              const bTime = b?.OriginalEntryTimestamp
+                ? Date.parse(b.OriginalEntryTimestamp)
+                : 0;
+
+              return bTime - aTime; // newest first
             })
-            ?.filter((l: any) => {
-              const type = (l?.property_sub_type || "").toLowerCase();
-              return !nonResidentialTypes.some((nonRes) =>
-                type.includes(nonRes),
-              );
-            })
-            .map((l: any) => mapProperty(l, true)) || []
+            ?.map((l: any) => mapProperty(l, true)) || []
         );
       },
     },
@@ -154,25 +146,20 @@ const OurProperty = () => {
       { location: city, page: 1, pageSize: 30, priceChange: "all" },
       {
         select: (res: any) => {
-          const nonResidentialTypes = [
-            "office",
-            "business",
-            "agriculture",
-            "vacant land",
-            "industrial",
-            "retail",
-          ];
-
           return (
             res?.data
-              ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-              .filter((l: any) => {
-                const type = (l?.property_sub_type || "").toLowerCase();
-                return !nonResidentialTypes.some((nonRes) =>
-                  type.includes(nonRes),
-                );
+              ?.sort((a: any, b: any) => {
+                const aTime = a?.ModificationTimestamp
+                  ? Date.parse(a.ModificationTimestamp)
+                  : 0;
+
+                const bTime = b?.ModificationTimestamp
+                  ? Date.parse(b.ModificationTimestamp)
+                  : 0;
+
+                return bTime - aTime; // newest first
               })
-              .map((l: any) => mapProperty(l, true)) || []
+              ?.map((l: any) => mapProperty(l, true)) || []
           );
         },
       },

@@ -72,11 +72,12 @@ const PropertySimilarAndSoldListing = ({
     image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing?.old_price
-      ? listing?.ModificationTimestamp
-      : listing?.OriginalEntryTimestamp
-        ? listing?.OriginalEntryTimestamp
-        : listing?.raw_data?.BridgeModificationTimestamp,
+    daysAgo:
+      Number(listing?.old_price) > 0
+        ? listing?.ModificationTimestamp
+        : (listing?.OriginalEntryTimestamp ??
+          listing?.raw_data?.BridgeModificationTimestamp ??
+          0),
     address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
@@ -108,14 +109,38 @@ const PropertySimilarAndSoldListing = ({
   const { data: similarList = [], isLoading: isLoadingSimilar } =
     useGetSimilarProperties(propertyId, {
       select(data) {
-        return data?.data?.map((item: any) => mapProperty(item, true));
+        return data?.data
+          ?.sort((a: any, b: any) => {
+            const aTime = a?.OriginalEntryTimestamp
+              ? Date.parse(a.OriginalEntryTimestamp)
+              : 0;
+
+            const bTime = b?.OriginalEntryTimestamp
+              ? Date.parse(b.OriginalEntryTimestamp)
+              : 0;
+
+            return bTime - aTime; // newest first
+          })
+          .map((item: any) => mapProperty(item, true));
       },
     });
   // Similar Sold Properties
   const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } =
     useGetSimilarSoldProperties(propertyId, {
       select(data) {
-        return data?.data?.map((item: any) => mapProperty(item, false));
+        return data?.data
+          ?.sort((a: any, b: any) => {
+            const aTime = a?.OriginalEntryTimestamp
+              ? Date.parse(a.OriginalEntryTimestamp)
+              : 0;
+
+            const bTime = b?.OriginalEntryTimestamp
+              ? Date.parse(b.OriginalEntryTimestamp)
+              : 0;
+
+            return bTime - aTime; // newest first
+          })
+          .map((item: any) => mapProperty(item, false));
       },
     });
 

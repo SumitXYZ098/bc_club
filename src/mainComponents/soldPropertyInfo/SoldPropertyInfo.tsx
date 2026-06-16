@@ -80,7 +80,7 @@ const SoldPropertyInfo = ({ paramsId }: { paramsId: string }) => {
         lotSize={listing?.lot_size_area}
         price={listing.price}
         baths={listing.bathrooms}
-        livingArea={listing.Living_area}
+        livingArea={listing.area}
       />
 
       <FaqsSection />

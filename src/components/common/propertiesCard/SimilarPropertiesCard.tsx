@@ -3,21 +3,17 @@ import { Heart } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import LineGradient from "../lineGradient/LineGradient";
-import Description, { IDescriptionTypes } from "../../description/Description";
-import { Icons, Images } from "@/src/app/exports";
+import { Images } from "@/src/app/exports";
 import CustomButton from "../../button/CustomButton";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import {
   useGetMe,
-  useRemoveFromWishlist,
-  useToggleWishlist,
   useToggleDdfWishlist,
   useRemoveDdfWishlist,
 } from "@/src/hooks/listing/useListingQueries";
 import dayjs from "dayjs";
 import { calculateAge, getTime } from "@/src/utilities/utilities";
-import { IoArrowUpOutline, IoArrowDownOutline } from "react-icons/io5";
 
 export interface SimilarPropertiesCardProps {
   id: string;
@@ -241,8 +237,12 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
     : "---- sft";
   const img = image ? image : Images.apartment;
 
-  const isLinkDisabled = isExpired || isSold;
-  const getHref = isLinkDisabled ? "#" : `/property-info/${id}`;
+  const isLinkDisabled = isExpired;
+  const getHref = isLinkDisabled
+    ? "#"
+    : isSold
+      ? `/sold-property-info/${id}`
+      : `/property-info/${id}`;
 
   return (
     <Link

@@ -54,11 +54,12 @@ const AssessmentPropertySimilarAndSoldListing = ({
     image: listing?.media_url,
     title: listing?.property_sub_type,
     price: listing?.price,
-    daysAgo: listing?.old_price
-      ? listing?.ModificationTimestamp
-      : (listing?.OriginalEntryTimestamp ??
-        listing?.raw_data?.BridgeModificationTimestamp ??
-        0),
+    daysAgo:
+      Number(listing?.old_price) > 0
+        ? listing?.ModificationTimestamp
+        : (listing?.OriginalEntryTimestamp ??
+          listing?.raw_data?.BridgeModificationTimestamp ??
+          0),
     address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
