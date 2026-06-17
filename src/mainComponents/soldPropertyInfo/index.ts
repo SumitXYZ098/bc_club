@@ -1,5 +1,8 @@
 import { TableHeader } from "@/src/components/common/dynamicTable/DynamicTable";
-import { getTime, sqftToAcresFormatted } from "@/src/utilities/utilities";
+import {
+  getDaysAgoTime,
+  sqftToAcresFormatted,
+} from "@/src/utilities/utilities";
 import dayjs from "dayjs";
 
 export const propertyDetailsHeaders: TableHeader[] = [
@@ -67,7 +70,7 @@ export const getPropertyDetailsRows = (property: any) => [
         data: {
           label: "Days On Market",
           value: property?.raw_data?.OriginalEntryTimestamp
-            ? `${getTime(property.raw_data.OriginalEntryTimestamp)}`
+            ? `${getDaysAgoTime(property.raw_data.OriginalEntryTimestamp)}`
             : "-",
         },
       },
@@ -95,7 +98,7 @@ export const getPropertyDetailsRows = (property: any) => [
               data: {
                 label: "Days On Market",
                 value: property?.raw_data?.BridgeModificationTimestamp
-                  ? `${getTime(property.raw_data.BridgeModificationTimestamp)}`
+                  ? `${getDaysAgoTime(property.raw_data.BridgeModificationTimestamp)}`
                   : "-",
               },
             },

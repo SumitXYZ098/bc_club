@@ -13,7 +13,11 @@ import {
   useRemoveDdfWishlist,
 } from "@/src/hooks/listing/useListingQueries";
 import dayjs from "dayjs";
-import { calculateAge, getTime } from "@/src/utilities/utilities";
+import {
+  calculateAge,
+  getDaysAgoTime,
+  getTime,
+} from "@/src/utilities/utilities";
 
 export interface SimilarPropertiesCardProps {
   id: string;
@@ -425,7 +429,9 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
               <LineGradient />
               <div className="flex w-full justify-between flex-nowrap items-center">
                 <span className=" opacity-40">Days on Market:</span>
-                <span className="">{listingDate && getTime(listingDate)}</span>
+                <span className="">
+                  {listingDate && getDaysAgoTime(listingDate)}
+                </span>
               </div>
               <LineGradient />
               <div className="flex w-full justify-between flex-nowrap items-center">
