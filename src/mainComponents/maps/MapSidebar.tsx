@@ -34,25 +34,12 @@ export default function MapSidebar({
   selectedAssessmentProperty,
   setAssessmentDrawerOpen,
 }: MapSidebarProps) {
-  // const displayChartData =
-  //   selectedAssessmentProperty?.chartComparison?.map((item: any) => ({
-  //     year: item.year,
-  //     value: Number(item.assessedValue || 0),
-  //     change: item.propertyChangePercent ?? 0,
-  //     displayValue:
-  //       item.assessedValueFormatted ||
-  //       `$${Number(item.assessedValue || 0).toLocaleString()}`,
-  //   })) || [];
-
-  // const barMax =
-  //   Math.max(...displayChartData.map((item: any) => item.value), 0) * 1.15;
-
   if (assessmentDrawerOpen && selectedAssessmentProperty) {
     return (
       <div className="hidden md:w-110 xl:flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
         <div className="h-full w-full bg-white overflow-y-auto">
           {/* Header */}
-          <div className="sticky top-0 bg-white z-10 border-b border-gray-200 p-5">
+          <div className="sticky top-0 bg-white z-10 border-b border-gray-200 p-5 pt-0">
             <button
               onClick={() => setAssessmentDrawerOpen?.(false)}
               className="mb-3 text-sm font-semibold text-gray-500 hover:text-[#305487]"
@@ -141,119 +128,6 @@ export default function MapSidebar({
                 </p>
               )}
             </div>
-
-            {/* Assessment History */}
-            {/* {displayChartData.length > 0 && (
-              <div className="rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-4">
-                  Assessment History
-                </h3>
-
-                <div className="h-[380px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={displayChartData}
-                      layout="vertical"
-                      margin={{ top: 0, right: 0, left: 10, bottom: 0 }}
-                      barCategoryGap={15}
-                    >
-                      <XAxis type="number" hide domain={[0, barMax]} />
-
-                      <YAxis
-                        type="category"
-                        dataKey="year"
-                        axisLine={false}
-                        tickLine={false}
-                        width={75}
-                        tick={(props: any) => {
-                          const { x, y, payload } = props;
-                          return (
-                            <g transform={`translate(${x - 75},${y - 19.5})`}>
-                              <rect
-                                width="69"
-                                height="39"
-                                rx="8"
-                                fill="#f3f4f6"
-                              />
-                              <text
-                                x="34.5"
-                                y="24"
-                                textAnchor="middle"
-                                fill="#4b5563"
-                                style={{ fontSize: "14px", fontWeight: "500" }}
-                              >
-                                {payload.value}
-                              </text>
-                            </g>
-                          );
-                        }}
-                      />
-
-                      <Bar
-                        dataKey="value"
-                        radius={[8, 8, 8, 8]}
-                        barSize={39}
-                        background={{ fill: "#f3f4f6", radius: 8 }}
-                      >
-                        {displayChartData.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill="#E1A22A" />
-                        ))}
-
-                        <LabelList
-                          dataKey="value"
-                          content={(props: any) => {
-                            const { x, y, width, index } = props;
-                            const entry = displayChartData[index];
-
-                            if (!entry) return null;
-
-                            return (
-                              <g>
-                                <rect
-                                  x={x + 12}
-                                  y={y + 8}
-                                  width="55"
-                                  height="25"
-                                  rx="6"
-                                  fill="rgba(255,255,255,0.25)"
-                                />
-
-                                <text
-                                  x={x + 39.5}
-                                  y={y + 25}
-                                  textAnchor="middle"
-                                  fill="white"
-                                  style={{
-                                    fontSize: "13px",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  {entry.change >= 0 ? "+" : ""}
-                                  {entry.change}%
-                                </text>
-
-                                <text
-                                  x={x + width - 15}
-                                  y={y + 26}
-                                  textAnchor="end"
-                                  fill="white"
-                                  style={{
-                                    fontSize: "16px",
-                                    fontWeight: "700",
-                                  }}
-                                >
-                                  {entry.displayValue}
-                                </text>
-                              </g>
-                            );
-                          }}
-                        />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )} */}
             <div className="rounded-xl border border-gray-200 p-4">
               <h3 className="text-sm font-bold text-gray-900 mb-3">
                 Assessment History
@@ -295,27 +169,6 @@ export default function MapSidebar({
               )}
             </div>
 
-            {/* Location */}
-            {/* <div className="rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">Location</h3>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-xs text-gray-500">Latitude</p>
-                  <p className="font-semibold text-gray-800">
-                    {selectedAssessmentProperty.latitude || "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-gray-500">Longitude</p>
-                  <p className="font-semibold text-gray-800">
-                    {selectedAssessmentProperty.longitude || "-"}
-                  </p>
-                </div>
-              </div>
-            </div> */}
-
             {/* Action */}
             <button
               onClick={() =>
@@ -334,8 +187,8 @@ export default function MapSidebar({
     );
   }
   return (
-    <div className="hidden md:w-110 xl:flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
-      <div className="p-4 flex justify-between items-center text-sm font-semibold border-b border-gray-50">
+    <div className="hidden md:w-[380px] xl:flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
+      <div className="p-4 pt-0 flex justify-between items-center text-sm font-semibold border-b border-gray-50">
         <div className="text-gray-500 ">
           Results:{" "}
           <span className="text-black ">

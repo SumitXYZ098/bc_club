@@ -68,7 +68,7 @@ export default function MapTopFilterBar({
   }, []);
 
   return (
-    <div className="flex flex-wrap justify-start items-center gap-4 lg:gap-2 xl:gap-4 h-auto w-full pl-5 md:mb-6 mb-3">
+    <div className="flex flex-wrap justify-start items-center gap-4 lg:gap-2 xl:gap-4 h-auto">
       <FiltersPopup
         id="map"
         open={isFilterOpen}
@@ -116,7 +116,7 @@ export default function MapTopFilterBar({
         Expired
       </div>
 
-      <div className="hidden md:flex relative" ref={priceAreaRef}>
+      {/* <div className="hidden md:flex relative" ref={priceAreaRef}>
         <div
           onClick={() => setIsPriceAreaOpen(!isPriceAreaOpen)}
           className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
@@ -300,43 +300,6 @@ export default function MapTopFilterBar({
             </div>
           </div>
         )}
-      </div>
-
-      {/* <div className="relative min-w-50 shrink-0">
-        <FilterPillSelect
-          label="Property Type"
-          value={activeProperty}
-          onChange={setActiveProperty}
-          pillBase={pillBase}
-          pillActive={pillActive}
-          pillInactive={pillInactive}
-          options={
-            status === "sold" || status === "expired"
-              ? [
-                  { label: "All", value: "any" },
-                  { label: "Apartment/Condo", value: "Apartment/Condo" },
-                  {
-                    label: "Single Family Residence",
-                    value: "Single Family Residence",
-                  },
-                  { label: "Townhouse", value: "Townhouse" },
-                  { label: "Half Duplex", value: "Half Duplex" },
-                  {
-                    label: "Row House (Non-Strata)",
-                    value: "Row House (Non-Strata)",
-                  },
-                ]
-              : [
-                  { label: "All", value: "any" },
-                  { label: "Single-Family", value: "Single-Family" },
-                  { label: "Multi-Family", value: "Multi-Family" },
-                  { label: "Office", value: "Office" },
-                  { label: "Business", value: "Business" },
-                  { label: "Agriculture", value: "Agriculture" },
-                  { label: "Vacant Land", value: "Vacant Land" },
-                ]
-          }
-        />
       </div> */}
 
       <div className="hidden md:flex relative" ref={locationRef}>
@@ -355,8 +318,8 @@ export default function MapTopFilterBar({
         </div>
 
         {isLocationOpen && (
-          <div className="absolute top-full left-0 md:left-0 mt-3 border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-9999 p-5 w-[92vw] md:w-60 animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95">
-            <div className="max-h-80 overflow-y-auto no-scrollbar p-2">
+          <div className="absolute top-full -left-20 mt-3 border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-9999 w-[92vw] p-4 md:w-60 animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm bg-white/95">
+            <div className="max-h-80 overflow-y-auto no-scrollbar">
               {[
                 "British Columbia",
                 "Vancouver",

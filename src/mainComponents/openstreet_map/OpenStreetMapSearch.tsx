@@ -841,10 +841,10 @@ export default function OpenStreetMapSearch() {
 
   return (
     <>
-      <div className="w-full lg:h-[90svh] h-screen flex flex-col overflow-hidden mt-20">
-        <div className="flex items-center gap-4 flex-wrap mb-6 justify-between pl-5">
+      <div className="flex flex-col overflow-hidden mt-20 w-full h-[calc(100vh-5px)]">
+        <div className="flex flex-row items-center gap-4 flex-wrap mb-6 justify-between w-full mx-auto xl:max-w-screen-2xl xl:px-16 md:px-13 px-6">
           {/* 🔍 CHIP SEARCH BAR (DESIGN SAME) */}
-          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] border border-gray-200 w-full max-w-md">
+          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-200 w-full max-w-md">
             <input
               type="text"
               value={search}
@@ -862,29 +862,29 @@ export default function OpenStreetMapSearch() {
               <FiSearch size={18} className="text-white" />
             </button>
           </div>
+          <MapTopFilterBar
+            status={status}
+            setStatus={setStatus}
+            price={price as [number, number]}
+            setPrice={setPrice}
+            sqft={sqft as [number, number]}
+            setSqft={setSqft}
+            activeBedRoom={activeBedRoom}
+            setActiveBedRoom={setActiveBedRoom}
+            activeBathRoom={activeBathRoom}
+            setActiveBathRoom={setActiveBathRoom}
+            location={location}
+            setLocation={setLocation}
+          />
+
+          <MapActiveFilters
+            hasActiveFilters={hasActiveFilters}
+            activeFilterPills={activeFilterPills}
+            resetAllFilters={resetAllFilters}
+          />
         </div>
-        <MapTopFilterBar
-          status={status}
-          setStatus={setStatus}
-          price={price as [number, number]}
-          setPrice={setPrice}
-          sqft={sqft as [number, number]}
-          setSqft={setSqft}
-          activeBedRoom={activeBedRoom}
-          setActiveBedRoom={setActiveBedRoom}
-          activeBathRoom={activeBathRoom}
-          setActiveBathRoom={setActiveBathRoom}
-          location={location}
-          setLocation={setLocation}
-        />
 
-        <MapActiveFilters
-          hasActiveFilters={hasActiveFilters}
-          activeFilterPills={activeFilterPills}
-          resetAllFilters={resetAllFilters}
-        />
-
-        <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative">
+        <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative xl:max-w-screen-2xl mx-auto w-full h-full">
           <MapSidebar
             isLoading={isLoading}
             visibleProperties={visibleProperties}

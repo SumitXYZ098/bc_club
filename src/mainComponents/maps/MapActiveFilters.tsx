@@ -20,7 +20,7 @@ export default function MapActiveFilters({
   if (!hasActiveFilters) return null;
 
   return (
-    <div className="relative z-999 bg-[#f8faff] border-b border-gray-100 px-4 py-2 flex items-center gap-2 flex-wrap">
+    <div className="relative flex items-center gap-2 flex-wrap w-full">
       <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide shrink-0 mr-1">
         Active:
       </span>

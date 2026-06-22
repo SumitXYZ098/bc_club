@@ -52,9 +52,9 @@ const NewsLetter = () => {
           Be the first one to know about discounts, offers and events
         </span>
       </div>
-      <div className="w-full xl:w-[45%] flex flex-col relative">
+      <div className="w-full xl:w-[35%] flex flex-col relative">
         <div className="w-full border rounded-xl pl-4 md:p-1.5 py-5 flex items-center-safe justify-between xl:mb-0 md:mb-3">
-          <div className="flex flex-row gap-x-1 items-center-safe">
+          <div className="flex flex-1/2 flex-row gap-x-1 items-center-safe">
             <Image
               title="image title"
               src={Icons.emailIcon}
@@ -64,7 +64,7 @@ const NewsLetter = () => {
               className="w-5 h-5 object-contain"
             />
             <input
-              className="outline-none placeholder:text-background"
+              className="outline-none placeholder:text-background w-[90%]"
               type="email"
               placeholder="Enter Your Email"
               required
