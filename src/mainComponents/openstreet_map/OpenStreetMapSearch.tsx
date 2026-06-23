@@ -372,13 +372,6 @@ export default function OpenStreetMapSearch() {
     isLoading: isLoadingActive,
     isFetching: isFetchingActive,
   } = useGetMapZoomListings(mapZoomParams, {
-    select: (res: any) =>
-      (res?.data || [])
-        .map((listing: any) => transformActiveListing(listing, me))
-        .filter(
-          (l: any) =>
-            Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
-        ),
     enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData: any) => previousData,
@@ -395,20 +388,25 @@ export default function OpenStreetMapSearch() {
     placeholderData: (previousData: any) => previousData,
   });
 
-  const {
-    data: queryDataAssignment,
-    isLoading: isLoadingAssignment,
-    isFetching: isFetchingAssignment,
-  } = useGetMapZoomAssignmentList(mapZoomParams, {
-    select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
-    enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
-    staleTime: 1000 * 60 * 5,
-    placeholderData: (previousData: any) => previousData,
-  });
+  const { data: queryDataAssignment } = useGetMapZoomAssignmentList(
+    mapZoomParams,
+    {
+      select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
+      enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
+      staleTime: 1000 * 60 * 5,
+      placeholderData: (previousData: any) => previousData,
+    },
+  );
 
+  const cleanData = queryDataActive?.data
+    ?.map((listing: any) => transformActiveListing(listing, me))
+    .filter(
+      (l: any) => Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
+    );
+  console.log("CleanData", cleanData);
   const rawProperties = useMemo(
-    () => (isForSale ? queryDataActive || [] : queryDataNormal || []),
-    [isForSale, queryDataActive, queryDataNormal],
+    () => (isForSale ? cleanData || [] : queryDataNormal || []),
+    [isForSale, queryDataNormal],
   );
 
   useEffect(() => {
@@ -1070,13 +1068,23 @@ export default function OpenStreetMapSearch() {
                 />
               ))}
 
-              <OpenStreetMapMarkerLayer
+              {/* <OpenStreetMapMarkerLayer
                 clusters={clusters}
                 map={map}
                 status={status}
                 hoveredPropertyId={hoveredPropertyId}
-                selectedClusterProperties={selectedClusterProperties}
-                superclusterRef={superclusterRef}
+                // selectedClusterProperties={selectedClusterProperties}
+                // superclusterRef={superclusterRef}
+                setHoveredPropertyId={setHoveredPropertyId}
+                setSelectedProperty={setSelectedProperty}
+                setSelectedClusterProperties={setSelectedClusterProperties}
+                setClusterPosition={setClusterPosition}
+              /> */}
+              <OpenStreetMapMarkerLayer
+                clusters={queryDataActive}
+                map={map}
+                status={status}
+                hoveredPropertyId={hoveredPropertyId}
                 setHoveredPropertyId={setHoveredPropertyId}
                 setSelectedProperty={setSelectedProperty}
                 setSelectedClusterProperties={setSelectedClusterProperties}

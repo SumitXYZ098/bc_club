@@ -12,6 +12,7 @@ export const Endpoints = {
   me: `${BASE_URL}/api/users/me`,
   getActivePropertyLists: `${BASE_URL}/api/ddf-listings`,
   mapZoom: `${BASE_URL}/api/map-zoom`,
+  mapCluster: `${BASE_URL}/api/ddf-listings/map-clusters`,
   getActiveListingById: (id: string) => `${BASE_URL}/api/ddf-listings/${id}`,
   addDdfFavorite: (id: string) =>
     `${BASE_URL}/api/ddf-listings/add-favorite/${id}`,
