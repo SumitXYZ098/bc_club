@@ -60,6 +60,20 @@ export async function getMapZoomWithClusters(params?: any): Promise<any> {
   }
 }
 
+// Map Zoom Properties
+export async function getMapZoomProperties(params?: any): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.mapZoomProperties, { params });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
 // Map Zoom Assignment List
 export async function getMapZoomAssignmentList(params?: any): Promise<any> {
   try {

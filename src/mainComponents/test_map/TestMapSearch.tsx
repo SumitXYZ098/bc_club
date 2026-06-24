@@ -12,9 +12,7 @@ import {
   TileLayer,
   Popup,
   useMap,
-  useMapEvents,
 } from "react-leaflet";
-import Supercluster from "supercluster";
 import {
   useGetListings,
   useGetMapZoomAssignmentList,
@@ -22,6 +20,7 @@ import {
   useGetMapZoomSchools,
   useGetMapZoomSoldList,
   useGetMe,
+  useGetMapZoomProperties,
 } from "@/src/hooks/listing/useListingQueries";
 import { useListingStore } from "@/src/store/useListingStore";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
@@ -29,7 +28,6 @@ import {
   boundsKey,
   formatMeter,
   getBoundsPayload,
-  getClusterRadius,
   getDistanceBetweenPoints,
   getMiddlePoint,
   type LatLngPoint,
@@ -50,17 +48,9 @@ import {
 import MapLoading from "../maps/google_map/MapLoading";
 import MapTopFilterBar from "../maps/MapTopFilterBar";
 import MapActiveFilters from "../maps/MapActiveFilters";
-import MapSidebar from "../maps/MapSidebar";
 import MapLoadingBadge from "../maps/google_map/MapLoadingBadge";
 import GetInTouch from "../getInTouch/GetInTouch";
 import { Endpoints } from "@/src/api/endpoints";
-import {
-  MdApartment,
-  MdEmojiEvents,
-  MdMap,
-  MdSchool,
-  MdStar,
-} from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
 import {
   cityCoords,
@@ -77,21 +67,13 @@ import {
   TestMapPropertyPopup,
 } from "./TestMapInfoWindows";
 import TestMapControls from "./TestMapControls";
+import TestMapSidebar from "./TestMapSidebar";
+import TestMapSchoolMarker, { type SchoolItem, type SchoolType } from "./TestMapSchoolMarker";
+import TestMapEvents from "./TestMapEvents";
 
-type SchoolType = "Elementary" | "Secondary" | "All";
-
-type SchoolItem = {
-  id: string;
-  school_name: string;
-  school_type: SchoolType;
-  city?: string;
-  rating?: number | string;
-  rank?: number;
-  address?: string;
-  latitude: number;
-  longitude: number;
-};
-
+/**
+ * Fires a callback once the Leaflet Map container is loaded and ready.
+ */
 function MapReady({ onReady }: { onReady: (map: L.Map) => void }) {
   const map = useMap();
 
@@ -100,129 +82,6 @@ function MapReady({ onReady }: { onReady: (map: L.Map) => void }) {
   }, [map, onReady]);
 
   return null;
-}
-
-function MapEvents({
-  measureMode,
-  selectedProperty,
-  selectedClusterProperties,
-  triggerSearch,
-  clearPopups,
-  handleMeasureClick,
-  handleMeasureMove,
-}: {
-  measureMode: boolean;
-  selectedProperty: any;
-  selectedClusterProperties: any[];
-  triggerSearch: () => void;
-  clearPopups: () => void;
-  handleMeasureClick: (point: LatLngPoint) => void;
-  handleMeasureMove: (point: LatLngPoint) => void;
-}) {
-  const timeoutRef = useRef<any>(null);
-
-  useMapEvents({
-    moveend() {
-      if (selectedClusterProperties.length > 0 || selectedProperty) return;
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(triggerSearch, 400);
-    },
-    zoomend() {
-      if (selectedClusterProperties.length > 0 || selectedProperty) return;
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(triggerSearch, 400);
-    },
-    dragstart() {
-      clearPopups();
-    },
-    click(e) {
-      if (measureMode) {
-        handleMeasureClick({ lat: e.latlng.lat, lng: e.latlng.lng });
-      }
-      clearPopups();
-    },
-    mousemove(e) {
-      if (!measureMode) return;
-      handleMeasureMove({ lat: e.latlng.lat, lng: e.latlng.lng });
-    },
-  });
-
-  return null;
-}
-
-function SchoolMarker({ school }: { school: SchoolItem }) {
-  const icon = useMemo(
-    () =>
-      L.divIcon({
-        className: "bc-osm-marker",
-        html: `<div class="bc-osm-school"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="22" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M256 32 20 160l236 128 192-104v104h44V160L256 32zM108 247.3V336c0 48.6 66.3 88 148 88s148-39.4 148-88v-88.7L256 328 108 247.3z"></path></svg></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-      }),
-    [],
-  );
-  // if (!school.city) return null;
-  return (
-    <Marker position={[school.latitude, school.longitude]} icon={icon}>
-      <Popup className="school-popup w-[350px]">
-        <div className="w-[350px] overflow-hidden rounded-2xl bg-white p-4">
-          <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50">
-              <MdSchool className="h-6 w-6 text-primary" />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <h3 className="text-base font-bold leading-snug text-[#15376b]">
-                {school.school_name || "-"}
-              </h3>
-
-              <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-primary">
-                <MdApartment className="h-3.5 w-3.5" />
-                {school.school_type || "-"}
-              </div>
-            </div>
-          </div>
-
-          <div className="my-4 border-t border-dashed border-gray-200" />
-
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-yellow-50">
-                <MdStar className="h-5 w-5 text-yellow-500" />
-              </div>
-              <span className="font-medium text-gray-600">Rating</span>
-              <span className="ml-auto font-bold text-primary">
-                {school.rating || "-"} / 10
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50">
-                <MdEmojiEvents className="h-5 w-5 text-purple-600" />
-              </div>
-              <span className="font-medium text-gray-600">Rank</span>
-              <span className="ml-auto font-bold text-purple-600">
-                {school.rank || "-"}
-              </span>
-            </div>
-
-            <div className="flex items-start gap-3 border-b border-gray-100 pb-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-50">
-                <MdMap className="h-5 w-5 text-blue-500" />
-              </div>
-              <span className="font-medium text-gray-600">Address</span>
-              <span className="ml-auto max-w-[150px] text-right font-semibold leading-snug text-gray-800">
-                {school.address || "-"}
-              </span>
-            </div>
-            <span className="text-right text-[10px] font-medium text-gray-400">
-              Data Source: Fraser Institute
-            </span>
-          </div>
-        </div>
-      </Popup>
-    </Marker>
-  );
 }
 
 export default function TestMapSearch() {
@@ -249,7 +108,6 @@ export default function TestMapSearch() {
   const [isSatellite, setIsSatellite] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
   const [visibleProperties, setVisibleProperties] = useState<any[]>([]);
-  const [clusters, setClusters] = useState<any[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
     null,
@@ -284,8 +142,8 @@ export default function TestMapSearch() {
     useState<any>(null);
 
   const [assessmentDrawerOpen, setAssessmentDrawerOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const superclusterRef = useRef<Supercluster | null>(null);
   const lastFetchedBounds = useRef<string>("");
   const popupRef = useRef<HTMLDivElement | null>(null);
   const lastLocationRef = useRef<string | null>(null);
@@ -362,6 +220,8 @@ export default function TestMapSearch() {
             Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
         ),
     enabled: !isForSale && !!mapBounds,
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData: any) => previousData,
   });
 
   const {
@@ -369,6 +229,29 @@ export default function TestMapSearch() {
     isLoading: isLoadingActive,
     isFetching: isFetchingActive,
   } = useGetMapZoomWithClusters(mapZoomParams, {
+    enabled: isForSale && !!mapBounds,
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData: any) => previousData,
+  });
+
+  const mapZoomParamsWithPage = useMemo(() => {
+    return {
+      ...mapZoomParams,
+      page: currentPage,
+      pageSize: 50,
+    };
+  }, [mapZoomParams, currentPage]);
+
+  // Reset pagination state when viewport bounds or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [mapZoomParams, status]);
+
+  const {
+    data: queryDataProperties,
+    isLoading: isLoadingProperties,
+    isFetching: isFetchingProperties,
+  } = useGetMapZoomProperties(mapZoomParamsWithPage, {
     enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData: any) => previousData,
@@ -396,15 +279,15 @@ export default function TestMapSearch() {
   );
 
   const cleanData = useMemo(() => {
-    if (!queryDataActive?.data || !isForSale) return [];
+    if (!queryDataProperties?.data || !isForSale) return [];
 
-    return queryDataActive.data
+    return queryDataProperties.data
       .map((listing: any) => transformActiveListing(listing, me))
       .filter(
         (l: any) =>
           Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
       );
-  }, [queryDataActive?.data, isForSale, me]);
+  }, [queryDataProperties?.data, isForSale, me]);
 
   const rawProperties = useMemo(
     () => (isForSale ? cleanData : queryDataNormal || []),
@@ -483,8 +366,12 @@ export default function TestMapSearch() {
       .filter(Boolean);
   }, [rawProperties, geocodedCache]);
 
-  const isFetching = isForSale ? isFetchingActive : isFetchingNormal;
-  const isLoadingData = isForSale ? isLoadingActive : isLoadingNormal;
+  const isFetching = isForSale
+    ? isFetchingActive || isFetchingProperties
+    : isFetchingNormal;
+  const isLoadingData = isForSale
+    ? isLoadingActive || isLoadingProperties
+    : isLoadingNormal;
   const isLoading =
     isLoadingData || isFetching || isLoadingSold || isFetchingSold;
 
@@ -649,49 +536,18 @@ export default function TestMapSearch() {
     }
   }, [properties, mapLoaded, map, fitBoundsDone, location]);
 
+  // Syncs and sorts properties that are visible within the current map viewport bounds
   useEffect(() => {
     if (selectedClusterProperties.length > 0) return;
 
     if (!properties || properties.length === 0) {
-      setClusters((prev) => (prev.length === 0 ? prev : []));
       setVisibleProperties((prev) => (prev.length === 0 ? prev : []));
       return;
     }
 
     if (!map) return;
 
-    const zoom = map.getZoom() || 13;
     const bounds = map.getBounds();
-
-    const points = properties.map((p: any) => ({
-      type: "Feature",
-      properties: { cluster: false, propertyId: p.id, propertyData: p },
-      geometry: {
-        type: "Point",
-        coordinates: [Number(p.longitude), Number(p.latitude)],
-      },
-    }));
-
-    superclusterRef.current = new Supercluster({
-      radius: getClusterRadius(zoom),
-      maxZoom: 18,
-    });
-
-    superclusterRef.current.load(points as any);
-
-    const bbox: [number, number, number, number] = [
-      bounds.getWest(),
-      bounds.getSouth(),
-      bounds.getEast(),
-      bounds.getNorth(),
-    ];
-
-    const clustersData = superclusterRef.current.getClusters(
-      bbox,
-      Math.floor(zoom),
-    );
-    setClusters(clustersData);
-
     const visible = properties
       .filter((p: any) => bounds.contains([p.latitude, p.longitude]))
       .sort((a: any, b: any) => {
@@ -837,6 +693,13 @@ export default function TestMapSearch() {
     setSelectedClusterProperties([]);
     setClusterPosition(null);
   };
+  const isSidebarLoading =
+    isLoadingData || isLoadingProperties;
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
   if (!mapLoaded && typeof window === "undefined") return <MapLoading />;
 
   return (
@@ -885,16 +748,26 @@ export default function TestMapSearch() {
         </div>
 
         <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative xl:max-w-screen-2xl mx-auto w-full h-full">
-          <MapSidebar
-            isLoading={isLoading}
+          <TestMapSidebar
+            isLoading={isSidebarLoading}
             visibleProperties={visibleProperties}
-            properties={properties}
+            properties={queryDataProperties}
             isLoggedIn={isLoggedIn}
             status={status}
             setHoveredPropertyId={setHoveredPropertyId}
             assessmentDrawerOpen={assessmentDrawerOpen}
             selectedAssessmentProperty={selectedAssessmentProperty}
             setAssessmentDrawerOpen={setAssessmentDrawerOpen}
+            currentPage={currentPage}
+            totalPages={
+              queryDataProperties?.meta
+                ? Math.ceil(
+                    queryDataProperties.meta.total /
+                      queryDataProperties.meta.pageSize,
+                  )
+                : 1
+            }
+            onPageChange={handlePageChange}
           />
 
           <div className="flex flex-1 relative z-10 w-full h-full">
@@ -934,7 +807,7 @@ export default function TestMapSearch() {
                 }
               />
 
-              <MapEvents
+              <TestMapEvents
                 measureMode={measureMode}
                 selectedProperty={selectedProperty}
                 selectedClusterProperties={selectedClusterProperties}
@@ -969,7 +842,7 @@ export default function TestMapSearch() {
                 mapZoomVal &&
                 mapZoomVal >= 15 &&
                 schools.map((school: SchoolItem) => (
-                  <SchoolMarker key={school.id} school={school} />
+                  <TestMapSchoolMarker key={school.id} school={school} />
                 ))}
 
               {measureMode && (

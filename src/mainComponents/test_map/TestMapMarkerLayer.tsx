@@ -94,10 +94,27 @@ export default function TestMapMarkerLayer({
             click: () => {
               if (!map) return;
 
+              const currentZoom = map.getZoom() || 0;
               setSelectedProperty(null);
-              setSelectedClusterProperties([]);
-              setClusterPosition(null);
 
+              // <=10 properties
+              if (
+                item.properties &&
+                item.properties.length > 0 &&
+                item.pointCount <= 10 &&
+                currentZoom >= 18
+              ) {
+                setSelectedClusterProperties(item.properties);
+
+                setClusterPosition({
+                  lat: Number(item.latitude),
+                  lng: Number(item.longitude),
+                });
+
+                return;
+              }
+
+              // >10 properties
               map.flyTo(
                 [Number(item.latitude), Number(item.longitude)],
                 Number(item.expansionZoom || map.getZoom() + 2),

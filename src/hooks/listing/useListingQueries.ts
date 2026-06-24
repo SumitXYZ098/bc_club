@@ -32,6 +32,7 @@ import {
   getMapZoomSoldList,
   getMapZoomSchools,
   getMapZoomWithClusters,
+  getMapZoomProperties,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -91,6 +92,7 @@ export function useGetMapZoomListings<TData = any>(
   });
 }
 
+// Map Zoom With Clusters
 export function useGetMapZoomWithClusters<TData = any>(
   params?: any,
   options?: Omit<
@@ -101,6 +103,21 @@ export function useGetMapZoomWithClusters<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: ["mapZoomWithClusters", params || {}],
     queryFn: () => getMapZoomWithClusters(params),
+    ...options,
+  });
+}
+
+// Map Zoom Properties
+export function useGetMapZoomProperties<TData = any>(
+  params?: any,
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["mapZoomProperties", params || {}],
+    queryFn: () => getMapZoomProperties(params),
     ...options,
   });
 }

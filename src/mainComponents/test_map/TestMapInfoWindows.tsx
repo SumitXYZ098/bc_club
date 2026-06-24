@@ -141,7 +141,7 @@ export function TestMapClusterPopup({
 
         {selectedClusterProperties.map((p) => (
           <div
-            key={p.id}
+            key={p.documentId}
             onClick={(e) => {
               e.stopPropagation();
               window.open(
@@ -161,7 +161,7 @@ export function TestMapClusterPopup({
             }}
           >
             <img
-              src={p.image || Images.apartment}
+              src={p.media_url || Images.apartment}
               alt=""
               style={{
                 width: 70,
