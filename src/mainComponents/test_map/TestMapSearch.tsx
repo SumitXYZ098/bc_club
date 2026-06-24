@@ -14,31 +14,17 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-
 import Supercluster from "supercluster";
 import {
   useGetListings,
   useGetMapZoomAssignmentList,
-  useGetMapZoomListings,
+  useGetMapZoomWithClusters,
   useGetMapZoomSchools,
   useGetMapZoomSoldList,
   useGetMe,
 } from "@/src/hooks/listing/useListingQueries";
 import { useListingStore } from "@/src/store/useListingStore";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
-
-import {
-  cityCoords,
-  osmDefaultCenter,
-  osmRoadmapTile,
-  osmSatelliteTile,
-} from "./osmMapConfig";
-import OpenStreetMapControls from "./OpenStreetMapControls";
-import OpenStreetMapMarkerLayer from "./OpenStreetMapMarkerLayer";
-import {
-  OpenStreetClusterPopup,
-  OpenStreetPropertyPopup,
-} from "./OpenStreetMapInfoWindows";
 import {
   boundsKey,
   formatMeter,
@@ -47,7 +33,7 @@ import {
   getDistanceBetweenPoints,
   getMiddlePoint,
   type LatLngPoint,
-} from "./osmUtils";
+} from "./testMapUtils";
 import { MapBounds } from "../maps/google_map/mapTypes";
 import {
   buildActiveFilterPills,
@@ -67,19 +53,30 @@ import MapActiveFilters from "../maps/MapActiveFilters";
 import MapSidebar from "../maps/MapSidebar";
 import MapLoadingBadge from "../maps/google_map/MapLoadingBadge";
 import GetInTouch from "../getInTouch/GetInTouch";
-import OSMGeoJsonLayer from "./OSMGeoJsonLayer";
-import OpenStreetMapSoldMakerLayer from "./OpenStreetMapSoldMakerLayer";
 import { Endpoints } from "@/src/api/endpoints";
 import {
   MdApartment,
   MdEmojiEvents,
-  MdLocationOn,
   MdMap,
   MdSchool,
   MdStar,
 } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
-import OpenStreetMapAssignmentGeoLayer from "./OpenStreetMapAssignmentGeoLayer";
+import {
+  cityCoords,
+  testMapDefaultCenter,
+  testMapRoadmapTile,
+  testMapSatelliteTile,
+} from "./testMapConfig";
+import TestMapAssignmentGeoLayer from "./TestMapAssignmentGeoLayer";
+import TestMapGeoJsonLayer from "./TestMapGeoJsonLayer";
+import TestMapMarkerLayer from "./TestMapMarkerLayer";
+import TestMapSoldMakerLayer from "./TestMapSoldMakerLayer";
+import {
+  TestMapClusterPopup,
+  TestMapPropertyPopup,
+} from "./TestMapInfoWindows";
+import TestMapControls from "./TestMapControls";
 
 type SchoolType = "Elementary" | "Secondary" | "All";
 
@@ -228,7 +225,7 @@ function SchoolMarker({ school }: { school: SchoolItem }) {
   );
 }
 
-export default function OpenStreetMapSearch() {
+export default function TestMapSearch() {
   const { data: me } = useGetMe();
   const { isLoggedIn, setOpenLogin } = useAuthContext();
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
@@ -371,14 +368,7 @@ export default function OpenStreetMapSearch() {
     data: queryDataActive,
     isLoading: isLoadingActive,
     isFetching: isFetchingActive,
-  } = useGetMapZoomListings(mapZoomParams, {
-    select: (res: any) =>
-      (res?.data || [])
-        .map((listing: any) => transformActiveListing(listing, me))
-        .filter(
-          (l: any) =>
-            Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
-        ),
+  } = useGetMapZoomWithClusters(mapZoomParams, {
     enabled: isForSale && !!mapBounds,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData: any) => previousData,
@@ -395,20 +385,30 @@ export default function OpenStreetMapSearch() {
     placeholderData: (previousData: any) => previousData,
   });
 
-  const {
-    data: queryDataAssignment,
-    isLoading: isLoadingAssignment,
-    isFetching: isFetchingAssignment,
-  } = useGetMapZoomAssignmentList(mapZoomParams, {
-    select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
-    enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
-    staleTime: 1000 * 60 * 5,
-    placeholderData: (previousData: any) => previousData,
-  });
+  const { data: queryDataAssignment } = useGetMapZoomAssignmentList(
+    mapZoomParams,
+    {
+      select: (res: any) => res.data.filter((l: any) => Number(l.price) > 0),
+      enabled: isForSale && !!mapBounds && mapZoomVal! > 15,
+      staleTime: 1000 * 60 * 5,
+      placeholderData: (previousData: any) => previousData,
+    },
+  );
+
+  const cleanData = useMemo(() => {
+    if (!queryDataActive?.data || !isForSale) return [];
+
+    return queryDataActive.data
+      .map((listing: any) => transformActiveListing(listing, me))
+      .filter(
+        (l: any) =>
+          Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
+      );
+  }, [queryDataActive?.data, isForSale, me]);
 
   const rawProperties = useMemo(
-    () => (isForSale ? queryDataActive || [] : queryDataNormal || []),
-    [isForSale, queryDataActive, queryDataNormal],
+    () => (isForSale ? cleanData : queryDataNormal || []),
+    [isForSale, queryDataNormal, cleanData],
   );
 
   useEffect(() => {
@@ -596,7 +596,7 @@ export default function OpenStreetMapSearch() {
       },
       () => {
         setLocationChecked(true);
-        mapInstance.setView(osmDefaultCenter, 13);
+        mapInstance.setView(testMapDefaultCenter, 13);
 
         setTimeout(() => {
           const nextBounds = getBoundsPayload(mapInstance);
@@ -615,7 +615,7 @@ export default function OpenStreetMapSearch() {
 
     if (!location) {
       if (userLocation) map.setView([userLocation.lat, userLocation.lng], 13);
-      else map.setView(osmDefaultCenter, 13);
+      else map.setView(testMapDefaultCenter, 13);
       setTimeout(() => triggerSearch(), 300);
       return;
     }
@@ -905,7 +905,7 @@ export default function OpenStreetMapSearch() {
             )}
 
             <MapContainer
-              center={osmDefaultCenter}
+              center={testMapDefaultCenter}
               zoom={13}
               minZoom={8}
               maxZoom={22}
@@ -918,15 +918,19 @@ export default function OpenStreetMapSearch() {
               <TileLayer
                 attribution={
                   isSatellite
-                    ? osmSatelliteTile.attribution
-                    : osmRoadmapTile.attribution
+                    ? testMapSatelliteTile.attribution
+                    : testMapRoadmapTile.attribution
                 }
-                url={isSatellite ? osmSatelliteTile.url : osmRoadmapTile.url}
+                url={
+                  isSatellite
+                    ? testMapSatelliteTile.url
+                    : testMapRoadmapTile.url
+                }
                 maxZoom={22}
                 maxNativeZoom={
                   isSatellite
-                    ? osmSatelliteTile.maxNativeZoom
-                    : osmRoadmapTile.maxNativeZoom
+                    ? testMapSatelliteTile.maxNativeZoom
+                    : testMapRoadmapTile.maxNativeZoom
                 }
               />
 
@@ -944,7 +948,7 @@ export default function OpenStreetMapSearch() {
                 handleMeasureMove={handleMeasureMove}
               />
 
-              <OpenStreetMapAssignmentGeoLayer
+              <TestMapAssignmentGeoLayer
                 map={map}
                 data={queryDataAssignment || []}
                 zoomVal={mapZoomVal}
@@ -955,7 +959,10 @@ export default function OpenStreetMapSearch() {
               />
 
               {parcelGeoJSON && mapZoomVal && mapZoomVal >= 19 && (
-                <OSMGeoJsonLayer data={parcelGeoJSON} properties={properties} />
+                <TestMapGeoJsonLayer
+                  data={parcelGeoJSON}
+                  properties={properties}
+                />
               )}
 
               {schoolMode &&
@@ -1070,32 +1077,30 @@ export default function OpenStreetMapSearch() {
                 />
               ))}
 
-              <OpenStreetMapMarkerLayer
-                clusters={clusters}
+              <TestMapMarkerLayer
+                clusters={queryDataActive}
                 map={map}
                 status={status}
                 hoveredPropertyId={hoveredPropertyId}
-                selectedClusterProperties={selectedClusterProperties}
-                superclusterRef={superclusterRef}
                 setHoveredPropertyId={setHoveredPropertyId}
                 setSelectedProperty={setSelectedProperty}
                 setSelectedClusterProperties={setSelectedClusterProperties}
                 setClusterPosition={setClusterPosition}
               />
 
-              <OpenStreetMapSoldMakerLayer
+              <TestMapSoldMakerLayer
                 map={map}
                 soldListings={queryDataSold || []}
                 zoomVal={mapZoomVal}
               />
 
-              <OpenStreetPropertyPopup
+              <TestMapPropertyPopup
                 selectedProperty={selectedProperty}
                 popupRef={popupRef}
                 onClose={() => setSelectedProperty(null)}
               />
 
-              <OpenStreetClusterPopup
+              <TestMapClusterPopup
                 selectedClusterProperties={selectedClusterProperties}
                 stableClusterPosition={stableClusterPosition}
                 onClose={() => setSelectedClusterProperties([])}
@@ -1104,7 +1109,7 @@ export default function OpenStreetMapSearch() {
 
             {isLoading && <MapLoadingBadge />}
 
-            <OpenStreetMapControls
+            <TestMapControls
               map={map}
               isSatellite={isSatellite}
               measureMode={measureMode}

@@ -46,10 +46,10 @@ export async function getMapZoomListings(params?: any): Promise<any> {
   }
 }
 
-// Map Cluster
-export async function getMapCluster(params?: any): Promise<any> {
+// Map Zoom With Cluster
+export async function getMapZoomWithClusters(params?: any): Promise<any> {
   try {
-    const res = await axios.get(Endpoints.mapCluster, { params });
+    const res = await axios.get(Endpoints.mapZoomWithClusters, { params });
 
     return res.data;
   } catch (error) {

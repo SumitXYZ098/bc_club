@@ -31,7 +31,7 @@ import {
   getMapZoomAssignmentList,
   getMapZoomSoldList,
   getMapZoomSchools,
-  getMapCluster,
+  getMapZoomWithClusters,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -91,7 +91,7 @@ export function useGetMapZoomListings<TData = any>(
   });
 }
 
-export function useGetMapCluster<TData = any>(
+export function useGetMapZoomWithClusters<TData = any>(
   params?: any,
   options?: Omit<
     UseQueryOptions<any, Error, TData, any>,
@@ -99,8 +99,8 @@ export function useGetMapCluster<TData = any>(
   >,
 ) {
   return useQuery<any, Error, TData, any>({
-    queryKey: ["mapCluster", params || {}],
-    queryFn: () => getMapCluster(params),
+    queryKey: ["mapZoomWithClusters", params || {}],
+    queryFn: () => getMapZoomWithClusters(params),
     ...options,
   });
 }
