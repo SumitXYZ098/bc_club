@@ -1,4 +1,4 @@
-import OpenStreetMapSearchWrapper from "@/src/mainComponents/openstreet_map/OpenStreetMapSearchWrapper";
+import OpenStreetMapSearchWrapper from "@/src/mainComponents/openStreetMap/OpenStreetMapSearchWrapper";
 
 export default function MapSearchPage() {
   return <OpenStreetMapSearchWrapper />;

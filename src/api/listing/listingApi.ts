@@ -32,19 +32,6 @@ export async function getActiveListings(params?: any): Promise<any> {
     throw new Error("An unexpected error occurred");
   }
 }
-// Map Zoom Listings
-export async function getMapZoomListings(params?: any): Promise<any> {
-  try {
-    const res = await axios.get(Endpoints.mapZoom, { params });
-
-    return res.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.error?.message || "API error");
-    }
-    throw new Error("An unexpected error occurred");
-  }
-}
 
 // Map Zoom With Cluster
 export async function getMapZoomWithClusters(params?: any): Promise<any> {

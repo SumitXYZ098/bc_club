@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import { useMapEvents } from "react-leaflet";
-import { type LatLngPoint } from "./testMapUtils";
+import { type LatLngPoint } from "./osmMapUtils";
 
-interface MapEventsProps {
+interface OpenStreetMapEventsProps {
   measureMode: boolean;
   selectedProperty: any;
   selectedClusterProperties: any[];
@@ -18,7 +18,7 @@ interface MapEventsProps {
  * Handles map interaction events (drag, zoom, click, mousemove) and
  * delegates search triggers and measurement actions appropriately.
  */
-export default function TestMapEvents({
+export default function OpenStreetMapEvents({
   measureMode,
   selectedProperty,
   selectedClusterProperties,
@@ -26,7 +26,7 @@ export default function TestMapEvents({
   clearPopups,
   handleMeasureClick,
   handleMeasureMove,
-}: MapEventsProps) {
+}: OpenStreetMapEventsProps) {
   const timeoutRef = useRef<any>(null);
 
   useMapEvents({

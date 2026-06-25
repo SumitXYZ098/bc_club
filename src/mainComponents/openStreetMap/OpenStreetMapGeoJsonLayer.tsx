@@ -50,7 +50,7 @@ function hasPropertyInsideFeature(feature: any, properties: PropertyType[]) {
   });
 }
 
-export default function TestMapGeoJsonLayer({
+export default function OpenStreetMapGeoJsonLayer({
   data,
   properties = [],
 }: {

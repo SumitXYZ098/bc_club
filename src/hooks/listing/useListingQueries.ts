@@ -18,7 +18,6 @@ import {
   getMyDdfFavorites,
   removeFromFavourite,
   getActiveListings,
-  getMapZoomListings,
   getAssessmentPropertiesList,
   getNearbyPlaces,
   getSimilarProperties,
@@ -73,21 +72,6 @@ export function useGetActiveListings<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: listingKeys.list(params || {}),
     queryFn: () => getActiveListings(params),
-    ...options,
-  });
-}
-
-// Map Zoom Listing
-export function useGetMapZoomListings<TData = any>(
-  params?: any,
-  options?: Omit<
-    UseQueryOptions<any, Error, TData, any>,
-    "queryKey" | "queryFn"
-  >,
-) {
-  return useQuery<any, Error, TData, any>({
-    queryKey: ["mapZoomListings", params || {}],
-    queryFn: () => getMapZoomListings(params),
     ...options,
   });
 }

@@ -1,4 +1,6 @@
-export const testMapDefaultCenter: [number, number] = [49.2827, -123.1207];
+export const OpenStreetMapDefaultCenter: [number, number] = [
+  49.2827, -123.1207,
+];
 
 export const cityCoords: Record<string, [number, number]> = {
   Vancouver: [49.2827, -123.1207],
@@ -21,14 +23,14 @@ export const cityCoords: Record<string, [number, number]> = {
   "Prince George": [53.917065, -122.749672],
 };
 
-export const testMapRoadmapTile = {
+export const OpenStreetMapRoadmapTile = {
   url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
   attribution:
     "<a href='https://www.maptiler.com/copyright/' target='_blank'>&copy; MapTiler</a> <a href='https://www.openstreetmap.org/copyright' target='_blank'>&copy; OpenStreetMap contributors</a>",
   maxNativeZoom: 19,
 };
 
-export const testMapSatelliteTile = {
+export const OpenStreetMapSatelliteTile = {
   url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   attribution: "Tiles &copy; Esri",
   maxNativeZoom: 18,

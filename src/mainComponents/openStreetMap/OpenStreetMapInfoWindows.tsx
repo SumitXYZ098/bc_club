@@ -1,7 +1,7 @@
 import { Popup } from "react-leaflet";
 import { Images } from "@/src/app/exports";
 
-export function TestMapPropertyPopup({
+export function OpenStreetMapPropertyPopup({
   selectedProperty,
   popupRef,
   onClose,
@@ -107,7 +107,7 @@ export function TestMapPropertyPopup({
   );
 }
 
-export function TestMapClusterPopup({
+export function OpenStreetMapClusterPopup({
   selectedClusterProperties,
   stableClusterPosition,
   onClose,

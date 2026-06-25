@@ -11,9 +11,6 @@ export const Endpoints = {
   getFavouriteProperties: `${BASE_URL}/api/my-favorites`,
   me: `${BASE_URL}/api/users/me`,
   getActivePropertyLists: `${BASE_URL}/api/ddf-listings`,
-  mapZoom: `${BASE_URL}/api/map-zoom`,
-  mapZoomWithClusters: `${BASE_URL}/api/ddf-listings/map-zoom-clusters`,
-  mapZoomProperties: `${BASE_URL}/api/map-properties`,
   getActiveListingById: (id: string) => `${BASE_URL}/api/ddf-listings/${id}`,
   addDdfFavorite: (id: string) =>
     `${BASE_URL}/api/ddf-listings/add-favorite/${id}`,
@@ -40,6 +37,8 @@ export const Endpoints = {
   getSaleReport: `${BASE_URL}/api/sales-reported`,
 
   // MapZoom
+  mapZoomWithClusters: `${BASE_URL}/api/ddf-listings/map-zoom-clusters`,
+  mapZoomProperties: `${BASE_URL}/api/map-properties`,
   getMapZoomAssignmentList: `${BASE_URL}/api/property-assignment-lists/map-zoom`,
   getMapZoomSold: `${BASE_URL}/api/properties/sold/map-zoom`,
   getMapZoomSchools: `${BASE_URL}/api/schools/map-zoom`,

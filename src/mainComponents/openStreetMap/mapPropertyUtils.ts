@@ -30,18 +30,6 @@ export const normalizeAddress = (property: any) => {
   return parts.join(", ");
 };
 
-export const fitBoundsWithZoom = (
-  map: google.maps.Map,
-  bounds: google.maps.LatLngBounds,
-  zoom = 14,
-) => {
-  map.fitBounds(bounds);
-
-  google.maps.event.addListenerOnce(map, "idle", () => {
-    map.setZoom(zoom);
-  });
-};
-
 export const getSafeLatLng = (listing: any) => {
   const lat = Number(listing?.latitude);
   const lng = Number(listing?.longitude);

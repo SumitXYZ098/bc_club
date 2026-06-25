@@ -3,7 +3,13 @@
 import React, { useMemo } from "react";
 import L from "leaflet";
 import { Marker, Popup } from "react-leaflet";
-import { MdApartment, MdEmojiEvents, MdMap, MdSchool, MdStar } from "react-icons/md";
+import {
+  MdApartment,
+  MdEmojiEvents,
+  MdMap,
+  MdSchool,
+  MdStar,
+} from "react-icons/md";
 
 export type SchoolType = "Elementary" | "Secondary" | "All";
 
@@ -23,40 +29,61 @@ export type SchoolItem = {
  * Renders a specialized school marker with a detailed information popup,
  * showing Fraser Institute rating, rank, and address.
  */
-export default function TestMapSchoolMarker({ school }: { school: SchoolItem }) {
+export default function OpenStreetMapSchoolMarker({
+  school,
+}: {
+  school: SchoolItem;
+}) {
+  const rating = school.rating ? Number(school.rating) : null;
+
   const icon = useMemo(
     () =>
       L.divIcon({
         className: "bc-osm-marker",
-        html: `<div class="bc-osm-school"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="22" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M256 32 20 160l236 128 192-104v104h44V160L256 32zM108 247.3V336c0 48.6 66.3 88 148 88s148-39.4 148-88v-88.7L256 328 108 247.3z"></path></svg></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
+        html: `
+          <div class="relative flex h-[34px] w-[34px] items-center justify-center rounded-full bg-primary text-white shadow-lg ring-2 ring-white">
+            <svg stroke="currentColor" fill="currentColor" viewBox="0 0 512 512" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M256 32 20 160l236 128 192-104v104h44V160L256 32zM108 247.3V336c0 48.6 66.3 88 148 88s148-39.4 148-88v-88.7L256 328 108 247.3z"></path>
+            </svg>
+            ${
+              rating
+                ? `<span class="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-yellow-400 px-1 text-[10px] font-bold text-[#15376b] shadow">${rating}</span>`
+                : ""
+            }
+          </div>
+        `,
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
       }),
-    [],
+    [rating],
   );
 
   return (
     <Marker position={[school.latitude, school.longitude]} icon={icon}>
-      <Popup className="school-popup w-[350px]">
-        <div className="w-[350px] overflow-hidden rounded-2xl bg-white p-4">
+      <Popup
+        className="school-popup"
+        // maxWidth={360}
+        minWidth={262}
+      >
+        <div className="w-[calc(100vw-40px)] md:max-w-[350px] max-w-[260px] overflow-hidden rounded-2xl bg-white p-3 sm:p-4">
           <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50 sm:h-12 sm:w-12">
               <MdSchool className="h-6 w-6 text-primary" />
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="text-base font-bold leading-snug text-[#15376b]">
+              <h3 className="wrap-break-word text-sm font-bold leading-snug text-[#15376b] sm:text-base">
                 {school.school_name || "-"}
               </h3>
 
-              <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-primary">
+              <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-primary sm:px-3 sm:text-xs">
                 <MdApartment className="h-3.5 w-3.5" />
                 {school.school_type || "-"}
               </div>
             </div>
           </div>
 
-          <div className="my-4 border-t border-dashed border-gray-200" />
+          <div className="my-3 border-t border-dashed border-gray-200 sm:my-4" />
 
           <div className="space-y-2 text-xs">
             <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
@@ -84,13 +111,14 @@ export default function TestMapSchoolMarker({ school }: { school: SchoolItem }) 
                 <MdMap className="h-5 w-5 text-blue-500" />
               </div>
               <span className="font-medium text-gray-600">Address</span>
-              <span className="ml-auto max-w-[150px] text-right font-semibold leading-snug text-gray-800">
+              <span className="ml-auto max-w-[55%] wrap-break-word text-right font-semibold leading-snug text-gray-800">
                 {school.address || "-"}
               </span>
             </div>
-            <span className="text-right text-[10px] font-medium text-gray-400">
+
+            <div className="text-right text-[10px] font-medium text-gray-400">
               Data Source: Fraser Institute
-            </span>
+            </div>
           </div>
         </div>
       </Popup>

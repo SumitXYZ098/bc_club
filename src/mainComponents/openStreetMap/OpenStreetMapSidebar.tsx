@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { FiLoader } from "react-icons/fi";
 import PropertiesCard from "@/src/components/common/propertiesCard/PropertiesCard";
 
-interface TestMapSidebarProps {
+interface OpenStreetMapSidebarProps {
   isLoading: boolean;
   visibleProperties: any[];
   properties: any;
@@ -17,7 +17,7 @@ interface TestMapSidebarProps {
   onPageChange: (page: number) => void;
 }
 
-export default function TestMapSidebar({
+export default function OpenStreetMapSidebar({
   isLoading,
   visibleProperties,
   properties,
@@ -30,7 +30,7 @@ export default function TestMapSidebar({
   currentPage,
   totalPages,
   onPageChange,
-}: TestMapSidebarProps) {
+}: OpenStreetMapSidebarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

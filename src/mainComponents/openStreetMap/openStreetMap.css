@@ -80,8 +80,8 @@
   width: 30px;
   height: 30px;
   border-radius: 999px;
-  background: #22c55e;
-  border: 2px solid white;
+  background: #305487;
+  border: 2px solid #22c55e;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
@@ -116,6 +116,7 @@
 }
 
 .leaflet-popup-content-wrapper {
+
   border-radius: 8px;
 }
 
@@ -124,6 +125,7 @@
 }
 
 .school-popup .leaflet-popup-content {
+  width: auto !important;
   margin: 0 !important;
 }
 

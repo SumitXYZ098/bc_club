@@ -13,7 +13,8 @@ type AssignmentGeoItem = {
   coordinates?: number[][][];
 };
 
-export default function TestMapAssignmentGeoLayer({
+export default function OpenStreetMapAssignmentGeoLayer
+({
   map,
   data = [],
   zoomVal,

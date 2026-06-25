@@ -121,9 +121,5 @@ export const company: LinkListProps = {
       label: "Terms & Conditions",
       href: "/terms-and-conditions",
     },
-    {
-      label: "Test Map",
-      href: "/map-test",
-    },
   ],
 };

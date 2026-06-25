@@ -2,9 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { FiChevronDown } from "react-icons/fi";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
 import FilterListIcon from "@mui/icons-material/FilterList";
-// import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
-import LineGradient from "@/src/components/common/lineGradient/LineGradient";
-import { PriceSlider } from "./mapUtils";
 
 interface MapTopFilterBarProps {
   status: string;
