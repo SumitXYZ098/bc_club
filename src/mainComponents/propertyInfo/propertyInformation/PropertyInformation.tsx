@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
 import PropertyContactUs from "./PropertyContactUs";
 import PropertyTabs from "./PropertyTabs";
 import Description, {
@@ -19,13 +18,11 @@ import {
   marketStatsRows,
   propertyDetailsHeaders,
   roomHeaders,
-  taxHistoryHeaders,
-  taxHistoryRows,
 } from "..";
-import AssessmentHistory from "./AssessmentHistory";
 import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 import CustomButton from "@/src/components/button/CustomButton";
+import { useAuthContext } from "../../auth/AuthContext";
 
 const SCHOOL_LOCATOR_URL =
   "https://mybaragar.com/index.cfm?event=page.SchoolLocatorPublic&DistrictGUID=E6EC1BC2-3986-463A-9ED9-FFF4DECA3AB3&DistrictCode=BC36&DataStatus=1";
@@ -71,21 +68,12 @@ const PropertyInformation = ({ property }: { property: any }) => {
       : []),
   ];
 
-  const formatCurrency = (num?: number) => {
-    if (!num) return "-";
-    return `$${Number(num).toLocaleString()}`;
-  };
-
-  // const price = property?.price;
-  // const assessed = property?.raw_data?.TaxAssessedValue;
-  // const rentEstimate = property?.raw_data?.RentEstimate; // if exists
-
-  // const offerValue = price || assessed || 0;
-  // const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`;
 
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
     useGetNearbyPlaces(property.documentId);
+
+  const { isLoggedIn } = useAuthContext();
 
   const openSchoolLocatorPopup = () => {
     const width = 1200;
@@ -192,7 +180,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
           <DynamicTable
             title="Property Details"
             headers={propertyDetailsHeaders}
-            rows={getPropertyDetailsRows(property)}
+            rows={getPropertyDetailsRows(property, isLoggedIn)}
           />
           {/* Room Information */}
           {property?.rooms && property?.rooms?.length > 0 && (
@@ -203,45 +191,8 @@ const PropertyInformation = ({ property }: { property: any }) => {
             />
           )}
 
-          {/*  */}
-          <div
-            id="assessment"
-            className="scroll-mt-40 flex flex-col md:gap-y-6 gap-y-5"
-          >
-            <AssessmentHistory />
-            <DynamicTable headers={taxHistoryHeaders} rows={taxHistoryRows} />
-          </div>
-
-          {/* Pricing Estimate */}
-          {/* <div
-            id="estimate"
-            className="scroll-mt-40 p-5 rounded-xl bg-gray flex flex-col gap-y-4"
-          >
-            <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
-              Pricing Estimate
-            </h2>
-            <LineGradient customClasses="" />
-            <div className="flex flex-row md:flex-nowrap flex-wrap justify-between w-full xl:gap-x-6 gap-x-5 gap-y-4">
-       
-              <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
-                <span className="text-sm">Offer Value Estimate</span>
-                <span className="text-primary font-bold text-xl xl:text-2xl">
-                  {formatCurrency(offerValue)}
-                </span>
-              </div>
-
-
-              <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
-                <span className="text-sm">Offer Rent Estimate</span>
-                <span className="text-primary font-bold text-xl xl:text-2xl">
-                  {formatCurrency(offerRent)}
-                </span>
-              </div>
-            </div>
-          </div> */}
-
           {/* Nearby Schools */}
-          <div id="neighbourhood" className="scroll-mt-40">
+          <div id="neighborhoods" className="scroll-mt-40">
             <div>
               <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
                 Nearby Schools

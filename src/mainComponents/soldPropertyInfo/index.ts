@@ -190,7 +190,7 @@ export const getPropertyDetailsRows = (property: any) => [
   },
   {
     data: {
-      label: "MLS Number",
+      label: "MLS® Number",
       value: property?.mls_number || "-",
     },
   },

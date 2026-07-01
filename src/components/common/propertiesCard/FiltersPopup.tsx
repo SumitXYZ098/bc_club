@@ -734,67 +734,73 @@ export default function FiltersPopup({
         <LineGradient />
 
         {/* When Listed */}
-        <div className="mb-6 space-y-2 flex flex-col gap-y-1 pt-5">
-          <label className="font-medium">When Listed</label>
-          <div className="relative w-full">
-            <div
-              onClick={() => setWhenListedDropdownOpen(!whenListedDropdownOpen)}
-              className="w-full border border-[#33333333] rounded-xl px-3 py-3 cursor-pointer text-sm flex justify-between items-center bg-white"
-            >
-              <span
-                className={
-                  whenListed !== "any"
-                    ? "text-black capitalize"
-                    : "text-gray-500"
-                }
-              >
-                {whenListed === "any" ? "Any time" : whenListed}
-              </span>
-              <span className="text-gray-400">
-                {whenListedDropdownOpen ? (
-                  <FiChevronUp size={18} />
-                ) : (
-                  <FiChevronDown size={18} />
-                )}
-              </span>
-            </div>
-
-            {whenListedDropdownOpen && (
-              <div className="absolute top-full mt-1 w-full bg-white border border-[#33333333] shadow-lg rounded-xl z-50 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hide py-2">
-                {[
-                  { label: "Any time", value: "any" },
-                  { label: "Today", value: "today" },
-                  { label: "Yesterday", value: "yesterday" },
-                  {
-                    label: "Today and yesterday",
-                    value: "today and yesterday",
-                  },
-                  { label: "Last 7 days", value: "last 7 days" },
-                  { label: "Last 14 days", value: "last 14 days" },
-                  { label: "This month", value: "this month" },
-                  { label: "Last month", value: "last month" },
-                  { label: "This year", value: "this year" },
-                ].map((option) => (
-                  <div
-                    key={option.value}
-                    className={`px-6 py-2.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center transition ${
-                      whenListed === option.value
-                        ? "bg-gray-100 font-medium text-primary"
-                        : "text-gray-700"
-                    }`}
-                    onClick={() => {
-                      setWhenListed(option.value);
-                      setWhenListedDropdownOpen(false);
-                    }}
+        {isLoggedIn && (
+          <>
+            <div className="mb-6 space-y-2 flex flex-col gap-y-1 pt-5">
+              <label className="font-medium">When Listed</label>
+              <div className="relative w-full">
+                <div
+                  onClick={() =>
+                    setWhenListedDropdownOpen(!whenListedDropdownOpen)
+                  }
+                  className="w-full border border-[#33333333] rounded-xl px-3 py-3 cursor-pointer text-sm flex justify-between items-center bg-white"
+                >
+                  <span
+                    className={
+                      whenListed !== "any"
+                        ? "text-black capitalize"
+                        : "text-gray-500"
+                    }
                   >
-                    {option.label}
+                    {whenListed === "any" ? "Any time" : whenListed}
+                  </span>
+                  <span className="text-gray-400">
+                    {whenListedDropdownOpen ? (
+                      <FiChevronUp size={18} />
+                    ) : (
+                      <FiChevronDown size={18} />
+                    )}
+                  </span>
+                </div>
+
+                {whenListedDropdownOpen && (
+                  <div className="absolute top-full mt-1 w-full bg-white border border-[#33333333] shadow-lg rounded-xl z-50 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hide py-2">
+                    {[
+                      { label: "Any time", value: "any" },
+                      { label: "Today", value: "today" },
+                      { label: "Yesterday", value: "yesterday" },
+                      {
+                        label: "Today and yesterday",
+                        value: "today and yesterday",
+                      },
+                      { label: "Last 7 days", value: "last 7 days" },
+                      { label: "Last 14 days", value: "last 14 days" },
+                      { label: "This month", value: "this month" },
+                      { label: "Last month", value: "last month" },
+                      { label: "This year", value: "this year" },
+                    ].map((option) => (
+                      <div
+                        key={option.value}
+                        className={`px-6 py-2.5 text-sm cursor-pointer hover:bg-gray-50 flex items-center transition ${
+                          whenListed === option.value
+                            ? "bg-gray-100 font-medium text-primary"
+                            : "text-gray-700"
+                        }`}
+                        onClick={() => {
+                          setWhenListed(option.value);
+                          setWhenListedDropdownOpen(false);
+                        }}
+                      >
+                        {option.label}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
-        </div>
-        <LineGradient />
+            </div>
+            <LineGradient />
+          </>
+        )}
 
         {/* Property Type */}
         <div className="mb-6 space-y-3 pt-5">

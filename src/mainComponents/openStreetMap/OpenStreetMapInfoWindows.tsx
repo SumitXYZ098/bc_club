@@ -1,5 +1,9 @@
 import { Popup } from "react-leaflet";
 import { Images } from "@/src/app/exports";
+import LineGradient from "@/src/components/common/lineGradient/LineGradient";
+import Description, {
+  IDescriptionTypes,
+} from "@/src/components/description/Description";
 
 export function OpenStreetMapPropertyPopup({
   selectedProperty,
@@ -13,13 +17,17 @@ export function OpenStreetMapPropertyPopup({
   if (!selectedProperty) return null;
 
   const displayTitle =
-    selectedProperty.title === "Single Family"
-      ? selectedProperty.structureType
-      : selectedProperty.title;
+    selectedProperty.property_sub_type === "Single Family"
+      ? selectedProperty.structure_type
+      : selectedProperty.property_sub_type;
+
+  const displayRealtor = selectedProperty.office_name;
+  const displayMls = `MLS® ${selectedProperty.listing_id}`;
   return (
     <Popup
       position={[selectedProperty.latitude, selectedProperty.longitude]}
       eventHandlers={{ remove: onClose }}
+      offset={[0, 0]}
       closeButton
       autoPan
     >
@@ -53,7 +61,7 @@ export function OpenStreetMapPropertyPopup({
           }}
         >
           <img
-            src={selectedProperty.image || Images.apartment}
+            src={selectedProperty.media_url || Images.apartment}
             alt={selectedProperty.title}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
@@ -83,7 +91,6 @@ export function OpenStreetMapPropertyPopup({
               fontSize: 14,
               fontWeight: 700,
               color: "#333",
-              overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
@@ -101,6 +108,24 @@ export function OpenStreetMapPropertyPopup({
           >
             {selectedProperty.address}
           </p>
+          <LineGradient />
+          <div className="w-full flex flex-row flex-wrap items-start justify-between gap-1">
+            <div className="min-w-0 flex-1" title={displayRealtor}>
+              <Description
+                content={displayRealtor}
+                type={IDescriptionTypes.dec12}
+                customClasses="text-lightWhite my-0!"
+              />
+            </div>
+
+            <div className="min-w-0 shrink-0">
+              <Description
+                content={displayMls}
+                type={IDescriptionTypes.dec12}
+                customClasses="text-lightWhite my-0!"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Popup>

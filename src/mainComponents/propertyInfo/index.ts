@@ -17,7 +17,10 @@ export const calculatePropertyAge = (yearBuilt: number | string) => {
   return currentYear - Number(yearBuilt);
 };
 
-export const getPropertyDetailsRows = (property: any) => [
+export const getPropertyDetailsRows = (
+  property: any,
+  isPrivate: boolean = false,
+) => [
   {
     data: {
       label: "Property Type",
@@ -59,19 +62,23 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Listing Date",
-      value: property?.OriginalEntryTimestamp
-        ? dayjs(property.OriginalEntryTimestamp)
-            .tz("America/Vancouver")
-            .format("DD MMM, YYYY")
-        : "-",
+      value: !isPrivate
+        ? "***"
+        : property?.OriginalEntryTimestamp
+          ? dayjs(property.OriginalEntryTimestamp)
+              .tz("America/Vancouver")
+              .format("DD MMM, YYYY")
+          : "-",
     },
     subRows: [
       {
         data: {
           label: "Days On Market",
-          value: property?.OriginalEntryTimestamp
-            ? `${getDaysAgoTime(property.OriginalEntryTimestamp)}`
-            : "-",
+          value: !isPrivate
+            ? "***"
+            : property?.OriginalEntryTimestamp
+              ? `${getDaysAgoTime(property.OriginalEntryTimestamp)}`
+              : "-",
         },
       },
       {
@@ -87,19 +94,23 @@ export const getPropertyDetailsRows = (property: any) => [
         {
           data: {
             label: "Modified Date",
-            value: property?.ModificationTimestamp
-              ? dayjs(property.ModificationTimestamp)
-                  .tz("America/Vancouver")
-                  .format("DD MMM, YYYY")
-              : "-",
+            value: !isPrivate
+              ? "***"
+              : property?.ModificationTimestamp
+                ? dayjs(property.ModificationTimestamp)
+                    .tz("America/Vancouver")
+                    .format("DD MMM, YYYY")
+                : "-",
           },
           subRows: [
             {
               data: {
                 label: "Days On Market",
-                value: property?.ModificationTimestamp
-                  ? `${getDaysAgoTime(property.ModificationTimestamp)}`
-                  : "-",
+                value: !isPrivate
+                  ? "***"
+                  : property?.ModificationTimestamp
+                    ? `${getDaysAgoTime(property.ModificationTimestamp)}`
+                    : "-",
               },
             },
             {
@@ -188,7 +199,7 @@ export const getPropertyDetailsRows = (property: any) => [
   },
   {
     data: {
-      label: "MLS Number",
+      label: "MLS® Number",
       value: property?.listing_id || property?.mls_number || "-",
     },
   },

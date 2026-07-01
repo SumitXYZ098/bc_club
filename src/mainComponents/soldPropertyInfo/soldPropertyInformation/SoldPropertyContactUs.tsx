@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import LineGradient from "@/src/components/common/lineGradient/LineGradient";
-import { CallRegular, Person32Filled, StarFilled } from "@fluentui/react-icons";
+import { StarFilled } from "@fluentui/react-icons";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -39,19 +39,6 @@ const SoldPropertyContactUs = ({ property }: { property: any }) => {
       <LineGradient />
       <span className="text-2xl font-bold">Contact with us now !</span>
       <div className="p-4 flex flex-col gap-y-4 bg-gray rounded-[10px]">
-        <div className="flex gap-x-3 items-center">
-          <Person32Filled className="text-primary w-10 h-10" />
-          <div className="flex flex-col gap-y-2">
-            <span className="text-base font-medium">Contact Agent</span>
-            <Link
-              href={"tel:+1 485 526 258"}
-              className="text-base text-primary flex gap-x-1"
-            >
-              <CallRegular className="w-6 h-6" />
-              0123456789
-            </Link>
-          </div>
-        </div>
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -60,7 +47,7 @@ const SoldPropertyContactUs = ({ property }: { property: any }) => {
           Request a showing
         </button>
         <Link
-          href={"tel:0123456789"}
+          href={"tel:tel:+1 778-896-2478"}
           className="px-4 py-2.5 text-center text-base font-bold bg-primary text-background rounded-md"
         >
           Call Now

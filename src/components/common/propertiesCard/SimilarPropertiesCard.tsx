@@ -234,9 +234,11 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   const displaySqft = isLogin ? `${sqft} sft` : "---- sft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
+  console.log("targetLotSize", targetLotSize);
+  console.log("lotSize", lotSize);
   const displayLotSize = isLogin
     ? lotSize
-      ? `${lotSize} sft`
+      ? `${Number(lotSize)} sft`
       : "--- sft"
     : "---- sft";
   const img = image ? image : Images.apartment;
@@ -362,9 +364,11 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
               <div className="flex w-full justify-between flex-nowrap items-center">
                 <span className=" opacity-40">Listing Date:</span>
                 <span className="">
-                  {dayjs(listingDate)
-                    .tz("America/Vancouver")
-                    .format("DD MMM, YYYY")}
+                  {!isLoggedIn
+                    ? "****"
+                    : dayjs(listingDate)
+                        .tz("America/Vancouver")
+                        .format("DD MMM, YYYY")}
                 </span>
               </div>
               <LineGradient />
@@ -404,7 +408,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
                 </span>
               </div>
               <LineGradient />
-              {lotSize && (
+              {lotSize !== 0 && (
                 <>
                   <div className="flex w-full justify-between flex-nowrap items-center">
                     <span className=" opacity-40">Lot Size:</span>
@@ -430,12 +434,14 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
               <div className="flex w-full justify-between flex-nowrap items-center">
                 <span className=" opacity-40">Days on Market:</span>
                 <span className="">
-                  {listingDate && getDaysAgoTime(listingDate)}
+                  {!isLoggedIn
+                    ? "****"
+                    : listingDate && getDaysAgoTime(listingDate)}
                 </span>
               </div>
               <LineGradient />
               <div className="flex w-full justify-between flex-nowrap items-center">
-                <span className=" opacity-40">MLS Number:</span>
+                <span className=" opacity-40">MLS® Number:</span>
                 <span className="">{mls}</span>
               </div>
               <LineGradient />

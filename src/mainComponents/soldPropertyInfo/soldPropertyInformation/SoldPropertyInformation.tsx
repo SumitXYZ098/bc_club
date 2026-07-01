@@ -18,17 +18,11 @@ import {
   marketStatsRows,
   propertyDetailsHeaders,
   roomHeaders,
-  taxHistoryHeaders,
-  taxHistoryRows,
 } from "..";
-import AssessmentHistory from "./AssessmentHistory";
 import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 import SoldPropertyContactUs from "./SoldPropertyContactUs";
-import { useState } from "react";
 import CustomButton from "@/src/components/button/CustomButton";
-import { Dialog, IconButton } from "@mui/material";
-import { FiX } from "react-icons/fi";
 
 const SCHOOL_LOCATOR_URL =
   "https://mybaragar.com/index.cfm?event=page.SchoolLocatorPublic&DistrictGUID=E6EC1BC2-3986-463A-9ED9-FFF4DECA3AB3&DistrictCode=BC36&DataStatus=1";
@@ -205,47 +199,9 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
             />
           )}
 
-          {/*  */}
-          <div
-            id="assessment"
-            className="scroll-mt-40 flex flex-col md:gap-y-6 gap-y-5"
-          >
-            <AssessmentHistory />
-            <DynamicTable headers={taxHistoryHeaders} rows={taxHistoryRows} />
-          </div>
-
-          {/* Pricing Estimate */}
-          <div
-            id="estimate"
-            className="scroll-mt-40 p-5 rounded-xl bg-gray flex flex-col gap-y-4"
-          >
-            <h2 className="xl:text-2xl text-lg xl:font-bold font-semibold">
-              Pricing Estimate
-            </h2>
-            <LineGradient customClasses="" />
-            {/* Pricing content can be added here */}
-            <div className="flex flex-row md:flex-nowrap flex-wrap justify-between w-full xl:gap-x-6 gap-x-5 gap-y-4">
-              {/* Offer Value */}
-              <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
-                <span className="text-sm">Offer Value Estimate</span>
-                <span className="text-primary font-bold text-xl xl:text-2xl">
-                  {formatCurrency(offerValue)}
-                </span>
-              </div>
-
-              {/* Rent Estimate */}
-              <div className="bg-background px-4 py-5 flex items-center justify-between rounded-xl w-full">
-                <span className="text-sm">Offer Rent Estimate</span>
-                <span className="text-primary font-bold text-xl xl:text-2xl">
-                  {formatCurrency(offerRent)}
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Nearby Schools */}
           {nearbyPlaces?.data?.schools.length > 0 && (
-            <div id="neighbourhood" className="scroll-mt-40">
+            <div id="neighborhoods" className="scroll-mt-40">
               <div>
                 <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
                   Nearby Schools

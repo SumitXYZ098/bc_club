@@ -37,7 +37,10 @@ export default function DynamicTable({
   const colCount = headers.length;
 
   return (
-    <div className="rounded-2xl overflow-clip overflow-x-scroll bg-gray pt-5">
+    <div
+      id="details"
+      className="scroll-mt-30 rounded-2xl overflow-clip overflow-x-scroll bg-gray pt-5"
+    >
       {title && (
         <h3 className="xl:text-xl md:text-lg text-base font-bold p-5 pt-0 pb-4">
           {title}

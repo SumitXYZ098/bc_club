@@ -11,9 +11,7 @@ import {
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
-import PropertiesCard, {
-  PropertyCardProps,
-} from "@/src/components/common/propertiesCard/PropertiesCard";
+import { PropertyCardProps } from "@/src/components/common/propertiesCard/PropertiesCard";
 import SimilarPropertiesCard, {
   SimilarPropertiesCardProps,
 } from "@/src/components/common/propertiesCard/SimilarPropertiesCard";
@@ -83,7 +81,7 @@ const PropertySimilarAndSoldListing = ({
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
     likesCount: listing?.likesCount ?? 0,
-    lotSize: listing?.lot_size_area ?? "",
+    lotSize: listing?.lot_size_area ?? 0,
     structureType: listing?.structure_type ?? "",
     oldPrice: Number(listing?.old_price) || 0,
     assessedDiff: listing.price
