@@ -241,13 +241,14 @@ export default function OpenStreetMapSearch() {
       ...mapZoomParams,
       page: currentPage,
       pageSize: 50,
+      isLogin: isLoggedIn,
     };
-  }, [mapZoomParams, currentPage]);
+  }, [mapZoomParams, currentPage, isLoggedIn]);
 
   // Reset pagination state when viewport bounds or filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [mapZoomParams, status]);
+  }, [mapZoomParams, status, isLoggedIn]);
 
   const {
     data: queryDataProperties,

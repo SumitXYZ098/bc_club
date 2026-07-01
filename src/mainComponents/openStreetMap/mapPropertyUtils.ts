@@ -68,7 +68,7 @@ export const transformNormalListing = (listing: any, me: any) => {
     longitude,
     latitude,
     oldPrice: Number(listing?.old_price) || 0,
-    mls: listing?.mls_number,
+    mls: listing?.listing_id,
     realtor: getOfficeName(listing),
     isLogin: false,
     likesCount: listing?.likesCount,
