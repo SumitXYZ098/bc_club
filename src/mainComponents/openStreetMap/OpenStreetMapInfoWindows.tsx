@@ -45,8 +45,8 @@ export function OpenStreetMapPropertyPopup({
           e.stopPropagation();
           window.open(
             selectedProperty.isDdf
-              ? `/property-info/${selectedProperty.id}`
-              : `/sold-property-info/${selectedProperty.id}`,
+              ? `/property-info/${selectedProperty.documentId}`
+              : `/sold-property-info/${selectedProperty.documentId}`,
             `_blank`,
           );
         }}
@@ -143,7 +143,6 @@ export function OpenStreetMapClusterPopup({
 }) {
   if (selectedClusterProperties.length === 0 || !stableClusterPosition)
     return null;
-
   return (
     <Popup
       position={[stableClusterPosition.lat, stableClusterPosition.lng]}
@@ -171,8 +170,8 @@ export function OpenStreetMapClusterPopup({
               e.stopPropagation();
               window.open(
                 p.isDdf
-                  ? `/property-info/${p.id}`
-                  : `/sold-property-info/${p.id}`,
+                  ? `/property-info/${p.documentId}`
+                  : `/sold-property-info/${p.documentId}`,
                 `_blank`,
               );
             }}

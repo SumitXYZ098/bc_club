@@ -10,6 +10,8 @@ interface SignupPayload {
   email: string;
   password: string;
   role: string;
+  acceptedVowTerms: boolean;
+  acceptedVowVersion: string;
 }
 
 interface ForgotPasswordPayload {
@@ -22,6 +24,11 @@ interface VerifyOtpPayload {
 interface ResetPasswordPayload {
   email: string;
   resetToken: string;
+  newPassword: string;
+}
+interface ReactiveAccountPayload {
+  identifier: string;
+  oldPassword: string;
   newPassword: string;
 }
 
@@ -81,6 +88,19 @@ export const verifyOtp = async (payload: VerifyOtpPayload) => {
 export const resetPassword = async (payload: ResetPasswordPayload) => {
   try {
     const response = await axios.post(Endpoints.resetPassword, payload);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data.error.message);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+// Reactive Account Api
+export const reactiveAccount = async (payload: ReactiveAccountPayload) => {
+  try {
+    const response = await axios.post(Endpoints.reactiveAccount, payload);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

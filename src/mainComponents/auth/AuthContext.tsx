@@ -10,6 +10,7 @@ import NewPassword from "./NewPassword";
 import AccountCreate from "./AccountCreate";
 import { useListingStore } from "@/src/store/useListingStore";
 import { useQueryClient } from "@tanstack/react-query";
+import ReactiveAccount from "./ReactiveAccount";
 
 interface AuthContextType {
   openLogin: boolean;
@@ -33,6 +34,8 @@ interface AuthContextType {
   username: any;
   loginUser: (username: any, token?: string, keepLoggedIn?: boolean) => void;
   logoutUser: () => void;
+  openReactiveAccount: boolean;
+  setOpenReactiveAccount: (open: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,6 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [resetToken, setResetToken] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
+  const [openReactiveAccount, setOpenReactiveAccount] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const { clearAllFilters } = useListingStore();
   const query = useQueryClient();
@@ -126,6 +130,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         username,
         loginUser,
         logoutUser,
+        openReactiveAccount,
+        setOpenReactiveAccount,
       }}
     >
       {children}
@@ -141,6 +147,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         onOpenForgot={() => {
           setOpenLogin(false);
           setOpenForgot(true);
+        }}
+        openReactiveAccount={() => {
+          setOpenLogin(false);
+          setOpenReactiveAccount(true);
         }}
       />
 
@@ -196,6 +206,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }}
         open={openNewPassword}
         onClose={() => setOpenNewPassword(false)}
+      />
+
+      <ReactiveAccount
+        open={openReactiveAccount}
+        onClose={() => setOpenReactiveAccount(false)}
+        openLogin={() => {
+          setOpenReactiveAccount(false);
+          setOpenLogin(true);
+        }}
       />
     </AuthContext.Provider>
   );

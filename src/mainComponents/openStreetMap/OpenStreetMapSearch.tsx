@@ -428,16 +428,6 @@ export default function OpenStreetMapSearch() {
           fillColor: "#dc2626",
           fillOpacity: 0.75,
         },
-        // onEachFeature: (feature, layer) => {
-        //   const p = feature.properties || {};
-
-        //   layer.bindPopup(`
-        //   <strong>${p.floodplain_name || "Flood Province"}</strong><br/>
-        //   Feature: ${p.feature_name || "-"}<br/>
-        //   Code: ${p.feature_code || "-"}<br/>
-        //   Date: ${p.designation_date || "-"}
-        // `);
-        // },
       });
 
       layer.addTo(map);

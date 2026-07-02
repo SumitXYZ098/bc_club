@@ -22,6 +22,7 @@ interface LoginModalProps {
   onClose: () => void;
   onOpenSignup: () => void;
   onOpenForgot: () => void;
+  openReactiveAccount: () => void;
 }
 
 const LoginPopup = ({
@@ -29,8 +30,9 @@ const LoginPopup = ({
   onClose,
   onOpenSignup,
   onOpenForgot,
+  openReactiveAccount,
 }: LoginModalProps) => {
-  const { loginUser } = useAuthContext();
+  const { loginUser, setResetEmail } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,6 +53,17 @@ const LoginPopup = ({
         identifier: data.email,
         password: data.password,
       });
+      if (response.user?.isVowRegistrant && !response.user?.isVowActive) {
+        console.log("response.user?.email", response.user?.email, data.email);
+        setResetEmail(response.user?.email);
+        toast.error(
+          "Your VOW access has expired. Please reset your password to reactivate.",
+        );
+        onClose();
+        reset();
+        openReactiveAccount();
+        return;
+      }
       loginUser(
         response.user,
         response?.jwt || response?.token,
@@ -60,7 +73,23 @@ const LoginPopup = ({
       onClose();
       reset();
     } catch (error: any) {
-      setErrorMsg(error.message || "Failed to login");
+      const message =
+        error?.response?.data?.error?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to login";
+
+      if (message.toLowerCase().includes("vow")) {
+        console.log("response.user?.email", data.email);
+        setResetEmail(data.email);
+        toast.error(message);
+        onClose();
+        reset();
+        openReactiveAccount();
+        return;
+      }
+
+      setErrorMsg(message);
     } finally {
       setLoading(false);
     }
@@ -80,13 +109,30 @@ const LoginPopup = ({
       const data = await res.json();
 
       if (data.message && !data.jwt) {
-        toast.info(data.message); // "Please verify your email"
+        if (data.message.toLowerCase().includes("vow")) {
+          setResetEmail(data.user.email);
+          toast.error(data.message);
+          onClose();
+          openReactiveAccount();
+          return;
+        }
+
+        toast.info(data.message);
         return;
       }
 
       if (data.message && data.jwt) {
+        if (data.user?.isVowRegistrant && !data.user?.isVowActive) {
+          toast.error(
+            "Your VOW access has expired. Please reset your password to reactivate.",
+          );
+          setResetEmail(data.user.email);
+          onClose();
+          openReactiveAccount();
+          return;
+        }
         localStorage.setItem("token", data.jwt);
-        loginUser(data.user, data.jwt, false);
+        loginUser(data.user, data.jwt, true);
         onClose();
         toast.success("Login successful!");
       } else {

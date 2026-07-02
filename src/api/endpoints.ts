@@ -7,6 +7,7 @@ export const Endpoints = {
   forgotPassword: `${BASE_URL}/api/password/forgot`,
   verifyOtp: `${BASE_URL}/api/password/verify-otp`,
   resetPassword: `${BASE_URL}/api/password/reset`,
+  reactiveAccount: `${BASE_URL}/api/auth/reactivate-vow-account`,
   addToFavourite: (id: string) => `${BASE_URL}/api/properties/${id}/favorite`,
   getFavouriteProperties: `${BASE_URL}/api/my-favorites`,
   me: `${BASE_URL}/api/users/me`,

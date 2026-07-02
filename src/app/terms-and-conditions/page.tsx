@@ -1,8 +1,4 @@
-import Description, {
-  IDescriptionTypes,
-} from "@/src/components/description/Description";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
-import React from "react";
 
 const page = () => {
   return (

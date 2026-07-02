@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
 import { Dialog } from "@mui/material";
 
 interface CustomModalProps {
@@ -36,7 +34,7 @@ export default function CustomDialog({
           },
           borderRadius: 5,
           margin: "24px",
-          
+          scrollbarWidth: "none",
         },
       }}
     >
