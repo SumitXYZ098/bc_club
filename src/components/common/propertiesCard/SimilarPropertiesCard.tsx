@@ -362,7 +362,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
               </div>
               <LineGradient />
               <div className="flex w-full justify-between flex-nowrap items-center">
-                <span className=" opacity-40">Listing Date:</span>
+                <span className=" opacity-40">Listed On Website:</span>
                 <span className="">
                   {!isLoggedIn
                     ? "****"

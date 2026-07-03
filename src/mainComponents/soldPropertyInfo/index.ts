@@ -58,7 +58,7 @@ export const getPropertyDetailsRows = (property: any) => [
     : []),
   {
     data: {
-      label: "Listing Date",
+      label: "Listed On Website",
       value: property?.raw_data?.OriginalEntryTimestamp
         ? dayjs(property.raw_data.OriginalEntryTimestamp)
             .tz("America/Vancouver")

@@ -61,7 +61,7 @@ export const getPropertyDetailsRows = (
     : []),
   {
     data: {
-      label: "Listing Date",
+      label: "Listed On Website",
       value: !isPrivate
         ? "***"
         : property?.OriginalEntryTimestamp
