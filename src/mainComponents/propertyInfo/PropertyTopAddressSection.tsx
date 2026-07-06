@@ -50,13 +50,17 @@ const PropertyTopAddressSection = ({ property }: { property: any }) => {
           content={`$${Number(property?.price || 0).toLocaleString()}`}
           customClasses="text-primary"
         />
-        <Description
-          type={IDescriptionTypes.dec1614}
-          content={`${
-            property?.Living_area ?? property?.lot_size_area
-          } ${property?.living_area_units ?? property?.lot_size_units}`}
-          customClasses="text-black70"
-        />
+        {(property?.Living_area ?? property?.lot_size_area) ? (
+          <Description
+            type={IDescriptionTypes.dec1614}
+            content={`${
+              property?.Living_area ?? property?.lot_size_area
+            } ${property?.living_area_units ?? property?.lot_size_units}`}
+            customClasses="text-black70"
+          />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

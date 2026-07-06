@@ -10,25 +10,17 @@ import { Icons } from "@/src/app/exports";
 import Link from "next/link";
 import DynamicTable from "@/src/components/common/dynamicTable/DynamicTable";
 import {
-  buildingComplexHeaders,
-  buildingComplexRows,
   getPropertyDetailsRows,
   getRoomRows,
-  marketStatsHeaders,
-  marketStatsRows,
   propertyDetailsHeaders,
   roomHeaders,
 } from "..";
 import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 import SoldPropertyContactUs from "./SoldPropertyContactUs";
-import CustomButton from "@/src/components/button/CustomButton";
-
-const SCHOOL_LOCATOR_URL =
-  "https://mybaragar.com/index.cfm?event=page.SchoolLocatorPublic&DistrictGUID=E6EC1BC2-3986-463A-9ED9-FFF4DECA3AB3&DistrictCode=BC36&DataStatus=1";
 
 const SoldPropertyInformation = ({ property }: { property: any }) => {
-  const featureslist = [
+  const featuresList = [
     {
       icon: Icons.bedroom,
       label: "Bedrooms",
@@ -66,34 +58,10 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
       : []),
   ];
 
-  const formatCurrency = (num?: number) => {
-    if (!num) return "-";
-    return `$${Number(num).toLocaleString()}`;
-  };
-
-  const price = property?.price;
-  const assessed = property?.raw_data?.TaxAssessedValue;
-  const rentEstimate = property?.raw_data?.RentEstimate; // if exists
-
-  const offerValue = price || assessed || 0;
-  const offerRent = rentEstimate || (price ? Math.round(price * 0.004) : 0); // rough 0.4% rule
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`;
 
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
     useGetNearbyPlaces(property.documentId);
-
-  const openSchoolLocatorPopup = () => {
-    const width = 1200;
-    const height = 800;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    window.open(
-      SCHOOL_LOCATOR_URL,
-      "SchoolLocatorPopup",
-      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`,
-    );
-  };
 
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
@@ -130,7 +98,7 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
             </h2>
             <LineGradient />
             <div className="flex flex-row flex-wrap justify-between gap-y-3">
-              {featureslist.map((features, idx) => (
+              {featuresList.map((features, idx) => (
                 <div
                   key={idx}
                   className="flex flex-col gap-y-2 md:w-26.75 xl:w-36.25 h-auto px-2"
@@ -226,28 +194,21 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
             </div>
           )}
 
-          {/* School Locator */}
-          <CustomButton
-            buttonType="primary"
-            label="School Locator"
-            onClick={openSchoolLocatorPopup}
-          />
-
           {/* Building Complex Information */}
-          {property?.structure_type !== "Detached Home" && (
+          {/* {property?.structure_type !== "Detached Home" && (
             <DynamicTable
               title={"Building Complex Information (Dummy Data)"}
               headers={buildingComplexHeaders}
               rows={buildingComplexRows}
             />
-          )}
+          )} */}
           {/* Market Statistics */}
           <div id="stats" className="scroll-mt-40">
-            <DynamicTable
+            {/* <DynamicTable
               title="Market Statistics  (Dummy Data)"
               headers={marketStatsHeaders}
               rows={marketStatsRows}
-            />
+            /> */}
             {/* Sentinel (DO NOT REMOVE) */}
             <div id="stats-end" className="h-px" />
           </div>

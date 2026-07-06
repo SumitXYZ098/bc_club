@@ -812,21 +812,26 @@ export default function PropertiesListingPage() {
                 ))}
               </div>
               {data?.length !== 0 && pageCount !== 0 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 4,
-                  }}
-                >
-                  <Pagination
-                    count={pageCount}
-                    page={page}
-                    onChange={handlePageChange}
-                    color="primary"
-                    size="large"
-                  />
-                </Box>
+                <>
+                  <div className="md:hidden flex justify-center mt-6">
+                    <Pagination
+                      count={pageCount}
+                      page={page}
+                      onChange={handlePageChange}
+                      color="primary"
+                      size="small"
+                    />
+                  </div>
+                  <div className="md:flex hidden justify-center mt-10">
+                    <Pagination
+                      count={pageCount}
+                      page={page}
+                      onChange={handlePageChange}
+                      color="primary"
+                      size="large"
+                    />
+                  </div>
+                </>
               )}
             </div>
           </div>

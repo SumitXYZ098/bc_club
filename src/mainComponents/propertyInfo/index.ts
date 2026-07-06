@@ -27,18 +27,26 @@ export const getPropertyDetailsRows = (
       value: property?.property_sub_type || "-",
     },
   },
-  {
-    data: {
-      label: "Bedrooms",
-      value: property?.bedrooms ?? "-",
-    },
-  },
-  {
-    data: {
-      label: "Bathrooms",
-      value: property?.bathrooms ?? "-",
-    },
-  },
+  ...(property?.bedrooms || property?.bedrooms !== 0
+    ? [
+        {
+          data: {
+            label: "Bedrooms",
+            value: property?.bedrooms ?? "-",
+          },
+        },
+      ]
+    : []),
+  ...(property?.bathrooms || property?.bathrooms !== 0
+    ? [
+        {
+          data: {
+            label: "Bathrooms",
+            value: property?.bathrooms ?? "-",
+          },
+        },
+      ]
+    : []),
   {
     data: {
       label: "Asking Price",
@@ -123,26 +131,30 @@ export const getPropertyDetailsRows = (
         },
       ]
     : []),
-  {
-    data: {
-      label: "Floor Area",
-      value:
-        property?.Living_area || property?.area
-          ? `${property?.Living_area || property?.area} sft`
-          : "-",
-    },
-    subRows: [
-      {
-        data: {
-          label: "Price per sft",
-          value:
-            property?.price && (property?.Living_area || property?.area)
-              ? `$${Math.round(property.price / (property?.Living_area || property?.area))}`
-              : "-",
+  ...(property?.Living_area || property?.area
+    ? [
+        {
+          data: {
+            label: "Floor Area",
+            value:
+              property?.Living_area || property?.area
+                ? `${property?.Living_area || property?.area} sft`
+                : "-",
+          },
+          subRows: [
+            {
+              data: {
+                label: "Price per sft",
+                value:
+                  property?.price && (property?.Living_area || property?.area)
+                    ? `$${Math.round(property.price / (property?.Living_area || property?.area))}`
+                    : "-",
+              },
+            },
+          ],
         },
-      },
-    ],
-  },
+      ]
+    : []),
   ...(property?.lot_size_area > 0
     ? [
         {
@@ -155,20 +167,28 @@ export const getPropertyDetailsRows = (
         },
       ]
     : []),
-  {
-    data: {
-      label: "Year Built",
-      value: property?.raw_data?.YearBuilt || "-",
-    },
-  },
-  {
-    data: {
-      label: "Age",
-      value: property?.raw_data?.YearBuilt
-        ? `${calculatePropertyAge(property.raw_data.YearBuilt)} Years Old`
-        : "-",
-    },
-  },
+  ...(property?.raw_data?.YearBuilt
+    ? [
+        {
+          data: {
+            label: "Year Built",
+            value: property?.raw_data?.YearBuilt || "-",
+          },
+        },
+      ]
+    : []),
+  ...(property?.raw_data?.YearBuilt
+    ? [
+        {
+          data: {
+            label: "Age",
+            value: property?.raw_data?.YearBuilt
+              ? `${calculatePropertyAge(property.raw_data.YearBuilt)} Years Old`
+              : "-",
+          },
+        },
+      ]
+    : []),
   ...(property?.raw_data?.ParcelNumber
     ? [
         {
@@ -191,12 +211,16 @@ export const getPropertyDetailsRows = (
         },
       ]
     : []),
-  {
-    data: {
-      label: "Ownership",
-      value: property?.raw_data?.CommonInterest || "-",
-    },
-  },
+  ...(property?.raw_data?.CommonInterest
+    ? [
+        {
+          data: {
+            label: "Ownership",
+            value: property?.raw_data?.CommonInterest || "-",
+          },
+        },
+      ]
+    : []),
   {
     data: {
       label: "MLS® Number",
@@ -209,12 +233,16 @@ export const getPropertyDetailsRows = (
       value: `${property?.address}`,
     },
   },
-  {
-    data: {
-      label: "Parking",
-      value: property?.raw_data?.ParkingTotal ?? "-",
-    },
-  },
+  ...(property?.raw_data?.ParkingTotal
+    ? [
+        {
+          data: {
+            label: "Parking",
+            value: property?.raw_data?.ParkingTotal ?? "-",
+          },
+        },
+      ]
+    : []),
   ...(property?.raw_data?.Heating?.length > 0
     ? [
         {

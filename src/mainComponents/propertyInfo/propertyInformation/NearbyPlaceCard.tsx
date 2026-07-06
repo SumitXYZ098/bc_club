@@ -6,6 +6,7 @@ type NearbyPlace = {
   longitude: number;
   distanceKm: number;
   googleMapLink: string;
+  ranking: string;
 };
 
 const NavigationIcon = () => (
@@ -66,6 +67,14 @@ const NearbyPlaceCard = ({
         <h3 className="mt-5 text-lg md:text-xl font-bold text-gray-900 leading-tight">
           {place.school_name}
         </h3>
+
+        {place.ranking && (
+          <div className="mt-2 flex items-center gap-2">
+            <span className="rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+              🏆 Ranked #{place.ranking}
+            </span>
+          </div>
+        )}
 
         {/* Address */}
         <p className="mt-2.5 text-sm md:text-base font-semibold text-gray-500 leading-relaxed">

@@ -10,40 +10,38 @@ import { Icons } from "@/src/app/exports";
 import Link from "next/link";
 import DynamicTable from "@/src/components/common/dynamicTable/DynamicTable";
 import {
-  buildingComplexHeaders,
-  buildingComplexRows,
   getPropertyDetailsRows,
   getPropertyRoomRows,
-  marketStatsHeaders,
-  marketStatsRows,
   propertyDetailsHeaders,
   roomHeaders,
 } from "..";
 import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
-import CustomButton from "@/src/components/button/CustomButton";
 import { useAuthContext } from "../../auth/AuthContext";
 
-const SCHOOL_LOCATOR_URL =
-  "https://mybaragar.com/index.cfm?event=page.SchoolLocatorPublic&DistrictGUID=E6EC1BC2-3986-463A-9ED9-FFF4DECA3AB3&DistrictCode=BC36&DataStatus=1";
-
 const PropertyInformation = ({ property }: { property: any }) => {
-  const featureslist = [
+  const featuresList = [
     {
       icon: Icons.bedroom,
       label: "Bedrooms",
       value: property?.bedrooms || "Na",
     },
+
     {
       icon: Icons.bathtub,
       label: "Bathrooms",
       value: property?.bathrooms || "Na",
     },
-    {
-      icon: Icons.garage,
-      label: "Garage",
-      value: "0",
-    },
+
+    ...(property?.property_sub_type !== "Business"
+      ? [
+          {
+            icon: Icons.garage,
+            label: "Garage",
+            value: "0",
+          },
+        ]
+      : []),
     {
       icon: Icons.calendar,
       label: "Year Built",
@@ -73,20 +71,10 @@ const PropertyInformation = ({ property }: { property: any }) => {
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
     useGetNearbyPlaces(property.documentId);
 
+  console.log("nearbyPlaces", nearbyPlaces?.data?.schools);
+
   const { isLoggedIn } = useAuthContext();
 
-  const openSchoolLocatorPopup = () => {
-    const width = 1200;
-    const height = 800;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    window.open(
-      SCHOOL_LOCATOR_URL,
-      "SchoolLocatorPopup",
-      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`,
-    );
-  };
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
       <div className="flex flex-col xl:w-[70%] w-full h-full  relative">
@@ -122,10 +110,10 @@ const PropertyInformation = ({ property }: { property: any }) => {
             </h2>
             <LineGradient />
             <div className="flex flex-row flex-wrap justify-between gap-y-3">
-              {featureslist.map((features, idx) => (
+              {featuresList.map((features, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col gap-y-2 md:w-26.75 xl:w-36.25 h-auto px-2"
+                  className="flex flex-col gap-y-2 w-auto h-auto px-2"
                 >
                   <div className="flex flex-row items-center gap-x-2">
                     <Image
@@ -192,52 +180,46 @@ const PropertyInformation = ({ property }: { property: any }) => {
           )}
 
           {/* Nearby Schools */}
-          <div id="neighborhoods" className="scroll-mt-40">
-            <div>
-              <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
-                Nearby Schools
-              </h2>
+          {nearbyPlaces?.data?.schools &&
+            nearbyPlaces?.data?.schools?.length > 0 && (
+              <div id="neighborhoods" className="scroll-mt-40">
+                <h2 className="mb-6 xl:text-2xl text-lg xl:font-bold font-semibold">
+                  Nearby Schools
+                </h2>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {nearbyPlacesLoading
-                  ? Array.from({ length: 6 }).map((_, index) => (
-                      <NearbyPlaceSkeleton key={index} />
-                    ))
-                  : nearbyPlaces?.data?.schools?.map(
-                      (school: any, idx: number) => (
-                        <NearbyPlaceCard
-                          key={idx}
-                          place={school}
-                          type="school"
-                        />
-                      ),
-                    )}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {nearbyPlacesLoading
+                    ? Array.from({ length: 6 }).map((_, index) => (
+                        <NearbyPlaceSkeleton key={index} />
+                      ))
+                    : nearbyPlaces?.data?.schools?.map(
+                        (school: any, idx: number) => (
+                          <NearbyPlaceCard
+                            key={idx}
+                            place={school}
+                            type="school"
+                          />
+                        ),
+                      )}
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* School Locator */}
-          <CustomButton
-            buttonType="primary"
-            label="School Locator"
-            onClick={openSchoolLocatorPopup}
-          />
+            )}
 
           {/* Building Complex Information */}
-          {property?.structure_type !== "Detached Home" && (
+          {/* {property?.structure_type !== "Detached Home" && (
             <DynamicTable
               title={"Building Complex Information (Dummy Data)"}
               headers={buildingComplexHeaders}
               rows={buildingComplexRows}
             />
-          )}
+          )} */}
           {/* Market Statistics */}
           <div id="stats" className="scroll-mt-40">
-            <DynamicTable
+            {/* <DynamicTable
               title="Market Statistics  (Dummy Data)"
               headers={marketStatsHeaders}
               rows={marketStatsRows}
-            />
+            /> */}
             {/* Sentinel (DO NOT REMOVE) */}
             <div id="stats-end" className="h-px" />
           </div>

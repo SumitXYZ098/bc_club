@@ -234,8 +234,6 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   const displaySqft = isLogin ? `${sqft} sft` : "---- sft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
-  console.log("targetLotSize", targetLotSize);
-  console.log("lotSize", lotSize);
   const displayLotSize = isLogin
     ? lotSize
       ? `${Number(lotSize)} sft`

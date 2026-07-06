@@ -9,7 +9,7 @@ const tabs = [
   { label: "Features", id: "features" },
   { label: "Property Details", id: "details" },
   { label: "Neighborhoods", id: "neighborhoods" },
-  { label: "Stats", id: "stats" },
+  { label: "Similar", id: "stats" },
 ];
 
 export default function SoldPropertyTabs() {
