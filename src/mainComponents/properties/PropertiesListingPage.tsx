@@ -12,13 +12,10 @@ import PropertyCardSkeleton from "@/src/components/common/propertiesCard/Propert
 import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
 
 import { useListingStore } from "@/src/store/useListingStore";
-import {
-  useGetListings,
-  useGetActiveListings,
-  useGetMe,
-} from "@/src/hooks/listing/useListingQueries";
+import { useGetMe } from "@/src/hooks/listing/useListingQueries";
 import { getOfficeName } from "@/src/utilities/utilities";
 import { useSearchParams } from "next/navigation";
+import { useGetRealEstateListings } from "@/src/hooks/listing/useRealEstateListingQueries";
 
 export default function PropertiesListingPage() {
   const { data: me } = useGetMe();
@@ -118,9 +115,9 @@ export default function PropertiesListingPage() {
 
   if (!isForSale) {
     if (status === "sold") {
-      params.propertyType = "sold";
+      params.status = "sold";
     } else if (status === "expired") {
-      params.propertyType = "expired";
+      params.status = "expired";
     }
   }
 
@@ -299,16 +296,14 @@ export default function PropertiesListingPage() {
     return { properties, listings, pagination };
   };
 
-  const { data: queryDataNormal, isLoading: isLoadingNormal } = useGetListings(
-    params,
-    {
+  const { data: queryDataNormal, isLoading: isLoadingNormal } =
+    useGetRealEstateListings(params, {
       select,
       enabled: !isForSale,
-    },
-  );
+    });
 
   const { data: queryDataActive, isLoading: isLoadingActive } =
-    useGetActiveListings(params, {
+    useGetRealEstateListings(params, {
       select,
       enabled: isForSale,
     });

@@ -225,7 +225,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
             )}
 
             {/* Price Drop Banner */}
-            {oldPrice !== 0 && oldPrice && (
+            {!isSold && !isExpired && oldPrice !== 0 && oldPrice && (
               <span
                 className={`absolute bottom-5 right-0 p-1.5 text-xs inline-flex text-background h-auto items-center gap-0.5 uppercase  rounded-l-sm ${
                   price < oldPrice ? "bg-red/90" : "bg-green/90"

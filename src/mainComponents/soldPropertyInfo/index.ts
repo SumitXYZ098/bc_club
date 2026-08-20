@@ -67,8 +67,8 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "Listed On Website",
-      value: property?.raw_data?.OriginalEntryTimestamp
-        ? dayjs(property.raw_data.OriginalEntryTimestamp)
+      value: property?.OriginalEntryTimestamp
+        ? dayjs(property.OriginalEntryTimestamp)
             .tz("America/Vancouver")
             .format("DD MMM, YYYY")
         : "-",
@@ -77,26 +77,26 @@ export const getPropertyDetailsRows = (property: any) => [
       {
         data: {
           label: "Days On Market",
-          value: property?.raw_data?.OriginalEntryTimestamp
-            ? `${getDaysAgoTime(property.raw_data.OriginalEntryTimestamp)}`
+          value: property?.OriginalEntryTimestamp
+            ? `${getDaysAgoTime(property.OriginalEntryTimestamp)}`
             : "-",
         },
       },
       {
         data: {
           label: "Status",
-          value: property?.property_status || "-",
+          value: property?.standard_status || "-",
         },
       },
     ],
   },
-  ...(property?.raw_data?.BridgeModificationTimestamp
+  ...(property?.old_price > 0
     ? [
         {
           data: {
             label: "Modified Date",
-            value: property?.raw_data?.BridgeModificationTimestamp
-              ? dayjs(property.raw_data.BridgeModificationTimestamp)
+            value: property?.ModificationTimestamp
+              ? dayjs(property.ModificationTimestamp)
                   .tz("America/Vancouver")
                   .format("DD MMM, YYYY")
               : "-",
@@ -105,15 +105,15 @@ export const getPropertyDetailsRows = (property: any) => [
             {
               data: {
                 label: "Days On Market",
-                value: property?.raw_data?.BridgeModificationTimestamp
-                  ? `${getDaysAgoTime(property.raw_data.BridgeModificationTimestamp)}`
+                value: property?.ModificationTimestamp
+                  ? `${getDaysAgoTime(property.ModificationTimestamp)}`
                   : "-",
               },
             },
             {
               data: {
                 label: "Status",
-                value: property?.property_status || "-",
+                value: property?.standard_status || "-",
               },
             },
           ],
@@ -190,24 +190,22 @@ export const getPropertyDetailsRows = (property: any) => [
         },
       ]
     : []),
-  ...(property?.raw_data?.TaxAnnualAmount
+  ...(property?.annual_tax
     ? [
         {
           data: {
             label: "Property Taxes",
-            value: property?.raw_data?.TaxAnnualAmount
-              ? `$${property.raw_data.TaxAnnualAmount}`
-              : "-",
+            value: property?.annual_tax ? `$${property.annual_tax}` : "-",
           },
         },
       ]
     : []),
-  ...(property?.raw_data?.Ownership
+  ...(property?.raw_data?.CommonInterest
     ? [
         {
           data: {
             label: "Ownership",
-            value: property?.raw_data?.Ownership || "-",
+            value: property?.raw_data?.CommonInterest || "-",
           },
         },
       ]
@@ -215,7 +213,7 @@ export const getPropertyDetailsRows = (property: any) => [
   {
     data: {
       label: "MLS® Number",
-      value: property?.mls_number || "-",
+      value: property?.listing_id || property?.mls_number || "-",
     },
   },
   {

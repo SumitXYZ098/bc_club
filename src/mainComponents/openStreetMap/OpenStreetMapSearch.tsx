@@ -838,7 +838,7 @@ export default function OpenStreetMapSearch() {
                 ))}
 
               {measureMode && (
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-999 w-[330px] bg-yellow-300 border border-black text-center text-xs shadow-md">
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-999 w-82.5 bg-yellow-300 border border-black text-center text-xs shadow-md">
                   <div className="bg-yellow-400 border-b border-black font-bold text-[10px]">
                     MEASUREMENT TOOL
                   </div>
@@ -882,10 +882,12 @@ export default function OpenStreetMapSearch() {
 
               {measurePoints.length >= 2 && (
                 <Polyline
-                  positions={measurePoints.map((point) => [
-                    point.lat,
-                    point.lng,
-                  ])}
+                  positions={
+                    measurePoints.map((point) => [
+                      point.lat,
+                      point.lng,
+                    ]) as [number, number][]
+                  }
                   pathOptions={{ color: "#22558b", opacity: 1, weight: 3 }}
                 />
               )}

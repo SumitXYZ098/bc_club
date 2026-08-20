@@ -96,11 +96,13 @@ const BookingDialog: React.FC<Props> = ({ open, onClose, property }) => {
       }}
       fullWidth
       maxWidth="xs"
-      PaperProps={{
-        sx: {
-          borderRadius: {
-            xs: "16px",
-            sm: "20px",
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: {
+              xs: "16px",
+              sm: "20px",
+            },
           },
         },
       }}
@@ -133,7 +135,7 @@ const BookingDialog: React.FC<Props> = ({ open, onClose, property }) => {
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* STEP 1 */}
               {activeStep === 0 && (
-                <Box display="flex" flexDirection="column" gap={2}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <TextField
                     placeholder="Full Name"
                     fullWidth
@@ -153,7 +155,7 @@ const BookingDialog: React.FC<Props> = ({ open, onClose, property }) => {
                   />
 
                   {/* Property */}
-                  <Box position="relative">
+                  <Box sx={{ position: "relative" }}>
                     <Controller
                       name="property"
                       control={control}
@@ -251,7 +253,7 @@ const BookingDialog: React.FC<Props> = ({ open, onClose, property }) => {
 
               {/* STEP 2 */}
               {activeStep === 1 && (
-                <Box display="flex" flexDirection="column" gap={3}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   {/* Date Picker */}
                   <Controller
                     name="date"
@@ -309,7 +311,7 @@ const BookingDialog: React.FC<Props> = ({ open, onClose, property }) => {
                     )}
                   />
 
-                  <Box display="flex" gap={2} width={"100%"}>
+                  <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
                     <CustomButton
                       buttonType="secondary-outlined"
                       label="Back"

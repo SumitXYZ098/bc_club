@@ -46,4 +46,21 @@ export const Endpoints = {
 
   // Flood Province
   getFloodProvinceGeoJSON: `${BASE_URL}/api/flood-province/findGeoJSON`,
+
+  // Real Estate Board Listing
+  getRealEstatePropertiesList: `${BASE_URL}/api/real-estate-boards`,
+  getRealEstatePropertiesListById: (id: string) =>
+    `${BASE_URL}/api/real-estate-boards/${id}`,
+  getSimilarRealEstateProperties: (id: string) =>
+    `${BASE_URL}/api/real-estate-board/${id}/similar?radiusKm=5&limit=20`,
+  getSimilarRealEstateSoldProperties: (id: string) =>
+    `${BASE_URL}/api/real-estate-board/${id}/similar-sold?radiusKm=5&limit=20`,
+  getRealEstatePropertiesListByAddress: `${BASE_URL}/api/real-estate-board/search-by-address`,
+  getNearbyRealEstatePlaces: (id: string) =>
+    `${BASE_URL}/api/real-estate-board/${id}/neighborhood?radius=16000&limit=6`,
+  getMyRealEstateFavorites: `${BASE_URL}/api/real-estate-board/my-favorites`,
+  addRealEstateFavorite: (id: string) =>
+    `${BASE_URL}/api/real-estate-board/add-favorite/${id}`,
+  removeRealEstateFavorite: (id: string) =>
+    `${BASE_URL}/api/real-estate-board/remove-favorite/${id}`,
 };

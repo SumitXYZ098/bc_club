@@ -102,7 +102,7 @@ const HomePropertiesSold = () => {
 
       {/* Property Cards */}
 
-      <div className="w-full min-h-[456px] h-fit flex flex-row flex-wrap justify-between gap-y-6 relative">
+      <div className="w-full min-h-114 h-fit flex flex-row flex-wrap justify-between gap-y-6 relative">
         {!isLoggedIn ? (
           <ChartSignInOverlay
             monthContent={"previous month"}

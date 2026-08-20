@@ -193,7 +193,7 @@ export default function OpenStreetMapSidebar({
   }
 
   return (
-    <div className="hidden md:w-[380px] xl:flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
+    <div className="hidden md:w-95 xl:flex flex-col bg-white md:border-r border-gray-200 z-10 h-full">
       <div className="p-4 pt-0 flex justify-between items-center text-sm font-semibold border-b border-gray-50">
         <div className="text-gray-500 ">
           Results:{" "}

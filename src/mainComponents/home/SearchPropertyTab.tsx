@@ -10,6 +10,7 @@ import {
   useGetAssessmentPropertiesList,
   useGetDDFPropertiesListByAddress,
 } from "@/src/hooks/listing/useListingQueries";
+import { useGetRealEstatePropertiesListByAddress } from "@/src/hooks/listing/useRealEstateListingQueries";
 
 const SearchPropertyTab = () => {
   const tabList = ["Find Home", "Home Assessment", "Market Trends"];
@@ -32,7 +33,7 @@ const SearchPropertyTab = () => {
     });
 
   const { data: ddfList, isLoading: isLoadingDdfListing } =
-    useGetDDFPropertiesListByAddress({
+    useGetRealEstatePropertiesListByAddress({
       address: ddfQuery,
     });
 

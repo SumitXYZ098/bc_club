@@ -38,7 +38,7 @@ const faqs = [
 const FaqsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   return (
-    <section className="max-w-[979px] mx-auto py-12 px-6 sm:px-13 lg:px-8 lg:mb-20 mb-10">
+    <section className="max-w-244.75 mx-auto py-12 px-6 sm:px-13 lg:px-8 lg:mb-20 mb-10">
       <div className="w-full flex flex-col space-y-8 lg:space-y-13 items-center text-center">
         <Heading
           content="Everything You Need to Know About BC Club"

@@ -162,9 +162,11 @@ const LoginPopup = ({
           {...register("email", { required: "Email is required" })}
           error={!!errors.email}
           helperText={errors.email?.message as string}
-          InputProps={{
-            style: {
-              paddingTop: "3px",
+          slotProps={{
+            input: {
+              style: {
+                paddingTop: "3px",
+              },
             },
           }}
         />
@@ -178,14 +180,19 @@ const LoginPopup = ({
             {...register("password", { required: "Password is required" })}
             error={!!errors.password}
             helperText={errors.password?.message as string}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+                style: {
+                  paddingTop: "3px",
+                },
+              },
             }}
           />
         </div>

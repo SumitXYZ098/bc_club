@@ -3,19 +3,19 @@ import PropertyTopAddressSection from "./PropertyTopAddressSection";
 import PropertyGallery from "./PropertyGallery";
 import PropertyInformation from "./propertyInformation/PropertyInformation";
 import GetInTouch from "../getInTouch/GetInTouch";
-import { useGetUnifiedListingById } from "@/src/hooks/listing/useListingQueries";
 import PropertyInfoSkeleton from "./PropertyInfoSkeleton";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
 import PropertySimilarAndSoldListing from "./PropertySimilarAndSoldListing";
 import FaqsSection from "./propertyInformation/FaqsSection";
+import { useGetRealEstateListingById } from "@/src/hooks/listing/useRealEstateListingQueries";
 
 const PropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const {
     data: listing,
     isLoading: loading,
     error,
-  } = useGetUnifiedListingById(paramsId, {
+  } = useGetRealEstateListingById(paramsId, {
     select: (res: any) => res?.data || res,
   });
 

@@ -2,11 +2,7 @@
 import { getOfficeName } from "@/src/utilities/utilities";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  useGetMe,
-  useGetSimilarProperties,
-  useGetSimilarSoldProperties,
-} from "@/src/hooks/listing/useListingQueries";
+import { useGetMe } from "@/src/hooks/listing/useListingQueries";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
@@ -15,6 +11,10 @@ import SimilarPropertiesCard, {
   SimilarPropertiesCardProps,
 } from "@/src/components/common/propertiesCard/SimilarPropertiesCard";
 import { useAuthContext } from "../auth/AuthContext";
+import {
+  useGetSimilarRealEstateProperties,
+  useGetSimilarRealEstateSoldProperties,
+} from "@/src/hooks/listing/useRealEstateListingQueries";
 
 const swiperConfig = {
   spaceBetween: 12,
@@ -105,7 +105,7 @@ const PropertySimilarAndSoldListing = ({
 
   // Similar Properties
   const { data: similarList = [], isLoading: isLoadingSimilar } =
-    useGetSimilarProperties(propertyId, {
+    useGetSimilarRealEstateProperties(propertyId, {
       select(data) {
         return data?.data?.map((item: any) => mapProperty(item, true));
       },
@@ -113,7 +113,7 @@ const PropertySimilarAndSoldListing = ({
 
   // Similar Sold Properties
   const { data: similarSoldList = [], isLoading: isLoadingSimilarSold } =
-    useGetSimilarSoldProperties(propertyId, {
+    useGetSimilarRealEstateSoldProperties(propertyId, {
       select(data) {
         return data?.data?.map((item: any) => mapProperty(item, false));
       },

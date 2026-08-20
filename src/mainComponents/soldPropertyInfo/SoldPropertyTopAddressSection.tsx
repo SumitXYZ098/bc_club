@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
 
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import Description, {
@@ -36,7 +35,7 @@ const SoldPropertyTopAddressSection = ({ property }: { property: any }) => {
             {property?.city}, {property?.state}, Canada
           </span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
-          <span>MLS® {property?.mls_number || "FPR345643E3"}</span>
+          <span>MLS® {property?.listing_id || "FPR345643E3"}</span>
           <LineGradient vr customClasses="mx-2 md:block hidden" />
           <span>Courtesy of: {getOfficeName(property)}</span>
         </div>
@@ -50,7 +49,7 @@ const SoldPropertyTopAddressSection = ({ property }: { property: any }) => {
         />
         <Description
           type={IDescriptionTypes.dec1614}
-          content={`${property?.area} square feet`}
+          content={`${property?.Living_area} square feet`}
           customClasses="text-black70"
         />
       </div>

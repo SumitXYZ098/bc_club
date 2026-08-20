@@ -549,12 +549,14 @@ export default function FiltersPopup({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: 650,
-          borderRadius: 5,
-          margin: "24px",
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+            maxWidth: 650,
+            borderRadius: 5,
+            margin: "24px",
+          },
         },
       }}
     >
@@ -806,21 +808,57 @@ export default function FiltersPopup({
         <div className="mb-6 space-y-3 pt-5">
           <label className="font-medium">Property Type</label>
           <div className="grid grid-cols-1 gap-8">
-            {status === "sold" || status === "expired" ? (
-              /* Sold/Expired Options */
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1 ">
+            <div className="flex flex-col gap-3 py-2">
+              {/* Single Family Section */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1">
                 {[
-                  { label: "Apartment/Condo", value: "Apartment/Condo" },
-                  {
-                    label: "Single Family Residence",
-                    value: "Single Family Residence",
-                  },
                   { label: "Townhouse", value: "Townhouse" },
-                  { label: "Half Duplex", value: "Half Duplex" },
-                  {
-                    label: "Row House (Non-Strata)",
-                    value: "Row House (Non-Strata)",
-                  },
+                  { label: "Detached Home", value: "Detached Home" },
+                  { label: "Duplex", value: "Duplex" },
+                  { label: "Apartment", value: "Apartment" },
+                ].map((prop) => (
+                  <div
+                    key={prop.value}
+                    className="flex items-center gap-3 cursor-pointer group"
+                    onClick={() => handleToggleStructureType(prop.value)}
+                  >
+                    <div
+                      className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
+                        selectedStructureTypes.includes(prop.value)
+                          ? "bg-primary border-primary"
+                          : "border-gray-300 group-hover:border-primary"
+                      }`}
+                    >
+                      {selectedStructureTypes.includes(prop.value) && (
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-sm text-gray-700 font-medium">
+                      {prop.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Other Types Section */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1">
+                {[
+                  { label: "Multi-Family", value: "Multi-Family" },
+                  { label: "Office", value: "Office" },
+                  { label: "Business", value: "Business" },
+                  { label: "Agriculture", value: "Agriculture" },
+                  { label: "Vacant Land", value: "Vacant Land" },
                 ].map((prop) => (
                   <div
                     key={prop.value}
@@ -855,95 +893,7 @@ export default function FiltersPopup({
                   </div>
                 ))}
               </div>
-            ) : (
-              /* For Sale Options */
-              <div className="flex flex-col gap-3 py-2">
-                {/* Single Family Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1">
-                  {[
-                    { label: "Townhouse", value: "Townhouse" },
-                    { label: "Detached Home", value: "Detached Home" },
-                    { label: "Duplex", value: "Duplex" },
-                    { label: "Apartment", value: "Apartment" },
-                  ].map((prop) => (
-                    <div
-                      key={prop.value}
-                      className="flex items-center gap-3 cursor-pointer group"
-                      onClick={() => handleToggleStructureType(prop.value)}
-                    >
-                      <div
-                        className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                          selectedStructureTypes.includes(prop.value)
-                            ? "bg-primary border-primary"
-                            : "border-gray-300 group-hover:border-primary"
-                        }`}
-                      >
-                        {selectedStructureTypes.includes(prop.value) && (
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-700 font-medium">
-                        {prop.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Other Types Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1">
-                  {[
-                    { label: "Multi-Family", value: "Multi-Family" },
-                    { label: "Office", value: "Office" },
-                    { label: "Business", value: "Business" },
-                    { label: "Agriculture", value: "Agriculture" },
-                    { label: "Vacant Land", value: "Vacant Land" },
-                  ].map((prop) => (
-                    <div
-                      key={prop.value}
-                      className="flex items-center gap-3 cursor-pointer group"
-                      onClick={() => handleToggleProperty(prop.value, false)}
-                    >
-                      <div
-                        className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                          selectedProperties.includes(prop.value)
-                            ? "bg-primary border-primary"
-                            : "border-gray-300 group-hover:border-primary"
-                        }`}
-                      >
-                        {selectedProperties.includes(prop.value) && (
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-700 font-medium">
-                        {prop.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
         <LineGradient />

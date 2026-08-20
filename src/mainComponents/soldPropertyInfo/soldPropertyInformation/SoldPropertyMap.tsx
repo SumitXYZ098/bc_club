@@ -82,7 +82,7 @@ const SoldPropertyMap = ({
       ref={mapContainerRef}
       className="w-full h-98.75 rounded-xl overflow-clip map-container relative"
     >
-      <div className="absolute top-3 left-3 w-full max-w-[350px] bg-white z-10 p-4 rounded-xl shadow-lg border border-gray-100 flex justify-between items-start gap-3">
+      <div className="absolute top-3 left-3 w-full max-w-87.5 bg-white z-10 p-4 rounded-xl shadow-lg border border-gray-100 flex justify-between items-start gap-3">
         <div className="flex-1">
           <h3 className="text-base font-bold text-gray-900 leading-tight mb-1">
             {address.split(",")[0]}

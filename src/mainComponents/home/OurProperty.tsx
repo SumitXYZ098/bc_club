@@ -23,6 +23,7 @@ import { getOfficeName } from "@/src/utilities/utilities";
 import { useRouter } from "next/navigation";
 import RippleButton from "@/src/components/button/RippleButton";
 import { useAuthContext } from "../auth/AuthContext";
+import { useGetRealEstateListings } from "@/src/hooks/listing/useRealEstateListingQueries";
 
 const tabList = [
   "Newly Listed properties",
@@ -111,38 +112,39 @@ const OurProperty = () => {
       : 0,
     mls: listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
-    status: listing?.status || "",
+    status: listing?.standard_status || "",
     isFavourite: listing?.users?.some(
       (user: any) => user?.documentId === me?.documentId,
     ),
     isDdf: !!isDdf,
   });
 
-  const { data: newList = [], isLoading: isLoadingNew } = useGetActiveListings(
-    { location: city, page: 1, pageSize: 30 },
-    {
-      select: (res: any) => {
-        return (
-          res?.data
-            ?.sort((a: any, b: any) => {
-              const aTime = a?.OriginalEntryTimestamp
-                ? Date.parse(a.OriginalEntryTimestamp)
-                : 0;
+  const { data: newList = [], isLoading: isLoadingNew } =
+    useGetRealEstateListings(
+      { location: city, page: 1, pageSize: 30 },
+      {
+        select: (res: any) => {
+          return (
+            res?.data
+              ?.sort((a: any, b: any) => {
+                const aTime = a?.OriginalEntryTimestamp
+                  ? Date.parse(a.OriginalEntryTimestamp)
+                  : 0;
 
-              const bTime = b?.OriginalEntryTimestamp
-                ? Date.parse(b.OriginalEntryTimestamp)
-                : 0;
+                const bTime = b?.OriginalEntryTimestamp
+                  ? Date.parse(b.OriginalEntryTimestamp)
+                  : 0;
 
-              return bTime - aTime; // newest first
-            })
-            ?.map((l: any) => mapProperty(l, true)) || []
-        );
+                return bTime - aTime; // newest first
+              })
+              ?.map((l: any) => mapProperty(l, true)) || []
+          );
+        },
       },
-    },
-  );
+    );
 
   const { data: priceUpdateList = [], isLoading: isLoadingPriceUpdate } =
-    useGetActiveListings(
+    useGetRealEstateListings(
       { location: city, page: 1, pageSize: 30, priceChange: "all" },
       {
         select: (res: any) => {
@@ -165,42 +167,43 @@ const OurProperty = () => {
       },
     );
 
-  const { data: soldList = [], isLoading: isLoadingSold } = useGetListings(
-    {
-      propertyType: "sold",
-      location: city,
-      page: 1,
-      pageSize: 30,
-    },
-    {
-      select: (res: any) => {
-        const nonResidentialTypes = [
-          "office",
-          "business",
-          "agriculture",
-          "vacant land",
-          "industrial",
-          "retail",
-        ];
-        return (
-          res?.data
-            ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-            .filter((l: any) => {
-              const type = (l?.property_sub_type || "").toLowerCase();
-              return !nonResidentialTypes.some((nonRes) =>
-                type.includes(nonRes),
-              );
-            })
-            .map((l: any) => mapProperty(l, false)) || []
-        );
+  const { data: soldList = [], isLoading: isLoadingSold } =
+    useGetRealEstateListings(
+      {
+        status: "sold",
+        location: city,
+        page: 1,
+        pageSize: 30,
       },
-    },
-  );
+      {
+        select: (res: any) => {
+          const nonResidentialTypes = [
+            "office",
+            "business",
+            "agriculture",
+            "vacant land",
+            "industrial",
+            "retail",
+          ];
+          return (
+            res?.data
+              ?.filter((l: any) => l?.address && Number(l?.price) > 0)
+              .filter((l: any) => {
+                const type = (l?.property_sub_type || "").toLowerCase();
+                return !nonResidentialTypes.some((nonRes) =>
+                  type.includes(nonRes),
+                );
+              })
+              .map((l: any) => mapProperty(l, false)) || []
+          );
+        },
+      },
+    );
 
   const { data: expiredList = [], isLoading: isLoadingExpired } =
-    useGetListings(
+    useGetRealEstateListings(
       {
-        propertyType: "expired",
+        status: "expired",
         location: city,
         page: 1,
         pageSize: 30,
@@ -297,6 +300,7 @@ const OurProperty = () => {
     isLoginOverride?: boolean,
     navId?: string,
   ) => {
+    console.log(list[0]);
     if (isLoading) {
       return (
         <div className="flex gap-6 justify-center-safe">

@@ -20,8 +20,12 @@ const NavBarDrawer: React.FC<INavBarDrawerProps> = ({ open, onClose }) => {
       open={open}
       onClose={onClose}
       anchor="right"
-      PaperProps={{
-        width: "100%",
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+          },
+        },
       }}
       sx={{
         zIndex: 99,

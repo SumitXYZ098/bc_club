@@ -89,7 +89,8 @@ const ReactiveAccount = ({
           })}
           error={!!errors.oldPassword}
           helperText={errors.oldPassword?.message as string}
-          InputProps={{
+          slotProps={{
+            input: {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
@@ -98,7 +99,7 @@ const ReactiveAccount = ({
                   {showOldPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
-            ),
+            ),}
           }}
         />
         {/* New Password */}
@@ -120,7 +121,8 @@ const ReactiveAccount = ({
           })}
           error={!!errors.newPassword}
           helperText={errors.newPassword?.message as string}
-          InputProps={{
+          slotProps={{
+            input: {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
@@ -129,7 +131,7 @@ const ReactiveAccount = ({
                   {showNewPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
-            ),
+            ),}
           }}
         />
 
@@ -148,7 +150,8 @@ const ReactiveAccount = ({
           })}
           error={!!errors.confirmPassword}
           helperText={errors.confirmPassword?.message as string}
-          InputProps={{
+          slotProps={{
+            input: {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
@@ -157,7 +160,7 @@ const ReactiveAccount = ({
                   {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
-            ),
+            ),}
           }}
         />
 

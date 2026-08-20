@@ -11,13 +11,13 @@ import Link from "next/link";
 import DynamicTable from "@/src/components/common/dynamicTable/DynamicTable";
 import {
   getPropertyDetailsRows,
-  getRoomRows,
   propertyDetailsHeaders,
   roomHeaders,
 } from "..";
-import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 import SoldPropertyContactUs from "./SoldPropertyContactUs";
+import { useGetNearbyRealEstatePlaces } from "@/src/hooks/listing/useRealEstateListingQueries";
+import { getPropertyRoomRows } from "../../propertyInfo";
 
 const SoldPropertyInformation = ({ property }: { property: any }) => {
   const featuresList = [
@@ -26,16 +26,22 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
       label: "Bedrooms",
       value: property?.bedrooms || "Na",
     },
+
     {
       icon: Icons.bathtub,
       label: "Bathrooms",
       value: property?.bathrooms || "Na",
     },
-    {
-      icon: Icons.garage,
-      label: "Garage",
-      value: "0",
-    },
+
+    ...(property?.property_sub_type !== "Business"
+      ? [
+          {
+            icon: Icons.garage,
+            label: "Garage",
+            value: "0",
+          },
+        ]
+      : []),
     {
       icon: Icons.calendar,
       label: "Year Built",
@@ -45,7 +51,9 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
       icon: Icons.scale,
       label: "Living Area Size",
       value:
-        property?.area && property?.area !== 0 ? `${property?.area} sft` : "Na",
+        property?.Living_area && property?.Living_area !== 0
+          ? `${property?.Living_area} sft`
+          : "Na",
     },
     ...(property?.lot_size_area != null && property?.lot_size_area !== ""
       ? [
@@ -61,7 +69,7 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`;
 
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
-    useGetNearbyPlaces(property.documentId);
+    useGetNearbyRealEstatePlaces(property.documentId);
 
   return (
     <div className="flex flex-row items-start flex-nowrap gap-5 w-full mt-6 md:mt-8 xl:mt-13">
@@ -159,11 +167,11 @@ const SoldPropertyInformation = ({ property }: { property: any }) => {
             rows={getPropertyDetailsRows(property)}
           />
           {/* Room Information */}
-          {property?.raw_data && (
+          {property?.rooms && property?.rooms?.length > 0 && (
             <DynamicTable
               title="Room Information"
               headers={roomHeaders}
-              rows={getRoomRows(property)}
+              rows={getPropertyRoomRows(property)}
             />
           )}
 

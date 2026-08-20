@@ -15,9 +15,9 @@ import {
   propertyDetailsHeaders,
   roomHeaders,
 } from "..";
-import { useGetNearbyPlaces } from "@/src/hooks/listing/useListingQueries";
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 import { useAuthContext } from "../../auth/AuthContext";
+import { useGetNearbyRealEstatePlaces } from "@/src/hooks/listing/useRealEstateListingQueries";
 
 const PropertyInformation = ({ property }: { property: any }) => {
   const featuresList = [
@@ -69,7 +69,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`;
 
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
-    useGetNearbyPlaces(property.documentId);
+    useGetNearbyRealEstatePlaces(property.documentId);
 
   console.log("nearbyPlaces", nearbyPlaces?.data?.schools);
 

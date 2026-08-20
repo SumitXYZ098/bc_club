@@ -1,6 +1,5 @@
 "use client";
 import GetInTouch from "../getInTouch/GetInTouch";
-import { useGetUnifiedListingById } from "@/src/hooks/listing/useListingQueries";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
 import FaqsSection from "./soldPropertyInformation/FaqsSection";
@@ -10,6 +9,7 @@ import SoldPropertyGallery from "./SoldPropertyGallery";
 import SoldPropertyInformation from "./soldPropertyInformation/SoldPropertyInformation";
 import PropertySimilarAndSoldListing from "./PropertySimilarAndSoldListing";
 import { useAuthContext } from "../auth/AuthContext";
+import { useGetRealEstateListingById } from "@/src/hooks/listing/useRealEstateListingQueries";
 
 const SoldPropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const { isLoggedIn, setOpenLogin, authLoading } = useAuthContext();
@@ -17,7 +17,7 @@ const SoldPropertyInfo = ({ paramsId }: { paramsId: string }) => {
     data: listing,
     isLoading: loading,
     error,
-  } = useGetUnifiedListingById(paramsId, {
+  } = useGetRealEstateListingById(paramsId, {
     select: (res: any) => res?.data || res,
     enabled: !!paramsId && isLoggedIn,
   });

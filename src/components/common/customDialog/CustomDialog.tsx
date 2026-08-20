@@ -24,17 +24,19 @@ export default function CustomDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: {
-            sm: 450,
-            xs: 350,
-            lg: 550,
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+            maxWidth: {
+              sm: 450,
+              xs: 350,
+              lg: 550,
+            },
+            borderRadius: 5,
+            margin: "24px",
+            scrollbarWidth: "none",
           },
-          borderRadius: 5,
-          margin: "24px",
-          scrollbarWidth: "none",
         },
       }}
     >
