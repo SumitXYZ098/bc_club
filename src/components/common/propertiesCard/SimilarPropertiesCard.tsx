@@ -7,17 +7,17 @@ import { Images } from "@/src/app/exports";
 import CustomButton from "../../button/CustomButton";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
-import {
-  useGetMe,
-  useToggleDdfWishlist,
-  useRemoveDdfWishlist,
-} from "@/src/hooks/listing/useListingQueries";
+import { useGetMe } from "@/src/hooks/listing/useListingQueries";
 import dayjs from "dayjs";
 import {
   calculateAge,
   getDaysAgoTime,
   getTime,
 } from "@/src/utilities/utilities";
+import {
+  useAddRealEstateFavorite,
+  useRemoveRealEstateFavorite,
+} from "@/src/hooks/listing/useRealEstateListingQueries";
 
 export interface SimilarPropertiesCardProps {
   id: string;
@@ -164,11 +164,8 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   targetLivingArea,
 }) => {
   const { data: me } = useGetMe();
-  const ddfToggle = useToggleDdfWishlist();
-  const toggleWishlist = ddfToggle;
-
-  const ddfRemove = useRemoveDdfWishlist();
-  const removeFromWishlist = ddfRemove;
+  const toggleWishlist = useAddRealEstateFavorite();
+  const removeFromWishlist = useRemoveRealEstateFavorite();
 
   const [localIsFavourite, setLocalIsFavourite] = React.useState(false);
   const [localLikesCount, setLocalLikesCount] = React.useState(likesCount || 0);

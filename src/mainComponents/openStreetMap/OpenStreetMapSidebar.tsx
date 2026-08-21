@@ -230,8 +230,8 @@ export default function OpenStreetMapSidebar({
               >
                 <PropertiesCard
                   {...p}
-                  isLogin={isLoggedIn || status === "forSale"}
-                  isSold={status === "sold"}
+                  isLogin={isLoggedIn || p.status === "Active"}
+                  isSold={status === "closed"}
                   isExpired={status === "expired"}
                   isDdf={p.isDdf}
                 />

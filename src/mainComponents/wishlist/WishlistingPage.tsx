@@ -6,13 +6,13 @@ import { getOfficeName } from "@/src/utilities/utilities";
 import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
-import { useGetMyDdfFavorites } from "@/src/hooks/listing/useListingQueries";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import { Box, Chip, Pagination } from "@mui/material";
 import CustomButton from "@/src/components/button/CustomButton";
 import { FiSearch } from "react-icons/fi";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Link from "next/link";
+import { useGetMyRealEstateFavorites } from "@/src/hooks/listing/useRealEstateListingQueries";
 
 const WishlistingPage = () => {
   const { isLoggedIn, setOpenLogin } = useAuthContext();
@@ -47,54 +47,67 @@ const WishlistingPage = () => {
       pageCount: res?.count ? Math.ceil(res.count / pageSize) : 1,
     };
 
-    let properties: PropertyCardProps[] = res?.data.map((listing: any) => ({
-      id: listing?.documentId,
-      image:
-        typeof listing?.media?.[0] === "string"
-          ? listing.media[0]
-          : listing?.media?.[0]?.MediaURL,
-      title: listing?.property_sub_type,
-      price: listing?.price,
-      daysAgo:
-        Number(listing?.old_price) > 0
-          ? listing?.ModificationTimestamp
-          : (listing?.OriginalEntryTimestamp ??
-            listing?.raw_data?.BridgeModificationTimestamp ??
-            0),
-      address: `${listing?.address}, ${listing?.city}, ${listing?.state}`,
-      sqft: listing?.area ?? listing?.lot_size_area ?? 0,
-      beds: listing?.bedrooms ?? 0,
-      baths: listing?.bathrooms ?? 0,
-      likesCount: listing?.likesCount ?? 0,
-      oldPrice: Number(listing?.old_price) || 0,
-      priceDrop:
-        listing.PreviousListPrice > listing.ListPrice
+    let properties: PropertyCardProps[] =
+      res?.data?.map((listing: any) => ({
+        id: listing?.documentId || listing?.id || listing?.listing_id,
+        image:
+          typeof listing?.media_url === "string"
+            ? listing.media_url
+            : Array.isArray(listing?.media_url)
+              ? listing.media_url[0]
+              : (typeof listing?.media?.[0] === "string"
+                ? listing.media[0]
+                : listing?.media?.[0]?.MediaURL) || "",
+        title: listing?.property_sub_type || "Property",
+        price: Number(listing?.price) || 0,
+        daysAgo:
+          Number(listing?.old_price) > 0
+            ? listing?.ModificationTimestamp
+            : (listing?.OriginalEntryTimestamp ??
+              listing?.raw_data?.BridgeModificationTimestamp ??
+              0),
+        address: listing?.address
+          ? listing?.city
+            ? `${listing.address}, ${listing.city}${listing?.state ? `, ${listing.state}` : ""}`
+            : listing.address
+          : "",
+        sqft: listing?.Living_area ?? listing?.area ?? listing?.lot_size_area ?? 0,
+        beds: listing?.bedrooms ?? 0,
+        baths: listing?.bathrooms ?? 0,
+        likesCount: listing?.likesCount ?? 0,
+        oldPrice: Number(listing?.old_price) || 0,
+        lotSize: listing?.lot_size_area ?? "",
+        structureType: listing?.structure_type ?? "",
+        standardStatus: listing?.standard_status ?? "",
+        priceDrop:
+          listing?.PreviousListPrice > listing?.ListPrice
+            ? Number(
+                (
+                  (listing.PreviousListPrice - listing.ListPrice) /
+                  listing.ListPrice
+                ).toFixed(1),
+              )
+            : undefined,
+        assessedDiff: listing?.price
           ? Number(
               (
-                (listing.PreviousListPrice - listing.ListPrice) /
-                listing.ListPrice
+                (Number(listing.price) -
+                  (listing?.annual_tax ?? listing?.TaxAssessedValue ?? 0)) /
+                Number(listing.price)
               ).toFixed(1),
             )
-          : undefined,
-      assessedDiff: listing.ListPrice
-        ? Number(
-            (
-              (listing.ListPrice - (listing.TaxAssessedValue ?? 0)) /
-              listing.ListPrice
-            ).toFixed(1),
-          )
-        : 0,
-      mls:
-        listing?.mls_number ??
-        listing?.listing_id ??
-        listing?.raw_data?.ListingID ??
-        listing?.raw_data?.MLS ??
-        listing?.MlsNumber ??
-        listing?.raw_data?.MlsNumber ??
-        "N/A",
-      realtor: getOfficeName(listing),
-      isFavourite: listing?.isFavourite,
-    }));
+          : 0,
+        mls:
+          listing?.listing_id ??
+          listing?.mls_number ??
+          listing?.raw_data?.ListingID ??
+          listing?.raw_data?.MLS ??
+          listing?.MlsNumber ??
+          listing?.raw_data?.MlsNumber ??
+          "N/A",
+        realtor: listing?.office_name ?? getOfficeName(listing),
+        isFavourite: listing?.isFavourite,
+      })) || [];
 
     return { properties, listings, pagination };
   };
@@ -103,7 +116,7 @@ const WishlistingPage = () => {
     data: ddfWishlistData,
     isLoading: ddfWishlistLoading,
     refetch: refetchDdfWishlist,
-  } = useGetMyDdfFavorites(params, { select, enabled: isLoggedIn });
+  } = useGetMyRealEstateFavorites(params, { select, enabled: isLoggedIn });
 
   useEffect(() => {
     if (isLoggedIn) {

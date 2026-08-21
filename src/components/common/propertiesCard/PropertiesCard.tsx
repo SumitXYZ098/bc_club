@@ -8,13 +8,13 @@ import { Icons, Images } from "@/src/app/exports";
 import CustomButton from "../../button/CustomButton";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
-import {
-  useGetMe,
-  useToggleDdfWishlist,
-  useRemoveDdfWishlist,
-} from "@/src/hooks/listing/useListingQueries";
+import { useGetMe } from "@/src/hooks/listing/useListingQueries";
 import { getTime } from "@/src/utilities/utilities";
 import { IoArrowUpOutline, IoArrowDownOutline } from "react-icons/io5";
+import {
+  useAddRealEstateFavorite,
+  useRemoveRealEstateFavorite,
+} from "@/src/hooks/listing/useRealEstateListingQueries";
 
 export interface PropertyCardProps {
   id: string;
@@ -40,6 +40,7 @@ export interface PropertyCardProps {
   likesCount?: number;
   structureType?: string;
   oldPrice?: number;
+  standardStatus?: string;
 }
 
 const PropertiesCard: React.FC<PropertyCardProps> = ({
@@ -66,12 +67,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   oldPrice = 0,
 }) => {
   const { data: me } = useGetMe();
-  const ddfToggle = useToggleDdfWishlist();
-  const toggleWishlist = ddfToggle;
-
-  const ddfRemove = useRemoveDdfWishlist();
-  const removeFromWishlist = ddfRemove;
-
+  const toggleWishlist = useAddRealEstateFavorite();
+  const removeFromWishlist = useRemoveRealEstateFavorite();
   const [localIsFavourite, setLocalIsFavourite] = React.useState(false);
   const [localLikesCount, setLocalLikesCount] = React.useState(likesCount || 0);
 
@@ -180,8 +177,8 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
               {img ? (
                 <Image
                   src={img}
-                  alt={title}
-                  title={title}
+                  alt={title || "Property Image"}
+                  title={title || "Property Image"}
                   className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
                     isLogin ? "group-hover:scale-125" : "blur-sm"
                   }`}

@@ -168,26 +168,6 @@ export const buildActiveFilterPills = ({
   return activeFilterPills;
 };
 
-export const buildListingParams = (filters: any) => {
-  const page =
-    filters.status === "sold" || filters.status === "expired"
-      ? "page"
-      : "pagination[page]";
-  const pageSize =
-    filters.status === "sold" || filters.status === "expired"
-      ? "pageSize"
-      : "pagination[pageSize]";
-  const params: any = {
-    [page]: 1,
-    [pageSize]: 500,
-  };
-
-  appendCommonParams(params, filters);
-  if (filters.status && filters.status !== "any")
-    params.propertyType = filters.status;
-  return params;
-};
-
 export const buildMapZoomParams = ({
   filters,
   mapBounds,
@@ -206,7 +186,7 @@ export const buildMapZoomParams = ({
     filters.status !== "forSale" &&
     filters.status !== "any"
   ) {
-    p.propertyType = filters.status;
+    p.status = filters.status;
   }
 
   if (mapBounds) {

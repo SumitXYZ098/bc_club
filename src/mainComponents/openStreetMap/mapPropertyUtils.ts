@@ -75,7 +75,6 @@ export const transformNormalListing = (listing: any, me: any) => {
     isFavourite: listing?.users?.some(
       (user: any) => user.documentId === me?.documentId,
     ),
-    isDdf: false,
     assessedDiff: listing.price
       ? Number(
           ((listing.price - (listing.annual_tax ?? 0)) / listing.price).toFixed(
@@ -118,8 +117,8 @@ export const transformActiveListing = (listing: any, me: any) => {
     isFavourite: listing?.users?.some(
       (user: any) => user.documentId === me?.documentId,
     ),
+    status: listing?.status,
     likesCount: listing?.likesCount,
-    isDdf: true,
     priceDrop:
       listing.PreviousListPrice && listing.PreviousListPrice > listing.ListPrice
         ? Number(

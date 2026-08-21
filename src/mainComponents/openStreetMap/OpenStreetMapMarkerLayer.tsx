@@ -4,7 +4,11 @@ import { escapeHtml } from "./osmMapUtils";
 import { formatPriceAbbreviated } from "./mapUtils";
 
 const getStatusColor = (status: string) =>
-  status === "sold" ? "#ef4444" : status === "expired" ? "#3b82f6" : "#22c55e";
+  status === "closed"
+    ? "#ef4444"
+    : status === "expired"
+      ? "#c8c8c8"
+      : "#22c55e";
 
 const clusterIcon = (count: number) => {
   const size = count < 10 ? 30 : count < 100 ? 40 : 50;

@@ -13,12 +13,7 @@ import PropertiesCard, {
 } from "@/src/components/common/propertiesCard/PropertiesCard";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
-
-import {
-  useGetActiveListings,
-  useGetListings,
-  useGetMe,
-} from "@/src/hooks/listing/useListingQueries";
+import { useGetMe } from "@/src/hooks/listing/useListingQueries";
 import { getOfficeName } from "@/src/utilities/utilities";
 import { useRouter } from "next/navigation";
 import RippleButton from "@/src/components/button/RippleButton";

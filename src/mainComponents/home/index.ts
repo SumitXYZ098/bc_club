@@ -64,60 +64,6 @@ export const propertyDataByCity: Record<string, PropertySoldData[]> = {
     },
   ],
 
-  // Victoria: [
-  //   {
-  //     type: "Detached Homes",
-  //     sold: 450,
-  //     changePercent: 7,
-  //     marketCondition: "Balanced",
-  //     gaugeValue: 60,
-  //     tip: "Steady demand—around 20 sold per 100 listings",
-  //   },
-  //   {
-  //     type: "Townhouse",
-  //     sold: 210,
-  //     changePercent: -10,
-  //     marketCondition: "Buyer's Market",
-  //     gaugeValue: 28,
-  //     tip: "More listings than buyers—good for buyers",
-  //   },
-  //   {
-  //     type: "Condos/Apartments",
-  //     sold: 500,
-  //     changePercent: 12,
-  //     marketCondition: "Seller's Market",
-  //     gaugeValue: 72,
-  //     tip: "Condos moving fast—multiple offers common",
-  //   },
-  // ],
-
-  // Kelowna: [
-  //   {
-  //     type: "Detached Homes",
-  //     sold: 390,
-  //     changePercent: 5,
-  //     marketCondition: "Balanced",
-  //     gaugeValue: 52,
-  //     tip: "Average movement—steady interest",
-  //   },
-  //   {
-  //     type: "Townhouse",
-  //     sold: 190,
-  //     changePercent: 4,
-  //     marketCondition: "Balanced",
-  //     gaugeValue: 45,
-  //     tip: "Townhomes stable—good for both buyers/sellers",
-  //   },
-  //   {
-  //     type: "Condos/Apartments",
-  //     sold: 280,
-  //     changePercent: 6,
-  //     marketCondition: "Seller's Market",
-  //     gaugeValue: 68,
-  //     tip: "Condos trending upward—strong demand",
-  //   },
-  // ],
-
   "Prince George": [
     {
       type: "Detached Homes",

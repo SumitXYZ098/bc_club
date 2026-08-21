@@ -2,7 +2,7 @@
 import CustomButton from "@/src/components/button/CustomButton";
 import React, { useLayoutEffect, useState } from "react";
 import PropertiesMap from "../properties/PropertiesMap";
-import { getListings } from "@/src/api/listing/listingApi";
+import { getListings } from "@/src/api/listing/realEstateListing";
 
 const MapTapSection = () => {
   const tabsLabel = [

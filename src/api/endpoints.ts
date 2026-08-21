@@ -1,30 +1,15 @@
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export const Endpoints = {
-  getListing: `${BASE_URL}/api/properties`,
-  getListingById: (id: string) => `${BASE_URL}/api/properties/${id}`,
+  // Auth Login
   login: `${BASE_URL}/api/auth/login`,
   signup: `${BASE_URL}/api/register-with-role`,
   forgotPassword: `${BASE_URL}/api/password/forgot`,
   verifyOtp: `${BASE_URL}/api/password/verify-otp`,
   resetPassword: `${BASE_URL}/api/password/reset`,
   reactiveAccount: `${BASE_URL}/api/auth/reactivate-vow-account`,
-  addToFavourite: (id: string) => `${BASE_URL}/api/properties/${id}/favorite`,
-  getFavouriteProperties: `${BASE_URL}/api/my-favorites`,
   me: `${BASE_URL}/api/users/me`,
-  getActivePropertyLists: `${BASE_URL}/api/ddf-listings`,
-  getActiveListingById: (id: string) => `${BASE_URL}/api/ddf-listings/${id}`,
-  addDdfFavorite: (id: string) =>
-    `${BASE_URL}/api/ddf-listings/add-favorite/${id}`,
-  removeDdfFavorite: (id: string) =>
-    `${BASE_URL}/api/ddf-listings/remove-favorite/${id}`,
-  getMyDdfFavorites: `${BASE_URL}/api/ddf-listings/my-favorites`,
-  getNearbyPlaces: (id: string) =>
-    `${BASE_URL}/api/ddf-listings/${id}/neighborhood?radius=16000&limit=6`,
-  getSimilarProperties: (id: string) =>
-    `${BASE_URL}/api/ddf-listings/${id}/similar?radiusKm=5&limit=20`,
-  getSimilarSoldProperties: (id: string) =>
-    `${BASE_URL}/api/properties/${id}/similar-sold?radiusKm=5&limit=20`,
 
+  // Assignment List Properties
   getAssessmentPropertiesList: `${BASE_URL}/api/property-assignment-lists`,
   getPropertiesAssignmentDetails: (id: string) =>
     `${BASE_URL}/api/property-assignment-lists/${id}`,
@@ -35,13 +20,13 @@ export const Endpoints = {
   getDDFPropertiesListByAddress: `${BASE_URL}/api/ddf-listings/search-by-address`,
 
   // Sale Report
-  getSaleReport: `${BASE_URL}/api/sales-reported`,
+  getSaleReport: `${BASE_URL}/api/real-estate-board/sales-reported`,
 
   // MapZoom
-  mapZoomWithClusters: `${BASE_URL}/api/ddf-listings/map-zoom-clusters`,
-  mapZoomProperties: `${BASE_URL}/api/map-properties`,
+  mapZoomWithClusters: `${BASE_URL}/api/real-estate-board/map-zoom-clusters`,
+  mapZoomProperties: `${BASE_URL}/api/real-estate-board/map-properties`,
   getMapZoomAssignmentList: `${BASE_URL}/api/property-assignment-lists/map-zoom`,
-  getMapZoomSold: `${BASE_URL}/api/properties/sold/map-zoom`,
+  getMapZoomSold: `${BASE_URL}/api/real-estate-board/sold/map-zoom`,
   getMapZoomSchools: `${BASE_URL}/api/schools/map-zoom`,
 
   // Flood Province

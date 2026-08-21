@@ -93,7 +93,7 @@ const PropertySimilarAndSoldListing = ({
       : 0,
     mls: listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),
-    status: listing?.status || "",
+    status: listing?.standard_status || "",
     age: listing?.age,
     distance: listing?.distanceKm,
     listingDate: listing?.OriginalEntryTimestamp,

@@ -38,15 +38,18 @@ export function OpenStreetMapPropertyPopup({
           background: "white",
           borderRadius: 6,
           fontFamily: "Plus Jakarta Display",
-          cursor: "pointer",
+          cursor:
+            selectedProperty.status === "Expired" ? "not-allowed" : "pointer",
           padding: 4,
         }}
         onClick={(e) => {
           e.stopPropagation();
           window.open(
-            selectedProperty.isDdf
-              ? `/property-info/${selectedProperty.documentId}`
-              : `/sold-property-info/${selectedProperty.documentId}`,
+            selectedProperty.status === "Closed"
+              ? `/sold-property-info/${selectedProperty.documentId}`
+              : selectedProperty.status === "Expired"
+                ? "#"
+                : `/property-info/${selectedProperty.documentId}`,
             `_blank`,
           );
         }}
@@ -169,9 +172,11 @@ export function OpenStreetMapClusterPopup({
             onClick={(e) => {
               e.stopPropagation();
               window.open(
-                p.isDdf
-                  ? `/property-info/${p.documentId}`
-                  : `/sold-property-info/${p.documentId}`,
+                p.status === "Closed"
+                  ? `/sold-property-info/${p.documentId}`
+                  : p.status === "Expired"
+                    ? "#"
+                    : `/property-info/${p.documentId}`,
                 `_blank`,
               );
             }}
@@ -179,7 +184,7 @@ export function OpenStreetMapClusterPopup({
               display: "flex",
               gap: 10,
               marginBottom: 12,
-              cursor: "pointer",
+              cursor: p.status === "Expired" ? "not-allowed" : "pointer",
               borderBottom: "1px solid #eee",
               paddingBottom: 10,
             }}

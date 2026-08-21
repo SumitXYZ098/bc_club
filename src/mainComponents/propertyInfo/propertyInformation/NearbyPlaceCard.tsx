@@ -50,7 +50,7 @@ const NearbyPlaceCard = ({
   type: "school" | "hospital";
 }) => {
   return (
-    <div className="rounded-[24px] border border-gray-100 bg-white p-6 shadow-sm flex flex-col justify-between transition-shadow hover:shadow-md">
+    <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm flex flex-col justify-between transition-shadow hover:shadow-md">
       <div>
         {/* Top Row: Badge & Distance */}
         <div className="flex items-center justify-between">
@@ -104,7 +104,7 @@ export default NearbyPlaceCard;
 
 export const NearbyPlaceSkeleton = () => {
   return (
-    <div className="animate-pulse rounded-[24px] border border-gray-100 bg-white p-6 shadow-sm flex flex-col justify-between">
+    <div className="animate-pulse rounded-3xl border border-gray-100 bg-white p-6 shadow-sm flex flex-col justify-between">
       <div>
         {/* Top Row Skeleton */}
         <div className="flex items-center justify-between">

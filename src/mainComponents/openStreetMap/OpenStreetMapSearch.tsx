@@ -13,7 +13,6 @@ import {
   useMap,
 } from "react-leaflet";
 import {
-  useGetListings,
   useGetMapZoomAssignmentList,
   useGetMapZoomWithClusters,
   useGetMapZoomSchools,
@@ -32,11 +31,7 @@ import {
   type LatLngPoint,
 } from "./osmMapUtils";
 import { MapBounds } from "./mapTypes";
-import {
-  buildActiveFilterPills,
-  buildListingParams,
-  buildMapZoomParams,
-} from "./mapFilterUtils";
+import { buildActiveFilterPills, buildMapZoomParams } from "./mapFilterUtils";
 import {
   getGeoKey,
   hasValidCoordinates,
@@ -159,7 +154,7 @@ export default function OpenStreetMapSearch() {
     updateInstanceFilter("map", "location", val);
 
   const setStatus = (val: string) => {
-    if ((val === "sold" || val === "expired") && !isLoggedIn) {
+    if ((val === "closed" || val === "expired") && !isLoggedIn) {
       setOpenLogin(true);
       return;
     }
@@ -207,31 +202,31 @@ export default function OpenStreetMapSearch() {
     [filters, mapBounds, mapZoomVal],
   );
 
-  const params = useMemo(() => buildListingParams(filters), [filters]);
+  // const params = useMemo(() => buildListingParams(filters), [filters]);
 
-  const {
-    data: queryDataNormal,
-    isLoading: isLoadingNormal,
-    isFetching: isFetchingNormal,
-  } = useGetListings(params, {
-    select: (res: any) =>
-      (res?.data || [])
-        .map((listing: any) => transformNormalListing(listing, me))
-        .filter(
-          (l: any) =>
-            Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
-        ),
-    enabled: !isForSale && !!mapBounds,
-    staleTime: 1000 * 60 * 5,
-    placeholderData: (previousData: any) => previousData,
-  });
+  // const {
+  //   data: queryDataNormal,
+  //   isLoading: isLoadingNormal,
+  //   isFetching: isFetchingNormal,
+  // } = useGetListings(params, {
+  //   select: (res: any) =>
+  //     (res?.data || [])
+  //       .map((listing: any) => transformNormalListing(listing, me))
+  //       .filter(
+  //         (l: any) =>
+  //           Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
+  //       ),
+  //   enabled: !isForSale && !!mapBounds,
+  //   staleTime: 1000 * 60 * 5,
+  //   placeholderData: (previousData: any) => previousData,
+  // });
 
   const {
     data: queryDataActive,
     isLoading: isLoadingActive,
     isFetching: isFetchingActive,
   } = useGetMapZoomWithClusters(mapZoomParams, {
-    enabled: isForSale && !!mapBounds,
+    enabled: !!mapBounds,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData: any) => previousData,
   });
@@ -255,7 +250,7 @@ export default function OpenStreetMapSearch() {
     isLoading: isLoadingProperties,
     isFetching: isFetchingProperties,
   } = useGetMapZoomProperties(mapZoomParamsWithPage, {
-    enabled: isForSale && !!mapBounds,
+    enabled: !!mapBounds,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData: any) => previousData,
   });
@@ -282,7 +277,7 @@ export default function OpenStreetMapSearch() {
   );
 
   const cleanData = useMemo(() => {
-    if (!queryDataProperties?.data || !isForSale) return [];
+    if (!queryDataProperties?.data) return [];
 
     return queryDataProperties.data
       .map((listing: any) => transformActiveListing(listing, me))
@@ -290,12 +285,9 @@ export default function OpenStreetMapSearch() {
         (l: any) =>
           Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
       );
-  }, [queryDataProperties?.data, isForSale, me]);
+  }, [queryDataProperties?.data, me]);
 
-  const rawProperties = useMemo(
-    () => (isForSale ? cleanData : queryDataNormal || []),
-    [isForSale, queryDataNormal, cleanData],
-  );
+  const rawProperties = useMemo(() => cleanData || [], [cleanData]);
 
   useEffect(() => {
     const needsGeocode = rawProperties.filter((property: any) => {
@@ -369,12 +361,8 @@ export default function OpenStreetMapSearch() {
       .filter(Boolean);
   }, [rawProperties, geocodedCache]);
 
-  const isFetching = isForSale
-    ? isFetchingActive || isFetchingProperties
-    : isFetchingNormal;
-  const isLoadingData = isForSale
-    ? isLoadingActive || isLoadingProperties
-    : isLoadingNormal;
+  const isFetching = isFetchingActive || isFetchingProperties;
+  const isLoadingData = isLoadingActive || isLoadingProperties;
   const isLoading =
     isLoadingData || isFetching || isLoadingSold || isFetchingSold;
 
@@ -720,14 +708,14 @@ export default function OpenStreetMapSearch() {
           <MapTopFilterBar
             status={status}
             setStatus={setStatus}
-            price={price as [number, number]}
-            setPrice={setPrice}
-            sqft={sqft as [number, number]}
-            setSqft={setSqft}
-            activeBedRoom={activeBedRoom}
-            setActiveBedRoom={setActiveBedRoom}
-            activeBathRoom={activeBathRoom}
-            setActiveBathRoom={setActiveBathRoom}
+            // price={price as [number, number]}
+            // setPrice={setPrice}
+            // sqft={sqft as [number, number]}
+            // setSqft={setSqft}
+            // activeBedRoom={activeBedRoom}
+            // setActiveBedRoom={setActiveBedRoom}
+            // activeBathRoom={activeBathRoom}
+            // setActiveBathRoom={setActiveBathRoom}
             location={location}
             setLocation={setLocation}
           />
@@ -883,10 +871,10 @@ export default function OpenStreetMapSearch() {
               {measurePoints.length >= 2 && (
                 <Polyline
                   positions={
-                    measurePoints.map((point) => [
-                      point.lat,
-                      point.lng,
-                    ]) as [number, number][]
+                    measurePoints.map((point) => [point.lat, point.lng]) as [
+                      number,
+                      number,
+                    ][]
                   }
                   pathOptions={{ color: "#22558b", opacity: 1, weight: 3 }}
                 />

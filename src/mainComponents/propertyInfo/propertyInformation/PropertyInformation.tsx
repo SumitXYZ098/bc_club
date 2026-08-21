@@ -71,8 +71,6 @@ const PropertyInformation = ({ property }: { property: any }) => {
   const { data: nearbyPlaces, isLoading: nearbyPlacesLoading } =
     useGetNearbyRealEstatePlaces(property.documentId);
 
-  console.log("nearbyPlaces", nearbyPlaces?.data?.schools);
-
   const { isLoggedIn } = useAuthContext();
 
   return (

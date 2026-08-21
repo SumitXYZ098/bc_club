@@ -271,44 +271,14 @@ export const roomHeaders: TableHeader[] = [
   { key: "dimensions", label: "Dimensions", align: "right" },
 ];
 
-export const getRoomRows = (property: any) => {
-  const raw = property?.raw_data || {};
-  const rooms: Record<string, any> = {};
-
-  // Step 1: Group keys by room index
-  Object.keys(raw).forEach((key) => {
-    const match = key.match(/^BCRES_Room(\d+)(.*)$/);
-    if (!match) return;
-
-    const index = match[1]; // room number
-    const field = match[2]; // RoomType, RoomLevel...
-
-    if (!rooms[index]) rooms[index] = {};
-
-    rooms[index][field] = raw[key];
-  });
-
-  // Step 2: Convert to rows (skip null values)
-  return Object.values(rooms)
-    .filter(
-      (room: any) =>
-        room.RoomType && room.RoomLevel && room.RoomWidth && room.RoomLength,
-    )
-    .map((room: any) => {
-      return {
-        data: {
-          room: room.RoomType,
-          level: room.RoomLevel,
-          dimensions: `${room.RoomWidth} × ${room.RoomLength}`,
-        },
-      };
-    });
-};
-
 export const getPropertyRoomRows = (property: any) => {
   const rooms = property?.rooms || [];
   return rooms
-    .filter((room: any) => room.room_type && room.room_level)
+    .filter(
+      (room: any) =>
+        (room.RoomType || room.room_type) &&
+        (room.RoomLevel || room.room_level),
+    )
     .map((room: any) => {
       return {
         data: {

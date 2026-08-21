@@ -6,14 +6,6 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 interface MapTopFilterBarProps {
   status: string;
   setStatus: (val: string) => void;
-  price: [number, number];
-  setPrice: (val: [number, number]) => void;
-  sqft: [number, number];
-  setSqft: (val: [number, number]) => void;
-  activeBedRoom: string | undefined;
-  setActiveBedRoom: (val: string) => void;
-  activeBathRoom: string | undefined;
-  setActiveBathRoom: (val: string) => void;
   location: string;
   setLocation: (val: string) => void;
 }
@@ -21,38 +13,16 @@ interface MapTopFilterBarProps {
 export default function MapTopFilterBar({
   status,
   setStatus,
-  price,
-  setPrice,
-  sqft,
-  setSqft,
-  activeBedRoom,
-  setActiveBedRoom,
-  activeBathRoom,
-  setActiveBathRoom,
   location,
   setLocation,
 }: MapTopFilterBarProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isPriceAreaOpen, setIsPriceAreaOpen] = useState(false);
-  const [isBedsOpen, setIsBedsOpen] = useState(false);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
-
-  const priceAreaRef = useRef<HTMLDivElement>(null);
-  const bedsRef = useRef<HTMLDivElement>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        priceAreaRef.current &&
-        !priceAreaRef.current.contains(event.target as Node)
-      ) {
-        setIsPriceAreaOpen(false);
-      }
-      if (bedsRef.current && !bedsRef.current.contains(event.target as Node)) {
-        setIsBedsOpen(false);
-      }
       if (
         locationRef.current &&
         !locationRef.current.contains(event.target as Node)
@@ -92,9 +62,9 @@ export default function MapTopFilterBar({
       </div>
 
       <div
-        onClick={() => setStatus("sold")}
+        onClick={() => setStatus("closed")}
         className={`hidden md:flex items-center gap-1 border rounded-[10px] px-4 py-2.5 bg-background text-sm font-normal cursor-pointer shrink-0 transition-all ${
-          status === "sold"
+          status === "closed"
             ? "bg-primary text-white border-primary"
             : "border-gray-300 text-gray-700 hover:bg-gray-50"
         }`}
@@ -112,192 +82,6 @@ export default function MapTopFilterBar({
       >
         Expired
       </div>
-
-      {/* <div className="hidden md:flex relative" ref={priceAreaRef}>
-        <div
-          onClick={() => setIsPriceAreaOpen(!isPriceAreaOpen)}
-          className={`flex items-center gap-1 border rounded-[10px] px-5 py-2.5 text-sm font-normal cursor-pointer shrink-0 transition-all ${
-            isPriceAreaOpen
-              ? "border-primary bg-primary text-white"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          Price & Area{" "}
-          <FiChevronDown
-            className={`text-gray-400 ml-1 transition-transform ${isPriceAreaOpen ? "rotate-180 text-white" : ""}`}
-          />
-        </div>
-
-        {isPriceAreaOpen && (
-          <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-9999 p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[450px] animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-sm max-h-[80vh] overflow-y-auto no-scrollbar">
-            <div className="md:mb-8 mb-5">
-              <div className="flex items-center justify-between md:mb-3">
-                <h3 className="font-bold text-gray-800 text-lg">Price Range</h3>
-                <button
-                  onClick={() => setPrice([1000, 100000000])}
-                  className="text-xs font-bold text-primary hover:underline cursor-pointer"
-                >
-                  Reset Price
-                </button>
-              </div>
-              <div className="relative px-2">
-                <PriceSlider
-                  value={[price[0] ?? 1000, price[1] ?? 100000000]}
-                  min={1000}
-                  max={100000000}
-                  step={20000}
-                  onChange={(_, v) => setPrice(v as [number, number])}
-                  disableSwap
-                  valueLabelDisplay="auto"
-                />
-              </div>
-
-              <div className="flex flex-row items-center mt-5 justify-between gap-4 w-full">
-                <div className="flex flex-col flex-1">
-                  <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                    Min Price
-                  </p>
-                  <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                    <span className="text-secondary">$</span>
-                    <span>{price[0].toLocaleString()}</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col flex-1">
-                  <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                    Max Price
-                  </p>
-                  <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                    {price[1] === 100000000 ? (
-                      <span>Max</span>
-                    ) : (
-                      <>
-                        <span className="text-secondary">$</span>
-                        <span>{price[1].toLocaleString()}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <LineGradient />
-
-            <div className="md:mb-2 mb-2 mt-2">
-              <div className="flex items-center justify-between md:mb-3">
-                <h3 className="font-bold text-gray-800 text-lg">Area Range</h3>
-                <button
-                  onClick={() => setSqft([100, 15000])}
-                  className="text-xs font-bold text-primary hover:underline cursor-pointer"
-                >
-                  Reset Area
-                </button>
-              </div>
-              <div className="relative px-2">
-                <PriceSlider
-                  value={[sqft[0] ?? 100, sqft[1] ?? 15000]}
-                  min={100}
-                  max={15000}
-                  step={100}
-                  onChange={(_, v) => setSqft(v as [number, number])}
-                  disableSwap
-                  valueLabelDisplay="auto"
-                />
-              </div>
-
-              <div className="flex flex-row items-center mt-5 justify-between gap-4 w-full">
-                <div className="flex flex-col flex-1">
-                  <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                    Min Sqft
-                  </p>
-                  <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                    <span>{sqft[0]}</span>
-                    <span className="text-secondary text-[10px]">sqft</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col flex-1">
-                  <p className="text-[10px] text-[#333]/40 mb-1 uppercase font-bold tracking-wider">
-                    Max Sqft
-                  </p>
-                  <div className="flex text-sm font-bold items-center gap-1 border border-[#33333333] rounded-xl px-4 py-2.5 bg-white">
-                    {sqft[1] === 15000 ? (
-                      <span>Max</span>
-                    ) : (
-                      <>
-                        <span>{sqft[1]}</span>
-                        <span className="text-secondary text-[10px]">sqft</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="hidden md:flex relative" ref={bedsRef}>
-        <div
-          onClick={() => setIsBedsOpen(!isBedsOpen)}
-          className={`flex items-center gap-1 border rounded-[10px] px-7 py-2.5 text-[15px] font-semibold cursor-pointer shrink-0 transition-all ${
-            isBedsOpen
-              ? "border-primary bg-primary text-white shadow-md"
-              : "border-gray-200 text-gray-700 hover:border-gray-300 bg-white"
-          }`}
-        >
-          Beds & Baths{" "}
-          <FiChevronDown
-            className={`ml-1.5 transition-transform duration-300 ${isBedsOpen ? "rotate-180" : "text-gray-400"}`}
-          />
-        </div>
-
-        {isBedsOpen && (
-          <div className="absolute top-full left-0 md:left-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-9999 p-5 md:p-7 w-[92vw] md:w-auto md:min-w-[380px] animate-in fade-in slide-in-from-top-3 duration-300">
-            <div className="mb-7">
-              <h3 className="font-bold text-gray-800 text-lg mb-4">Bedrooms</h3>
-              <div className="flex flex-wrap gap-2.5">
-                {["any", "1", "2", "3", "4+"].map((val) => (
-                  <button
-                    key={val}
-                    onClick={() => setActiveBedRoom(val)}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
-                      activeBedRoom === val
-                        ? "bg-primary border-primary text-white shadow-sm"
-                        : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {val === "any" ? "All" : val}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <LineGradient />
-
-            <div className="mb-2 mt-4">
-              <h3 className="font-bold text-gray-800 text-lg mb-4">
-                Bathrooms
-              </h3>
-              <div className="flex flex-wrap gap-2.5">
-                {["any", "1", "2", "3", "4+"].map((val) => (
-                  <button
-                    key={val}
-                    onClick={() => setActiveBathRoom(val)}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 ${
-                      activeBathRoom === val
-                        ? "bg-primary border-primary text-white shadow-sm"
-                        : "border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {val === "any" ? "All" : val}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div> */}
 
       <div className="hidden md:flex relative" ref={locationRef}>
         <div

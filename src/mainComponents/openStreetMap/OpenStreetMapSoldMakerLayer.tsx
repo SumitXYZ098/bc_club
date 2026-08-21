@@ -20,7 +20,7 @@ type SoldListing = {
   Living_area?: number;
   area?: number;
   media_url?: string;
-  sold_date?: string;
+  soldDate?: string;
 };
 
 export default function OpenStreetMapSoldMakerLayer({
@@ -47,8 +47,8 @@ export default function OpenStreetMapSoldMakerLayer({
 
       if (!lat || !lng || Number.isNaN(lat) || Number.isNaN(lng)) return;
 
-      const soldYear = item.sold_date
-        ? new Date(item.sold_date).getFullYear()
+      const soldYear = item.soldDate
+        ? new Date(item.soldDate).getFullYear()
         : "";
 
       const price = Number(item.price || 0).toLocaleString();

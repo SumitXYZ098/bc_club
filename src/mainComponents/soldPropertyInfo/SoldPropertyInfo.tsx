@@ -2,14 +2,14 @@
 import GetInTouch from "../getInTouch/GetInTouch";
 import Image from "next/image";
 import { Images } from "@/src/app/exports";
-import FaqsSection from "./soldPropertyInformation/FaqsSection";
-import SoldPropertyInfoSkeleton from "./SoldPropertyInfoSkeleton";
-import SoldPropertyTopAddressSection from "./SoldPropertyTopAddressSection";
-import SoldPropertyGallery from "./SoldPropertyGallery";
-import SoldPropertyInformation from "./soldPropertyInformation/SoldPropertyInformation";
-import PropertySimilarAndSoldListing from "./PropertySimilarAndSoldListing";
 import { useAuthContext } from "../auth/AuthContext";
 import { useGetRealEstateListingById } from "@/src/hooks/listing/useRealEstateListingQueries";
+import FaqsSection from "../propertyInfo/propertyInformation/FaqsSection";
+import PropertySimilarAndSoldListing from "../propertyInfo/PropertySimilarAndSoldListing";
+import PropertyTopAddressSection from "../propertyInfo/PropertyTopAddressSection";
+import PropertyGallery from "../propertyInfo/PropertyGallery";
+import PropertyInformation from "../propertyInfo/propertyInformation/PropertyInformation";
+import PropertyInfoSkeleton from "../propertyInfo/PropertyInfoSkeleton";
 
 const SoldPropertyInfo = ({ paramsId }: { paramsId: string }) => {
   const { isLoggedIn, setOpenLogin, authLoading } = useAuthContext();
@@ -22,7 +22,7 @@ const SoldPropertyInfo = ({ paramsId }: { paramsId: string }) => {
     enabled: !!paramsId && isLoggedIn,
   });
 
-  if (authLoading || loading) return <SoldPropertyInfoSkeleton />;
+  if (authLoading || loading) return <PropertyInfoSkeleton />;
   if (error)
     return (
       <div className="p-10 text-red-500 xl:max-w-screen-2xl mx-auto w-full h-[50svh] flex justify-center items-center">
@@ -54,9 +54,9 @@ const SoldPropertyInfo = ({ paramsId }: { paramsId: string }) => {
   ) : (
     <>
       <section className="xl:max-w-screen-2xl mx-auto w-full bg-background flex flex-col xl:px-16 md:px-13 px-6 xl:pt-35.5 xl:pb-28.25 md:pt-28 md:pb-25 pt-21 pb-13 items-center-safe">
-        <SoldPropertyTopAddressSection property={listing} />
+        <PropertyTopAddressSection property={listing} />
         {listing?.media && listing.media.length > 0 ? (
-          <SoldPropertyGallery images={listing?.media} />
+          <PropertyGallery images={listing?.media} />
         ) : (
           <div className="w-1/2 xl:h-134 md:h-76.5 h-56.5 relative cursor-pointer md:rounded-2xl rounded-xl">
             <Image
@@ -69,7 +69,7 @@ const SoldPropertyInfo = ({ paramsId }: { paramsId: string }) => {
             />
           </div>
         )}
-        <SoldPropertyInformation property={listing} />
+        <PropertyInformation property={listing} />
       </section>
 
       {/* Sections */}
