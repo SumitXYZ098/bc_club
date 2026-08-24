@@ -13,6 +13,7 @@ import {
   getPropertiesAssignmentDetails,
   getDDFPropertiesListByAddress,
   getSalesReported,
+  getSoldMarketSummary,
   getMapZoomAssignmentList,
   getMapZoomSoldList,
   getMapZoomSchools,
@@ -199,6 +200,21 @@ export function useGetSalesReported<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: ["saleReported", params],
     queryFn: () => getSalesReported(params),
+    ...options,
+  });
+}
+
+// Sold Market Summary
+export function useGetSoldMarketSummary<TData = any>(
+  params?: { location?: string },
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["soldMarketSummary", params],
+    queryFn: () => getSoldMarketSummary(params),
     ...options,
   });
 }

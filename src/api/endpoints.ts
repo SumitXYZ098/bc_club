@@ -21,6 +21,7 @@ export const Endpoints = {
 
   // Sale Report
   getSaleReport: `${BASE_URL}/api/real-estate-board/sales-reported`,
+  getSoldSummary: `${BASE_URL}/api/real-estate-board/sold-market-summary`,
 
   // MapZoom
   mapZoomWithClusters: `${BASE_URL}/api/real-estate-board/map-zoom-clusters`,

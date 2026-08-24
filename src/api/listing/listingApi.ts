@@ -176,6 +176,24 @@ export async function getSalesReported(params?: {
   }
 }
 
+// Sold Market Summary
+export async function getSoldMarketSummary(params?: {
+  location?: string;
+}): Promise<any> {
+  try {
+    const res = await axios.get(Endpoints.getSoldSummary, {
+      params,
+    });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
 // School List
 export async function getMapZoomSchools(params?: any): Promise<any> {
   try {

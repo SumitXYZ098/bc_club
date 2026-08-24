@@ -2,11 +2,12 @@
 import React, { useState } from "react";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
 import { MenuItem, Select } from "@mui/material";
-import { cities, propertyDataByCity } from ".";
+import { cities, propertyDataByCity, PropertySoldData } from ".";
 import MarketDemandGauge from "@/src/components/charts/MarketDemandGauge";
 import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
 import { useAuthContext } from "../auth/AuthContext";
 import ChartSignInOverlay from "@/src/components/common/charts/ChartSignInOverlay";
+import { useGetSoldMarketSummary } from "@/src/hooks/listing/useListingQueries";
 
 const HomePropertiesSold = () => {
   const [location, setLocation] = useState<string>("Surrey");
@@ -16,7 +17,24 @@ const HomePropertiesSold = () => {
     setLocation(event.target.value);
   };
 
-  const propertyData = propertyDataByCity[location];
+  const {
+    data: soldSummaryRes,
+    isLoading,
+    isFetching,
+  } = useGetSoldMarketSummary(
+    { location },
+    {
+      enabled: !!location && isLoggedIn,
+    },
+  );
+
+  const propertyData: PropertySoldData[] =
+    soldSummaryRes?.data && soldSummaryRes.data.length > 0
+      ? soldSummaryRes.data
+      : propertyDataByCity[location] || [];
+
+  const meta = soldSummaryRes?.meta;
+  const isDataLoading = isLoading || isFetching;
 
   const GaugeChart = ({
     value,
@@ -66,6 +84,17 @@ const HomePropertiesSold = () => {
     );
   };
 
+  const CardSkeleton = () => (
+    <div className="bg-white rounded-xl shadow-[0_0_20px_0_rgba(0,0,0,0.12)] p-6 flex flex-col gap-6 w-full md:w-[47%] xl:w-[32%] animate-pulse min-h-87.5">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-6 w-36 bg-gray-200 rounded" />
+        <div className="h-12 w-24 bg-gray-200 rounded" />
+        <div className="h-5 w-44 bg-gray-200 rounded" />
+      </div>
+      <div className="w-full bg-gray-200 rounded-xl h-48" />
+    </div>
+  );
+
   return (
     <section className="xl:max-w-screen-2xl mx-auto w-full xl:px-16 md:px-13 px-6 xl:py-35 md:py-31 py-14 overflow-hidden flex flex-col items-end">
       {/* Header */}
@@ -109,6 +138,10 @@ const HomePropertiesSold = () => {
             onSignIn={() => setOpenLogin(true)}
             bg="bg-gray"
           />
+        ) : isDataLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <CardSkeleton key={index} />
+          ))
         ) : (
           propertyData.map((property, index) => (
             <div
@@ -171,13 +204,15 @@ const HomePropertiesSold = () => {
                   </svg>
                   <span
                     className={`text-sm font-medium ${
-                      property.changePercent > 0 ? "text-green" : "text-red"
+                      property.changePercent >= 0 ? "text-green" : "text-red"
                     }`}
                   >
                     {Math.abs(property.changePercent)}%{" "}
-                    {property.changePercent > 0 ? "More than" : "Less than"}
+                    {property.changePercent >= 0 ? "More than" : "Less than"}
                   </span>
-                  <span className="text-sm text-lightWhite">March 2025</span>
+                  <span className="text-sm text-lightWhite">
+                    {meta?.comparisonMonthName || "Previous Month"}
+                  </span>
                 </div>
               </div>
               {/* Market Demand Gauge */}

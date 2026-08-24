@@ -295,7 +295,6 @@ const OurProperty = () => {
     isLoginOverride?: boolean,
     navId?: string,
   ) => {
-    console.log(list[0]);
     if (isLoading) {
       return (
         <div className="flex gap-6 justify-center-safe">

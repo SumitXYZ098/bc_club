@@ -97,7 +97,7 @@ const generateDashboardData = (
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-2.5 min-w-[180px]">
+      <div className="bg-white p-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-2.5 min-w-45">
         <p className="text-sm font-bold text-black border-b border-gray-100 pb-2 mb-1">
           {label}
         </p>
@@ -208,9 +208,9 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
         <div className="h-full w-px bg-gray-300" />
         {Array.from({ length: 12 }).map((_, i) => (
           <div key={i} className="flex-1 flex items-end gap-1 px-3">
-            <div className="w-3 bg-gray-200 rounded-t-md h-[120px]" />
-            <div className="w-3 bg-gray-200 rounded-t-md h-[180px]" />
-            <div className="w-3 bg-gray-200 rounded-t-md h-[90px]" />
+            <div className="w-3 bg-gray-200 rounded-t-md h-30" />
+            <div className="w-3 bg-gray-200 rounded-t-md h-45" />
+            <div className="w-3 bg-gray-200 rounded-t-md h-22.5" />
           </div>
         ))}
       </div>
@@ -229,7 +229,7 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
 
   if (!isMounted)
     return (
-      <div className="p-8 space-y-8 bg-white border border-gray-100 rounded-3xl min-h-[500px] shadow-sm"></div>
+      <div className="p-8 space-y-8 bg-white border border-gray-100 rounded-3xl min-h-125 shadow-sm"></div>
     );
 
   return (
@@ -319,7 +319,7 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
         <h2 className="text-xl font-bold text-black px-2">All Properties</h2>
 
         {/* Chart */}
-        <div className="w-full h-[350px] relative">
+        <div className="w-full h-87.5 relative">
           {isProtectedRange ? (
             <ChartSignInOverlay
               monthContent={monthName(range)}
@@ -332,7 +332,7 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
               <BarChart
                 data={data.chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                barGap={6}
+                barGap={4}
               >
                 <CartesianGrid
                   vertical={false}

@@ -1,4 +1,11 @@
-export const cities = ["Surrey", "Vancouver", "Prince George"];
+export const cities = [
+  "Surrey",
+  "Vancouver",
+  "Prince George",
+  "Burnaby",
+  "Langley",
+  "Abbotsford",
+];
 
 export interface PropertySoldData {
   type: string;
