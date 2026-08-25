@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import MarketTrend from "./marketTrend/MarketTrend";
 import { FiPrinter, FiShare2 } from "react-icons/fi";
 import GetInTouch from "../getInTouch/GetInTouch";
-import MonthlySalesReports from "./monthlySalesReports/MonthlySalesReports";
 import StatsMap from "./statsMap/StatsMap";
 import MonthlySaleChart from "./monthlySaleChart/MonthlySaleChart";
-import MonthlySalesTable from "./monthlySalesTable/MonthlySalesTable";
+import MonthlySalesReports from "./monthlySalesReports/MonthlySalesReports";
+import StatisticsSalesTable from "./statisticsSalesTable/StatisticsSalesTable";
 
 const TrendStepPage = () => {
-  const [activeTab, setActiveTab] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<number>(2);
 
   return (
     <>
@@ -39,7 +39,7 @@ const TrendStepPage = () => {
                   : "border-borderColor text-gray-500"
               }`}
             >
-              Monthly Sales
+              Monthly Sales Reports
             </button>
 
             <button
@@ -61,7 +61,7 @@ const TrendStepPage = () => {
                   : "border-borderColor text-gray-500"
               }`}
             >
-              Monthly Sales Reports
+              Statistics Sales Table
             </button>
 
             <button className="p-2 bg-[#3054871A] rounded-md">
@@ -76,9 +76,9 @@ const TrendStepPage = () => {
 
         {activeTab === 0 && <MarketTrend />}
         {activeTab === 1 && <MonthlySaleChart />}
-        {activeTab === 2 && <MonthlySalesTable />}
+        {activeTab === 2 && <MonthlySalesReports />}
         {activeTab === 3 && <StatsMap />}
-        {activeTab === 4 && <MonthlySalesReports />}
+        {activeTab === 4 && <StatisticsSalesTable />}
       </section>
 
       {(activeTab === 0 || activeTab === 1 || activeTab === 2) && (
