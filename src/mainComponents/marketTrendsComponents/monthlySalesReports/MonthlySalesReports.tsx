@@ -978,7 +978,7 @@ const MonthlySalesReports = () => {
           </div>
 
           {/* Chart Container */}
-          <div className="w-full h-105 overflow-x-auto scrollbar-hide">
+          <div className="w-full h-80 overflow-x-auto scrollbar-hide">
             <div className="min-w-162.5 w-full h-full">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
