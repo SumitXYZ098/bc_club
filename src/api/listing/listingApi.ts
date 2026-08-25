@@ -201,6 +201,7 @@ export async function getMonthlySalesReports(params?: {
   propertyType?: string;
   region?: string;
   type?: string;
+  yearsBack?: string | number;
 }): Promise<any> {
   try {
     const res = await axios.get(Endpoints.getMonthlySalesReports, {

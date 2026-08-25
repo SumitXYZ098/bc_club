@@ -37,7 +37,6 @@ import {
   hasValidCoordinates,
   normalizeAddress,
   transformActiveListing,
-  transformNormalListing,
 } from "./mapPropertyUtils";
 import MapLoading from "./MapLoading";
 import MapTopFilterBar from "./MapTopFilterBar";
@@ -96,8 +95,6 @@ export default function OpenStreetMapSearch() {
     maxPrice,
     minSqft,
     maxSqft,
-    activeBedRoom,
-    activeBathRoom,
   } = filters;
 
   const [map, setMap] = useState<L.Map | null>(null);
@@ -165,19 +162,6 @@ export default function OpenStreetMapSearch() {
     setFitBoundsDone(false);
   }, [filters]);
 
-  const price = [minPrice ?? 1000, maxPrice ?? 100000000];
-  const sqft = [minSqft ?? 100, maxSqft ?? 15000];
-
-  const setPrice = (val: [number, number]) => {
-    updateInstanceFilter("map", "minPrice", val[0]);
-    updateInstanceFilter("map", "maxPrice", val[1]);
-  };
-
-  const setSqft = (val: [number, number]) => {
-    updateInstanceFilter("map", "minSqft", val[0]);
-    updateInstanceFilter("map", "maxSqft", val[1]);
-  };
-
   const resetAllFilters = () => {
     clearInstanceFilters("map");
     setSortBy("newest");
@@ -201,25 +185,6 @@ export default function OpenStreetMapSearch() {
     () => buildMapZoomParams({ filters, mapBounds, mapZoomVal }),
     [filters, mapBounds, mapZoomVal],
   );
-
-  // const params = useMemo(() => buildListingParams(filters), [filters]);
-
-  // const {
-  //   data: queryDataNormal,
-  //   isLoading: isLoadingNormal,
-  //   isFetching: isFetchingNormal,
-  // } = useGetListings(params, {
-  //   select: (res: any) =>
-  //     (res?.data || [])
-  //       .map((listing: any) => transformNormalListing(listing, me))
-  //       .filter(
-  //         (l: any) =>
-  //           Number(l.price) > 0 && (hasValidCoordinates(l) || l.address),
-  //       ),
-  //   enabled: !isForSale && !!mapBounds,
-  //   staleTime: 1000 * 60 * 5,
-  //   placeholderData: (previousData: any) => previousData,
-  // });
 
   const {
     data: queryDataActive,

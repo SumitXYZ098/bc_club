@@ -14,6 +14,7 @@ import {
   getDDFPropertiesListByAddress,
   getSalesReported,
   getSoldMarketSummary,
+  getMonthlySalesReports,
   getMapZoomAssignmentList,
   getMapZoomSoldList,
   getMapZoomSchools,
@@ -215,6 +216,28 @@ export function useGetSoldMarketSummary<TData = any>(
   return useQuery<any, Error, TData, any>({
     queryKey: ["soldMarketSummary", params],
     queryFn: () => getSoldMarketSummary(params),
+    ...options,
+  });
+}
+
+// Monthly Sales Reports
+export function useGetMonthlySalesReports<TData = any>(
+  params?: {
+    year?: string | number;
+    month?: string | number;
+    propertyType?: string;
+    region?: string;
+    type?: string;
+    yearsBack?: string | number;
+  },
+  options?: Omit<
+    UseQueryOptions<any, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<any, Error, TData, any>({
+    queryKey: ["monthlySalesReports", params],
+    queryFn: () => getMonthlySalesReports(params),
     ...options,
   });
 }
