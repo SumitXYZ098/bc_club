@@ -136,6 +136,56 @@ const ComparisonIcon = ({
   }
 };
 
+const isImageFileUrl = (url: string): boolean => {
+  if (!url || typeof url !== "string") return false;
+  const cleanUrl = url.trim().toLowerCase();
+
+  if (
+    !cleanUrl.startsWith("http://") &&
+    !cleanUrl.startsWith("https://") &&
+    !cleanUrl.startsWith("/")
+  ) {
+    return false;
+  }
+
+  const invalidPatterns = [
+    "yelp.ca",
+    "yelp.com",
+    "youtube.com",
+    "youtu.be",
+    "vimeo.com",
+    ".pdf",
+    ".mp4",
+    ".mov",
+    ".avi",
+    ".webm",
+    ".doc",
+    ".docx",
+    "utm_campaign",
+  ];
+
+  if (invalidPatterns.some((pattern) => cleanUrl.includes(pattern))) {
+    const pathname = cleanUrl.split("?")[0];
+    const validExtensions = [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+      ".avif",
+      ".gif",
+      ".svg",
+    ];
+    const hasValidExtension = validExtensions.some((ext) =>
+      pathname.endsWith(ext)
+    );
+    if (!hasValidExtension) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   id,
   image,
@@ -169,6 +219,13 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
 
   const [localIsFavourite, setLocalIsFavourite] = React.useState(false);
   const [localLikesCount, setLocalLikesCount] = React.useState(likesCount || 0);
+
+  const initialImg = image && isImageFileUrl(image) ? image : Images.apartment;
+  const [imgSrc, setImgSrc] = React.useState(initialImg);
+
+  React.useEffect(() => {
+    setImgSrc(image && isImageFileUrl(image) ? image : Images.apartment);
+  }, [image]);
 
   const isFavourite =
     me?.favorites?.some(
@@ -236,7 +293,6 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
       ? `${Number(lotSize)} sft`
       : "--- sft"
     : "---- sft";
-  const img = image ? image : Images.apartment;
 
   const isLinkDisabled = isExpired;
   const getHref = isLinkDisabled
@@ -263,10 +319,10 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
         <div className="flex flex-col justify-between w-full h-full">
           <div className="relative flex items-center">
             <div className="w-full h-56 overflow-clip rounded-t-2xl">
-              {img ? (
+              {imgSrc ? (
                 <Image
                   title="image title"
-                  src={img}
+                  src={imgSrc}
                   alt={title}
                   className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
                     isLogin ? "group-hover:scale-125" : "blur-sm"
@@ -274,6 +330,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
                   width={700}
                   height={403}
                   loading="eager"
+                  onError={() => setImgSrc(Images.apartment)}
                 />
               ) : (
                 <div className="w-full h-56 bg-gray-200 rounded-lg animate-pulse" />

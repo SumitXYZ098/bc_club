@@ -40,8 +40,57 @@ export interface PropertyCardProps {
   likesCount?: number;
   structureType?: string;
   oldPrice?: number;
-  standardStatus?: string;
 }
+
+const isImageFileUrl = (url: string): boolean => {
+  if (!url || typeof url !== "string") return false;
+  const cleanUrl = url.trim().toLowerCase();
+
+  if (
+    !cleanUrl.startsWith("http://") &&
+    !cleanUrl.startsWith("https://") &&
+    !cleanUrl.startsWith("/")
+  ) {
+    return false;
+  }
+
+  const invalidPatterns = [
+    "yelp.ca",
+    "yelp.com",
+    "youtube.com",
+    "youtu.be",
+    "vimeo.com",
+    ".pdf",
+    ".mp4",
+    ".mov",
+    ".avi",
+    ".webm",
+    ".doc",
+    ".docx",
+    "utm_campaign",
+  ];
+
+  if (invalidPatterns.some((pattern) => cleanUrl.includes(pattern))) {
+    const pathname = cleanUrl.split("?")[0];
+    const validExtensions = [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+      ".avif",
+      ".gif",
+      ".svg",
+    ];
+    const hasValidExtension = validExtensions.some((ext) =>
+      pathname.endsWith(ext)
+    );
+    if (!hasValidExtension) {
+      return false;
+    }
+  }
+
+  return true;
+};
 
 const PropertiesCard: React.FC<PropertyCardProps> = ({
   id,
@@ -146,7 +195,12 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   const displayMls = isLogin ? `MLS® ${mls}` : "MLS® *******";
   const displayRealtor = isLogin ? realtor : "Courtesy of: **********";
 
-  const img = image ? image : Images.apartment;
+  const initialImg = image && isImageFileUrl(image) ? image : Images.apartment;
+  const [imgSrc, setImgSrc] = React.useState(initialImg);
+
+  React.useEffect(() => {
+    setImgSrc(image && isImageFileUrl(image) ? image : Images.apartment);
+  }, [image]);
 
   const isLinkDisabled = isExpired;
   const getHref = isLinkDisabled
@@ -174,9 +228,9 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
         <div className="flex flex-col justify-between w-full h-full">
           <div className="relative flex items-center">
             <div className="w-full h-67 overflow-clip rounded-t-2xl">
-              {img ? (
+              {imgSrc ? (
                 <Image
-                  src={img}
+                  src={imgSrc}
                   alt={title || "Property Image"}
                   title={title || "Property Image"}
                   className={`w-full h-full object-cover rounded-t-2xl transition duration-300 ease-in-out ${
@@ -185,6 +239,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                   width={700}
                   height={403}
                   loading="eager"
+                  onError={() => setImgSrc(Images.apartment)}
                 />
               ) : (
                 <div className="w-full h-56 bg-gray-200 rounded-lg animate-pulse" />
