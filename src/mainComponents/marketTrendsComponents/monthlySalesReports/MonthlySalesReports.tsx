@@ -53,7 +53,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   }, []);
 
   return (
-    <div ref={selectRef} className="relative flex-1">
+    <div ref={selectRef} className="relative flex-1 min-w-0 w-full">
       <p className="text-sm text-gray-500 mb-1">{label}</p>
       <button
         type="button"
@@ -319,20 +319,20 @@ const CustomXAxisTick = (props: any) => {
     <g transform={`translate(${x},${y})`}>
       <text
         x={0}
-        y={12}
+        y={10}
         textAnchor="middle"
         fill="#000"
-        fontSize={12}
+        fontSize={11}
         fontWeight="bold"
       >
         {month}
       </text>
       <text
         x={0}
-        y={26}
+        y={23}
         textAnchor="middle"
         fill="#000"
-        fontSize={12}
+        fontSize={11}
         fontWeight="bold"
       >
         {year}
@@ -349,7 +349,7 @@ const CustomChartTooltip = ({ active, payload, label }: any) => {
       : "-";
 
     return (
-      <div className="bg-white border border-gray-300 p-3 rounded-lg shadow-xl text-xs space-y-1.5 min-w-52.5">
+      <div className="bg-white border border-gray-300 p-3 rounded-lg shadow-xl text-xs space-y-1.5 min-w-48 max-w-70 sm:max-w-none">
         <div className="font-bold text-sm text-gray-900 border-b border-gray-100 pb-1">
           {data.label || label}
         </div>
@@ -580,7 +580,7 @@ const MonthlySalesReports = () => {
   return (
     <section className="space-y-6 mt-10">
       {/* Filters */}
-      <div className="bg-white rounded-2xl shadow p-5 flex flex-col md:flex-row gap-4">
+      <div className="bg-white rounded-2xl shadow p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <CustomSelect
           label="Property Type"
           options={PROPERTY_TYPE_OPTIONS}
@@ -953,42 +953,48 @@ const MonthlySalesReports = () => {
 
       {/* Chart */}
       {loading ? (
-        <div className="bg-[#F2FBF3] border border-gray-400 rounded-xl p-5 shadow-sm space-y-4 mt-6 h-105 flex flex-col justify-center items-center">
-          <div className="w-9 h-9 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-sm font-semibold text-gray-700">
+        <div className="bg-[#F2FBF3] border border-gray-400 rounded-xl p-4 sm:p-5 shadow-sm space-y-4 mt-6 h-80 sm:h-105 flex flex-col justify-center items-center">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-xs sm:text-sm font-semibold text-gray-700">
             Loading Chart Data...
           </span>
         </div>
       ) : chartData && chartData.length > 0 ? (
-        <div className="bg-[#F2FBF3] border border-gray-400 rounded-xl p-5 shadow-sm space-y-4 mt-6">
+        <div className="bg-[#F2FBF3] border border-gray-400 rounded-xl p-3 sm:p-5 shadow-sm space-y-4 mt-6">
           {/* Top Legend */}
-          <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-gray-800 border-b border-gray-300/60 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="w-3.5 h-3.5 rounded-full bg-red-600 inline-block shrink-0"></span>
+          <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-6 text-xs sm:text-sm font-bold text-gray-800 border-b border-gray-300/60 pb-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-red-600 inline-block shrink-0"></span>
               <span>Median Sold Price</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3.5 h-3.5 bg-green-700 inline-block shrink-0"></span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-green-700 inline-block shrink-0"></span>
               <span>Inventory Count</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-4 h-3.5 bg-amber-500 rounded-sm inline-block shrink-0"></span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="w-3.5 h-3 sm:w-4 sm:h-3.5 bg-amber-500 rounded-sm inline-block shrink-0"></span>
               <span>Sold Count</span>
             </div>
           </div>
 
           {/* Chart Container */}
-          <div className="w-full h-80 overflow-x-auto scrollbar-hide">
-            <div className="min-w-162.5 w-full h-full">
+          <div className="w-full h-72 sm:h-80 md:h-96 overflow-x-auto touch-pan-x scrollbar-hide">
+            <div
+              style={{
+                minWidth: `${Math.max(600, chartData.length * 60)}px`,
+                width: "100%",
+                height: "100%",
+              }}
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={chartData}
-                  margin={{ top: 25, right: 25, left: 25, bottom: 25 }}
+                  margin={{ top: 25, right: 15, left: 15, bottom: 25 }}
                 >
                   <XAxis
                     dataKey="label"
                     axisLine={{ stroke: "#000", strokeWidth: 1.5 }}
-                    tickLine={false}
+                    tickLine={true}
                     tick={<CustomXAxisTick />}
                     interval={0}
                   />
@@ -1013,14 +1019,14 @@ const MonthlySalesReports = () => {
                     yAxisId="sold"
                     dataKey="soldCount"
                     fill="#FFA500"
-                    barSize={32}
+                    barSize={28}
                     radius={[2, 2, 0, 0]}
                   >
                     <LabelList
                       dataKey="soldCount"
                       position="top"
                       style={{
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: "bold",
                         fill: "#000",
                       }}
@@ -1040,7 +1046,7 @@ const MonthlySalesReports = () => {
                       dataKey="inventoryCount"
                       position="top"
                       style={{
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: "bold",
                         fill: "#000",
                       }}
@@ -1054,14 +1060,14 @@ const MonthlySalesReports = () => {
                     dataKey="medianSoldPrice"
                     stroke="#DC2626"
                     strokeWidth={2.5}
-                    dot={{ r: 5, fill: "#DC2626", stroke: "#DC2626" }}
+                    dot={{ r: 4, fill: "#DC2626", stroke: "#DC2626" }}
                   >
                     <LabelList
                       dataKey="medianSoldPrice"
                       position="top"
                       formatter={formatPriceLabel}
                       style={{
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: "bold",
                         fill: "#000",
                       }}

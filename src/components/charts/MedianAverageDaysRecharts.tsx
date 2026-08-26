@@ -15,6 +15,7 @@ import PoweredBy from "../common/poweredby/PoweredBy";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import ChartSignInOverlay from "../common/charts/ChartSignInOverlay";
 import { monthName } from "@/src/utilities/utilities";
+import { timeRanges } from "./SalesReportedRecharts";
 
 /* -------------------------------
    1️⃣ Data Generation Logic
@@ -53,7 +54,7 @@ const generateMedianAverageData = (range: string) => {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-2.5 min-w-[180px]">
+      <div className="bg-white p-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-2.5 min-w-45">
         <p className="text-sm font-bold text-black border-b border-gray-100 pb-2 mb-1">
           {label}
         </p>
@@ -104,7 +105,7 @@ const MedianAverageDaysRecharts = () => {
 
   if (!isMounted) {
     return (
-      <div className="w-full h-[450px] bg-white rounded-3xl animate-pulse" />
+      <div className="w-full h-112.5 bg-white rounded-3xl animate-pulse" />
     );
   }
 
@@ -115,8 +116,8 @@ const MedianAverageDaysRecharts = () => {
         <h2 className="md:text-xl text-lg font-bold text-black">
           Median & Average Days
         </h2>
-        <div className="flex items-center rounded-2xl gap-1">
-          {["12D", "1M", "3M", "6M", "Custom"].map((r) => (
+        <div className="flex flex-wrap bg-[#F5F5F5] p-1.5 rounded-xl gap-1">
+          {timeRanges.map((r) => (
             <button
               key={r}
               onClick={() => {
@@ -126,10 +127,10 @@ const MedianAverageDaysRecharts = () => {
                   setRange(r);
                 }
               }}
-              className={`px-4 py-2 rounded-xl text-sm transition-all ${
+              className={`md:px-5 md:py-2 px-3 py-1 rounded-lg md:text-sm text-xs font-medium transition-all cursor-pointer ${
                 range === r
                   ? "bg-[#FFA500] text-white shadow-sm"
-                  : "text-black70 hover:bg-gray-200 bg-gray"
+                  : "text-gray-500 hover:bg-gray-200"
               }`}
             >
               {r}
@@ -139,76 +140,84 @@ const MedianAverageDaysRecharts = () => {
       </div>
 
       {/* Chart Area */}
-      <div className="w-full h-[400px] relative">
+      <div className="w-full h-100 relative overflow-x-auto touch-pan-x scrollbar-hide">
         {isProtectedRange ? (
           <ChartSignInOverlay
             monthContent={monthName(range)}
             onSignIn={() => setOpenLogin(true)}
           />
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              margin={{ top: 20, right: 10, left: 0, bottom: 20 }}
-              barGap={2}
-            >
-              <CartesianGrid
-                vertical={false}
-                stroke="#F0F0F0"
-                strokeDasharray="0"
-              />
-              <XAxis
-                dataKey="name"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 500 }}
-                dy={12}
-              />
-              <YAxis
-                hide // Match the clean look if preferred, or keep minimal ticks
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                cursor={{ fill: "transparent" }}
-                content={<CustomTooltip />}
-              />
-              <Bar
-                name="Median Days"
-                dataKey="median"
-                fill="#FFA500"
-                barSize={14}
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                name="Average Days"
-                dataKey="average"
-                fill="#1D4E89"
-                barSize={14}
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <div
+            style={{
+              minWidth: `${Math.max(500, (data?.length || 0) * 40)}px`,
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data}
+                margin={{ top: 20, right: 10, left: 0, bottom: 20 }}
+                barGap={2}
+              >
+                <CartesianGrid
+                  vertical={false}
+                  stroke="#F0F0F0"
+                  strokeDasharray="0"
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 500 }}
+                  dy={12}
+                />
+                <YAxis
+                  hide // Match the clean look if preferred, or keep minimal ticks
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: "transparent" }}
+                  content={<CustomTooltip />}
+                />
+                <Bar
+                  name="Median Days"
+                  dataKey="median"
+                  fill="#FFA500"
+                  barSize={14}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  name="Average Days"
+                  dataKey="average"
+                  fill="#1D4E89"
+                  barSize={14}
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </div>
 
       {/* Legend Row */}
-      <div className="flex items-center justify-between gap-8">
-        <div className="flex items-center justify-center gap-8">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
           {[
             { label: "Median Days", color: "#FFA500" },
             { label: "Average Days", color: "#1D4E89" },
           ].map((item) => (
-            <div key={item.label} className="flex items-center gap-0.5">
+            <div key={item.label} className="flex items-center gap-1">
               <div
-                className="w-4 h-4"
-                style={{ backgroundColor: item.color, borderRadius: "4px" }}
+                className="w-4 h-4 rounded-xs shrink-0"
+                style={{ backgroundColor: item.color }}
               />
               <span className="text-xs text-black">{item.label}</span>
             </div>
           ))}
         </div>
-        <PoweredBy className="justify-end" textStyle="text-xs!" />
+        <PoweredBy className="justify-end shrink-0" textStyle="text-xs!" />
       </div>
     </div>
   );

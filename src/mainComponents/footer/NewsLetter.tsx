@@ -76,7 +76,7 @@ const NewsLetter = () => {
             onClick={handleSubscribe}
             title="Submit"
             buttonType="quaternary"
-            customClassName="py-3.5 px-8.5 !rounded-lg md:flex hidden"
+            customClassName="py-3.5 px-8.5 !rounded-lg md:!flex !hidden"
             textClassName="!font-bold !text-base"
           />
         </div>

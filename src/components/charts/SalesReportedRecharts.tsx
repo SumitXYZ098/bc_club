@@ -17,7 +17,7 @@ import ChartSignInOverlay from "../common/charts/ChartSignInOverlay";
 import { monthName } from "@/src/utilities/utilities";
 import { useGetSalesReported } from "@/src/hooks/listing/useListingQueries";
 
-const timeRanges = ["12D", "1M", "3M", "6M", "Custom"];
+export const timeRanges = ["12D", "1M", "3M", "6M", "Custom"];
 type SeriesKey = "detached" | "apartment" | "townhouse";
 
 /* -------------------------------
@@ -131,14 +131,14 @@ const SummaryCard = ({
   value: number;
   isLoading: boolean;
 }) => (
-  <div className="rounded-xl lg:p-6 p-4 bg-gray flex flex-col items-center justify-center gap-y-2 flex-1 w-1/2">
+  <div className="rounded-xl lg:p-6 p-2 bg-gray flex flex-col items-center justify-center gap-y-2 flex-1 w-1/2">
     <h3 className="text-foreground lg:text-sm text-xs font-medium opacity-70">
       {title}
     </h3>
     {isLoading ? (
       <div className="h-8 w-60 bg-white/50 animate-pulse rounded" />
     ) : (
-      <p className="lg:text-4xl text-2xl font-bold text-black">
+      <p className="lg:text-4xl text-base font-bold text-black">
         {value.toLocaleString()}
       </p>
     )}
@@ -233,9 +233,9 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
     );
 
   return (
-    <div className="lg:p-8 p-4 space-y-8 bg-white border border-transparent rounded-3xl">
+    <div className="lg:p-8 p-4 space-y-3 md:space-y-8 bg-white border border-transparent rounded-3xl w-full">
       {/* 1st Row: Summary Cards */}
-      <div className="flex flex-row flex-wrap gap-6 justify-center w-full">
+      <div className="flex flex-row flex-wrap md:gap-6 gap-2 justify-center w-full">
         <SummaryCard
           title="Total properties sold"
           value={data.summary.sold}
@@ -250,7 +250,7 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
 
       {/* 2nd Row: Filters and Series Toggles */}
       <div className="flex flex-wrap items-center gap-6 justify-between">
-        <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex flex-wrap md:gap-3 gap-2 items-center">
           {[
             { key: "detached", color: "#FF0400" },
             { key: "apartment", color: "#1D00FF" },
@@ -274,17 +274,19 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
                   return nextState;
                 })
               }
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border transition-all ${
+              className={`flex items-center md:gap-2 md:px-4 md:py-2.5 gap-1 px-2 py-1.5 rounded-xl bg-white border transition-all ${
                 visibleSeries[key as keyof typeof visibleSeries]
                   ? "border-gray-200"
                   : "border-transparent opacity-40 shadow-none"
               } shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]`}
             >
               <span
-                className="w-4 h-4 rounded-md"
+                className="md:w-4 md:h-4 w-2 h-2 rounded-md"
                 style={{ background: color }}
               />
-              <span className="text-sm font-medium capitalize">{key}</span>
+              <span className="md:text-sm text-xs font-medium capitalize">
+                {key}
+              </span>
             </button>
           ))}
         </div>
@@ -302,7 +304,7 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
                     setRange(r);
                   }
                 }}
-                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                className={`md:px-5 md:py-2 px-3 py-1 rounded-lg md:text-sm text-xs font-medium transition-all cursor-pointer ${
                   range === r
                     ? "bg-[#FFA500] text-white shadow-sm"
                     : "text-gray-500 hover:bg-gray-200"
@@ -315,19 +317,28 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-black px-2">All Properties</h2>
+      {/* <div className="space-y-4 w-full"> */}
+      <h2 className="md:text-xl text-lg font-bold text-black px-2">
+        All Properties
+      </h2>
 
-        {/* Chart */}
-        <div className="w-full h-87.5 relative">
-          {isProtectedRange ? (
-            <ChartSignInOverlay
-              monthContent={monthName(range)}
-              onSignIn={() => setOpenLogin(true)}
-            />
-          ) : isChartLoading ? (
-            <ChartSkeleton />
-          ) : (
+      {/* Chart */}
+      <div className="w-full h-87.5 relative overflow-x-auto touch-pan-x scrollbar-hide">
+        {isProtectedRange ? (
+          <ChartSignInOverlay
+            monthContent={monthName(range)}
+            onSignIn={() => setOpenLogin(true)}
+          />
+        ) : isChartLoading ? (
+          <ChartSkeleton />
+        ) : (
+          <div
+            style={{
+              minWidth: `${Math.max(600, (data?.chartData?.length || 0) * 45)}px`,
+              width: "100%",
+              height: "100%",
+            }}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data.chartData}
@@ -420,11 +431,12 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
                 )}
               </BarChart>
             </ResponsiveContainer>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-      <div className="w-full flex flex-nowrap justify-between items-start">
-        <div className="grid grid-cols-3 gap-4 w-fit">
+      {/* </div> */}
+      <div className="w-full flex flex-col sm:flex-row flex-wrap sm:flex-nowrap justify-between items-start gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 w-full sm:w-fit">
           {[
             {
               key: "Total Detached Listed",
@@ -459,18 +471,18 @@ const SalesReportedRecharts = ({ location }: { location: string }) => {
               total: data?.summary?.total_townhouse_sold || 0,
             },
           ].map(({ key, color, total }) => (
-            <div key={key} className="flex items-center gap-1">
+            <div key={key} className="flex items-center gap-1.5">
               <span
-                className="w-3 h-3 rounded-xs"
+                className="w-3 h-3 rounded-xs shrink-0"
                 style={{ background: color }}
               />
-              <span className="text-sm font-medium capitalize">
+              <span className="text-xs sm:text-sm font-medium capitalize">
                 {key}: {total}
               </span>
             </div>
           ))}
         </div>
-        <PoweredBy className="justify-end" />
+        <PoweredBy className="justify-end shrink-0" />
       </div>
     </div>
   );

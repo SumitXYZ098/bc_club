@@ -59,7 +59,6 @@ const HomeSellingTrends = () => {
       <SalesReportedRecharts location={location} />
 
       <div className="flex lg:flex-row flex-col gap-6 items-center justify-between mt-6">
-        {/* <MedianAverageDays /> */}
         <MedianAverageDaysRecharts />
         <MedianAveragePriceRecharts />
       </div>
