@@ -40,6 +40,7 @@ export interface PropertyCardProps {
   likesCount?: number;
   structureType?: string;
   oldPrice?: number;
+  onCardClick?: (id: string, isSold?: boolean) => void;
 }
 
 const isImageFileUrl = (url: string): boolean => {
@@ -82,7 +83,7 @@ const isImageFileUrl = (url: string): boolean => {
       ".svg",
     ];
     const hasValidExtension = validExtensions.some((ext) =>
-      pathname.endsWith(ext)
+      pathname.endsWith(ext),
     );
     if (!hasValidExtension) {
       return false;
@@ -103,17 +104,16 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   beds,
   baths,
   lotSize,
-  assessedDiff,
   mls,
   realtor,
   isExpired,
   isSold,
   isFavourite: isFavouriteProp,
   isLogin: isLoginProp,
-  isDdf,
   likesCount,
   structureType,
   oldPrice = 0,
+  onCardClick,
 }) => {
   const { data: me } = useGetMe();
   const toggleWishlist = useAddRealEstateFavorite();
@@ -213,10 +213,15 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
     <Link
       href={`${!isLogin ? "#" : getHref}`}
       className="w-full h-full flex"
-      target="_blank"
+      target={onCardClick ? "_self" : "_blank"}
       onClick={(e) => {
         if (isLinkDisabled) {
           e.preventDefault(); // Stop link from navigating
+          return;
+        }
+        if (onCardClick && isLogin) {
+          e.preventDefault();
+          onCardClick(id, isSold);
         }
       }}
     >

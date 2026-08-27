@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import { Dialog } from "@mui/material";
+import { FiArrowLeft, FiMaximize2, FiMinimize2, FiX } from "react-icons/fi";
 
 import "swiper/css/navigation";
 
@@ -19,6 +21,7 @@ import { useRouter } from "next/navigation";
 import RippleButton from "@/src/components/button/RippleButton";
 import { useAuthContext } from "../auth/AuthContext";
 import { useGetRealEstateListings } from "@/src/hooks/listing/useRealEstateListingQueries";
+import PropertyInfo from "@/src/mainComponents/propertyInfo/PropertyInfo";
 
 const tabList = [
   "Newly Listed properties",
@@ -57,6 +60,11 @@ const OurProperty = () => {
   const [tab, setTab] = useState(tabList[0]);
 
   const [city, setCity] = useState("Vancouver"); // default fallback
+
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
+    null,
+  );
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const refs = {
     "Newly Listed properties": useRef<HTMLDivElement>(null),
@@ -385,6 +393,7 @@ const OurProperty = () => {
                 isLogin={isLoginOverride ?? isLoggedIn}
                 isSold={item.status === "Closed" ? true : false}
                 isExpired={item.status === "Expired" ? true : false}
+                onCardClick={(id) => setSelectedPropertyId(id)}
               />
             </SwiperSlide>
           ))}
@@ -489,6 +498,77 @@ const OurProperty = () => {
           {renderSlider(soldList, isLoadingSold, isLoggedIn, "sold")}
         </div>
       </div>
+
+      {/* Property Information Tab Dialog */}
+      <Dialog
+        fullScreen={isFullScreen}
+        maxWidth="xl"
+        fullWidth
+        open={Boolean(selectedPropertyId)}
+        onClose={() => setSelectedPropertyId(null)}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "var(--background, #ffffff)",
+              borderRadius: isFullScreen ? 0 : { xs: 0, md: "16px" },
+              margin: isFullScreen ? 0 : { xs: 0, md: "24px auto" },
+              maxHeight: isFullScreen
+                ? "100vh"
+                : { xs: "100vh", md: "calc(100vh - 48px)" },
+              height: "100%",
+              width: "100%",
+              maxWidth: isFullScreen ? "100vw" : "1400px",
+              overflow: "hidden",
+              transition: "all 0.3s ease-in-out",
+            },
+          },
+        }}
+      >
+        <div className="flex flex-col h-full w-full bg-background overflow-hidden">
+          {/* Top Header */}
+          <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-sm shrink-0">
+            <button
+              onClick={() => setSelectedPropertyId(null)}
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold transition cursor-pointer text-sm md:text-base"
+            >
+              <FiArrowLeft className="w-5 h-5 text-gray-700" />
+              <span>Back</span>
+            </button>
+
+            <span className="text-lg font-bold ">Property Details</span>
+
+            {/* Actions: Full Screen Toggle & Close */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsFullScreen((prev) => !prev)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition cursor-pointer text-sm font-medium border border-gray-200"
+                title={
+                  isFullScreen
+                    ? "Exit Full Screen (Decrease Width)"
+                    : "Full Screen (Increase Width)"
+                }
+                aria-label="Toggle Width"
+              >
+                {isFullScreen ? (
+                  <FiMinimize2 className="w-4 h-4 text-gray-700" />
+                ) : (
+                  <FiMaximize2 className="w-4 h-4 text-gray-700" />
+                )}
+                <span className="hidden md:inline-block">
+                  {isFullScreen ? "Collapse" : "Fullscreen"}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Content Body */}
+          <div className="w-full flex-1 overflow-y-auto">
+            {selectedPropertyId && (
+              <PropertyInfo paramsId={selectedPropertyId} isDialog={true} />
+            )}
+          </div>
+        </div>
+      </Dialog>
     </section>
   );
 };

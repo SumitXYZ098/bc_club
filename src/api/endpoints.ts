@@ -39,12 +39,12 @@ export const Endpoints = {
   getRealEstatePropertiesListById: (id: string) =>
     `${BASE_URL}/api/real-estate-boards/${id}`,
   getSimilarRealEstateProperties: (id: string) =>
-    `${BASE_URL}/api/real-estate-board/${id}/similar?radiusKm=5&limit=20`,
+    `${BASE_URL}/api/real-estate-board/${id}/similar?radiusKm=90&limit=20`,
   getSimilarRealEstateSoldProperties: (id: string) =>
-    `${BASE_URL}/api/real-estate-board/${id}/similar-sold?radiusKm=5&limit=20`,
+    `${BASE_URL}/api/real-estate-board/${id}/similar-sold?radiusKm=90&limit=20`,
   getRealEstatePropertiesListByAddress: `${BASE_URL}/api/real-estate-board/search-by-address`,
   getNearbyRealEstatePlaces: (id: string) =>
-    `${BASE_URL}/api/real-estate-board/${id}/neighborhood?radius=16000&limit=6`,
+    `${BASE_URL}/api/real-estate-board/${id}/neighborhood?radius=90000&limit=6`,
   getMyRealEstateFavorites: `${BASE_URL}/api/real-estate-board/my-favorites`,
   addRealEstateFavorite: (id: string) =>
     `${BASE_URL}/api/real-estate-board/add-favorite/${id}`,

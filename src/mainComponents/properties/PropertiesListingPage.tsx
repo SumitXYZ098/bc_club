@@ -1,15 +1,22 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { FiSearch, FiX } from "react-icons/fi";
+import {
+  FiSearch,
+  FiX,
+  FiArrowLeft,
+  FiMaximize2,
+  FiMinimize2,
+} from "react-icons/fi";
 import { motion } from "framer-motion";
 import FiltersPopup from "@/src/components/common/propertiesCard/FiltersPopup";
-import { Box, Chip, Pagination } from "@mui/material";
+import { Box, Chip, Dialog, Pagination } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PropertiesCard, {
   PropertyCardProps,
 } from "@/src/components/common/propertiesCard/PropertiesCard";
 import PropertyCardSkeleton from "@/src/components/common/propertiesCard/PropertyCardSkeleton";
 import FilterPillSelect from "@/src/components/filterPillSelect/FilterPillSelect";
+import PropertyInfo from "@/src/mainComponents/propertyInfo/PropertyInfo";
 
 import { useListingStore } from "@/src/store/useListingStore";
 import { useGetMe } from "@/src/hooks/listing/useListingQueries";
@@ -20,6 +27,10 @@ import { useGetRealEstateListings } from "@/src/hooks/listing/useRealEstateListi
 export default function PropertiesListingPage() {
   const { data: me } = useGetMe();
   const [openFilters, setOpenFilters] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
+    null,
+  );
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const { getInstanceFilters, updateInstanceFilter, clearInstanceFilters } =
     useListingStore();
@@ -124,9 +135,8 @@ export default function PropertiesListingPage() {
   // sorting
   if (activePrice && activePrice !== "any") {
     if (isForSale) {
-      if (activePrice === "newest") params.sort = "ModificationTimestamp:desc";
-      else if (activePrice === "oldest")
-        params.sort = "ModificationTimestamp:asc";
+      if (activePrice === "newest") params.sort = "newest";
+      else if (activePrice === "oldest") params.sort = "oldest";
       else if (activePrice === "asc") params.sort = "price:asc";
       else if (activePrice === "desc") params.sort = "price:desc";
       else if (activePrice === "tax-asc") params.sort = "tax:asc";
@@ -803,6 +813,7 @@ export default function PropertiesListingPage() {
                     isSold={status === "sold"}
                     isExpired={status === "expired"}
                     isDdf={property.isDdf}
+                    onCardClick={(id) => setSelectedPropertyId(id)}
                   />
                 ))}
               </div>
@@ -838,6 +849,77 @@ export default function PropertiesListingPage() {
         open={openFilters}
         onClose={() => setOpenFilters(false)}
       />
+
+      {/* Property Information Tab Dialog */}
+      <Dialog
+        fullScreen={isFullScreen}
+        maxWidth="xl"
+        fullWidth
+        open={Boolean(selectedPropertyId)}
+        onClose={() => setSelectedPropertyId(null)}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "var(--background, #ffffff)",
+              borderRadius: isFullScreen ? 0 : { xs: 0, md: "16px" },
+              margin: isFullScreen ? 0 : { xs: 0, md: "24px auto" },
+              maxHeight: isFullScreen
+                ? "100vh"
+                : { xs: "100vh", md: "calc(100vh - 48px)" },
+              height: "100%",
+              width: "100%",
+              maxWidth: isFullScreen ? "100vw" : "1400px",
+              overflow: "hidden",
+              transition: "all 0.3s ease-in-out",
+            },
+          },
+        }}
+      >
+        <div className="flex flex-col h-full w-full bg-background overflow-hidden">
+          {/* Top Header */}
+          <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-sm shrink-0">
+            <button
+              onClick={() => setSelectedPropertyId(null)}
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold transition cursor-pointer text-sm md:text-base"
+            >
+              <FiArrowLeft className="w-5 h-5 text-gray-700" />
+              <span>Back</span>
+            </button>
+
+            <span className="text-base font-bold ">Property Details</span>
+
+            {/* Actions: Full Screen Toggle & Close */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsFullScreen((prev) => !prev)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition cursor-pointer text-sm font-medium border border-gray-200"
+                title={
+                  isFullScreen
+                    ? "Exit Full Screen (Decrease Width)"
+                    : "Full Screen (Increase Width)"
+                }
+                aria-label="Toggle Width"
+              >
+                {isFullScreen ? (
+                  <FiMinimize2 className="w-4 h-4 text-gray-700" />
+                ) : (
+                  <FiMaximize2 className="w-4 h-4 text-gray-700" />
+                )}
+                <span className="hidden md:inline-block">
+                  {isFullScreen ? "Collapse" : "Fullscreen"}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Content Body */}
+          <div className="w-full flex-1 overflow-y-auto">
+            {selectedPropertyId && (
+              <PropertyInfo paramsId={selectedPropertyId} isDialog={true} />
+            )}
+          </div>
+        </div>
+      </Dialog>
     </motion.div>
   );
 }
