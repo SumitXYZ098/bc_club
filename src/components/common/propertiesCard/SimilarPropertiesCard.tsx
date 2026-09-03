@@ -13,6 +13,7 @@ import {
   calculateAge,
   getDaysAgoTime,
   getTime,
+  sqftToAcresFormatted,
 } from "@/src/utilities/utilities";
 import {
   useAddRealEstateFavorite,
@@ -30,6 +31,7 @@ export interface SimilarPropertiesCardProps {
   beds: number;
   baths: number;
   lotSize?: number;
+  lotSizeUnits?: string;
   priceDrop?: number;
   assessedDiff: number;
   mls: string;
@@ -176,7 +178,7 @@ const isImageFileUrl = (url: string): boolean => {
       ".svg",
     ];
     const hasValidExtension = validExtensions.some((ext) =>
-      pathname.endsWith(ext)
+      pathname.endsWith(ext),
     );
     if (!hasValidExtension) {
       return false;
@@ -197,6 +199,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   beds,
   baths,
   lotSize,
+  lotSizeUnits,
   mls,
   realtor,
   isExpired,
@@ -222,6 +225,17 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
 
   const initialImg = image && isImageFileUrl(image) ? image : Images.apartment;
   const [imgSrc, setImgSrc] = React.useState(initialImg);
+
+  const getLotSizeDisplay = () => {
+    const units = lotSizeUnits;
+    const normalizedUnits = units?.trim()?.toLowerCase();
+    if (normalizedUnits === "square feet") {
+      const numericArea = Number(String(lotSize).replace(/,/g, ""));
+      const unitLabel = units === "square feet" ? "acres" : "Acres";
+      return `${sqftToAcresFormatted(numericArea)} ${unitLabel}`;
+    }
+    return `${lotSize} ${units || "sft"}`;
+  };
 
   React.useEffect(() => {
     setImgSrc(image && isImageFileUrl(image) ? image : Images.apartment);
@@ -288,11 +302,7 @@ const SimilarPropertiesCard: React.FC<SimilarPropertiesCardProps> = ({
   const displaySqft = isLogin ? `${sqft} sft` : "---- sft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
-  const displayLotSize = isLogin
-    ? lotSize
-      ? `${Number(lotSize)} sft`
-      : "--- sft"
-    : "---- sft";
+  const displayLotSize = isLogin ? getLotSizeDisplay() : "--- acres";
 
   const isLinkDisabled = isExpired;
   const getHref = isLinkDisabled

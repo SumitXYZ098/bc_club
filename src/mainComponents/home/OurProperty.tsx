@@ -47,7 +47,7 @@ const swiperConfig = {
     dynamicBullets: true,
   },
   breakpoints: {
-    640: { slidesPerView: 1.5, spaceBetween: 20 },
+    640: { slidesPerView: 2.3, spaceBetween: 20 },
     1024: { slidesPerView: 3.2, spaceBetween: 16 },
   },
   speed: 900,
@@ -93,17 +93,20 @@ const OurProperty = () => {
     title: listing?.property_sub_type,
     price: listing?.price,
     daysAgo:
-      Number(listing?.old_price) > 0
+      listing.standard_status !== "Active"
         ? listing?.ModificationTimestamp
-        : (listing?.OriginalEntryTimestamp ??
-          listing?.raw_data?.BridgeModificationTimestamp ??
-          0),
+        : Number(listing?.old_price) > 0
+          ? listing?.ModificationTimestamp
+          : (listing?.OriginalEntryTimestamp ??
+            listing?.raw_data?.BridgeModificationTimestamp ??
+            0),
     address: listing?.address,
     sqft: listing?.area ?? listing?.Living_area ?? 0,
     beds: listing?.bedrooms ?? 0,
     baths: listing?.bathrooms ?? 0,
     likesCount: listing?.likesCount ?? 0,
     lotSize: listing?.lot_size_area ?? "",
+    lotSizeUnits: listing?.lot_size_units ?? "",
     structureType: listing?.structure_type ?? "",
     oldPrice: Number(listing?.old_price) || 0,
     assessedDiff: listing.price
@@ -129,6 +132,7 @@ const OurProperty = () => {
         select: (res: any) => {
           return (
             res?.data
+              ?.filter((l: any) => l?.priceChangedAt === null)
               ?.sort((a: any, b: any) => {
                 const aTime = a?.OriginalEntryTimestamp
                   ? Date.parse(a.OriginalEntryTimestamp)
@@ -154,12 +158,12 @@ const OurProperty = () => {
           return (
             res?.data
               ?.sort((a: any, b: any) => {
-                const aTime = a?.ModificationTimestamp
-                  ? Date.parse(a.ModificationTimestamp)
+                const aTime = a?.priceChangedAt
+                  ? Date.parse(a.priceChangedAt)
                   : 0;
 
-                const bTime = b?.ModificationTimestamp
-                  ? Date.parse(b.ModificationTimestamp)
+                const bTime = b?.priceChangedAt
+                  ? Date.parse(b.priceChangedAt)
                   : 0;
 
                 return bTime - aTime; // newest first
@@ -180,22 +184,19 @@ const OurProperty = () => {
       },
       {
         select: (res: any) => {
-          const nonResidentialTypes = [
-            "office",
-            "business",
-            "agriculture",
-            "vacant land",
-            "industrial",
-            "retail",
-          ];
           return (
             res?.data
               ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-              .filter((l: any) => {
-                const type = (l?.property_sub_type || "").toLowerCase();
-                return !nonResidentialTypes.some((nonRes) =>
-                  type.includes(nonRes),
-                );
+              ?.sort((a: any, b: any) => {
+                const aTime = a?.ModificationTimestamp
+                  ? Date.parse(a.ModificationTimestamp)
+                  : 0;
+
+                const bTime = b?.ModificationTimestamp
+                  ? Date.parse(b.ModificationTimestamp)
+                  : 0;
+
+                return bTime - aTime; // newest first
               })
               .map((l: any) => mapProperty(l, false)) || []
           );
@@ -213,22 +214,19 @@ const OurProperty = () => {
       },
       {
         select: (res: any) => {
-          const nonResidentialTypes = [
-            "office",
-            "business",
-            "agriculture",
-            "vacant land",
-            "industrial",
-            "retail",
-          ];
           return (
             res?.data
               ?.filter((l: any) => l?.address && Number(l?.price) > 0)
-              .filter((l: any) => {
-                const type = (l?.property_sub_type || "").toLowerCase();
-                return !nonResidentialTypes.some((nonRes) =>
-                  type.includes(nonRes),
-                );
+              .sort((a: any, b: any) => {
+                const aTime = a?.ModificationTimestamp
+                  ? Date.parse(a.ModificationTimestamp)
+                  : 0;
+
+                const bTime = b?.ModificationTimestamp
+                  ? Date.parse(b.ModificationTimestamp)
+                  : 0;
+
+                return bTime - aTime; // newest first
               })
               .map((l: any) => mapProperty(l, false)) || []
           );
@@ -319,14 +317,14 @@ const OurProperty = () => {
 
     return (
       <div className="relative group/slider">
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-10 flex justify-between pointer-events-none px-1 md:-mx-5">
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-10 flex justify-between pointer-events-none px-1 md:-mx-5 xl:-mx-6">
           {/* Prev */}
           <button
             className={[
               `${navId}-prev`,
               "pointer-events-auto",
               "relative overflow-hidden",
-              "w-16 h-16 rounded-full",
+              "w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 rounded-full",
               "flex items-center justify-center",
               "bg-white",
               // clean shadow edge — no CSS border
@@ -345,7 +343,7 @@ const OurProperty = () => {
             <ChevronLeft
               size={22}
               strokeWidth={2.5}
-              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:-translate-x-0.5"
+              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:-translate-x-0.5 w-4 h-4 sm:w-5 sm:h-5 md:w-5 md:h-5 lg:w-6 lg:h-6"
             />
           </button>
 
@@ -355,7 +353,7 @@ const OurProperty = () => {
               `${navId}-next`,
               "pointer-events-auto",
               "relative overflow-hidden",
-              "w-16 h-16 rounded-full",
+              "w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 rounded-full",
               "flex items-center justify-center",
               "bg-white",
               // clean shadow edge — no CSS border
@@ -374,7 +372,7 @@ const OurProperty = () => {
             <ChevronRight
               size={22}
               strokeWidth={2.5}
-              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:translate-x-0.5"
+              className="relative z-10 text-primary group-hover/btn:text-white transition-all duration-300 group-hover/btn:translate-x-0.5 w-4 h-4 sm:w-5 sm:h-5 md:w-5 md:h-5 lg:w-6 lg:h-6"
             />
           </button>
         </div>

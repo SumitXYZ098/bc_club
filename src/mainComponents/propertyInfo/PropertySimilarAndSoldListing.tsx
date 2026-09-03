@@ -82,6 +82,7 @@ const PropertySimilarAndSoldListing = ({
     baths: listing?.bathrooms ?? 0,
     likesCount: listing?.likesCount ?? 0,
     lotSize: listing?.lot_size_area ?? 0,
+    lotSizeUnits: listing?.lot_size_units,
     structureType: listing?.structure_type ?? "",
     oldPrice: Number(listing?.old_price) || 0,
     assessedDiff: listing.price

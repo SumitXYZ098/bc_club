@@ -18,8 +18,22 @@ import {
 import NearbyPlaceCard, { NearbyPlaceSkeleton } from "./NearbyPlaceCard";
 import { useAuthContext } from "../../auth/AuthContext";
 import { useGetNearbyRealEstatePlaces } from "@/src/hooks/listing/useRealEstateListingQueries";
+import { sqftToAcresFormatted } from "@/src/utilities/utilities";
 
 const PropertyInformation = ({ property }: { property: any }) => {
+  const getLotSizeDisplay = () => {
+    const units = property?.lot_size_units ?? property?.raw_data?.LotSizeUnits;
+    const normalizedUnits = units?.trim()?.toLowerCase();
+    if (normalizedUnits === "square feet") {
+      const numericArea = Number(
+        String(property?.lot_size_area).replace(/,/g, "")
+      );
+      const unitLabel = units === "square feet" ? "acres" : "Acres";
+      return `${sqftToAcresFormatted(numericArea)} ${unitLabel}`;
+    }
+    return `${property?.lot_size_area} ${units || "sft"}`;
+  };
+
   const featuresList = [
     {
       icon: Icons.bedroom,
@@ -60,7 +74,7 @@ const PropertyInformation = ({ property }: { property: any }) => {
           {
             icon: Icons.lot,
             label: "Lot Size",
-            value: `${property?.lot_size_area} sft`,
+            value: getLotSizeDisplay(),
           },
         ]
       : []),

@@ -9,7 +9,7 @@ import CustomButton from "../../button/CustomButton";
 import Link from "next/link";
 import { useAuthContext } from "@/src/mainComponents/auth/AuthContext";
 import { useGetMe } from "@/src/hooks/listing/useListingQueries";
-import { getTime } from "@/src/utilities/utilities";
+import { getTime, sqftToAcresFormatted } from "@/src/utilities/utilities";
 import { IoArrowUpOutline, IoArrowDownOutline } from "react-icons/io5";
 import {
   useAddRealEstateFavorite,
@@ -27,6 +27,7 @@ export interface PropertyCardProps {
   beds: number;
   baths: number;
   lotSize?: number;
+  lotSizeUnits?: string;
   priceDrop?: number;
   assessedDiff: number;
   mls: string;
@@ -104,6 +105,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   beds,
   baths,
   lotSize,
+  lotSizeUnits,
   mls,
   realtor,
   isExpired,
@@ -120,6 +122,17 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   const removeFromWishlist = useRemoveRealEstateFavorite();
   const [localIsFavourite, setLocalIsFavourite] = React.useState(false);
   const [localLikesCount, setLocalLikesCount] = React.useState(likesCount || 0);
+
+  const getLotSizeDisplay = () => {
+    const units = lotSizeUnits;
+    const normalizedUnits = units?.trim()?.toLowerCase();
+    if (normalizedUnits === "square feet") {
+      const numericArea = Number(String(lotSize).replace(/,/g, ""));
+      const unitLabel = units === "square feet" ? "acres" : "Acres";
+      return `${sqftToAcresFormatted(numericArea)} ${unitLabel}`;
+    }
+    return `${lotSize} ${units || "sft"}`;
+  };
 
   const isFavourite =
     me?.favorites?.some(
@@ -187,11 +200,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
   const displaySqft = isLogin ? `${sqft} sft` : "---- sft";
   const displayBeds = isLogin ? beds : "---";
   const displayBaths = isLogin ? baths : "---";
-  const displayLotSize = isLogin
-    ? lotSize
-      ? `${lotSize} sft`
-      : "--- sft"
-    : "---- sft";
+  const displayLotSize = isLogin ? getLotSizeDisplay() : "---- acres";
   const displayMls = isLogin ? `MLS® ${mls}` : "MLS® *******";
   const displayRealtor = isLogin ? realtor : "Courtesy of: **********";
 
@@ -384,7 +393,7 @@ const PropertiesCard: React.FC<PropertyCardProps> = ({
                 />
                 <span>{displayBaths}</span>
               </div>
-              {lotSize && Number(lotSize) > 100 && (
+              {lotSize && (
                 <>
                   <LineGradient vr={true} />
                   <div className="flex flex-row items-center gap-x-1 text-primary2 text-sm w-auto">

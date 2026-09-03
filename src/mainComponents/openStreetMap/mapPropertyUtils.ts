@@ -111,6 +111,7 @@ export const transformActiveListing = (listing: any, me: any) => {
     longitude,
     latitude,
     lotSize: listing?.lot_size_area ?? "",
+    lotSizeUnits: listing?.lot_size_units,
     structureType: listing?.structure_type ?? "",
     mls: listing?.mls_number ?? listing?.listing_id,
     realtor: listing?.office_name ?? getOfficeName(listing),

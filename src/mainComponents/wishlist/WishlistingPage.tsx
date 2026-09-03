@@ -56,8 +56,8 @@ const WishlistingPage = () => {
             : Array.isArray(listing?.media_url)
               ? listing.media_url[0]
               : (typeof listing?.media?.[0] === "string"
-                ? listing.media[0]
-                : listing?.media?.[0]?.MediaURL) || "",
+                  ? listing.media[0]
+                  : listing?.media?.[0]?.MediaURL) || "",
         title: listing?.property_sub_type || "Property",
         price: Number(listing?.price) || 0,
         daysAgo:
@@ -71,12 +71,14 @@ const WishlistingPage = () => {
             ? `${listing.address}, ${listing.city}${listing?.state ? `, ${listing.state}` : ""}`
             : listing.address
           : "",
-        sqft: listing?.Living_area ?? listing?.area ?? listing?.lot_size_area ?? 0,
+        sqft:
+          listing?.Living_area ?? listing?.area ?? listing?.lot_size_area ?? 0,
         beds: listing?.bedrooms ?? 0,
         baths: listing?.bathrooms ?? 0,
         likesCount: listing?.likesCount ?? 0,
         oldPrice: Number(listing?.old_price) || 0,
         lotSize: listing?.lot_size_area ?? "",
+        lotSizeUnits: listing?.lot_size_units,
         structureType: listing?.structure_type ?? "",
         standardStatus: listing?.standard_status ?? "",
         priceDrop:
