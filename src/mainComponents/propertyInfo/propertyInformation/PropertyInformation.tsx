@@ -38,23 +38,23 @@ const PropertyInformation = ({ property }: { property: any }) => {
     {
       icon: Icons.bedroom,
       label: "Bedrooms",
-      value: property?.bedrooms || "Na",
+      value: property?.bedrooms || "0",
     },
 
     {
       icon: Icons.bathtub,
       label: "Bathrooms",
-      value: property?.bathrooms || "Na",
+      value: property?.bathrooms || "0",
     },
 
     ...(property?.property_sub_type !== "Business"
       ? [
-          {
-            icon: Icons.garage,
-            label: "Garage",
-            value: "0",
-          },
-        ]
+        {
+          icon: Icons.garage,
+          label: "Garage",
+          value: "0",
+        },
+      ]
       : []),
     {
       icon: Icons.calendar,
@@ -71,12 +71,12 @@ const PropertyInformation = ({ property }: { property: any }) => {
     },
     ...(property?.lot_size_area != null && property?.lot_size_area !== ""
       ? [
-          {
-            icon: Icons.lot,
-            label: "Lot Size",
-            value: getLotSizeDisplay(),
-          },
-        ]
+        {
+          icon: Icons.lot,
+          label: "Lot Size",
+          value: getLotSizeDisplay(),
+        },
+      ]
       : []),
   ];
 
@@ -202,17 +202,17 @@ const PropertyInformation = ({ property }: { property: any }) => {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   {nearbyPlacesLoading
                     ? Array.from({ length: 6 }).map((_, index) => (
-                        <NearbyPlaceSkeleton key={index} />
-                      ))
-                    : nearbyPlaces?.data?.schools?.map(
-                        (school: any, idx: number) => (
-                          <NearbyPlaceCard
-                            key={idx}
-                            place={school}
-                            type="school"
-                          />
-                        ),
-                      )}
+                      <NearbyPlaceSkeleton key={index} />
+                    ))
+                    : nearbyPlaces?.data?.schools?.sort((a: any, b: any) => Number(b.rating) - Number(a.rating)).map(
+                      (school: any, idx: number) => (
+                        <NearbyPlaceCard
+                          key={idx}
+                          place={school}
+                          type="school"
+                        />
+                      ),
+                    )}
                 </div>
               </div>
             )}
