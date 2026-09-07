@@ -25,14 +25,15 @@ export const saleBC: GetInTouchLinkListProps = {
       label: "Homes For Sale in Richmond",
       href: "/Homes For Sale in Richmond",
     },
-    {
-      label: "Homes For Sale in Victoria",
-      href: "/Homes For Sale in Victoria",
-    },
-    {
-      label: "Homes For Sale in Kelowna",
-      href: "/Homes For Sale in Kelowna",
-    },
+    // {
+    //   label: "Homes For Sale in Victoria",
+    //   href: "/Homes For Sale in Victoria",
+    // }, 
+    // {
+    //   label: "Homes For Sale in Kelowna",
+    //   href: "/Homes For Sale in Kelowna",
+    // },
+   
     {
       label: "Homes For Sale in Abbotsford",
       href: "/Homes For Sale in Abbotsford",
@@ -48,36 +49,20 @@ export const soldBC: GetInTouchLinkListProps = {
   title: "Homes for Sold in BC",
   linkList: [
     {
-      label: "Homes For sold in Vancouver",
-      href: "/Homes For sold in Vancouver",
+      label: "Homes Sold in Vancouver",
+      href: "/Homes Sold in Vancouver",
     },
     {
-      label: "Homes For sold in Victoria",
-      href: "/Homes For sold in Victoria",
+      label: "Homes Sold in Abbotsford",
+      href: "/Homes Sold in Abbotsford",
     },
     {
-      label: "Homes For sold in Kelowna",
-      href: "/Homes For sold in Kelowna",
+      label: "Homes Sold in White Rock",
+      href: "/Homes Sold in White Rock",
     },
     {
-      label: "Homes For sold in Abbotsford",
-      href: "/Homes For sold in Abbotsford",
-    },
-    {
-      label: "Homes For sold in Nanaimo",
-      href: "/Homes For sold in Nanaimo",
-    },
-    {
-      label: "Homes For sold in White Rock",
-      href: "/Homes For sold in White Rock",
-    },
-    {
-      label: "Homes For sold in Kamloops",
-      href: "/Homes For sold in Kamloops",
-    },
-    {
-      label: "Homes For sold in Maple Ridge",
-      href: "/Homes For sold in Maple Ridge",
+      label: "Homes Sold in Maple Ridge",
+      href: "/Homes Sold in Maple Ridge",
     },
   ],
 };
@@ -113,9 +98,5 @@ export const realEstateBC: GetInTouchLinkListProps = {
       label: "Homes For Sale in Chilliwack",
       href: "/Homes For Sale in Chilliwack",
     },
-    // {
-    //   label: "British Columbia Sitemap",
-    //   href: "/British Columbia Sitemap",
-    // },
   ],
 };

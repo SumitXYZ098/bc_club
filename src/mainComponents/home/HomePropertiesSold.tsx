@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
-import { MenuItem, Select } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { cities, propertyDataByCity, PropertySoldData } from ".";
 import MarketDemandGauge from "@/src/components/charts/MarketDemandGauge";
 import PoweredBy from "@/src/components/common/poweredby/PoweredBy";
@@ -13,7 +13,7 @@ const HomePropertiesSold = () => {
   const [location, setLocation] = useState<string>("Surrey");
   const { isLoggedIn, setOpenLogin } = useAuthContext();
 
-  const handleChange = (event: { target: { value: string } }) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
     setLocation(event.target.value);
   };
 
@@ -110,6 +110,26 @@ const HomePropertiesSold = () => {
           <Select
             value={location}
             onChange={handleChange}
+            MenuProps={{
+              slotProps: {
+                paper: {
+                  sx: {
+                    maxHeight: 260,
+                  },
+                },
+              },
+              anchorOrigin: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
+              transformOrigin: {
+                vertical: "top",
+                horizontal: "left",
+              },
+              variant: "menu",
+              disableAutoFocusItem: true,
+              autoFocus: false,
+            }}
             sx={{
               borderRadius: 3,
               width: 180,
@@ -120,8 +140,8 @@ const HomePropertiesSold = () => {
             }}
             className="shadow-[0_0_20px_0_rgba(0,0,0,0.12)]"
           >
-            {cities.map((city, idx) => (
-              <MenuItem key={idx} value={city}>
+            {cities.map((city) => (
+              <MenuItem key={city} value={city}>
                 {city}
               </MenuItem>
             ))}

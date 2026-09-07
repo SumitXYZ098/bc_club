@@ -1,6 +1,6 @@
 "use client";
 import Heading, { IHeadingTypes } from "@/src/components/heading/Heading";
-import { MenuItem, Select } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { useState } from "react";
 import { cities } from ".";
 import Description, {
@@ -15,7 +15,7 @@ const HomeSellingTrends = () => {
   const [location, setLocation] = useState<string>("Surrey");
   const { isLoggedIn } = useAuthContext();
 
-  const handleChange = (event: { target: { value: string } }) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
     setLocation(event.target.value);
   };
 
@@ -36,6 +36,26 @@ const HomeSellingTrends = () => {
             <Select
               value={location}
               onChange={handleChange}
+              MenuProps={{
+                slotProps: {
+                  paper: {
+                    sx: {
+                      maxHeight: 260,
+                    },
+                  },
+                },
+                anchorOrigin: {
+                  vertical: "bottom",
+                  horizontal: "left",
+                },
+                transformOrigin: {
+                  vertical: "top",
+                  horizontal: "left",
+                },
+                variant: "menu",
+                disableAutoFocusItem: true,
+                autoFocus: false,
+              }}
               sx={{
                 borderRadius: 3,
                 width: 180,
@@ -46,8 +66,8 @@ const HomeSellingTrends = () => {
               }}
               className="shadow-[0_0_20px_0_rgba(0,0,0,0.12)]"
             >
-              {cities.map((city, idx) => (
-                <MenuItem key={idx} value={city}>
+              {cities.map((city) => (
+                <MenuItem key={city} value={city}>
                   {city}
                 </MenuItem>
               ))}
