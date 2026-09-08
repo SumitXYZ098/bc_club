@@ -1,7 +1,12 @@
 import TrendStepPage from "@/src/mainComponents/marketTrendsComponents/TrendStepPage";
+import { Suspense } from "react";
 
 const Page = () => {
-  return <TrendStepPage />;
+  return (
+    <Suspense>
+      <TrendStepPage />
+    </Suspense>
+  );
 };
 
 export default Page;

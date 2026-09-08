@@ -9,7 +9,7 @@ import MonthlySalesReports from "./monthlySalesReports/MonthlySalesReports";
 import StatisticsSalesTable from "./statisticsSalesTable/StatisticsSalesTable";
 
 const TrendStepPage = () => {
-  const [activeTab, setActiveTab] = useState<number>(2);
+  const [activeTab, setActiveTab] = useState<number>(1);
 
   return (
     <>

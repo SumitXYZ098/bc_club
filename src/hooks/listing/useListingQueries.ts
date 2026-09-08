@@ -17,6 +17,11 @@ import {
   getMapZoomSchools,
   getMapZoomWithClusters,
   getMapZoomProperties,
+  getCityMonthlyData,
+  CityMonthlyDataResponse,
+  getMonthlySalesChart,
+  MonthlySalesChartParams,
+  MonthlySalesChartResponse,
 } from "@/src/api/listing/listingApi";
 import Cookies from "js-cookie";
 
@@ -253,3 +258,46 @@ export function useGetMapZoomSchools<TData = any>(
     ...options,
   });
 }
+
+// City Monthly Data Hook
+export function useGetCityMonthlyData<TData = CityMonthlyDataResponse>(
+  params?: { city?: string; propertyType?: string },
+  options?: Omit<
+    UseQueryOptions<CityMonthlyDataResponse, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<CityMonthlyDataResponse, Error, TData, any>({
+    queryKey: ["cityMonthlyData", params?.city, params?.propertyType],
+    queryFn: () => getCityMonthlyData(params),
+    enabled: !!params?.city,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    ...options,
+  });
+}
+
+// Monthly Sales Chart Hook
+export function useGetMonthlySalesChart<TData = MonthlySalesChartResponse>(
+  params?: MonthlySalesChartParams,
+  options?: Omit<
+    UseQueryOptions<MonthlySalesChartResponse, Error, TData, any>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<MonthlySalesChartResponse, Error, TData, any>({
+    queryKey: [
+      "monthlySalesChart",
+      params?.region,
+      params?.neighbourhood,
+      params?.property_sub_type,
+      params?.year,
+      params?.data,
+    ],
+    queryFn: () => getMonthlySalesChart(params),
+    enabled: !!params?.region,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    ...options,
+  });
+}
+
+

@@ -229,3 +229,96 @@ export async function getMapZoomSchools(params?: any): Promise<any> {
     throw new Error("An unexpected error occurred");
   }
 }
+
+// City Monthly Data Interfaces
+export interface MetricDetail {
+  formatted: string;
+  percent: number | null;
+  direction: "up" | "down" | "neutral";
+}
+
+export interface CityMonthData {
+  month: string;
+  monthName: string;
+  comparisonMonth: string;
+  comparisonMonthName: string;
+  subtitle: string;
+  metrics: {
+    medianSoldPrice: MetricDetail;
+    medianPricePerSqFt: MetricDetail;
+    sales: MetricDetail;
+    inventory: MetricDetail;
+    newListings: MetricDetail;
+    medianDaysOnMarket: MetricDetail;
+  };
+}
+
+export interface CityMonthlyDataResponse {
+  city: string;
+  propertyType: string;
+  dateRange: {
+    from: string;
+    to: string;
+    totalMonths: number;
+  };
+  data: CityMonthData[];
+}
+
+// City Monthly Data API
+export async function getCityMonthlyData(params?: {
+  city?: string;
+  propertyType?: string;
+}): Promise<CityMonthlyDataResponse> {
+  try {
+    const res = await axios.get(Endpoints.getCityMonthlyData, {
+      params,
+    });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+// Monthly Sales Chart Data API
+export interface MonthlySalesChartItem {
+  month: string;
+  soldCount: number;
+  averageSoldPrice: number;
+  "12MonthAvgPrice": number;
+  [key: string]: any;
+}
+
+export interface MonthlySalesChartParams {
+  region?: string;
+  neighbourhood?: string;
+  property_sub_type?: string;
+  year?: number | string;
+  data?: string;
+}
+
+export interface MonthlySalesChartResponse {
+  data: MonthlySalesChartItem[];
+}
+
+export async function getMonthlySalesChart(
+  params?: MonthlySalesChartParams
+): Promise<MonthlySalesChartResponse> {
+  try {
+    const res = await axios.get(Endpoints.getMonthlySalesChart, {
+      params,
+    });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error?.message || "API error");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+}
+
+

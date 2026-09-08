@@ -251,6 +251,7 @@ export default function PropertiesListingPage() {
         baths: listing?.bathrooms ?? 0,
         likesCount: listing?.likesCount ?? 0,
         lotSize: listing?.lot_size_area ?? "",
+        lotSizeUnits: listing?.lot_size_units ?? "",
         structureType: listing?.structure_type ?? "",
         assessedDiff: listing.price
           ? Number(

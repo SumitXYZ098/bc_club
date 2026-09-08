@@ -3,7 +3,7 @@ import StatsDetail from "./StatsDetail";
 
 const StatsMap = () => {
   return (
-    <section className="h-125 w-full bg-white rounded-2xl p-4">
+    <section className="w-full bg-white rounded-2xl shadow p-2 relative">
       <StatsDetail />
     </section>
   );

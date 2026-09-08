@@ -1,163 +1,88 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { FiChevronDown, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import CityStatsPopup from "@/src/mainComponents/home/CityStatsPopup";
+import { REGION_COORDINATES, RegionCoordinate } from "..";
 
-/* ================= TYPES ================= */
-interface House {
-  id: number;
-  title: string;
-  rent: string;
+interface ActiveRegion {
+  name: string;
   coordinates: [number, number];
 }
 
-interface CustomSelectProps {
-  options: string[];
-  value: string;
-  onChange: (value: string) => void;
-}
-
-type Trend = "up" | "down";
-
-interface StatRow {
-  label: string;
-  value: string;
-  change: string;
-  trend: Trend;
-}
-
-/* ================= SELECT ================= */
-const CustomSelect: React.FC<CustomSelectProps> = ({
-  options,
-  value,
-  onChange,
-}) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((p) => !p)}
-        className="flex items-center justify-between border border-[#E6EAEE] rounded-full px-4 py-2 text-sm bg-background text-foreground min-w-40"
-      >
-        <span>{value}</span>
-        <FiChevronDown
-          size={18}
-          className={`transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {open && (
-        <div className="absolute z-30 mt-2 w-full bg-background text-foreground rounded-xl shadow">
-          {options.map((opt) => (
-            <div
-              key={opt}
-              onClick={() => {
-                onChange(opt);
-                setOpen(false);
-              }}
-              className="px-4 py-2 text-sm cursor-pointer hover:bg-gray-100"
-            >
-              {opt}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-/* ================= DATA ================= */
-const rentedHouses: House[] = [
-  {
-    id: 1,
-    title: "Lombardie",
-    rent: "$2,500 / month",
-    coordinates: [-123.1207, 49.2827],
-  },
-  {
-    id: 2,
-    title: "Lombardie",
-    rent: "$2,100 / month",
-    coordinates: [-123.0999, 49.2705],
-  },
-  {
-    id: 3,
-    title: "Lombardie",
-    rent: "$2,100 / month",
-    coordinates: [-123.02999, 49.2735],
-  },
-  {
-    id: 4,
-    title: "Lombardie",
-    rent: "$2,100 / month",
-    coordinates: [-123.10999, 49.2765],
-  },
-];
-
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-const monthlyStats: Record<string, StatRow[]> = {
-  "November 2025": [
-    {
-      label: "Median Sold Price",
-      value: "$1,850,000",
-      change: "14.0%",
-      trend: "down",
-    },
-    {
-      label: "Median Price per SqFt",
-      value: "$602",
-      change: "14.0%",
-      trend: "down",
-    },
-    { label: "Sale", value: "7", change: "14.0%", trend: "down" },
-    { label: "Inventory", value: "117", change: "14.0%", trend: "down" },
-    { label: "New Listings", value: "29", change: "14.0%", trend: "up" },
-    { label: "Active Listings", value: "28", change: "14.0%", trend: "down" },
-    { label: "Avg DOM", value: "4.70%", change: "14.0%", trend: "up" },
-    { label: "Price Change", value: "0.00%", change: "14.0%", trend: "down" },
-  ],
-};
-
-const MIN_YEAR = 2025;
-const MAX_YEAR = 2031;
-
-/* ================= COMPONENT ================= */
 const StatsDetail: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Map | null>(null);
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
-  const [region, setRegion] = useState("Detached");
-  const [monthIndex, setMonthIndex] = useState(10);
-  const [year, setYear] = useState(2025);
+  const [activeRegion, setActiveRegion] = useState<ActiveRegion | null>(null);
+  const [popupPosition, setPopupPosition] = useState<{
+    top?: number | string;
+    left?: number | string;
+    right?: number | string;
+    bottom?: number | string;
+  }>({});
 
-  const currentMonthLabel = `${months[monthIndex]} ${year}`;
-  const stats =
-    monthlyStats[currentMonthLabel] || monthlyStats["November 2025"];
+  const activeRegionRef = useRef<ActiveRegion | null>(null);
+  activeRegionRef.current = activeRegion;
 
-  /* ===== Scroll Lock ===== */
-  useEffect(() => {
-    document.body.style.overflow = selectedHouse ? "hidden" : "";
-  }, [selectedHouse]);
+  // Calculate popup position near the active marker, clamped safely within container
+  const updatePopupPos = useCallback((coords: [number, number]) => {
+    if (!mapRef.current || !mapContainerRef.current) return;
+    const point = mapRef.current.project(coords);
+    const container = mapContainerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
 
-  /* ===== MAP (FIXED) ===== */
+    const popupWidth = Math.min(445, containerWidth - 24);
+    const popupHeight = 490; // estimated popup height
+
+    // Horizontal placement: prefer right, fallback to left or center
+    let left: number;
+    if (point.x + popupWidth + 24 <= containerWidth) {
+      left = point.x + 16;
+    } else if (point.x - popupWidth - 24 >= 0) {
+      left = point.x - popupWidth - 16;
+    } else {
+      left = Math.max(12, (containerWidth - popupWidth) / 2);
+    }
+
+    // Vertical placement: align slightly above marker, clamped safely inside container
+    let top = point.y - 120;
+    top = Math.max(12, Math.min(containerHeight - popupHeight - 12, top));
+
+    setPopupPosition({
+      top: `${top}px`,
+      left: `${left}px`,
+    });
+  }, []);
+
+  const handleMarkerClick = useCallback(
+    (region: string, coords: [number, number]) => {
+      // Toggle if clicking the active region, or switch to selected region
+      setActiveRegion((prev) => {
+        if (prev?.name === region) {
+          return null; // Close if clicked again
+        }
+        return { name: region, coordinates: coords };
+      });
+      updatePopupPos(coords);
+    },
+    [updatePopupPos]
+  );
+
+  const handleClosePopup = useCallback(() => {
+    setActiveRegion(null);
+  }, []);
+
+  // Stable handlers ref for Mapbox event listeners
+  const handlersRef = useRef({
+    handleMarkerClick,
+  });
+  handlersRef.current = {
+    handleMarkerClick,
+  };
+
   useEffect(() => {
     const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
     if (!token) {
@@ -171,135 +96,159 @@ const StatsDetail: React.FC = () => {
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      center: [-123.1207, 49.2827],
-      zoom: 9,
-      style: "mapbox://styles/mapbox/streets-v12",  
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [-122.6, 49.35],
+      zoom: 11,
+      minZoom: 7,
+      maxZoom: 13,
     });
+
+    // Add navigation controls (zoom, compass)
+    map.addControl(
+      new mapboxgl.NavigationControl({ showCompass: true }),
+      "bottom-right"
+    );
 
     map.on("load", () => {
       map.resize();
 
-      rentedHouses.forEach((house) => {
-        const marker = new mapboxgl.Marker({ color: "#f59e0b" })
-          .setLngLat(house.coordinates)
+      // Fit map bounds to cover all 41 regions
+      const bounds = new mapboxgl.LngLatBounds();
+      REGION_COORDINATES.forEach((c) => {
+        bounds.extend([c.longitude, c.latitude]);
+      });
+      map.fitBounds(bounds, {
+        padding: { top: 50, bottom: 50, left: 50, right: 50 },
+        minZoom: 8,
+        maxZoom: 11,
+        duration: 800,
+      });
+
+      // Clear any prior markers
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
+
+      // Add markers displaying the region/location name on click
+      REGION_COORDINATES.forEach((item: RegionCoordinate) => {
+        const markerEl = document.createElement("div");
+        markerEl.className =
+          "region-map-marker group flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-gray-800 border border-[#E6EAEE] shadow-md hover:shadow-lg hover:border-primary cursor-pointer transition-all duration-200 select-none whitespace-nowrap";
+        markerEl.setAttribute("data-region", item.region);
+
+        markerEl.innerHTML = `
+          <span class="marker-dot w-2 h-2 rounded-full bg-[#EEA500] shrink-0 transition-colors"></span>
+          <span class="marker-text text-xs font-semibold tracking-tight text-gray-800 transition-colors">${item.region}</span>
+        `;
+
+        const coords: [number, number] = [item.longitude, item.latitude];
+
+        markerEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          handlersRef.current.handleMarkerClick(item.region, coords);
+        });
+
+        const marker = new mapboxgl.Marker({ element: markerEl })
+          .setLngLat(coords)
           .addTo(map);
 
-        marker.getElement().addEventListener("click", () => {
-          setSelectedHouse(house);
-          dialogRef.current?.showModal();
-        });
+        markersRef.current.push(marker);
       });
     });
+
+    // Update popup position when panning/zooming map
+    map.on("move", () => {
+      if (activeRegionRef.current) {
+        updatePopupPos(activeRegionRef.current.coordinates);
+      }
+    });
+
+    // Close popup on map click (outside markers and outside popup)
+    map.on("click", (e) => {
+      const target = e.originalEvent.target as HTMLElement | null;
+      if (
+        !target?.closest(".region-map-marker") &&
+        !target?.closest(".city-stats-popup-container")
+      ) {
+        handleClosePopup();
+      }
+    });
+
+    // ResizeObserver to ensure map canvas fits container
+    const ro = new ResizeObserver(() => {
+      map.resize();
+    });
+    if (mapContainerRef.current) {
+      ro.observe(mapContainerRef.current);
+    }
 
     mapRef.current = map;
 
     return () => {
+      ro.disconnect();
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [updatePopupPos, handleClosePopup]);
 
-  /* ===== Month ===== */
-  const prevMonth = () => {
-    setMonthIndex((p) => {
-      if (p === 0 && year > MIN_YEAR) {
-        setYear((y) => y - 1);
-        return 11;
+  // Highlight active marker visually when selected
+  useEffect(() => {
+    const markerEls =
+      document.querySelectorAll<HTMLElement>(".region-map-marker");
+    markerEls.forEach((el) => {
+      const region = el.getAttribute("data-region");
+      const dot = el.querySelector<HTMLElement>(".marker-dot");
+      const text = el.querySelector<HTMLElement>(".marker-text");
+
+      if (region === activeRegion?.name) {
+        el.classList.add(
+          "bg-[#22558b]",
+          "text-white",
+          "border-[#22558b]",
+          "ring-2",
+          "ring-primary/40",
+          "shadow-xl",
+          "scale-105"
+        );
+        el.classList.remove("bg-white", "text-gray-800", "border-[#E6EAEE]");
+        if (dot) dot.classList.replace("bg-[#EEA500]", "bg-white");
+        if (text) text.classList.replace("text-gray-800", "text-white");
+        el.style.zIndex = "50";
+      } else {
+        el.classList.remove(
+          "bg-[#22558b]",
+          "text-white",
+          "border-[#22558b]",
+          "ring-2",
+          "ring-primary/40",
+          "shadow-xl",
+          "scale-105"
+        );
+        el.classList.add("bg-white", "text-gray-800", "border-[#E6EAEE]");
+        if (dot) dot.classList.replace("bg-white", "bg-[#EEA500]");
+        if (text) text.classList.replace("text-white", "text-gray-800");
+        el.style.zIndex = "1";
       }
-      return Math.max(0, p - 1);
     });
-  };
-
-  const nextMonth = () => {
-    setMonthIndex((p) => {
-      if (p === 11 && year < MAX_YEAR) {
-        setYear((y) => y + 1);
-        return 0;
-      }
-      return Math.min(11, p + 1);
-    });
-  };
-
-  const closeDialog = () => {
-    dialogRef.current?.close();
-    setSelectedHouse(null);
-  };
+  }, [activeRegion]);
 
   return (
-    <>
-      {/* MAP */}
-      <div  
-        ref={mapContainerRef}
-        className="w-full rounded-3xl "
-        style={{ height: "550px" }}
-      />
+    <div className="relative w-full h-[620px] lg:h-[550px] rounded-xl overflow-hidden bg-gray-100">
+      {/* Mapbox Canvas */}
+      <div ref={mapContainerRef} className="w-full h-full rounded-xl" />
 
-      {/* DIALOG */}
-      <dialog
-        ref={dialogRef}
-        onClick={(e) => e.target === e.currentTarget && closeDialog()}
-        className="w-142.5 max-w-[95%] rounded-2xl p-5 m-auto backdrop:bg-black/70 bg-background"
-      >
-        {selectedHouse && (
-          <div className="bg-transparent rounded-2xl">
-            {/* HEADER */}
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-foreground">Lombardie</h2>
-              <CustomSelect
-                options={["North Vancouver", "Vancouver", "Burnaby"]}
-                value={region}
-                onChange={setRegion}
-              />
-            </div>
-
-            {/* MONTH */}
-            <div className="bg-primary text-background mt-3 py-3 rounded-xl flex justify-between items-center px-4">
-              <FiChevronLeft onClick={prevMonth} className="cursor-pointer" />
-              <div className="text-center">
-                <div className="font-semibold">{currentMonthLabel}</div>
-                <div className="text-xs opacity-80">
-                  Trends reflect changes from {months[monthIndex]} {year - 1}
-                </div>
-              </div>
-              <FiChevronRight onClick={nextMonth} className="cursor-pointer" />
-            </div>
-
-            {/* STATS TABLE */}
-            <div className="mt-3 border-borderColor rounded-xl shadow overflow-hidden text-foreground">
-              <table className="w-full text-sm">
-                <tbody>
-                  {stats.map((s, i) => (
-                    <tr
-                      key={i}
-                      className={i % 2 === 0 ? "bg-background" : "bg-gray"}
-                    >
-                      <td className="px-4 py-2">{s.label}</td>
-                      <td className="px-4 py-2 text-right font-medium">
-                        {s.value}
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        <span
-                          className={`font-medium ${
-                            s.trend === "up" ? "text-green-600" : "text-red-600"
-                          }`}
-                        >
-                          {s.trend === "up" ? "▲" : "▼"} {s.change}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* FOOTER */}
-            <div className="mt-3 bg-[#F0F0F0] rounded-xl py-2 text-center text-sm text-yellow-600 font-medium cursor-pointer">
-               Show detailed Chartsv 
-            </div>
-          </div>
-        )}
-      </dialog>
-    </>
+      {/* City Stats Popup */}
+      <div className="city-stats-popup-container">
+        <CityStatsPopup
+          city={activeRegion?.name || ""}
+          isVisible={!!activeRegion}
+          position={popupPosition}
+          customClasses="flex"
+          onClose={handleClosePopup}
+        />
+      </div>
+    </div>
   );
 };
 

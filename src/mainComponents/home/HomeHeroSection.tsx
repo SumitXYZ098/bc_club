@@ -63,43 +63,76 @@ const HomeHeroSection = () => {
             className="w-full xl:h-195 md:h-128.5 h-66.25 relative object-fill xl:rounded-bl-[124px] md:rounded-bl-[108px] rounded-bl-3xl"
           />
           <DotButton
+            cityName="Whistler"
+            isActive={hoveredCity === "Whistler"}
             customClasses="absolute lg:top-[197px] lg:left-20 z-20 w-11!"
             onMouseEnter={() =>
+              handleMouseEnter("Whistler", { top: "100px", left: "90px" })
+            }
+            onClick={() =>
               handleMouseEnter("Whistler", { top: "100px", left: "90px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Squamish"
+            isActive={hoveredCity === "Squamish"}
             customClasses="absolute lg:top-[268px] lg:left-[127px] z-20 w-12!"
             onMouseEnter={() =>
+              handleMouseEnter("Squamish", { top: "190px", left: "125px" })
+            }
+            onClick={() =>
               handleMouseEnter("Squamish", { top: "190px", left: "125px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Vancouver"
+            isActive={hoveredCity === "Vancouver"}
             customClasses="absolute lg:top-[382px] lg:left-[95px] z-20 w-12!"
             onMouseEnter={() =>
+              handleMouseEnter("Vancouver", { top: "90px", left: "100px" })
+            }
+            onClick={() =>
               handleMouseEnter("Vancouver", { top: "90px", left: "100px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Burnaby"
+            isActive={hoveredCity === "Burnaby"}
             customClasses="absolute lg:top-[380px] lg:left-[222px] z-20 w-10!"
             onMouseEnter={() =>
+              handleMouseEnter("Burnaby", { top: "90px", left: "140px" })
+            }
+            onClick={() =>
               handleMouseEnter("Burnaby", { top: "90px", left: "140px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Coquitlam"
+            isActive={hoveredCity === "Coquitlam"}
             customClasses="absolute lg:top-[379px] lg:left-[313px] z-20 w-11!"
             onMouseEnter={() =>
+              handleMouseEnter("Coquitlam", { top: "80px", left: "140px" })
+            }
+            onClick={() =>
               handleMouseEnter("Coquitlam", { top: "80px", left: "140px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="New Westminster"
+            isActive={hoveredCity === "New Westminster"}
             customClasses="absolute w-10! lg:top-[422px] lg:left-[264px] z-20 w-17!"
             onMouseEnter={() =>
+              handleMouseEnter("New Westminster", {
+                top: "100px",
+                left: "140px",
+              })
+            }
+            onClick={() =>
               handleMouseEnter("New Westminster", {
                 top: "100px",
                 left: "140px",
@@ -108,44 +141,77 @@ const HomeHeroSection = () => {
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Surrey"
+            isActive={hoveredCity === "Surrey"}
             customClasses="absolute lg:top-[454px] lg:left-[328px] z-20 w-8!"
             onMouseEnter={() =>
+              handleMouseEnter("Surrey", { top: "50px", left: "140px" })
+            }
+            onClick={() =>
               handleMouseEnter("Surrey", { top: "50px", left: "140px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Maple Ridge"
+            isActive={hoveredCity === "Maple Ridge"}
             customClasses="absolute w-9! lg:top-[422px] lg:right-87 z-20 w-14!"
             onMouseEnter={() =>
+              handleMouseEnter("Maple Ridge", { top: "80px", left: "140px" })
+            }
+            onClick={() =>
               handleMouseEnter("Maple Ridge", { top: "80px", left: "140px" })
             }
             onMouseLeave={handleMouseLeave}
           />
 
           <DotButton
+            cityName="Langley"
+            isActive={hoveredCity === "Langley"}
             customClasses="absolute lg:bottom-[281px] lg:left-[398px] z-20 w-9!"
             onMouseEnter={() =>
+              handleMouseEnter("Langley", { top: "100px", left: "160px" })
+            }
+            onClick={() =>
               handleMouseEnter("Langley", { top: "100px", left: "160px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Abbotsford"
+            isActive={hoveredCity === "Abbotsford"}
             customClasses="absolute lg:bottom-[250px] lg:right-74 z-20 w-12!"
             onMouseEnter={() =>
+              handleMouseEnter("Abbotsford", { top: "170px", left: "140px" })
+            }
+            onClick={() =>
               handleMouseEnter("Abbotsford", { top: "170px", left: "140px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Mission"
+            isActive={hoveredCity === "Mission"}
             customClasses="absolute lg:bottom-[246px] lg:right-47 z-20 w-9!"
             onMouseEnter={() =>
+              handleMouseEnter("Mission", { bottom: "-10px", left: "200px" })
+            }
+            onClick={() =>
               handleMouseEnter("Mission", { bottom: "-10px", left: "200px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Chilliwack"
+            isActive={hoveredCity === "Chilliwack"}
             customClasses="absolute lg:bottom-[257px] lg:right-29 z-20 w-11!"
             onMouseEnter={() =>
+              handleMouseEnter("Chilliwack", {
+                bottom: "-10px",
+                right: "120px",
+              })
+            }
+            onClick={() =>
               handleMouseEnter("Chilliwack", {
                 bottom: "-10px",
                 right: "120px",
@@ -154,22 +220,37 @@ const HomeHeroSection = () => {
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Hope"
+            isActive={hoveredCity === "Hope"}
             customClasses="absolute lg:bottom-[318px] lg:right-6 z-20 w-7!"
             onMouseEnter={() =>
+              handleMouseEnter("Hope", { bottom: "-10px", right: "50px" })
+            }
+            onClick={() =>
               handleMouseEnter("Hope", { bottom: "-10px", right: "50px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Richmond"
+            isActive={hoveredCity === "Richmond"}
             customClasses="absolute lg:top-[435px] lg:left-[91px] z-20 w-12!"
             onMouseEnter={() =>
+              handleMouseEnter("Richmond", { bottom: "-10px", left: "100px" })
+            }
+            onClick={() =>
               handleMouseEnter("Richmond", { bottom: "-10px", left: "100px" })
             }
             onMouseLeave={handleMouseLeave}
           />
           <DotButton
+            cityName="Delta"
+            isActive={hoveredCity === "Delta"}
             customClasses="absolute lg:bottom-[292px] lg:left-[183px] z-20 w-7!"
             onMouseEnter={() =>
+              handleMouseEnter("Delta", { bottom: "-10px", left: "100px" })
+            }
+            onClick={() =>
               handleMouseEnter("Delta", { bottom: "-10px", left: "100px" })
             }
             onMouseLeave={handleMouseLeave}
