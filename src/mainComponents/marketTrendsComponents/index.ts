@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 /* ================= REGION & NEIGHBORHOOD DATA ================= */
 export const REGION_DATA: { region: string; neighborhoods: string[] }[] = [
   {
@@ -629,7 +631,11 @@ export interface OptionGroup {
   items: string[];
 }
 
-export const DATA_OPTIONS: OptionGroup[] = [
+export const getLastCompletedMonth = (): string => {
+  return dayjs().subtract(1, "month").format("MMM");
+};
+
+export const getDataOptions = (lastMonth: string = getLastCompletedMonth()): OptionGroup[] => [
   {
     category: "Sold Price Charts",
     items: [
@@ -638,10 +644,9 @@ export const DATA_OPTIONS: OptionGroup[] = [
       "Sold Prices per SqFt",
       "Sold Prices by Type YTD",
       "Sold Prices by Area YTD",
-      "Sold Prices per SqFt every AUG",
-      "Sold Prices by Type every AUG",
-      "Sold Prices by Area every AUG",
-      "Sold Price : Assessment Ratio",
+      `Sold Prices per SqFt every ${lastMonth}`,
+      `Sold Prices by Type every ${lastMonth}`,
+      `Sold Prices by Area every ${lastMonth}`,
     ],
   },
   {
@@ -649,13 +654,10 @@ export const DATA_OPTIONS: OptionGroup[] = [
     items: [
       "Sold Count by Month",
       "Sold Count by Month (Compare)",
-      "Sold Count by % of Asking Price",
       "Sold Count by Type YTD",
       "Sold Count by Area YTD",
-      "Sold Count by Type every AUG",
-      "Sold Count by Area every AUG",
-      "% Sold Over Asking",
-      "Property Type Sales Distribution",
+      `Sold Count by Type every ${lastMonth}`,
+      `Sold Count by Area every ${lastMonth}`,
     ],
   },
   {
@@ -663,7 +665,6 @@ export const DATA_OPTIONS: OptionGroup[] = [
     items: [
       "Inventory Count by Month",
       "Months of Inventory",
-      "Sales-to-Active Listings Gauge",
     ],
   },
   {
@@ -677,21 +678,21 @@ export const DATA_OPTIONS: OptionGroup[] = [
     category: "Days on Market Charts",
     items: [
       "Median DOM by Month",
-      "Median DOM every AUG",
+      `Median DOM every ${lastMonth}`,
     ],
   },
   {
     category: "Discount Charts",
     items: [
       "Median Discount from Orig. Price",
-      "Median Discount every AUG",
+      `Median Discount every ${lastMonth}`,
     ],
   },
   {
     category: "Dollar Volume Charts",
     items: [
       "Sales Dollar Volume by Month",
-      "Sales Dollar Volume every AUG",
+      `Sales Dollar Volume every ${lastMonth}`,
     ],
   },
   {
@@ -710,6 +711,8 @@ export const DATA_OPTIONS: OptionGroup[] = [
     ],
   },
 ];
+
+export const DATA_OPTIONS: OptionGroup[] = getDataOptions();
 
 export const PROPERTY_OPTIONS = [
   "All Residential",

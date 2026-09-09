@@ -298,10 +298,15 @@ export interface MonthlySalesChartParams {
   property_sub_type?: string;
   year?: number | string;
   data?: string;
+  compare_region?: string;
+  compare_neighbourhood?: string;
+  month?: number | string;
 }
 
 export interface MonthlySalesChartResponse {
-  data: MonthlySalesChartItem[];
+  success?: boolean;
+  data: any;
+  chartData?: any[];
 }
 
 export async function getMonthlySalesChart(
